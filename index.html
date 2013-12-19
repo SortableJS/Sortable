@@ -21,21 +21,6 @@
 			background-image: linear-gradient(to bottom, #F4E2C9 20%, #F4D7C9 100%);
 		}
 
-		body {
-		}
-
-		body::before {
-			top: -8px;
-			left: -8px;
-			width: 100%;
-			bottom: 0;
-			opacity: .5;
-			content: '';
-			display: block;
-			position: absolute;
-			xbackground: url('mock.png');
-		}
-
 		html, body {
 			margin: 0;
 			padding: 0;
@@ -69,6 +54,13 @@
 			min-width: 1100px;
 			max-width: 1300px;
 			position: relative;
+		}
+
+		@media (min-width: 750px) and (max-width: 970px){
+			.container {
+				width: 100%;
+				min-width: 750px;
+			}
 		}
 
 
