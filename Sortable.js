@@ -250,7 +250,7 @@
 				;
 
 
-				if( el.children.length === 0 || target == null ){
+				if( el.children.length === 0 ){
 					el.appendChild(dragEl);
 				}
 				else if( target && (target !== dragEl) ){
