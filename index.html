@@ -104,12 +104,13 @@
 			text-align: center;
 			margin-top: 15px;
 			margin-left: 5px;
+			margin-right: 30px;
 			background-color: #fff;
 			display: inline-block;
-			margin-right: 30px;
 			vertical-align: top;
 		}
 			.tile__name {
+				cursor: move;
 				padding-bottom: 10px;
 				border-bottom: 1px solid #FF7373;
 			}
@@ -117,6 +118,10 @@
 			.tile__list {
 				margin-top: 10px;
 			}
+				.tile__list:last-child {
+					margin-right: 0;;
+				}
+
 				.tile__list img {
 					cursor: move;
 					margin: 10px;
@@ -237,7 +242,7 @@
 				</div>
 			</div>
 
-			<div class="tile" style="margin-right: 0">
+			<div class="tile">
 				<div class="tile__name">Group C</div>
 				<div class="tile__list">
 					<img src="//fbcdn-profile-a.akamaihd.net/hprofile-ak-frc3/c12.12.156.156/s100x100/303317_320632284665935_15996162_a.jpg"/><!--
@@ -315,7 +320,7 @@ sort.destroy();
 
 			new Sortable(multi, {
 				draggable: '.tile',
-				handle: '.tile__title'
+				handle: '.tile__name'
 			});
 
 
