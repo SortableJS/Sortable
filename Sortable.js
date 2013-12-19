@@ -137,6 +137,8 @@
 
 
 				_on(this.el, 'dragstart', this._onDragStart);
+				_on(this.el, 'dragend', this._onDrop);
+
 				_on(document, 'dragover', _globalDragOver);
 
 
@@ -285,6 +287,7 @@
 			_off(document, 'drop', this._onDrop);
 			_off(document, 'dragover', _globalDragOver);
 
+			_off(this.el, 'dragend', this._onDrop);
 			_off(this.el, 'dragstart', this._onDragStart);
 
 			_off(document, 'touchmove', this._onTouchMove);
@@ -293,6 +296,10 @@
 
 			if( evt ){
 				evt.preventDefault();
+
+				if( ghostEl ){
+					ghostEl.parentNode.removeChild(ghostEl);
+				}
 
 				if( dragEl ){
 					var opts = { bubbles: true, cancelable: true, detail: dragEl };
@@ -310,10 +317,6 @@
 						// Update event
 						dragEl.dispatchEvent(new Event('update', opts));
 					}
-				}
-
-				if( ghostEl ){
-					ghostEl.parentNode.removeChild(ghostEl);
 				}
 
 
@@ -411,7 +414,7 @@
 				el.classList[state ? 'add' : 'remove'](name);
 			}
 			else {
-				var className = (' '+el.className+' ').replace(' '+name+' ', '').replace(/\s+/g, ' ');
+				var className = (' '+el.className+' ').replace(/\s+/g, ' ').replace(' '+name+' ', '');
 				el.className = className + (state ? ' '+name : '')
 			}
 		}
