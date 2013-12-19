@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+
+	<title>Sortable (No jQuery)</title>
+
+	<meta name="keywords" content="sortable, reorder, list, javascript, html5, drag and drop, dnd, rubaxa"/>
+	<meta name="description" content="Sortable - is a minimalist JavaScript library for modern browsers and touch devices (No jQuery)."/>
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+
+	<style>
+		@import url(http://fonts.googleapis.com/css?family=Roboto:300);
+
+
+		html, body {
+			color: #333;
+			min-height: 100%;
+			font-size: 18px;
+			font-family: "Arial", Helvetica, Garuda, sans-serif;
+		}
+
+		h1, h2, h3 {
+			font-family: 'Roboto', sans-serif;
+			font-weight: 300;
+		}
+
+		h1 a {
+			color: #333;
+			text-decoration: underline;
+		}
+
+		h1 + div {
+			opacity: 0.95;
+			margin-bottom: 50px;
+		}
+
+
+		ul {
+			margin: 0;
+			padding: 0;
+			list-style: none;
+		}
+
+
+		.sortable-ghost {
+			opacity: .2;
+		}
+
+
+		img { vertical-align: middle; }
+
+		#contacts {
+			border-radius: 3px;
+			box-shadow: 0 0 1px rgba(0,0,0,0.4);
+		}
+			#contacts li:first-child {
+				border-radius: 3px 3px 0 0;
+			}
+			#contacts li:last-child {
+				border-radius: 0 0 3px 3px;
+			}
+
+			#contacts li {
+				cursor: move;
+				padding: 10px;
+				background: rgba(255,255,255,.8);
+				border-bottom: 1px solid #ccc;
+			}
+
+			#contacts img {
+				margin-right: 5px;
+			}
+
+
+		#tags {
+			min-height: 100px;
+			box-shadow: 0 1px 1px rgba(0,0,0,0.3);
+			border-radius: 5px;
+			background-color: #fff;
+		}
+
+			#tags li {
+				cursor: move;
+				float: left;
+				margin: 10px;
+				padding: 6px 15px;
+				background: #B7D967;
+				border-radius: 3px;
+				box-shadow: 0 2px 0 #6d823d;
+				text-shadow: 0 1px 1px rgba(255,255,255,0.6);
+			}
+
+			#tags img {
+				display: none;
+			}
+
+
+		.tile {
+			width: 280px;
+			float: left;
+			padding: 2px;
+			box-shadow: 0 0 0 3px rgba(0,0,0,0.2);
+			background-color: #fff;
+			margin-right: 30px;
+			margin-bottom: 30px;
+		}
+			.tile__title {
+				cursor: pointer;
+				padding: 7px 0 10px;
+				text-align: center;
+				background-color: #E0E4F2;
+			}
+
+			.tile__list {
+				padding: 15px;
+			}
+				.tile__list img {
+					margin: 10px;
+					cursor: move;
+				}
+
+		.download {
+			color: #333;
+			margin-left: 10px;
+			text-decoration: none;
+		}
+		.download:hover {
+			text-decoration: none;
+		}
+	</style>
+</head>
+<body>
+
+	<a href="https://github.com/RubaXa/Sortable"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+
+	<div class="container">
+		<h1>
+			<a href="https://github.com/RubaXa/Sortable/">Sortable</a>
+			<a class="download" title="Download" href="https://github.com/RubaXa/Sortable/archive/master.zip">&darr;</a>
+		</h1>
+		<div>&mdash; is a minimalist JavaScript library for modern browsers and touch devices (No jQuery).</div>
+
+
+		<div class="row">
+			<div class="col-md-6 col-sm-6">
+				<h3>List A</h3>
+
+				<ul id="contacts">
+					<li>
+						<img src="//fbcdn-profile-a.akamaihd.net/hprofile-ak-prn1/s32x32/41627_1611219478_5779_q.jpg"/>
+						<span>Catherine</span>
+					</li>
+					<li>
+						<img src="//fbcdn-profile-a.akamaihd.net/hprofile-ak-ash3/s32x32/370175_619386670_43244658_q.jpg"/>
+						<span>Polina</span>
+					</li>
+					<li>
+						<img src="//fbcdn-profile-a.akamaihd.net/hprofile-ak-ash3/s32x32/173108_654249662_698694459_q.jpg"/>
+						<span>Duke</span>
+					</li>
+					<li>
+						<img src="//fbcdn-profile-a.akamaihd.net/hprofile-ak-prn2/s32x32/372024_100000330534964_827799899_q.jpg"/>
+						<span>Adnrey</span>
+					</li>
+					<li>
+						<img src="//fbcdn-profile-a.akamaihd.net/hprofile-ak-ash1/s32x32/260934_100000460170867_1741520317_q.jpg"/>
+						<span>Maxim</span>
+					</li>
+				</ul>
+			</div>
+
+			<div class="col-md-6 col-sm-6">
+				<h3>List B</h3>
+
+				<ul id="tags">
+					<li>
+						<img src="//fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/s32x32/274297_100002088418977_1552918698_q.jpg"/>
+						<span>Ilya</span>
+					</li>
+					<li>
+						<img src="//fbcdn-profile-a.akamaihd.net/hprofile-ak-ash1/s32x32/370664_100003149104712_1050952731_q.jpg"/>
+						<span>Anna</span>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<p>&nbsp;</p>
+	<p>&nbsp;</p>
+
+	<div class="container" id="multi">
+		<h2>Multi</h2>
+
+		<div class="tile">
+			<div class="tile__title">Group A</div>
+			<div class="tile__list">
+				<img src="//fbcdn-profile-a.akamaihd.net/hprofile-ak-prn1/c9.9.113.113/s100x100/59436_1391411357920_1388516_s.jpg"/><!--
+				--><img src="//fbcdn-profile-a.akamaihd.net/hprofile-ak-ash3/c13.8.104.104/s100x100/941190_10151608397684663_1532692251_s.jpg"/><!--
+				--><img src="//fbcdn-profile-a.akamaihd.net/hprofile-ak-frc3/c0.0.103.103/s100x100/382696_10150378364701671_1792621129_a.jpg"/><!--
+				--><img src="//fbcdn-profile-a.akamaihd.net/hprofile-ak-ash3/c44.10.116.116/s100x100/552948_430685950285752_1435082176_a.jpg"/>
+			</div>
+		</div>
+
+		<div class="tile">
+			<div class="tile__title">Group B</div>
+			<div class="tile__list">
+				<img src="//fbcdn-profile-a.akamaihd.net/hprofile-ak-ash3/c8.8.105.105/s100x100/558916_4874661741992_448469446_s.jpg"/><!--
+				--><img src="//fbcdn-profile-a.akamaihd.net/hprofile-ak-prn1/c29.9.117.117/s100x100/68347_385372304875713_1358705380_a.jpg"/><!--
+				--><img src="https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/c9.9.113.113/s100x100/424349_465457316812937_2106915541_s.jpg"/>
+			</div>
+		</div>
+
+		<div class="tile">
+			<div class="tile__title">Group C</div>
+			<div class="tile__list">
+				<img src="//fbcdn-profile-a.akamaihd.net/hprofile-ak-frc3/c12.12.156.156/s100x100/303317_320632284665935_15996162_a.jpg"/><!--
+				--><img src="//fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/c9.9.109.109/s100x100/484507_4207733265938_1693034881_s.jpg"/>
+			</div>
+		</div>
+
+		<div class="row"></div>
+		<p>&nbsp;</p>
+	</div>
+
+	<div class="container">
+		<h2>Code example</h2>
+		<pre class="javascript"><code>// Simple list
+var list = document.getElementById("my-ui-list");
+new Sortable(list); // That's all.
+
+
+// Grouping
+var foo = document.getElementById("foo");
+new Sortable(foo, { group: "omega" });
+
+var bar = document.getElementById("bar");
+new Sortable(bar, { group: "omega" });
+
+
+// Or
+var container = document.getElementById("multi");
+var sort = new Sortable(container, {
+  handle: ".tile__title", // Restricts sort start click/touch to the specified element
+  dragabble: ".tile", // Specifies which items inside the element should be sortable
+  onUpdate: function (evt/**Event*/){
+     var item = evt.detail; // the current dragged HTMLElement
+  }
+});
+
+// ..
+sort.destroy();
+</code></pre>
+
+		<p>&nbsp;</p>
+		<p>&nbsp;</p>
+		<p>&nbsp;</p>
+	</div>
+
+
+	<script src="Sortable.js"></script>
+
+	<script>
+		(function (){
+			var console = window.console;
+
+			if( !console.log ){
+				console.log = function (){
+					alert([].join.apply(arguments, ' '));
+				};
+			}
+
+
+			new Sortable(contacts, {
+				group: "contacts",
+				onAdd: function (evt){ console.log('onAdd.contacts:', evt.detail); },
+				onUpdate: function (evt){ console.log('onUpdate.contacts:', evt.detail); },
+				onRemove: function (evt){ console.log('onRemove.contacts:', evt.detail); }
+			});
+
+			new Sortable(tags, {
+				group: "contacts",
+				onAdd: function (evt){ console.log('onAdd.tags:', evt.detail); },
+				onUpdate: function (evt){ console.log('onUpdate.tags:', evt.detail); },
+				onRemove: function (evt){ console.log('onRemove.tags:', evt.detail); }
+			});
+
+
+			new Sortable(multi, {
+				draggable: '.tile',
+				handle: '.tile__title'
+			});
+
+
+			[].forEach.call(multi.getElementsByClassName('tile__list'), function (el){
+				new Sortable(el, { group: 'photo' });
+			});
+		})();
+
+
+		function setNoiseBackground(el, color, width, height, opacity){
+			var canvas = document.createElement("canvas");
+			var context = canvas.getContext("2d");
+
+			canvas.width = width;
+			canvas.height = height;
+
+			for( var i = 0; i < width; i++ ){
+				for( var j = 0; j < height; j++ ){
+					var val = Math.floor(Math.random() * 255);
+					context.fillStyle = "rgba(" + val + "," + val + "," + val + "," + opacity + ")";
+					context.fillRect(i, j, 1, 1);
+				}
+			}
+
+			el.style.background = "url(" + canvas.toDataURL("image/png") + "), "+color;
+		}
+
+		// Usage
+		setNoiseBackground(document.getElementsByTagName('body')[0], "linear-gradient(to bottom, #E1E2D1 0%, #5AABA5 100%)", 50, 50, 0.03);
+	</script>
+
+
+
+
+	<!-- highlight.js -->
+	<style>
+		/* Tomorrow Theme */
+		/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+		/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+		/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+		.tomorrow-comment, pre .comment, pre .title {
+		  color: #8e908c;
+		}
+
+		.tomorrow-red, pre .variable, pre .attribute, pre .tag, pre .regexp, pre .ruby .constant, pre .xml .tag .title, pre .xml .pi, pre .xml .doctype, pre .html .doctype, pre .css .id, pre .css .class, pre .css .pseudo {
+		  color: #c82829;
+		}
+
+		.tomorrow-orange, pre .number, pre .preprocessor, pre .built_in, pre .literal, pre .params, pre .constant {
+		  color: #f5871f;
+		}
+
+		.tomorrow-yellow, pre .class, pre .ruby .class .title, pre .css .rules .attribute {
+		  color: #eab700;
+		}
+
+		.tomorrow-green, pre .string, pre .value, pre .inheritance, pre .header, pre .ruby .symbol, pre .xml .cdata {
+		  color: #718c00;
+		}
+
+		.tomorrow-aqua, pre .css .hexcolor {
+		  color: #3e999f;
+		}
+
+		.tomorrow-blue, pre .function, pre .python .decorator, pre .python .title, pre .ruby .function .title, pre .ruby .title .keyword, pre .perl .sub, pre .javascript .title, pre .coffeescript .title {
+		  color: #4271ae;
+		}
+
+		.tomorrow-purple, pre .keyword, pre .javascript .function {
+		  color: #8959a8;
+		}
+
+		pre {
+			border: 0;
+			box-shadow: 0 1px 2px rgba(0,0,0,0.4);
+			background-color: #fff;
+		}
+
+		pre code {
+		  display: block;
+		  color: #4d4d4c;
+		  font-family: Menlo, Monaco, Consolas, monospace;
+		  line-height: 1.5;
+		  padding: 10px;
+		}
+	</style>
+
+	<script src="//yandex.st/highlightjs/7.5/highlight.min.js"></script>
+	<script>hljs.initHighlightingOnLoad();</script>
+</body>
+</html>
