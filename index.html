@@ -397,7 +397,7 @@ sort.destroy();
 					var dx = el.w/el.fX * (rx / -halfWidth);
 					var dy = el.h/el.fY * (ry / halfHeight);
 					el.style['transform'] =
-					el.style['-webkit-transform'] = 'translate3d('+dx+'px,'+dy+'px,0)';
+					el.style['-webkit-transform'] = 'translate('+dx+'px,'+dy+'px)';
 				});
 
 				requestAnimationFrame(_loop);
