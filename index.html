@@ -395,7 +395,8 @@ sort.destroy();
 				items.forEach(function (el){
 					var dx = el.w/el.force * (rx / -halfWidth);
 					var dy = el.h/el.force * (ry / halfHeight);
-					el.style['transform'] = 'translate3d('+dx+'px,'+dy+'px,0)';
+					el.style['transform'] =
+					el.style['-webkit-transform'] = 'translate3d('+dx+'px,'+dy+'px,0)';
 				});
 
 				requestAnimationFrame(_loop);
