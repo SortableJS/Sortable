@@ -118,7 +118,8 @@
 				margin-top: 10px;
 			}
 				.tile__list:last-child {
-					margin-right: 0;;
+					margin-right: 0;
+					min-height: 80px;
 				}
 
 				.tile__list img {
@@ -402,7 +403,7 @@ sort.destroy();
 						el.style['-webkit-transform'] = 'translate('+dx+'px,'+dy+'px)';
 					});
 				}
-				
+
 				requestAnimationFrame(_loop);
 			})();
 		})();
