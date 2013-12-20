@@ -185,7 +185,7 @@
 	<div class="container">
 		<div style="padding: 80px 150px 0; height: 160px;">
 			<a class="logo" href="https://github.com/RubaXa/Sortable"><img src="st/logo.png"/></a>
-			<h1 class="layer" data-force="40" data-force-y="2.5">The JavaScript library for modern browsers and touch devices. No&nbsp;jQuery.</h1>
+			<h1 data-force="40" data-force-y="2.5">The JavaScript library for modern browsers and touch devices. No&nbsp;jQuery.</h1>
 		</div>
 	</div>
 
@@ -378,6 +378,7 @@ sort.destroy();
 				y = evt.clientY;
 			}, false);
 
+
 			document.addEventListener('mousemove', function (evt){
 				x = evt.clientX;
 				y = evt.clientY;
@@ -385,22 +386,24 @@ sort.destroy();
 
 
 			(function _loop(){
-				var winWidth = window.innerWidth;
-				var winHeight = window.innerHeight;
-				var halfWidth = winWidth / 2;
-				var halfHeight = winHeight / 2;
+				if( x && y ){
+					var winWidth = window.innerWidth;
+					var winHeight = window.innerHeight;
+					var halfWidth = winWidth / 2;
+					var halfHeight = winHeight / 2;
 
-				var rx = x - winWidth/2;
-				var ry = winHeight/2 - y;
+					var rx = x - winWidth/2;
+					var ry = winHeight/2 - y;
 
-				items.forEach(function (el){
-					var dx = el.w/el.fX * (rx / -halfWidth);
-					var dy = el.h/el.fY * (ry / halfHeight);
-					el.style['transform'] =
-					el.style['-webkit-transform'] = 'translate('+dx+'px,'+dy+'px)';
-				});
+					items.forEach(function (el){
+						var dx = el.w/el.fX * (rx / -halfWidth);
+						var dy = el.h/el.fY * (ry / halfHeight);
+						el.style['transform'] =
+						el.style['-webkit-transform'] = 'translate('+dx+'px,'+dy+'px)';
+					});
 
-				requestAnimationFrame(_loop);
+					requestAnimationFrame(_loop);
+				}
 			})();
 		})();
 	</script>
