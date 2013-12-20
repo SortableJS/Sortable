@@ -185,7 +185,7 @@
 	<div class="container">
 		<div style="padding: 80px 150px 0; height: 160px;">
 			<a class="layer logo" href="https://github.com/RubaXa/Sortable"><img src="st/logo.png"/></a>
-			<h1>The JavaScript library for modern browsers and touch devices. No&nbsp;jQuery.</h1>
+			<h1 class="layer" data-force="40" data-force-y="2.5">The JavaScript library for modern browsers and touch devices. No&nbsp;jQuery.</h1>
 		</div>
 	</div>
 
@@ -367,7 +367,8 @@ sort.destroy();
 				el.y = rect.top;
 				el.w = rect.right - rect.left;
 				el.h = rect.bottom - rect.top;
-				el.force = el.getAttribute('data-force') || 10;
+				el.fX = el.getAttribute('data-force-x') || el.getAttribute('data-force') || 10;
+				el.fY = el.getAttribute('data-force-y') || el.getAttribute('data-force') || 10;
 				return el;
 			});
 
@@ -393,8 +394,8 @@ sort.destroy();
 				var ry = winHeight/2 - y;
 
 				items.forEach(function (el){
-					var dx = el.w/el.force * (rx / -halfWidth);
-					var dy = el.h/el.force * (ry / halfHeight);
+					var dx = el.w/el.fX * (rx / -halfWidth);
+					var dy = el.h/el.fY * (ry / halfHeight);
 					el.style['transform'] =
 					el.style['-webkit-transform'] = 'translate3d('+dx+'px,'+dy+'px,0)';
 				});
