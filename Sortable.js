@@ -241,7 +241,7 @@
 				_on(document, 'touchmove', this._onTouchMove);
 				_on(document, 'touchend', this._onDrop);
 
-				this._loopId = setInterval(this._emulateDragOver, 100);
+				this._loopId = setInterval(this._emulateDragOver, 200);
 			}
 			else {
 				dataTransfer.effectAllowed = 'move';
@@ -277,18 +277,21 @@
 						, width = rect.right - rect.left
 						, height = rect.bottom - rect.top
 						, floating = /left|right|inline/.test(lastCSS.cssFloat + lastCSS.display)
-						, after = (
-							   (!floating && (evt.clientY - rect.top)/height > .5)
-							|| (floating &&
-								   (target.nextElementSibling !== dragEl)
-								|| (target.previousElementSibling === dragEl)
-							)
-						)
+						, skew = (floating ? (evt.clientX - rect.left)/width : (evt.clientY - rect.top)/height) > .5
+						, isLong = (target.offsetHeight > dragEl.offsetHeight)
+						, isWide = (target.offsetWidth > dragEl.offsetWidth)
 						, nextSibling = target.nextSibling
+						, after
 					;
 
 					_silent = true;
 					setTimeout(_unsilent, 30);
+
+					if( floating ){
+						after = (target.previousElementSibling === dragEl) && !isWide || (skew > .5) && isWide
+					} else {
+						after = (target.nextElementSibling !== dragEl) && !isLong || (skew > .5) && isLong;
+					}
 
 					if( after && !nextSibling ){
 						el.appendChild(dragEl);
