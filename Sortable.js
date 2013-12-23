@@ -36,6 +36,7 @@
 		, win = window
 		, document = win.document
 		, parseInt = win.parseInt
+		, _silent = false
 
 		, Event = (function (){
 			function CustomEvent(event, params){
@@ -254,7 +255,7 @@
 
 
 		_onDragOver: function (evt){
-			if( activeGroup === this.options.group && (evt.rootEl === void 0 || evt.rootEl === this.el) ){
+			if( !_silent && activeGroup === this.options.group && (evt.rootEl === void 0 || evt.rootEl === this.el) ){
 				var
 					  el = this.el
 					, target = _closest(evt.target, this.options.draggable, el)
@@ -276,10 +277,18 @@
 						, width = rect.right - rect.left
 						, height = rect.bottom - rect.top
 						, floating = /left|right|inline/.test(lastCSS.cssFloat + lastCSS.display)
-						, after = !floating && (evt.clientY - rect.top)/height > .5 || floating && (evt.clientX - rect.left)/width > .5
+						, after = (
+							   (!floating && (evt.clientY - rect.top)/height > .5)
+							|| (floating &&
+								   (target.nextElementSibling !== dragEl)
+								|| (target.previousElementSibling === dragEl)
+							)
+						)
 						, nextSibling = target.nextSibling
 					;
 
+					_silent = true;
+					setTimeout(_unsilent, 30);
 
 					if( after && !nextSibling ){
 						el.appendChild(dragEl);
@@ -468,6 +477,11 @@
 	}
 
 
+	function _unsilent(){
+		_silent = false;
+	}
+
+
 
 	// Export utils
 	Sortable.utils = {
@@ -481,7 +495,7 @@
 	};
 
 
-	Sortable.version = '0.1.0';
+	Sortable.version = '0.1.1';
 
 	// Export
 	return	Sortable;
