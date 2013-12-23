@@ -36,7 +36,18 @@
 		, win = window
 		, document = win.document
 		, parseInt = win.parseInt
-		, Event = win.CustomEvent
+
+		, Event = (function (){
+			function CustomEvent(event, params){
+				var evt = document.createEvent('CustomEvent');
+				evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
+				return	evt;
+			}
+
+			CustomEvent.prototype = win.CustomEvent.prototype;
+
+			return CustomEvent;
+		})()
 
 		, noop = function (){}
 		, slice = [].slice
