@@ -391,7 +391,7 @@
 
 
 	function _closest(el, selector, ctx){
-		if( el && ctx ){
+		if( el ){
 			ctx = ctx || document;
 			selector = selector.split('.');
 
@@ -498,7 +498,7 @@
 	};
 
 
-	Sortable.version = '0.1.1';
+	Sortable.version = '0.1.2';
 
 	// Export
 	return	Sortable;
