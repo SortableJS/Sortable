@@ -262,42 +262,43 @@
 					, target = _closest(evt.target, this.options.draggable, el)
 				;
 
-
-				if( el.children.length === 0 ){
-					el.appendChild(dragEl);
-				}
-				else if( target && (target !== dragEl) ){
-					if( lastEl !== target ){
-						lastEl = target;
-						lastCSS = _css(target)
-					}
-
-
-					var
-						  rect = target.getBoundingClientRect()
-						, width = rect.right - rect.left
-						, height = rect.bottom - rect.top
-						, floating = /left|right|inline/.test(lastCSS.cssFloat + lastCSS.display)
-						, skew = (floating ? (evt.clientX - rect.left)/width : (evt.clientY - rect.top)/height) > .5
-						, isLong = (target.offsetHeight > dragEl.offsetHeight)
-						, isWide = (target.offsetWidth > dragEl.offsetWidth)
-						, nextSibling = target.nextSibling
-						, after
-					;
-
-					_silent = true;
-					setTimeout(_unsilent, 30);
-
-					if( floating ){
-						after = (target.previousElementSibling === dragEl) && !isWide || (skew > .5) && isWide
-					} else {
-						after = (target.nextElementSibling !== dragEl) && !isLong || (skew > .5) && isLong;
-					}
-
-					if( after && !nextSibling ){
+				if( target[expando] === void 0 ){
+					if( el.children.length === 0 ){
 						el.appendChild(dragEl);
-					} else {
-						target.parentNode.insertBefore(dragEl, after ? nextSibling : target);
+					}
+					else if( target && (target !== dragEl) ){
+						if( lastEl !== target ){
+							lastEl = target;
+							lastCSS = _css(target)
+						}
+
+
+						var
+							  rect = target.getBoundingClientRect()
+							, width = rect.right - rect.left
+							, height = rect.bottom - rect.top
+							, floating = /left|right|inline/.test(lastCSS.cssFloat + lastCSS.display)
+							, skew = (floating ? (evt.clientX - rect.left)/width : (evt.clientY - rect.top)/height) > .5
+							, isLong = (target.offsetHeight > dragEl.offsetHeight)
+							, isWide = (target.offsetWidth > dragEl.offsetWidth)
+							, nextSibling = target.nextSibling
+							, after
+						;
+
+						_silent = true;
+						setTimeout(_unsilent, 30);
+
+						if( floating ){
+							after = (target.previousElementSibling === dragEl) && !isWide || (skew > .5) && isWide
+						} else {
+							after = (target.nextElementSibling !== dragEl) && !isLong || (skew > .5) && isLong;
+						}
+
+						if( after && !nextSibling ){
+							el.appendChild(dragEl);
+						} else {
+							target.parentNode.insertBefore(dragEl, after ? nextSibling : target);
+						}
 					}
 				}
 			}
