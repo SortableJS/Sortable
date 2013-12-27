@@ -119,15 +119,16 @@
 				  touch = evt.touches && evt.touches[0]
 				, target = (touch || evt).target
 				, options =  this.options
+				, el = this.el
 			;
 
 			if( options.handle ){
-				target = _closest(target, options.handle, this.el);
+				target = _closest(target, options.handle, el);
 			}
 
-			target = _closest(target, options.draggable, this.el);
+			target = _closest(target, options.draggable, el);
 
-			if( target && !dragEl ){
+			if( target && !dragEl && (target !== el) ){
 				tapEvt = evt;
 				target.draggable = true;
 
@@ -397,13 +398,13 @@
 
 			var
 				  tag = selector.shift().toUpperCase()
-				, re = new RegExp('\\b('+selector.join('|')+')\\b', 'g')
+				, re = new RegExp('\\s('+selector.join('|')+')\\s', 'g')
 			;
 
 			do {
 				if(
 					   (tag === '' || el.nodeName == tag)
-					&& (!selector.length || ((el.className+'').match(re) || []).length == selector.length)
+					&& (!selector.length || ((' '+el.className+' ').match(re) || []).length == selector.length)
 				){
 					return	el;
 				}
@@ -498,7 +499,7 @@
 	};
 
 
-	Sortable.version = '0.1.2';
+	Sortable.version = '0.1.3';
 
 	// Export
 	return	Sortable;
