@@ -32,15 +32,15 @@ new Sortable(elem, {
 	ghostClass: "sortable-ghost",
 
 	onAdd: function (evt){
-		var itemEl = ui.detail;
+		var itemEl = evt.item;
 	},
 
 	onUpdate: function (evt){
-		var itemEl = ui.detail; // the current dragged HTMLElement
+		var itemEl = evt.item; // the current dragged HTMLElement
 	},
 
 	onRemove: function (evt){
-		var itemEl = ui.detail;
+		var itemEl = evt.item;
 	}
 });
 ```

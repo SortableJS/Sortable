@@ -38,17 +38,12 @@
 		, parseInt = win.parseInt
 		, _silent = false
 
-		, Event = (function (){
-			function CustomEvent(event, params){
-				var evt = document.createEvent('CustomEvent');
-				evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
-				return	evt;
-			}
-
-			CustomEvent.prototype = win.CustomEvent.prototype;
-
-			return CustomEvent;
-		})()
+		, _createEvent = function (event/**String*/, item/**HTMLElement*/){
+			var evt = document.createEvent('Event');
+			evt.initEvent(event, true, true);
+			evt.item = item;
+			return evt;
+		}
 
 		, noop = function (){}
 		, slice = [].slice
@@ -131,6 +126,7 @@
 			if( target && !dragEl && (target !== el) ){
 				tapEvt = evt;
 				target.draggable = true;
+
 
 				// Disable "draggable"
 				_find(target, 'a', _disableDraggable);
@@ -262,11 +258,11 @@
 					, target = _closest(evt.target, this.options.draggable, el)
 				;
 
-				if( target[expando] === void 0 ){
+				if( target && target[expando] === void 0 ){
 					if( el.children.length === 0 ){
 						el.appendChild(dragEl);
 					}
-					else if( target && (target !== dragEl) ){
+					else if( target !== dragEl ){
 						if( lastEl !== target ){
 							lastEl = target;
 							lastCSS = _css(target)
@@ -327,20 +323,18 @@
 				}
 
 				if( dragEl ){
-					var opts = { bubbles: true, cancelable: true, detail: dragEl };
-
 					_toggleClass(dragEl, this.options.ghostClass, false);
 
 					if( !rootEl.contains(dragEl) ){
 						// Remove event
-						rootEl.dispatchEvent(new Event('remove', opts));
+						rootEl.dispatchEvent(_createEvent('remove', dragEl));
 
 						// Add event
-						dragEl.dispatchEvent(new Event('add', opts));
+						dragEl.dispatchEvent(_createEvent('add', dragEl));
 					}
 					else if( dragEl.nextSibling !== nextEl ){
 						// Update event
-						dragEl.dispatchEvent(new Event('update', opts));
+						dragEl.dispatchEvent(_createEvent('update', dragEl));
 					}
 				}
 
@@ -500,7 +494,7 @@
 	};
 
 
-	Sortable.version = '0.1.3';
+	Sortable.version = '0.1.4';
 
 	// Export
 	return	Sortable;

@@ -311,16 +311,16 @@ sort.destroy();
 
 			new Sortable(foo, {
 				group: "words",
-				onAdd: function (evt){ console.log('onAdd.foo:', evt.detail); },
-				onUpdate: function (evt){ console.log('onUpdate.foo:', evt.detail); },
-				onRemove: function (evt){ console.log('onRemove.foo:', evt.detail); }
+				onAdd: function (evt){ console.log('onAdd.foo:', evt.item); },
+				onUpdate: function (evt){ console.log('onUpdate.foo:', evt.item); },
+				onRemove: function (evt){ console.log('onRemove.foo:', evt.item); }
 			});
 
 			new Sortable(bar, {
 				group: "words",
-				onAdd: function (evt){ console.log('onAdd.bar:', evt.detail); },
-				onUpdate: function (evt){ console.log('onUpdate.bar:', evt.detail); },
-				onRemove: function (evt){ console.log('onRemove.bar:', evt.detail); }
+				onAdd: function (evt){ console.log('onAdd.bar:', evt.item); },
+				onUpdate: function (evt){ console.log('onUpdate.bar:', evt.item); },
+				onRemove: function (evt){ console.log('onRemove.bar:', evt.item); }
 			});
 
 
@@ -366,7 +366,7 @@ sort.destroy();
 	<!-- Parallax -->
 	<script>
 		(function (){
-			var x, y;
+			var x, y, reqAnimFrame = window.requestAnimationFrame || function (fn){ setTimeout(fn, 1000/60); };
 
 			var items = [].slice.call(document.querySelectorAll('.layer')).map(function (el){
 				var rect = el.getBoundingClientRect();
@@ -410,7 +410,7 @@ sort.destroy();
 					});
 				}
 
-				requestAnimationFrame(_loop);
+				reqAnimFrame(_loop);
 			})();
 		})();
 	</script>
