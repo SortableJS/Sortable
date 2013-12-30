@@ -220,19 +220,28 @@
 			activeGroup = this.options.group;
 
 			if( isTouch ){
-				var rect = target.getBoundingClientRect(), css = _css(target);
+				var
+					  rect = target.getBoundingClientRect()
+					, css = _css(target)
+					, ghostRect
+				;
 
 				ghostEl = target.cloneNode(true);
 
 				_css(ghostEl, 'top', rect.top - parseInt(css.marginTop, 10));
 				_css(ghostEl, 'left', rect.left - parseInt(css.marginLeft, 10));
-				_css(ghostEl, 'width', rect.right - rect.left);
-				_css(ghostEl, 'height', rect.bottom - rect.top);
+				_css(ghostEl, 'width', rect.width);
+				_css(ghostEl, 'height', rect.height);
 				_css(ghostEl, 'opacity', '0.8');
 				_css(ghostEl, 'position', 'fixed');
 				_css(ghostEl, 'zIndex', '100000');
 
-				target.parentNode.insertBefore(ghostEl, target);
+				rootEl.appendChild(ghostEl);
+
+				// Fixing dimensions.
+				ghostRect = ghostEl.getBoundingClientRect();
+				_css(ghostEl, 'width', rect.width*2 - ghostRect.width);
+				_css(ghostEl, 'height', rect.height*2 - ghostRect.height);
 
 				// Bind touch events
 				_on(document, 'touchmove', this._onTouchMove);
