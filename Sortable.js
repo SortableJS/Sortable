@@ -267,11 +267,11 @@
 					, target = _closest(evt.target, this.options.draggable, el)
 				;
 
-				if( target && target[expando] === void 0 ){
+				if( !target || target[expando] === void 0 ){
 					if( el.children.length === 0 ){
 						el.appendChild(dragEl);
 					}
-					else if( target !== dragEl ){
+					else if( target && target !== dragEl ){
 						if( lastEl !== target ){
 							lastEl = target;
 							lastCSS = _css(target)
