@@ -325,6 +325,7 @@
 
 			if( evt ){
 				evt.preventDefault();
+				evt.stopPropagation();
 
 				if( ghostEl ){
 					ghostEl.parentNode.removeChild(ghostEl);
