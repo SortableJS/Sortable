@@ -123,7 +123,7 @@
 
 			target = _closest(target, options.draggable, el);
 
-			if( target && !dragEl && (target !== el) ){
+			if( target && !dragEl && (target.parentNode === el) ){
 				tapEvt = evt;
 				target.draggable = true;
 
@@ -175,7 +175,6 @@
 
 				do {
 					if( parent[expando] === group ){
-
 						while( i-- ){
 							touchDragOverListeners[i]({
 								clientX: touchEvt.clientX,
@@ -186,6 +185,8 @@
 						}
 						break;
 					}
+
+					target = parent; // store last element
 				}
 				while( parent = parent.parentNode );
 
@@ -247,7 +248,7 @@
 				_on(document, 'touchmove', this._onTouchMove);
 				_on(document, 'touchend', this._onDrop);
 
-				this._loopId = setInterval(this._emulateDragOver, 200);
+				this._loopId = setInterval(this._emulateDragOver, 150);
 			}
 			else {
 				dataTransfer.effectAllowed = 'move';
@@ -261,49 +262,47 @@
 
 
 		_onDragOver: function (evt){
-			if( !_silent && activeGroup === this.options.group && (evt.rootEl === void 0 || evt.rootEl === this.el) ){
+			if( !_silent && (activeGroup === this.options.group) && (evt.rootEl === void 0 || evt.rootEl === this.el) ){
 				var
 					  el = this.el
 					, target = _closest(evt.target, this.options.draggable, el)
 				;
 
-				if( !target || target[expando] === void 0 ){
-					if( el.children.length === 0 ){
-						el.appendChild(dragEl);
+				if( el.children.length === 0 || el.children[0] === ghostEl ){
+					el.appendChild(dragEl);
+				}
+				else if( target && target !== dragEl && (target.parentNode[expando] !== void 0) ){
+					if( lastEl !== target ){
+						lastEl = target;
+						lastCSS = _css(target)
 					}
-					else if( target && target !== dragEl ){
-						if( lastEl !== target ){
-							lastEl = target;
-							lastCSS = _css(target)
-						}
 
 
-						var
-							  rect = target.getBoundingClientRect()
-							, width = rect.right - rect.left
-							, height = rect.bottom - rect.top
-							, floating = /left|right|inline/.test(lastCSS.cssFloat + lastCSS.display)
-							, skew = (floating ? (evt.clientX - rect.left)/width : (evt.clientY - rect.top)/height) > .5
-							, isLong = (target.offsetHeight > dragEl.offsetHeight)
-							, isWide = (target.offsetWidth > dragEl.offsetWidth)
-							, nextSibling = target.nextSibling
-							, after
-						;
+					var
+						  rect = target.getBoundingClientRect()
+						, width = rect.right - rect.left
+						, height = rect.bottom - rect.top
+						, floating = /left|right|inline/.test(lastCSS.cssFloat + lastCSS.display)
+						, skew = (floating ? (evt.clientX - rect.left)/width : (evt.clientY - rect.top)/height) > .5
+						, isWide = (target.offsetWidth > dragEl.offsetWidth)
+						, isLong = (target.offsetHeight > dragEl.offsetHeight)
+						, nextSibling = target.nextSibling
+						, after
+					;
 
-						_silent = true;
-						setTimeout(_unsilent, 30);
+					_silent = true;
+					setTimeout(_unsilent, 30);
 
-						if( floating ){
-							after = (target.previousElementSibling === dragEl) && !isWide || (skew > .5) && isWide
-						} else {
-							after = (target.nextElementSibling !== dragEl) && !isLong || (skew > .5) && isLong;
-						}
+					if( floating ){
+						after = (target.previousElementSibling === dragEl) && !isWide || (skew > .5) && isWide
+					} else {
+						after = (target.nextElementSibling !== dragEl) && !isLong || (skew > .5) && isLong;
+					}
 
-						if( after && !nextSibling ){
-							el.appendChild(dragEl);
-						} else {
-							target.parentNode.insertBefore(dragEl, after ? nextSibling : target);
-						}
+					if( after && !nextSibling ){
+						el.appendChild(dragEl);
+					} else {
+						target.parentNode.insertBefore(dragEl, after ? nextSibling : target);
 					}
 				}
 			}
@@ -346,7 +345,6 @@
 						dragEl.dispatchEvent(_createEvent('update', dragEl));
 					}
 				}
-
 
 				// Set NULL
 				rootEl =
@@ -503,7 +501,7 @@
 	};
 
 
-	Sortable.version = '0.1.4';
+	Sortable.version = '0.1.5';
 
 	// Export
 	return	Sortable;
