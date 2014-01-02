@@ -7,7 +7,7 @@
 		"grunt-version": "*",
 		"grunt-contrib-uglify": "*"
 	},
-	"description": "Sortable - is a minimalist JavaScript library for modern browsers and touch devices (No jQuery).",
+	"description": "Sortable is a minimalist JavaScript library for modern browsers and touch devices. No jQuery.",
 	"main": "Sortable.js",
 	"scripts": {
 		"test": "grunt"

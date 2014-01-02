@@ -5,7 +5,7 @@ module.exports = function (grunt){
 		pkg: grunt.file.readJSON('package.json'),
 
 		version: {
-			src: '<%= pkg.exportName %>.js'
+			src: ['<%= pkg.exportName %>.js', 'bower.json']
 		},
 
 		uglify: {
