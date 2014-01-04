@@ -44,3 +44,20 @@ new Sortable(elem, {
 	}
 });
 ```
+
+
+---
+
+
+
+### Sortable.utils
+* on(el`:HTMLElement`, event`:String`, fn`:Function`) — attach an event handler function
+* off(el`:HTMLElement`, event`:String`, fn`:Function`) — remove an event handler
+* css(el`:HTMLElement`)`:Object` — get the values of all the CSS properties
+* css(el`:HTMLElement`, prop`:String`)`:Mixed` — get the value of style properties
+* css(el`:HTMLElement`, prop`:String`, value`:String`) — set one CSS properties
+* css(el`:HTMLElement`, props`:Object`) — set more CSS properties
+* find(ctx`:HTMLElement`, tagName`:String`[, iterator`:Function`])`:Array` — get elements by tag name
+* bind(ctx`:Mixed`, fn`:Function`)`:Function` — Takes a function and returns a new one that will always have a particular context
+* closest(el`:HTMLElement`, selector`:String`[, ctx`:HTMLElement`])`:HTMLElement|Null` — for each element in the set, get the first element that matches the selector by testing the element itself and traversing up through its ancestors in the DOM tree
+* toggleClass(el`:HTMLElement`, name`:String`, state`:Boolean`) — add or remove one classes from each element
