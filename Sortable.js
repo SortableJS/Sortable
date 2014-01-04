@@ -74,10 +74,11 @@
 		options.onRemove = _bind(this, options.onRemove || noop);
 
 
+		// Export group name
 		el[expando] = options.group;
 
 
-		// Bind all prevate methods
+		// Bind all private methods
 		for( var fn in this ){
 			if( fn.charAt(0) === '_' ){
 				this[fn] = _bind(this, this[fn]);
@@ -109,7 +110,7 @@
 		},
 
 
-		_onTapStart: function (evt/**TouchEvent*/){
+		_onTapStart: function (evt/**Event|TouchEvent*/){
 			var
 				  touch = evt.touches && evt.touches[0]
 				, target = (touch || evt).target
@@ -195,7 +196,7 @@
 		},
 
 
-		_onTouchMove: function (evt){
+		_onTouchMove: function (evt/**TouchEvent*/){
 			if( tapEvt ){
 				var
 					  touch = evt.touches[0]
@@ -209,7 +210,7 @@
 		},
 
 
-		_onDragStart: function (evt/**Event*/, isTouch){
+		_onDragStart: function (evt/**Event*/, isTouch/**Boolean*/){
 			var
 				  target = evt.target
 				, dataTransfer = evt.dataTransfer
@@ -261,7 +262,7 @@
 		},
 
 
-		_onDragOver: function (evt){
+		_onDragOver: function (evt/**Event*/){
 			if( !_silent && (activeGroup === this.options.group) && (evt.rootEl === void 0 || evt.rootEl === this.el) ){
 				var
 					  el = this.el
