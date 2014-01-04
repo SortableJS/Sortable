@@ -273,7 +273,7 @@ new Sortable(bar, { group: "omega" });
 var container = document.getElementById("multi");
 var sort = new Sortable(container, {
   handle: ".tile__title", // Restricts sort start click/touch to the specified element
-  dragabble: ".tile", // Specifies which items inside the element should be sortable
+  draggable: ".tile", // Specifies which items inside the element should be sortable
   onUpdate: function (evt/**Event*/){
      var item = evt.item; // the current dragged HTMLElement
   }
