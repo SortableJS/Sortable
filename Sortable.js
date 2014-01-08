@@ -9,7 +9,7 @@
 	"use strict";
 
 	if( typeof define === "function" && define.amd ){
-		define("Sortable", [], factory);
+		define(factory);
 	}
 	else {
 		window["Sortable"] = factory();
