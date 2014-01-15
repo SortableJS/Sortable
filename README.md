@@ -61,3 +61,7 @@ new Sortable(elem, {
 * bind(ctx`:Mixed`, fn`:Function`)`:Function` — Takes a function and returns a new one that will always have a particular context
 * closest(el`:HTMLElement`, selector`:String`[, ctx`:HTMLElement`])`:HTMLElement|Null` — for each element in the set, get the first element that matches the selector by testing the element itself and traversing up through its ancestors in the DOM tree
 * toggleClass(el`:HTMLElement`, name`:String`, state`:Boolean`) — add or remove one classes from each element
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/RubaXa/sortable/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
