@@ -2,7 +2,7 @@
 
 
 ## Features
-* Support touch devices
+* Support touch devices and [modern](http://caniuse.com/#search=drag) browsers
 * Built using native HTML5 drag and drop API
 * Simple API
 * Lightweight, 2KB gzipped
