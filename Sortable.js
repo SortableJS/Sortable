@@ -378,6 +378,11 @@
 			_off(el, 'dragover', this._onDragOver);
 			_off(el, 'dragenter', this._onDragOver);
 
+			//remove draggable attributes
+			Array.prototype.forEach.call(el.querySelectorAll('[draggable]'), function(el) {
+				el.removeAttribute('draggable');
+			});
+
 			touchDragOverListeners.splice(touchDragOverListeners.indexOf(this._onDragOver), 1);
 
 			this._onDrop();
