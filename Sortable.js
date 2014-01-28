@@ -508,7 +508,7 @@
 	};
 
 
-	Sortable.version = '0.1.5';
+	Sortable.version = '0.1.6';
 
 	// Export
 	return	Sortable;
