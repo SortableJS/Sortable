@@ -1,22 +1,26 @@
 {
-	"name": "sortable",
-	"exportName": "Sortable",
-	"version": "0.1.5",
-	"devDependencies": {
-		"grunt": "*",
-		"grunt-version": "*",
-		"grunt-contrib-uglify": "*"
-	},
-	"description": "Sortable is a minimalist JavaScript library for modern browsers and touch devices. No jQuery.",
-	"main": "Sortable.js",
-	"scripts": {
-		"test": "grunt"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git://github.com/rubaxa/Sortable.git"
-	},
-	"keywords": ["sortable", "reorder", "drag"],
-	"author": "Konstantin Lebedev <ibnRubaXa@gmail.com>",
-	"license": "MIT"
+  "name": "sortable",
+  "exportName": "Sortable",
+  "version": "0.1.6",
+  "devDependencies": {
+    "grunt": "*",
+    "grunt-version": "*",
+    "grunt-contrib-uglify": "*"
+  },
+  "description": "Sortable is a minimalist JavaScript library for modern browsers and touch devices. No jQuery.",
+  "main": "Sortable.js",
+  "scripts": {
+    "test": "grunt"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/rubaxa/Sortable.git"
+  },
+  "keywords": [
+    "sortable",
+    "reorder",
+    "drag"
+  ],
+  "author": "Konstantin Lebedev <ibnRubaXa@gmail.com>",
+  "license": "MIT"
 }
