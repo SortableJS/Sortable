@@ -93,6 +93,7 @@
 
 		_on(el, 'mousedown', this._onTapStart);
 		_on(el, 'touchstart', this._onTapStart);
+		_on(el, 'selectstart', this._onTapStart);
 
 		_on(el, 'dragover', this._onDragOver);
 		_on(el, 'dragenter', this._onDragOver);
@@ -124,6 +125,13 @@
 
 			target = _closest(target, options.draggable, el);
 
+			//IE 9 Support
+			if( target && evt.type == 'selectstart' ){
+				if( target.tagName != 'A' && target.tagName != 'IMG'){
+					target.dragDrop();
+				}
+			}
+			
 			if( target && !dragEl && (target.parentNode === el) ){
 				tapEvt = evt;
 				target.draggable = true;
