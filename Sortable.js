@@ -134,7 +134,7 @@
 					target.dragDrop();
 				}
 			}
-			
+
 			if( target && !dragEl && (target.parentNode === el) ){
 				tapEvt = evt;
 				target.draggable = true;
@@ -330,6 +330,7 @@
 
 			_off(this.el, 'dragend', this._onDrop);
 			_off(this.el, 'dragstart', this._onDragStart);
+			_off(this.el, 'selectstart', this._onTapStart);
 
 			_off(document, 'touchmove', this._onTouchMove);
 			_off(document, 'touchend', this._onDrop);
@@ -385,6 +386,7 @@
 
 			_off(el, 'mousedown', this._onTapStart);
 			_off(el, 'touchstart', this._onTapStart);
+			_off(el, 'selectstart', this._onTapStart);
 
 			_off(el, 'dragover', this._onDragOver);
 			_off(el, 'dragenter', this._onDragOver);
