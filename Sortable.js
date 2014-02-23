@@ -69,7 +69,7 @@
 		// Defaults
 		options.group = options.group || Math.random();
 		options.handle = options.handle || null;
-		options.draggable = options.draggable || el.children[0] && el.children[0].nodeName || 'li';
+		options.draggable = options.draggable || el.children[0] && el.children[0].nodeName || (/[uo]l/i.test(el.nodeName) ? 'li' : '*');
 		options.ghostClass = options.ghostClass || 'sortable-ghost';
 
 		options.onAdd = _bind(this, options.onAdd || noop);
@@ -128,7 +128,7 @@
 
 			target = _closest(target, options.draggable, el);
 
-			//IE 9 Support
+			// IE 9 Support
 			if( target && evt.type == 'selectstart' ){
 				if( target.tagName != 'A' && target.tagName != 'IMG'){
 					target.dragDrop();
@@ -159,7 +159,6 @@
 
 				_on(this.el, 'dragstart', this._onDragStart);
 				_on(this.el, 'dragend', this._onDrop);
-
 				_on(document, 'dragover', _globalDragOver);
 
 
@@ -412,7 +411,10 @@
 
 
 	function _closest(el, selector, ctx){
-		if( el ){
+		if( selector === '*' ){
+			return el;
+		}
+		else if( el ){
 			ctx = ctx || document;
 			selector = selector.split('.');
 
@@ -519,7 +521,7 @@
 	};
 
 
-	Sortable.version = '0.1.6';
+	Sortable.version = '0.1.7';
 
 	// Export
 	return	Sortable;
