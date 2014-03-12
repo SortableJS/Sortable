@@ -28,6 +28,7 @@
 
 		, lastEl
 		, lastCSS
+		, lastRect
 
 		, activeGroup
 
@@ -279,18 +280,19 @@
 					, target = _closest(evt.target, this.options.draggable, el)
 				;
 
-				if( el.children.length === 0 || el.children[0] === ghostEl ){
+				if( el.children.length === 0 || el.children[0] === ghostEl || (el === evt.target) && _ghostInBottom(el, evt) ){
 					el.appendChild(dragEl);
 				}
 				else if( target && target !== dragEl && (target.parentNode[expando] !== void 0) ){
 					if( lastEl !== target ){
 						lastEl = target;
-						lastCSS = _css(target)
+						lastCSS = _css(target);
+						lastRect = target.getBoundingClientRect();
 					}
 
 
 					var
-						  rect = target.getBoundingClientRect()
+						  rect = lastRect
 						, width = rect.right - rect.left
 						, height = rect.bottom - rect.top
 						, floating = /left|right|inline/.test(lastCSS.cssFloat + lastCSS.display)
@@ -505,6 +507,12 @@
 
 	function _unsilent(){
 		_silent = false;
+	}
+
+
+	function _ghostInBottom(el, evt){
+		var last = el.lastElementChild.getBoundingClientRect();
+		return evt.clientY - (last.top + last.height) > 5; // min delta
 	}
 
 
