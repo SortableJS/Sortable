@@ -28,6 +28,7 @@
 
 		, lastEl
 		, lastCSS
+		, lastRect
 
 		, activeGroup
 
@@ -69,7 +70,7 @@
 		// Defaults
 		options.group = options.group || Math.random();
 		options.handle = options.handle || null;
-		options.draggable = options.draggable || el.children[0] && el.children[0].nodeName || 'li';
+		options.draggable = options.draggable || el.children[0] && el.children[0].nodeName || (/[uo]l/i.test(el.nodeName) ? 'li' : '*');
 		options.ghostClass = options.ghostClass || 'sortable-ghost';
 
 		options.onAdd = _bind(this, options.onAdd || noop);
@@ -128,7 +129,7 @@
 
 			target = _closest(target, options.draggable, el);
 
-			//IE 9 Support
+			// IE 9 Support
 			if( target && evt.type == 'selectstart' ){
 				if( target.tagName != 'A' && target.tagName != 'IMG'){
 					target.dragDrop();
@@ -159,7 +160,6 @@
 
 				_on(this.el, 'dragstart', this._onDragStart);
 				_on(this.el, 'dragend', this._onDrop);
-
 				_on(document, 'dragover', _globalDragOver);
 
 
@@ -280,18 +280,19 @@
 					, target = _closest(evt.target, this.options.draggable, el)
 				;
 
-				if( el.children.length === 0 || el.children[0] === ghostEl ){
+				if( el.children.length === 0 || el.children[0] === ghostEl || (el === evt.target) && _ghostInBottom(el, evt) ){
 					el.appendChild(dragEl);
 				}
 				else if( target && target !== dragEl && (target.parentNode[expando] !== void 0) ){
 					if( lastEl !== target ){
 						lastEl = target;
-						lastCSS = _css(target)
+						lastCSS = _css(target);
+						lastRect = target.getBoundingClientRect();
 					}
 
 
 					var
-						  rect = target.getBoundingClientRect()
+						  rect = lastRect
 						, width = rect.right - rect.left
 						, height = rect.bottom - rect.top
 						, floating = /left|right|inline/.test(lastCSS.cssFloat + lastCSS.display)
@@ -414,7 +415,10 @@
 
 
 	function _closest(el, selector, ctx){
-		if( el ){
+		if( selector === '*' ){
+			return el;
+		}
+		else if( el ){
 			ctx = ctx || document;
 			selector = selector.split('.');
 
@@ -508,6 +512,12 @@
 	}
 
 
+	function _ghostInBottom(el, evt){
+		var last = el.lastElementChild.getBoundingClientRect();
+		return evt.clientY - (last.top + last.height) > 5; // min delta
+	}
+
+
 
 	// Export utils
 	Sortable.utils = {
@@ -521,7 +531,7 @@
 	};
 
 
-	Sortable.version = '0.1.6';
+	Sortable.version = '0.1.8';
 
 	// Export
 	return	Sortable;
