@@ -40,6 +40,8 @@
 		, win = window
 		, document = win.document
 		, parseInt = win.parseInt
+		, supportIEdnd = !!document.createElement('div').dragDrop
+
 		, _silent = false
 
 		, _createEvent = function (event/**String*/, item/**HTMLElement*/){
@@ -97,7 +99,7 @@
 
 		_on(el, 'mousedown', this._onTapStart);
 		_on(el, 'touchstart', this._onTapStart);
-		_on(el, 'selectstart', this._onTapStart);
+		supportIEdnd && _on(el, 'selectstart', this._onTapStart);
 
 		_on(el, 'dragover', this._onDragOver);
 		_on(el, 'dragenter', this._onDragOver);
@@ -531,7 +533,7 @@
 	};
 
 
-	Sortable.version = '0.1.8';
+	Sortable.version = '0.1.9';
 
 	// Export
 	return	Sortable;
