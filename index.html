@@ -363,62 +363,6 @@ sort.destroy();
 
 
 
-	<!-- Parallax -->
-	<script>
-		(function (){
-			var x, y, reqAnimFrame = window.requestAnimationFrame || function (fn){ setTimeout(fn, 1000/60); };
-
-			var items = [].slice.call(document.querySelectorAll('.layer')).map(function (el){
-				var rect = el.getBoundingClientRect();
-				el.x = rect.left;
-				el.y = rect.top;
-				el.w = rect.right - rect.left;
-				el.h = rect.bottom - rect.top;
-				el.fX = el.getAttribute('data-force-x') || el.getAttribute('data-force') || 10;
-				el.fY = el.getAttribute('data-force-y') || el.getAttribute('data-force') || 10;
-				return el;
-			});
-
-
-			document.addEventListener('dragover', function (evt){
-				x = evt.clientX;
-				y = evt.clientY;
-			}, false);
-
-
-			document.addEventListener('mousemove', function (evt){
-				x = evt.clientX;
-				y = evt.clientY;
-			}, false);
-
-
-			(function _loop(){
-				if( x && y ){
-					var winWidth = window.innerWidth;
-					var winHeight = window.innerHeight;
-					var halfWidth = winWidth / 2;
-					var halfHeight = winHeight / 2;
-
-					var rx = x - winWidth/2;
-					var ry = winHeight/2 - y;
-
-					items.forEach(function (el){
-						var dx = el.w/el.fX * (rx / -halfWidth);
-						var dy = el.h/el.fY * (ry / halfHeight);
-						el.style['transform'] =
-						el.style['-webkit-transform'] = 'translate('+dx+'px,'+dy+'px)';
-					});
-				}
-
-				reqAnimFrame(_loop);
-			})();
-		})();
-	</script>
-
-
-
-
-
 	<!-- highlight.js -->
 	<style>
 		/* Tomorrow Theme */
