@@ -187,22 +187,24 @@
 					, i = touchDragOverListeners.length
 				;
 
-				do {
-					if( parent[expando] === group ){
-						while( i-- ){
-							touchDragOverListeners[i]({
-								clientX: touchEvt.clientX,
-								clientY: touchEvt.clientY,
-								target: target,
-								rootEl: parent
-							});
+				if( parent ){
+					do {
+						if( parent[expando] === group ){
+							while( i-- ){
+								touchDragOverListeners[i]({
+									clientX: touchEvt.clientX,
+									clientY: touchEvt.clientY,
+									target: target,
+									rootEl: parent
+								});
+							}
+							break;
 						}
-						break;
-					}
 
-					target = parent; // store last element
+						target = parent; // store last element
+					}
+					while( parent = parent.parentNode );
 				}
-				while( parent = parent.parentNode );
 
 				_css(ghostEl, 'display', '');
 			}
