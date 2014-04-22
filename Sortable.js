@@ -350,6 +350,7 @@
 				}
 
 				if( dragEl ){
+					_disableDraggable(dragEl);
 					_toggleClass(dragEl, this.options.ghostClass, false);
 
 					if( !rootEl.contains(dragEl) ){
