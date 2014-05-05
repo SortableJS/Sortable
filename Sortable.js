@@ -35,6 +35,8 @@
 		, tapEvt
 		, touchEvt
 
+		, cancelled
+
 		, expando = 'Sortable' + (new Date).getTime()
 
 		, win = window
@@ -278,6 +280,10 @@
 
 
 		_onDragOver: function (evt/**Event*/){
+			if( cancelled ) {
+				return;
+			}
+
 			if( !_silent && (activeGroup === this.options.group) && (evt.rootEl === void 0 || evt.rootEl === this.el) ){
 				var
 					  el = this.el
@@ -378,8 +384,15 @@
 				lastEl =
 				lastCSS =
 
+				cancelled =
+
 				activeGroup = null;
 			}
+		},
+
+
+		cancel: function (){
+			cancelled = true;
 		},
 
 
@@ -407,6 +420,8 @@
 			this._onDrop();
 
 			this.el = null;
+
+			cancelled = null;
 		}
 	};
 
