@@ -35,7 +35,7 @@
 		, tapEvt
 		, touchEvt
 
-		, cancelEl
+		, cancelledEl
 		, cancelled
 
 		, expando = 'Sortable' + (new Date).getTime()
@@ -239,7 +239,7 @@
 			dragEl = target;
 			nextEl = target.nextSibling;
 			activeGroup = this.options.group;
-			cancelEl = this.options.cancelEl
+			cancelledEl = this.options.cancelledEl
 
 			if( isTouch ){
 				var
@@ -284,8 +284,8 @@
 
 		_onDragOver: function (evt/**Event*/){
 			if( cancelled ) {
-				if( cancelEl ) {
-					_toggleClass(cancelEl, this.options.cancelledClass, true)
+				if( cancelledEl ) {
+					_toggleClass(cancelledEl, this.options.cancelledClass, true)
 				}
 				return;
 			}
@@ -361,8 +361,8 @@
 					ghostEl.parentNode.removeChild(ghostEl);
 				}
 
-				if( cancelEl ) {
-					_toggleClass(cancelEl, this.options.cancelledClass, false)
+				if( cancelledEl ) {
+					_toggleClass(cancelledEl, this.options.cancelledClass, false)
 				}
 
 				if( dragEl ){
@@ -399,7 +399,7 @@
 				lastEl =
 				lastCSS =
 
-				cancelEl =
+				cancelledEl =
 				cancelled =
 
 				activeGroup = null;
