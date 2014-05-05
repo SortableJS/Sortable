@@ -30,6 +30,8 @@ new Sortable(elem, {
 	handle: ".my-handle", // Restricts sort start click/touch to the specified element
 	draggable: ".item",   // Specifies which items inside the element should be sortable
 	ghostClass: "sortable-ghost",
+	cancelledEl: cancelledElement, // Optional: specifies in which DOM element 'cancel' class name is toggled
+	cancelledClass: "sortable-cancelled",
 
 	onAdd: function (evt){
 		var itemEl = evt.item;

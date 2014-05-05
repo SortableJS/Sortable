@@ -35,6 +35,9 @@
 		, tapEvt
 		, touchEvt
 
+		, cancelledEl
+		, cancelled
+
 		, expando = 'Sortable' + (new Date).getTime()
 
 		, win = window
@@ -74,6 +77,7 @@
 		options.handle = options.handle || null;
 		options.draggable = options.draggable || el.children[0] && el.children[0].nodeName || (/[uo]l/i.test(el.nodeName) ? 'li' : '*');
 		options.ghostClass = options.ghostClass || 'sortable-ghost';
+		options.cancelledClass = options.cancelClass || 'sortable-cancelled';
 
 		options.onAdd = _bind(this, options.onAdd || noop);
 		options.onUpdate = _bind(this, options.onUpdate || noop);
@@ -235,6 +239,7 @@
 			dragEl = target;
 			nextEl = target.nextSibling;
 			activeGroup = this.options.group;
+			cancelledEl = this.options.cancelledEl
 
 			if( isTouch ){
 				var
@@ -278,6 +283,13 @@
 
 
 		_onDragOver: function (evt/**Event*/){
+			if( cancelled ) {
+				if( cancelledEl ) {
+					_toggleClass(cancelledEl, this.options.cancelledClass, true)
+				}
+				return;
+			}
+
 			if( !_silent && (activeGroup === this.options.group) && (evt.rootEl === void 0 || evt.rootEl === this.el) ){
 				var
 					  el = this.el
@@ -349,21 +361,30 @@
 					ghostEl.parentNode.removeChild(ghostEl);
 				}
 
+				if( cancelledEl ) {
+					_toggleClass(cancelledEl, this.options.cancelledClass, false)
+				}
+
 				if( dragEl ){
 					_disableDraggable(dragEl);
 					_toggleClass(dragEl, this.options.ghostClass, false);
 
-					if( !rootEl.contains(dragEl) ){
-						// Remove event
-						rootEl.dispatchEvent(_createEvent('remove', dragEl));
+					cancelled = cancelled || false;
 
-						// Add event
-						dragEl.dispatchEvent(_createEvent('add', dragEl));
+					if( !cancelled ) {
+						if( !rootEl.contains(dragEl) ){
+							// Remove event
+							rootEl.dispatchEvent(_createEvent('remove', dragEl));
+
+							// Add event
+							dragEl.dispatchEvent(_createEvent('add', dragEl));
+						}
+						else if( dragEl.nextSibling !== nextEl ){
+							// Update event
+							dragEl.dispatchEvent(_createEvent('update', dragEl));
+						}
 					}
-					else if( dragEl.nextSibling !== nextEl ){
-						// Update event
-						dragEl.dispatchEvent(_createEvent('update', dragEl));
-					}
+
 				}
 
 				// Set NULL
@@ -378,8 +399,17 @@
 				lastEl =
 				lastCSS =
 
+				cancelledEl =
+				cancelled =
+
 				activeGroup = null;
 			}
+		},
+
+
+		cancel: function (){
+			cancelled = true;
+			_toggleClass(rootEl, this.options.cancelledClass, true);
 		},
 
 
@@ -407,6 +437,8 @@
 			this._onDrop();
 
 			this.el = null;
+
+			cancelled = null;
 		}
 	};
 
