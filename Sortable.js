@@ -359,17 +359,22 @@
 					_disableDraggable(dragEl);
 					_toggleClass(dragEl, this.options.ghostClass, false);
 
-					if( !rootEl.contains(dragEl) ){
-						// Remove event
-						rootEl.dispatchEvent(_createEvent('remove', dragEl));
+					cancelled = cancelled || false;
 
-						// Add event
-						dragEl.dispatchEvent(_createEvent('add', dragEl));
+					if( !cancelled ) {
+						if( !rootEl.contains(dragEl) ){
+							// Remove event
+							rootEl.dispatchEvent(_createEvent('remove', dragEl));
+
+							// Add event
+							dragEl.dispatchEvent(_createEvent('add', dragEl));
+						}
+						else if( dragEl.nextSibling !== nextEl ){
+							// Update event
+							dragEl.dispatchEvent(_createEvent('update', dragEl));
+						}
 					}
-					else if( dragEl.nextSibling !== nextEl ){
-						// Update event
-						dragEl.dispatchEvent(_createEvent('update', dragEl));
-					}
+
 				}
 
 				// Set NULL
