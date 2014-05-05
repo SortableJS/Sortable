@@ -35,6 +35,7 @@
 		, tapEvt
 		, touchEvt
 
+		, cancelEl
 		, cancelled
 
 		, expando = 'Sortable' + (new Date).getTime()
@@ -76,6 +77,7 @@
 		options.handle = options.handle || null;
 		options.draggable = options.draggable || el.children[0] && el.children[0].nodeName || (/[uo]l/i.test(el.nodeName) ? 'li' : '*');
 		options.ghostClass = options.ghostClass || 'sortable-ghost';
+		options.cancelledClass = options.cancelClass || 'sortable-cancelled';
 
 		options.onAdd = _bind(this, options.onAdd || noop);
 		options.onUpdate = _bind(this, options.onUpdate || noop);
@@ -237,6 +239,7 @@
 			dragEl = target;
 			nextEl = target.nextSibling;
 			activeGroup = this.options.group;
+			cancelEl = this.options.cancelEl
 
 			if( isTouch ){
 				var
@@ -281,6 +284,9 @@
 
 		_onDragOver: function (evt/**Event*/){
 			if( cancelled ) {
+				if( cancelEl ) {
+					_toggleClass(cancelEl, this.options.cancelledClass, true)
+				}
 				return;
 			}
 
@@ -355,6 +361,10 @@
 					ghostEl.parentNode.removeChild(ghostEl);
 				}
 
+				if( cancelEl ) {
+					_toggleClass(cancelEl, this.options.cancelledClass, false)
+				}
+
 				if( dragEl ){
 					_disableDraggable(dragEl);
 					_toggleClass(dragEl, this.options.ghostClass, false);
@@ -389,6 +399,7 @@
 				lastEl =
 				lastCSS =
 
+				cancelEl =
 				cancelled =
 
 				activeGroup = null;
@@ -398,6 +409,7 @@
 
 		cancel: function (){
 			cancelled = true;
+			_toggleClass(rootEl, this.options.cancelledClass, true);
 		},
 
 
