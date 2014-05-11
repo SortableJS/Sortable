@@ -430,12 +430,19 @@
 			var
 				  tag = selector.shift().toUpperCase()
 				, re = new RegExp('\\s('+selector.join('|')+')\\s', 'g')
+				, className
 			;
 
 			do {
+				className = el.className;
+
+				if (className && className.baseVal) { // SVG
+					className = className.baseVal;
+				}
+
 				if(
 					   (tag === '' || el.nodeName == tag)
-					&& (!selector.length || ((' '+el.className+' ').match(re) || []).length == selector.length)
+					&& (!selector.length || ((' '+className+' ').match(re) || []).length == selector.length)
 				){
 					return	el;
 				}
