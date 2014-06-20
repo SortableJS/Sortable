@@ -144,9 +144,13 @@
 
 
 				// Disable "draggable"
-				_find(target, 'a', _disableDraggable);
-				_find(target, 'img', _disableDraggable);
+                if (typeof options.ignore === 'undefined') {
+                    options.ignore = 'a, img';
+                }
 
+                Array.prototype.forEach.call(options.ignore.split(','), function (criteria) {
+                    _find(target, criteria.trim(), _disableDraggable);
+                });
 
 				if( touch ){
 					// Touch device support
@@ -409,7 +413,6 @@
 			this.el = null;
 		}
 	};
-
 
 	function _bind(ctx, fn){
 		var args = slice.call(arguments, 2);
