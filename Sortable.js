@@ -74,6 +74,7 @@
 		options.handle = options.handle || null;
 		options.draggable = options.draggable || el.children[0] && el.children[0].nodeName || (/[uo]l/i.test(el.nodeName) ? 'li' : '*');
 		options.ghostClass = options.ghostClass || 'sortable-ghost';
+		options.ignore = options.ignore || 'a, img';
 
 		options.onAdd = _bind(this, options.onAdd || noop);
 		options.onUpdate = _bind(this, options.onUpdate || noop);
@@ -142,12 +143,7 @@
 				tapEvt = evt;
 				target.draggable = true;
 
-
 				// Disable "draggable"
-                if (typeof options.ignore === 'undefined') {
-                    options.ignore = 'a, img';
-                }
-
                 Array.prototype.forEach.call(options.ignore.split(','), function (criteria) {
                     _find(target, criteria.trim(), _disableDraggable);
                 });
