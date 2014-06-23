@@ -144,9 +144,9 @@
 				target.draggable = true;
 
 				// Disable "draggable"
-                Array.prototype.forEach.call(options.ignore.split(','), function (criteria) {
-                    _find(target, criteria.trim(), _disableDraggable);
-                });
+				Array.prototype.forEach.call(options.ignore.split(','), function (criteria) {
+					_find(target, criteria.trim(), _disableDraggable);
+				});
 
 				if( touch ){
 					// Touch device support
