@@ -74,6 +74,7 @@
 		options.handle = options.handle || null;
 		options.draggable = options.draggable || el.children[0] && el.children[0].nodeName || (/[uo]l/i.test(el.nodeName) ? 'li' : '*');
 		options.ghostClass = options.ghostClass || 'sortable-ghost';
+		options.ignore = options.ignore || 'a, img';
 
 		options.onAdd = _bind(this, options.onAdd || noop);
 		options.onUpdate = _bind(this, options.onUpdate || noop);
@@ -142,11 +143,10 @@
 				tapEvt = evt;
 				target.draggable = true;
 
-
 				// Disable "draggable"
-				_find(target, 'a', _disableDraggable);
-				_find(target, 'img', _disableDraggable);
-
+				Array.prototype.forEach.call(options.ignore.split(','), function (criteria) {
+					_find(target, criteria.trim(), _disableDraggable);
+				});
 
 				if( touch ){
 					// Touch device support
@@ -409,7 +409,6 @@
 			this.el = null;
 		}
 	};
-
 
 	function _bind(ctx, fn){
 		var args = slice.call(arguments, 2);
