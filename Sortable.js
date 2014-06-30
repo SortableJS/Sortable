@@ -55,6 +55,10 @@
 		, slice = [].slice
 
 		, touchDragOverListeners = []
+
+    ,pointerdown
+    ,pointerup
+    ,pointermove
 	;
 
 
@@ -92,6 +96,16 @@
 			}
 		}
 
+    // Detect IE10/IE11+
+    if (window.onpointerdown !== undefined) {
+      pointerdown = 'pointerdown';
+      pointerup = 'pointerup';
+      pointermove = 'pointermove';
+    } else {
+      pointerdown = 'MSPointerDown';
+      pointerup = 'MSPointerUp';
+      pointermove = 'MSPointerMove';
+    }
 
 		// Bind events
 		_on(el, 'add', options.onAdd);
@@ -104,7 +118,7 @@
 
 		_on(el, 'dragover', this._onDragOver);
 		_on(el, 'dragenter', this._onDragOver);
-    _on(el, 'pointerdown', this._onTapStart);
+    _on(el, pointerdown, this._onTapStart);
 
     _css(el, 'touch-action', 'none');
     _css(el, '-ms-touch-action', 'none');
@@ -122,7 +136,7 @@
 		},
 
 
-		_onTapStart: function (evt/**Event|TouchEvent*/){
+		_onTapStart: function (evt/**Event|TouchEvent|PointerEvent*/){
 			var
 				  touch = evt.touches && evt.touches[0]
 				, target = (touch || evt).target
@@ -163,7 +177,7 @@
 					evt.preventDefault();
 				}
         
-        if (evt.type == 'pointerdown') {
+        if (evt.type == 'pointerdown' || evt.type == 'MSPointerDown') {
           this._onDragStart(tapEvt, true);
           evt.preventDefault();
         }
@@ -222,7 +236,7 @@
 		_onTouchMove: function (evt/**TouchEvent|PointerEvent*/){
 			if( tapEvt ){
 				var
-					  touch = (evt.type == 'pointermove') ? evt : evt.touches[0]
+					  touch = (evt.type == 'pointermove' || evt.type == 'MSPointerMove') ? evt : evt.touches[0]
 					, dx = touch.clientX - tapEvt.clientX
 					, dy = touch.clientY - tapEvt.clientY
 				;
@@ -232,6 +246,7 @@
 				_css(ghostEl, 'mozTransform', 'translate3d('+dx+'px,'+dy+'px,0)');
 				_css(ghostEl, 'msTransform', 'translate3d('+dx+'px,'+dy+'px,0)');
 				_css(ghostEl, 'transform', 'translate3d('+dx+'px,'+dy+'px,0)');
+        evt.preventDefault();
 			}
 		},
 
@@ -274,8 +289,8 @@
 				// Bind touch events
 				_on(document, 'touchmove', this._onTouchMove);
 				_on(document, 'touchend', this._onDrop);
-        _on(document, 'pointermove', this._onTouchMove);
-        _on(document, 'pointerup', this._onDrop);
+        _on(document, pointermove, this._onTouchMove);
+        _on(document, pointerup, this._onDrop);
 
 				this._loopId = setInterval(this._emulateDragOver, 150);
 			}
@@ -352,8 +367,8 @@
 
 			_off(document, 'touchmove', this._onTouchMove);
 			_off(document, 'touchend', this._onDrop);
-      _off(document, 'pointermove', this._onTouchMove);
-      _off(document, 'pointerup', this._onDrop);
+      _off(document, pointermove, this._onTouchMove);
+      _off(document, pointerup, this._onDrop);
 
 
 			if( evt ){
@@ -408,7 +423,7 @@
 			_off(el, 'mousedown', this._onTapStart);
 			_off(el, 'touchstart', this._onTapStart);
 			_off(el, 'selectstart', this._onTapStart);
-      _off(el, 'pointerdown', this._onTapStart);
+      _off(el, pointerdown, this._onTapStart);
 
 			_off(el, 'dragover', this._onDragOver);
 			_off(el, 'dragenter', this._onDragOver);
