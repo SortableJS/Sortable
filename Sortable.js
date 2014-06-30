@@ -56,10 +56,10 @@
 
 		, touchDragOverListeners = []
 
-		,pointerdown
-		,pointerup
-		,pointermove
-		,pointercancel
+		, pointerdown
+		, pointerup
+		, pointermove
+		, pointercancel
 	;
 
 
