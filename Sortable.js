@@ -21,7 +21,7 @@
 	"use strict";
 
 	var
-		  dragEl
+			dragEl
 		, ghostEl
 		, rootEl
 		, nextEl
@@ -56,10 +56,10 @@
 
 		, touchDragOverListeners = []
 
-    ,pointerdown
-    ,pointerup
-    ,pointermove
-    ,pointercancel
+		,pointerdown
+		,pointerup
+		,pointermove
+		,pointercancel
 	;
 
 
@@ -97,18 +97,18 @@
 			}
 		}
 
-    // Detect IE10/IE11+
-    if (window.onpointerdown !== undefined) {
-      pointerdown = 'pointerdown';
-      pointerup = 'pointerup';
-      pointermove = 'pointermove';
-      pointercancel = 'pointercancel';
-    } else {
-      pointerdown = 'MSPointerDown';
-      pointerup = 'MSPointerUp';
-      pointermove = 'MSPointerMove';
-      pointercancel = 'MSPointerCancel';
-    }
+		// Detect IE10/IE11+
+		if (window.onpointerdown !== undefined) {
+			pointerdown = 'pointerdown';
+			pointerup = 'pointerup';
+			pointermove = 'pointermove';
+			pointercancel = 'pointercancel';
+		} else {
+			pointerdown = 'MSPointerDown';
+			pointerup = 'MSPointerUp';
+			pointermove = 'MSPointerMove';
+			pointercancel = 'MSPointerCancel';
+		}
 
 		// Bind events
 		_on(el, 'add', options.onAdd);
@@ -121,10 +121,10 @@
 
 		_on(el, 'dragover', this._onDragOver);
 		_on(el, 'dragenter', this._onDragOver);
-    _on(el, pointerdown, this._onTapStart);
+		_on(el, pointerdown, this._onTapStart);
 
-    _css(el, 'touch-action', 'none');
-    _css(el, '-ms-touch-action', 'none');
+		_css(el, 'touch-action', 'none');
+		_css(el, '-ms-touch-action', 'none');
 
 		touchDragOverListeners.push(this._onDragOver);
 	}
@@ -141,7 +141,7 @@
 
 		_onTapStart: function (evt/**Event|TouchEvent|PointerEvent*/){
 			var
-				  touch = evt.touches && evt.touches[0]
+					touch = evt.touches && evt.touches[0]
 				, target = (touch || evt).target
 				, options =  this.options
 				, el = this.el
@@ -172,18 +172,18 @@
 				if( touch ){
 					// Touch device support
 					tapEvt = {
-						  target:  target
+							target:  target
 						, clientX: touch.clientX
 						, clientY: touch.clientY
 					};
 					this._onDragStart(tapEvt, true);
 					evt.preventDefault();
 				}
-        
-        if (evt.type == 'pointerdown' || evt.type == 'MSPointerDown') {
-          this._onDragStart(tapEvt, true);
-          evt.preventDefault();
-        }
+				
+				if (evt.type == 'pointerdown' || evt.type == 'MSPointerDown') {
+					this._onDragStart(tapEvt, true);
+					evt.preventDefault();
+				}
 
 				_on(this.el, 'dragstart', this._onDragStart);
 				_on(this.el, 'dragend', this._onDrop);
@@ -206,7 +206,7 @@
 				_css(ghostEl, 'display', 'none');
 
 				var
-					  target = document.elementFromPoint(touchEvt.clientX, touchEvt.clientY)
+						target = document.elementFromPoint(touchEvt.clientX, touchEvt.clientY)
 					, parent = target
 					, group = this.options.group
 					, i = touchDragOverListeners.length
@@ -239,7 +239,7 @@
 		_onTouchMove: function (evt/**TouchEvent|PointerEvent*/){
 			if( tapEvt ){
 				var
-					  touch = (evt.type == 'pointermove' || evt.type == 'MSPointerMove') ? evt : evt.touches[0]
+						touch = (evt.type == 'pointermove' || evt.type == 'MSPointerMove') ? evt : evt.touches[0]
 					, dx = touch.clientX - tapEvt.clientX
 					, dy = touch.clientY - tapEvt.clientY
 				;
@@ -249,14 +249,14 @@
 				_css(ghostEl, 'mozTransform', 'translate3d('+dx+'px,'+dy+'px,0)');
 				_css(ghostEl, 'msTransform', 'translate3d('+dx+'px,'+dy+'px,0)');
 				_css(ghostEl, 'transform', 'translate3d('+dx+'px,'+dy+'px,0)');
-        evt.preventDefault();
+				evt.preventDefault();
 			}
 		},
 
 
 		_onDragStart: function (evt/**Event*/, isTouch/**Boolean*/){
 			var
-				  target = evt.target
+					target = evt.target
 				, dataTransfer = evt.dataTransfer
 			;
 
@@ -267,7 +267,7 @@
 
 			if( isTouch ){
 				var
-					  rect = target.getBoundingClientRect()
+						rect = target.getBoundingClientRect()
 					, css = _css(target)
 					, ghostRect
 				;
@@ -293,9 +293,9 @@
 				_on(document, 'touchmove', this._onTouchMove);
 				_on(document, 'touchend', this._onDrop);
 				_on(document, 'touchcancel', this._onDrop);
-        _on(document, pointermove, this._onTouchMove);
-        _on(document, pointerup, this._onDrop);
-        _on(document, pointercancel, this._onDrop);
+				_on(document, pointermove, this._onTouchMove);
+				_on(document, pointerup, this._onDrop);
+				_on(document, pointercancel, this._onDrop);
 
 				this._loopId = setInterval(this._emulateDragOver, 150);
 			}
@@ -313,7 +313,7 @@
 		_onDragOver: function (evt/**Event*/){
 			if( !_silent && (activeGroup === this.options.group) && (evt.rootEl === void 0 || evt.rootEl === this.el) ){
 				var
-					  el = this.el
+						el = this.el
 					, target = _closest(evt.target, this.options.draggable, el)
 				;
 
@@ -329,7 +329,7 @@
 
 
 					var
-						  rect = lastRect
+							rect = lastRect
 						, width = rect.right - rect.left
 						, height = rect.bottom - rect.top
 						, floating = /left|right|inline/.test(lastCSS.cssFloat + lastCSS.display)
@@ -373,9 +373,9 @@
 			_off(document, 'touchmove', this._onTouchMove);
 			_off(document, 'touchend', this._onDrop);
 			_off(document, 'touchcancel', this._onDrop);
-      _off(document, pointermove, this._onTouchMove);
-      _off(document, pointerup, this._onDrop);
-      _off(document, pointercancel, this._onDrop);
+			_off(document, pointermove, this._onTouchMove);
+			_off(document, pointerup, this._onDrop);
+			_off(document, pointercancel, this._onDrop);
 
 
 			if( evt ){
@@ -430,7 +430,7 @@
 			_off(el, 'mousedown', this._onTapStart);
 			_off(el, 'touchstart', this._onTapStart);
 			_off(el, 'selectstart', this._onTapStart);
-      _off(el, pointerdown, this._onTapStart);
+			_off(el, pointerdown, this._onTapStart);
 
 			_off(el, 'dragover', this._onDragOver);
 			_off(el, 'dragenter', this._onDragOver);
@@ -465,13 +465,13 @@
 			selector = selector.split('.');
 
 			var
-				  tag = selector.shift().toUpperCase()
+					tag = selector.shift().toUpperCase()
 				, re = new RegExp('\\s('+selector.join('|')+')\\s', 'g')
 			;
 
 			do {
 				if(
-					   (tag === '' || el.nodeName == tag)
+						 (tag === '' || el.nodeName == tag)
 					&& (!selector.length || ((' '+el.className+' ').match(re) || []).length == selector.length)
 				){
 					return	el;
