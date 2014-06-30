@@ -59,6 +59,7 @@
     ,pointerdown
     ,pointerup
     ,pointermove
+    ,pointercancel
 	;
 
 
@@ -101,10 +102,12 @@
       pointerdown = 'pointerdown';
       pointerup = 'pointerup';
       pointermove = 'pointermove';
+      pointercancel = 'pointercancel';
     } else {
       pointerdown = 'MSPointerDown';
       pointerup = 'MSPointerUp';
       pointermove = 'MSPointerMove';
+      pointercancel = 'MSPointerCancel';
     }
 
 		// Bind events
@@ -289,8 +292,10 @@
 				// Bind touch events
 				_on(document, 'touchmove', this._onTouchMove);
 				_on(document, 'touchend', this._onDrop);
+				_on(document, 'touchcancel', this._onDrop);
         _on(document, pointermove, this._onTouchMove);
         _on(document, pointerup, this._onDrop);
+        _on(document, pointercancel, this._onDrop);
 
 				this._loopId = setInterval(this._emulateDragOver, 150);
 			}
@@ -367,8 +372,10 @@
 
 			_off(document, 'touchmove', this._onTouchMove);
 			_off(document, 'touchend', this._onDrop);
+			_off(document, 'touchcancel', this._onDrop);
       _off(document, pointermove, this._onTouchMove);
       _off(document, pointerup, this._onDrop);
+      _off(document, pointercancel, this._onDrop);
 
 
 			if( evt ){
