@@ -21,7 +21,7 @@
 	"use strict";
 
 	var
-			dragEl
+		  dragEl
 		, ghostEl
 		, rootEl
 		, nextEl
@@ -141,7 +141,7 @@
 
 		_onTapStart: function (evt/**Event|TouchEvent|PointerEvent*/){
 			var
-					touch = evt.touches && evt.touches[0]
+				  touch = evt.touches && evt.touches[0]
 				, target = (touch || evt).target
 				, options =  this.options
 				, el = this.el
@@ -172,7 +172,7 @@
 				if( touch ){
 					// Touch device support
 					tapEvt = {
-							target:  target
+						  target:  target
 						, clientX: touch.clientX
 						, clientY: touch.clientY
 					};
@@ -206,7 +206,7 @@
 				_css(ghostEl, 'display', 'none');
 
 				var
-						target = document.elementFromPoint(touchEvt.clientX, touchEvt.clientY)
+					  target = document.elementFromPoint(touchEvt.clientX, touchEvt.clientY)
 					, parent = target
 					, group = this.options.group
 					, i = touchDragOverListeners.length
@@ -239,7 +239,7 @@
 		_onTouchMove: function (evt/**TouchEvent|PointerEvent*/){
 			if( tapEvt ){
 				var
-						touch = (evt.type == 'pointermove' || evt.type == 'MSPointerMove') ? evt : evt.touches[0]
+					  touch = evt.touches[0]
 					, dx = touch.clientX - tapEvt.clientX
 					, dy = touch.clientY - tapEvt.clientY
 				;
@@ -256,7 +256,7 @@
 
 		_onDragStart: function (evt/**Event*/, isTouch/**Boolean*/){
 			var
-					target = evt.target
+				  target = evt.target
 				, dataTransfer = evt.dataTransfer
 			;
 
@@ -267,7 +267,7 @@
 
 			if( isTouch ){
 				var
-						rect = target.getBoundingClientRect()
+					  rect = target.getBoundingClientRect()
 					, css = _css(target)
 					, ghostRect
 				;
@@ -313,7 +313,7 @@
 		_onDragOver: function (evt/**Event*/){
 			if( !_silent && (activeGroup === this.options.group) && (evt.rootEl === void 0 || evt.rootEl === this.el) ){
 				var
-						el = this.el
+					  el = this.el
 					, target = _closest(evt.target, this.options.draggable, el)
 				;
 
@@ -329,7 +329,7 @@
 
 
 					var
-							rect = lastRect
+						  rect = lastRect
 						, width = rect.right - rect.left
 						, height = rect.bottom - rect.top
 						, floating = /left|right|inline/.test(lastCSS.cssFloat + lastCSS.display)
@@ -465,13 +465,13 @@
 			selector = selector.split('.');
 
 			var
-					tag = selector.shift().toUpperCase()
+				  tag = selector.shift().toUpperCase()
 				, re = new RegExp('\\s('+selector.join('|')+')\\s', 'g')
 			;
 
 			do {
 				if(
-						 (tag === '' || el.nodeName == tag)
+					   (tag === '' || el.nodeName == tag)
 					&& (!selector.length || ((' '+el.className+' ').match(re) || []).length == selector.length)
 				){
 					return	el;
