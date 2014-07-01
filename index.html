@@ -314,8 +314,8 @@ sort.destroy();
 				onAdd: function (evt){ console.log('onAdd.foo:', evt.item); },
 				onUpdate: function (evt){ console.log('onUpdate.foo:', evt.item); },
 				onRemove: function (evt){ console.log('onRemove.foo:', evt.item); },
-				onStartDragging:function(evt){ console.log('onStartDragging.foo:',evt.item);},
-				onStopDragging: function(evt){ console.log('onStopDragging.foo:',evt.item);}
+				onStart:function(evt){ console.log('onStart.foo:',evt.item);},
+				onEnd: function(evt){ console.log('onEnd.foo:',evt.item);}
 			});
 
 			new Sortable(bar, {
@@ -323,8 +323,8 @@ sort.destroy();
 				onAdd: function (evt){ console.log('onAdd.bar:', evt.item); },
 				onUpdate: function (evt){ console.log('onUpdate.bar:', evt.item); },
 				onRemove: function (evt){ console.log('onRemove.bar:', evt.item); },
-				onStartDragging:function(evt){ console.log('onStartDragging.foo:',evt.item);},
-				onStopDragging: function(evt){ console.log('onStopDragging.foo:',evt.item);}
+				onStart:function(evt){ console.log('onStart.foo:',evt.item);},
+				onEnd: function(evt){ console.log('onEnd.foo:',evt.item);}
 			});
 
 
