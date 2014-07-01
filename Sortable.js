@@ -84,6 +84,8 @@
 		options.onAdd = _bind(this, options.onAdd || noop);
 		options.onUpdate = _bind(this, options.onUpdate || noop);
 		options.onRemove = _bind(this, options.onRemove || noop);
+		options.onStartDragging = _bind(this, options.onStartDragging || noop);
+		options.onStopDragging = _bind(this, options.onStopDragging || noop);
 
 
 		// Export group name
@@ -114,6 +116,8 @@
 		_on(el, 'add', options.onAdd);
 		_on(el, 'update', options.onUpdate);
 		_on(el, 'remove', options.onRemove);
+		_on(el, 'start', options.onStartDragging);
+		_on(el, 'stop', options.onStopDragging);
 
 		_on(el, 'mousedown', this._onTapStart);
 		_on(el, 'touchstart', this._onTapStart);
@@ -306,6 +310,7 @@
 				_on(document, 'drop', this._onDrop);
 			}
 
+			dragEl.dispatchEvent(_createEvent('start', dragEl));
 			setTimeout(this._applyEffects);
 		},
 
@@ -401,6 +406,7 @@
 						// Update event
 						dragEl.dispatchEvent(_createEvent('update', dragEl));
 					}
+					dragEl.dispatchEvent(_createEvent('stop', dragEl));
 				}
 
 				// Set NULL
