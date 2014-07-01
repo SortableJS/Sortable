@@ -432,7 +432,8 @@
 			_off(el, 'add', options.onAdd);
 			_off(el, 'update', options.onUpdate);
 			_off(el, 'remove', options.onRemove);
-
+			_off(el, 'start', options.onStartDragging);
+			_off(el, 'stop', options.onStopDragging);
 			_off(el, 'mousedown', this._onTapStart);
 			_off(el, 'touchstart', this._onTapStart);
 			_off(el, 'selectstart', this._onTapStart);
