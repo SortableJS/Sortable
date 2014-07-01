@@ -30,16 +30,24 @@ new Sortable(elem, {
 	handle: ".my-handle", // Restricts sort start click/touch to the specified element
 	draggable: ".item",   // Specifies which items inside the element should be sortable
 	ghostClass: "sortable-ghost",
-
-	onAdd: function (evt){
+	
+	onStart: function (/**Event*/evt) { // dragging
 		var itemEl = evt.item;
 	},
 
-	onUpdate: function (evt){
+	onEnd: function (/**Event*/evt) { // dragging
+		var itemEl = evt.item;
+	},
+
+	onAdd: function (/**Event*/evt){
+		var itemEl = evt.item;
+	},
+
+	onUpdate: function (/**Event*/evt){
 		var itemEl = evt.item; // the current dragged HTMLElement
 	},
 
-	onRemove: function (evt){
+	onRemove: function (/**Event*/evt){
 		var itemEl = evt.item;
 	}
 });
