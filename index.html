@@ -244,7 +244,7 @@
 			<div class="layer tile" data-force="20">
 				<div class="tile__name">Group C</div>
 				<div class="tile__list">
-					<img src="//fbcdn-profile-a.akamaihd.net/hprofile-ak-frc3/c12.12.156.156/s100x100/303317_320632284665935_15996162_a.jpg"/><!--
+			o		<img src="//fbcdn-profile-a.akamaihd.net/hprofile-ak-frc3/c12.12.156.156/s100x100/303317_320632284665935_15996162_a.jpg"/><!--
 					--><img src="//fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/c9.9.109.109/s100x100/484507_4207733265938_1693034881_s.jpg"/>
 				</div>
 			</div>
@@ -315,7 +315,7 @@ sort.destroy();
 				onUpdate: function (evt){ console.log('onUpdate.foo:', evt.item); },
 				onRemove: function (evt){ console.log('onRemove.foo:', evt.item); },
 				onStart:function(evt){ console.log('onStart.foo:',evt.item);},
-				onEnd: function(evt){ console.log('onEnd.foo:',evt.item);}
+				onEnd: function(evt){ console.log('onEnd.foo:', evt.item);}
 			});
 
 			new Sortable(bar, {
@@ -323,8 +323,8 @@ sort.destroy();
 				onAdd: function (evt){ console.log('onAdd.bar:', evt.item); },
 				onUpdate: function (evt){ console.log('onUpdate.bar:', evt.item); },
 				onRemove: function (evt){ console.log('onRemove.bar:', evt.item); },
-				onStart:function(evt){ console.log('onStart.foo:',evt.item);},
-				onEnd: function(evt){ console.log('onEnd.foo:',evt.item);}
+				onStart:function(evt){ console.log('onStart.foo:', evt.item);},
+				onEnd: function(evt){ console.log('onEnd.foo:', evt.item);}
 			});
 
 
