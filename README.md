@@ -27,6 +27,7 @@ new Sortable(items);
 ```js
 new Sortable(elem, {
 	group: "name",
+	store: null, // @see Store
 	handle: ".my-handle", // Restricts sort start click/touch to the specified element
 	draggable: ".item",   // Specifies which items inside the element should be sortable
 	ghostClass: "sortable-ghost",
@@ -52,6 +53,49 @@ new Sortable(elem, {
 	}
 });
 ```
+
+
+### Method
+
+##### toArray():`String[]`
+Serializes the sortable's item data-id's into an array of string.
+
+
+##### sort(order:`Array`)
+Sorts the elements according to the array.
+```js
+	var order = sortable.toArray();
+	sortable.sort(order.reverse()); // apply
+```
+
+
+##### destroy()
+
+
+---
+
+
+### Store
+Saving and restoring of the sort.
+
+```js
+new Sortable(el, {
+	group: "localStorage-example",
+	store: {
+
+		get: function (sortable) {
+			var order = localStorage.getItem(sortable.options.group);
+			return order ? order.split('|') : [];
+		},
+
+		set: function (sortable) {
+			var order = sortable.toArray();
+			localStorage.setItem(sortable.options.group, order.join('|'));
+		}
+	}
+})
+```
+
 
 
 ---
