@@ -70,8 +70,8 @@ Serializes the sortable's item data-id's into an array of string.
 ##### sort(order:`Array`)
 Sorts the elements according to the array.
 ```js
-	var order = sortable.toArray();
-	sortable.sort(order.reverse()); // apply
+var order = sortable.toArray();
+sortable.sort(order.reverse()); // apply
 ```
 
 
