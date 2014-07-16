@@ -19,14 +19,19 @@
 ```
 
 ```js
-new Sortable(items);
+var el = document.getElementById('items');
+new Sortable(el);
 ```
+
+
+---
 
 
 ### Options
 ```js
-new Sortable(elem, {
+new Sortable(el, {
 	group: "name",
+	store: null, // @see Store
 	handle: ".my-handle", // Restricts sort start click/touch to the specified element
 	draggable: ".item",   // Specifies which items inside the element should be sortable
 	ghostClass: "sortable-ghost",
@@ -53,6 +58,59 @@ new Sortable(elem, {
 });
 ```
 
+---
+
+
+### Method
+
+##### toArray():`String[]`
+Serializes the sortable's item data-id's into an array of string.
+
+
+##### sort(order:`Array`)
+Sorts the elements according to the array.
+```js
+var order = sortable.toArray();
+sortable.sort(order.reverse()); // apply
+```
+
+
+##### destroy()
+
+
+---
+
+
+### Store
+Saving and restoring of the sort.
+
+```js
+new Sortable(el, {
+	group: "localStorage-example",
+	store: {
+		/**
+		 * Get the order of elements. Called once during initialization.
+		 * @param   {Sortable}  sortable
+		 * @retruns {Array}
+		 */
+		get: function (sortable) {
+			var order = localStorage.getItem(sortable.options.group);
+			return order ? order.split('|') : [];
+		},
+
+		/**
+		 * Save the order of elements. Called every time at the drag end.
+		 * @param {Sortable}  sortable
+		 */
+		set: function (sortable) {
+			var order = sortable.toArray();
+			localStorage.setItem(sortable.options.group, order.join('|'));
+		}
+	}
+})
+```
+
+
 
 ---
 
@@ -69,7 +127,4 @@ new Sortable(elem, {
 * bind(ctx`:Mixed`, fn`:Function`)`:Function` — Takes a function and returns a new one that will always have a particular context
 * closest(el`:HTMLElement`, selector`:String`[, ctx`:HTMLElement`])`:HTMLElement|Null` — for each element in the set, get the first element that matches the selector by testing the element itself and traversing up through its ancestors in the DOM tree
 * toggleClass(el`:HTMLElement`, name`:String`, state`:Boolean`) — add or remove one classes from each element
-
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/RubaXa/sortable/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 

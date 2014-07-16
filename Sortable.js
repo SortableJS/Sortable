@@ -58,11 +58,11 @@
 	;
 
 
+
 	/**
 	 * @class  Sortable
 	 * @param  {HTMLElement}  el
-	 * @param  {Object}  [options]
-	 * @constructor
+	 * @param  {Object}       [options]
 	 */
 	function Sortable(el, options){
 		this.el = el; // root element
@@ -71,6 +71,7 @@
 
 		// Defaults
 		options.group = options.group || Math.random();
+		options.store = options.store || null;
 		options.handle = options.handle || null;
 		options.draggable = options.draggable || el.children[0] && el.children[0].nodeName || (/[uo]l/i.test(el.nodeName) ? 'li' : '*');
 		options.ghostClass = options.ghostClass || 'sortable-ghost';
@@ -110,10 +111,13 @@
 		_on(el, 'dragenter', this._onDragOver);
 
 		touchDragOverListeners.push(this._onDragOver);
+
+		// Restore sorting
+		options.store && this.sort(options.store.get(this));
 	}
 
 
-	Sortable.prototype = {
+	Sortable.prototype = /** @lends Sortable.prototype */ {
 		constructor: Sortable,
 
 
@@ -378,6 +382,7 @@
 						// Update event
 						dragEl.dispatchEvent(_createEvent('update', dragEl));
 					}
+
 					dragEl.dispatchEvent(_createEvent('stop', dragEl));
 				}
 
@@ -394,11 +399,58 @@
 				lastCSS =
 
 				activeGroup = null;
+
+				// Save sorting
+				this.options.store && this.options.store.set(this);
 			}
 		},
 
 
-		destroy: function (){
+		/**
+		 * Serializes the item into an array of string.
+		 * @returns {String[]}
+		 */
+		toArray: function () {
+			var order = [],
+				el,
+				children = this.el.children,
+				i = 0,
+				n = children.length
+			;
+
+			for (; i < n; i++) {
+				el = children[i];
+				order.push(el.getAttribute('data-id') || _generateId(el));
+			}
+
+			return order;
+		},
+
+
+		/**
+		 * Sorts the elements according to the array.
+		 * @param  {String[]}  order  order of the items
+		 */
+		sort: function (order) {
+			var items = {}, el = this.el;
+
+			this.toArray().forEach(function (id, i) {
+				items[id] = el.children[i];
+			});
+
+			order.forEach(function (id) {
+				if (items[id]) {
+					el.removeChild(items[id]);
+					el.appendChild(items[id]);
+				}
+			});
+		},
+
+
+		/**
+		 * Destroy
+		 */
+		destroy: function () {
 			var el = this.el, options = this.options;
 
 			_off(el, 'add', options.onAdd);
@@ -425,6 +477,7 @@
 			this.el = null;
 		}
 	};
+
 
 	function _bind(ctx, fn){
 		var args = slice.call(arguments, 2);
@@ -538,6 +591,23 @@
 	}
 
 
+	/**
+	 * Generate id
+	 * @param   {HTMLElement} el
+	 * @returns {String}
+	 * @private
+	 */
+	function _generateId(el) {
+		var str = el.innerHTML + el.className + el.src,
+			i = str.length,
+			sum = 0
+		;
+		while (i--) {
+			sum += str.charCodeAt(i);
+		}
+		return sum.toString(36);
+	}
+
 
 	// Export utils
 	Sortable.utils = {
@@ -551,7 +621,8 @@
 	};
 
 
-	Sortable.version = '0.3.0';
+	Sortable.version = '0.4.0';
+
 
 	// Export
 	return	Sortable;
