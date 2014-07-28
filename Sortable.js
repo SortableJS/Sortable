@@ -353,9 +353,9 @@
 					setTimeout(_unsilent, 30);
 
 					if( floating ){
-						after = (target.previousElementSibling === dragEl) && !isWide || (skew > .5) && isWide
+						after = (target.previousElementSibling === dragEl) && !isWide || skew;
 					} else {
-						after = (target.nextElementSibling !== dragEl) && !isLong || (skew > .5) && isLong;
+						after = (target.nextElementSibling !== dragEl) && !isLong || skew;
 					}
 
 					if( after && !nextSibling ){
