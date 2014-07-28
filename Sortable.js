@@ -317,9 +317,9 @@
 						, width = rect.right - rect.left
 						, height = rect.bottom - rect.top
 						, floating = /left|right|inline/.test(lastCSS.cssFloat + lastCSS.display)
-						, skew = (floating ? (evt.clientX - rect.left)/width : (evt.clientY - rect.top)/height) > .5
 						, isWide = (target.offsetWidth > dragEl.offsetWidth)
 						, isLong = (target.offsetHeight > dragEl.offsetHeight)
+						, halfway = (floating ? (evt.clientX - rect.left)/width : (evt.clientY - rect.top)/height) > .5
 						, nextSibling = target.nextElementSibling
 						, after
 					;
@@ -328,9 +328,9 @@
 					setTimeout(_unsilent, 30);
 
 					if( floating ){
-						after = (target.previousElementSibling === dragEl) && !isWide || (skew > .5) && isWide
+						after = (target.previousElementSibling === dragEl) && !isWide || halfway && isWide
 					} else {
-						after = (nextSibling !== dragEl) && !isLong || (skew > .5) && isLong;
+						after = (nextSibling !== dragEl) && !isLong || halfway && isLong;
 					}
 
 					if( after && !nextSibling ){
@@ -621,7 +621,7 @@
 	};
 
 
-	Sortable.version = '0.4.0';
+	Sortable.version = '0.4.1';
 
 
 	// Export
