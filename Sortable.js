@@ -345,7 +345,7 @@
 						, skew = (floating ? (evt.clientX - rect.left)/width : (evt.clientY - rect.top)/height) > .5
 						, isWide = (target.offsetWidth > dragEl.offsetWidth)
 						, isLong = (target.offsetHeight > dragEl.offsetHeight)
-						, nextSibling = target.nextSibling
+						, nextSibling = target.nextElementSibling
 						, after
 					;
 
@@ -355,7 +355,7 @@
 					if( floating ){
 						after = (target.previousElementSibling === dragEl) && !isWide || (skew > .5) && isWide
 					} else {
-						after = (target.nextElementSibling !== dragEl) && !isLong || (skew > .5) && isLong;
+						after = (nextSibling !== dragEl) && !isLong || (skew > .5) && isLong;
 					}
 
 					if( after && !nextSibling ){
