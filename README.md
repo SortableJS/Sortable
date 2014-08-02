@@ -67,7 +67,7 @@ new Sortable(el, {
 Serializes the sortable's item data-id's into an array of string.
 
 
-##### sort(order:`Array`)
+##### sort(order:`String[]`)
 Sorts the elements according to the array.
 ```js
 var order = sortable.toArray();
