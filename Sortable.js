@@ -77,11 +77,11 @@
 		options.ghostClass = options.ghostClass || 'sortable-ghost';
 		options.ignore = options.ignore || 'a, img';
 
-		options.onAdd = _bind(this, options.onAdd || noop);
-		options.onUpdate = _bind(this, options.onUpdate || noop);
-		options.onRemove = _bind(this, options.onRemove || noop);
-		options.onStart = _bind(this, options.onStart || noop);
-		options.onEnd = _bind(this, options.onEnd || noop);
+
+		// Define events
+		'onAdd onUpdate onRemove onStart onEnd'.split(' ').forEach(function (name) {
+			options[name] = _bind(this, options[name] || noop);
+		});
 
 
 		// Export group name
@@ -149,10 +149,16 @@
 
 			if( target && !dragEl && (target.parentNode === el) ){
 				tapEvt = evt;
-				target.draggable = true;
+
+				rootEl = this.el;
+				dragEl = target;
+				nextEl = dragEl.nextSibling;
+				activeGroup = this.options.group;
+
+				dragEl.draggable = true;
 
 				// Disable "draggable"
-				Array.prototype.forEach.call(options.ignore.split(','), function (criteria) {
+				options.ignore.split(',').forEach(function (criteria) {
 					_find(target, criteria.trim(), _disableDraggable);
 				});
 
@@ -163,10 +169,14 @@
 						, clientX: touch.clientX
 						, clientY: touch.clientY
 					};
+
 					this._onDragStart(tapEvt, true);
 					evt.preventDefault();
 				}
 
+				_on(document, 'mouseup', this._onDrop);
+				_on(document, 'touchend', this._onDrop);
+				_on(document, 'touchcancel', this._onDrop);
 
 				_on(this.el, 'dragstart', this._onDragStart);
 				_on(this.el, 'dragend', this._onDrop);
@@ -180,9 +190,11 @@
 						window.getSelection().removeAllRanges()
 					}
 				} catch (err){ }
+
+
+				dragEl.dispatchEvent(_createEvent('start', dragEl));
 			}
 		},
-
 
 		_emulateDragOver: function (){
 			if( touchEvt ){
@@ -241,24 +253,18 @@
 
 
 		_onDragStart: function (evt/**Event*/, isTouch/**Boolean*/){
-			var
-				  target = evt.target
-				, dataTransfer = evt.dataTransfer
-			;
+			var dataTransfer = evt.dataTransfer;
 
-			rootEl = this.el;
-			dragEl = target;
-			nextEl = target.nextSibling;
-			activeGroup = this.options.group;
+			this._offUpEvents();
 
 			if( isTouch ){
 				var
-					  rect = target.getBoundingClientRect()
-					, css = _css(target)
+					  rect = dragEl.getBoundingClientRect()
+					, css = _css(dragEl)
 					, ghostRect
 				;
 
-				ghostEl = target.cloneNode(true);
+				ghostEl = dragEl.cloneNode(true);
 
 				_css(ghostEl, 'top', rect.top - parseInt(css.marginTop, 10));
 				_css(ghostEl, 'left', rect.left - parseInt(css.marginLeft, 10));
@@ -284,12 +290,11 @@
 			}
 			else {
 				dataTransfer.effectAllowed = 'move';
-				dataTransfer.setData('Text', target.textContent);
+				dataTransfer.setData('Text', dragEl.textContent);
 
 				_on(document, 'drop', this._onDrop);
 			}
 
-			dragEl.dispatchEvent(_createEvent('start', dragEl));
 			setTimeout(this._applyEffects);
 		},
 
@@ -317,10 +322,10 @@
 						, width = rect.right - rect.left
 						, height = rect.bottom - rect.top
 						, floating = /left|right|inline/.test(lastCSS.cssFloat + lastCSS.display)
-						, skew = (floating ? (evt.clientX - rect.left)/width : (evt.clientY - rect.top)/height) > .5
 						, isWide = (target.offsetWidth > dragEl.offsetWidth)
 						, isLong = (target.offsetHeight > dragEl.offsetHeight)
-						, nextSibling = target.nextSibling
+						, halfway = (floating ? (evt.clientX - rect.left)/width : (evt.clientY - rect.top)/height) > .5
+						, nextSibling = target.nextElementSibling
 						, after
 					;
 
@@ -328,9 +333,9 @@
 					setTimeout(_unsilent, 30);
 
 					if( floating ){
-						after = (target.previousElementSibling === dragEl) && !isWide || (skew > .5) && isWide
+						after = (target.previousElementSibling === dragEl) && !isWide || halfway && isWide
 					} else {
-						after = (target.nextElementSibling !== dragEl) && !isLong || (skew > .5) && isLong;
+						after = (nextSibling !== dragEl) && !isLong || halfway && isLong;
 					}
 
 					if( after && !nextSibling ){
@@ -342,6 +347,12 @@
 			}
 		},
 
+		_offUpEvents: function () {
+			_off(document, 'mouseup', this._onDrop);
+			_off(document, 'touchmove', this._onTouchMove);
+			_off(document, 'touchend', this._onDrop);
+			_off(document, 'touchcancel', this._onDrop);
+		},
 
 		_onDrop: function (evt/**Event*/){
 			clearInterval(this._loopId);
@@ -354,10 +365,7 @@
 			_off(this.el, 'dragstart', this._onDragStart);
 			_off(this.el, 'selectstart', this._onTapStart);
 
-			_off(document, 'touchmove', this._onTouchMove);
-			_off(document, 'touchend', this._onDrop);
-			_off(document, 'touchcancel', this._onDrop);
-
+			this._offUpEvents();
 
 			if( evt ){
 				evt.preventDefault();
@@ -621,7 +629,7 @@
 	};
 
 
-	Sortable.version = '0.4.0';
+	Sortable.version = '0.4.1';
 
 
 	// Export
