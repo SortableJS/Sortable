@@ -99,6 +99,8 @@
 		// Bind events
 		_on(el, 'add', options.onAdd);
 		_on(el, 'update', options.onUpdate);
+		_on(el, 'DOMNodeInserted', options.onUpdate);
+		_on(el, 'DOMNodeRemoved', options.onUpdate);
 		_on(el, 'remove', options.onRemove);
 		_on(el, 'start', options.onStart);
 		_on(el, 'stop', options.onEnd);
