@@ -65,6 +65,10 @@
 	 * @param  {Object}       [options]
 	 */
 	function Sortable(el, options){
+		if ( !(this instanceof Sortable) ){
+			return new Sortable(el, options);
+		}
+		
 		this.el = el; // root element
 		this.options = options = (options || {});
 
