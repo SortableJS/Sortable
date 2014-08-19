@@ -384,7 +384,9 @@
 						rootEl.dispatchEvent(_createEvent('remove', dragEl));
 
 						// Add event
-						dragEl.dispatchEvent(_createEvent('add', dragEl));
+						var addEvent = _createEvent('add', dragEl);
+						addEvent.removeDragEl = function () { dragEl.parentNode.removeChild(dragEl); };
+						dragEl.dispatchEvent(addEvent);
 					}
 					else if( dragEl.nextSibling !== nextEl ){
 						// Update event
