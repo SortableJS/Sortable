@@ -33,27 +33,27 @@ new Sortable(el, {
 	group: "name",
 	store: null, // @see Store
 	handle: ".my-handle", // Restricts sort start click/touch to the specified element
+	filter: ".ignor-elements", // Selectors that do not lead to dragging (String or Function)
 	draggable: ".item",   // Specifies which items inside the element should be sortable
 	ghostClass: "sortable-ghost",
 	
-	onStart: function (/**Event*/evt) { // dragging
-		var itemEl = evt.item;
-	},
-
-	onEnd: function (/**Event*/evt) { // dragging
-		var itemEl = evt.item;
-	},
+	onStart: function (/**Event*/evt) { /* dragging */ },
+	onEnd: function (/**Event*/evt) { /* dragging */ },
 
 	onAdd: function (/**Event*/evt){
-		var itemEl = evt.item;
+		var itemEl = evt.item; // dragged HTMLElement
 	},
 
 	onUpdate: function (/**Event*/evt){
-		var itemEl = evt.item; // the current dragged HTMLElement
+		var itemEl = evt.item; // dragged HTMLElement
 	},
 
 	onRemove: function (/**Event*/evt){
-		var itemEl = evt.item;
+		var itemEl = evt.item; // dragged HTMLElement
+	},
+
+	onFilter: function (/**Event*/evt){
+		var itemEl = evt.item; // HTMLElement on which was `nousedown|tapstart` event.
 	}
 });
 ```
@@ -63,8 +63,28 @@ new Sortable(el, {
 
 ### Method
 
+##### closest(el:`String`[, selector:`HTMLElement`]):`HTMLElement|null`
+For each element in the set, get the first element that matches the selector by testing the element itself and traversing up through its ancestors in the DOM tree.
+
+```js
+var editableList = new Sortable(list, {
+	filter: ".js-remove, .js-edit",
+	onFilter: function (evt) {
+		var el = editableList.closest(evt.item); // list item
+
+		if (editableList.closest(evt.item, ".js-remove")) { // Click on remove button
+			el.parentNode.removeChild(el); // remove sortable item
+		}
+		else if (editableList.closest(evt.item, ".js-edit")) { // Click on edit link
+			// ...
+		}
+	}
+})
+```
+
+
 ##### toArray():`String[]`
-Serializes the sortable's item data-id's into an array of string.
+Serializes the sortable's item `data-id`'s into an array of string.
 
 
 ##### sort(order:`String[]`)
@@ -83,6 +103,14 @@ sortable.sort(order.reverse()); // apply
 
 ### Store
 Saving and restoring of the sort.
+
+```html
+<ul>
+	<li data-id="1">order</li>
+	<li data-id="2">save</li>
+	<li data-id="3">restore</li>
+</ul>
+```
 
 ```js
 new Sortable(el, {
