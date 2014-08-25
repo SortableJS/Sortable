@@ -77,6 +77,12 @@
 		options.ghostClass = options.ghostClass || 'sortable-ghost';
 		options.ignore = options.ignore || 'a, img';
 
+        if(typeof options.filter === 'string'){
+            options.filter = options.filter.split(',');
+        }else if(options.filter.constructor.name !== 'Array'){
+            options.filter = [];
+        }
+
 
 		// Define events
 		'onAdd onUpdate onRemove onStart onEnd'.split(' ').forEach(function (name) {
@@ -133,6 +139,12 @@
 				, options =  this.options
 				, el = this.el
 			;
+
+            if( options.filter.length > 0 ){
+                for(var i = 0; options.filter.length > i; i += 1){
+                    if( _closest(target, options.filter[i], el) !== null ){ return; }
+                }
+            }
 
 			if( options.handle ){
 				target = _closest(target, options.handle, el);
