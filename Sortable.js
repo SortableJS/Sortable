@@ -606,7 +606,7 @@
 	 * @private
 	 */
 	function _generateId(el) {
-		var str = el.innerHTML + el.className + el.src,
+		var str = el.tagName + el.className + el.src + el.href + el.textContent,
 			i = str.length,
 			sum = 0
 		;
@@ -629,7 +629,7 @@
 	};
 
 
-	Sortable.version = '0.4.1';
+	Sortable.version = '0.4.2';
 
 
 	// Export
