@@ -266,12 +266,12 @@
 
 				ghostEl = dragEl.cloneNode(true);
 
-				_css(ghostEl, 'top', rect.top - parseInt(css.marginTop, 10));
-				_css(ghostEl, 'left', rect.left - parseInt(css.marginLeft, 10));
+				_css(ghostEl, 'top', target.offsetTop - parseInt(css.marginTop, 10));
+				_css(ghostEl, 'left', target.offsetLeft - parseInt(css.marginLeft, 10));
 				_css(ghostEl, 'width', rect.width);
 				_css(ghostEl, 'height', rect.height);
 				_css(ghostEl, 'opacity', '0.8');
-				_css(ghostEl, 'position', 'fixed');
+				_css(ghostEl, 'position', 'absolute');
 				_css(ghostEl, 'zIndex', '100000');
 
 				rootEl.appendChild(ghostEl);
