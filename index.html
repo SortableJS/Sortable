@@ -10,174 +10,10 @@
 	<meta name="description" content="Sortable - is a minimalist JavaScript library for modern browsers and touch devices (No jQuery)."/>
 	<meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-	<link href='//fonts.googleapis.com/css?family=Roboto:300' rel='stylesheet' type='text/css'/>
+	<link href="//rubaxa.github.io/Ply/ply.css" rel="stylesheet" type="text/css"/>
+	<link href="//fonts.googleapis.com/css?family=Roboto:300" rel="stylesheet" type="text/css"/>
 
-	<style>
-		html {
-			background-image: -webkit-linear-gradient(bottom, #F4E2C9 20%, #F4D7C9 100%);
-			background-image: -ms-linear-gradient(bottom, #F4E2C9 20%, #F4D7C9 100%);
-			background-image: linear-gradient(to bottom, #F4E2C9 20%, #F4D7C9 100%);
-		}
-
-		html, body {
-			margin: 0;
-			padding: 0;
-			position: relative;
-			color: #464637;
-			min-height: 100%;
-			font-size: 20px;
-			font-family: 'Roboto', sans-serif;
-			font-weight: 300;
-		}
-
-
-		h1 {
-			color: #FF3F00;
-			font-size: 20px;
-			font-family: 'Roboto', sans-serif;
-			font-weight: 300;
-			text-align: center;
-		}
-
-
-		ul {
-			margin: 0;
-			padding: 0;
-			list-style: none;
-		}
-
-		.container {
-			width: 80%;
-			margin: auto;
-			min-width: 1100px;
-			max-width: 1300px;
-			position: relative;
-		}
-
-		@media (min-width: 750px) and (max-width: 970px){
-			.container {
-				width: 100%;
-				min-width: 750px;
-			}
-		}
-
-
-		.sortable-ghost {
-			opacity: .2;
-		}
-
-
-		img {
-			border: 0;
-			vertical-align: middle;
-		}
-
-
-		.logo {
-			top: 55px;
-			left: 30px;
-			position: absolute;
-		}
-
-
-		.title {
-			color: #fff;
-			padding: 3px 10px;
-			display: inline-block;
-			position: relative;
-			background-color: #FF7373;
-			z-index: 1000;
-		}
-			.title_xl {
-				padding: 3px 15px;
-				font-size: 40px;
-			}
-
-
-
-		.tile {
-			width: 22%;
-			min-width: 245px;
-			color: #FF7270;
-			padding: 10px 30px;
-			text-align: center;
-			margin-top: 15px;
-			margin-left: 5px;
-			margin-right: 30px;
-			background-color: #fff;
-			display: inline-block;
-			vertical-align: top;
-		}
-			.tile__name {
-				cursor: move;
-				padding-bottom: 10px;
-				border-bottom: 1px solid #FF7373;
-			}
-
-			.tile__list {
-				margin-top: 10px;
-			}
-				.tile__list:last-child {
-					margin-right: 0;
-					min-height: 80px;
-				}
-
-				.tile__list img {
-					cursor: move;
-					margin: 10px;
-					border-radius: 100%;
-				}
-
-
-
-		.block {
-			opacity: 1;
-			position: absolute;
-		}
-			.block__list {
-				padding: 20px 0;
-				max-width: 360px;
-				margin-top: -8px;
-				margin-left: 5px;
-				background-color: #fff;
-			}
-				.block__list li { cursor: move; }
-
-			.block__list_words li {
-				background-color: #fff;
-				padding: 10px 40px;
-			}
-				.block__list_words .sortable-ghost {
-					opacity: 0.4;
-					background-color: #F4E2C9;
-				}
-
-				.block__list_words li:first-letter {
-					text-transform: uppercase;
-				}
-
-			.block__list_tags {
-				padding-left: 30px;
-			}
-
-			.block__list_tags:after {
-				clear: both;
-				content: '';
-				display: block;
-			}
-				.block__list_tags li {
-					color: #fff;
-					float: left;
-					margin: 8px 20px 10px 0;
-					padding: 5px 10px;
-					min-width: 10px;
-					background-color: #5F9EDF;
-					text-align: center;
-				}
-					.block__list_tags li:first-child:first-letter {
-						text-transform: uppercase;
-					}
-	</style>
+	<link href="st/app.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 
@@ -218,6 +54,7 @@
 	</div>
 
 
+	<a name="m"></a>
 	<div class="container">
 		<div id="multi" style="margin-left: 30px">
 			<div><div data-force="5" class="layer title title_xl">Multi</div></div>
@@ -253,6 +90,25 @@
 	</div>
 
 
+	<a name="e"></a>
+	<div class="container" style="margin-top: 100px">
+		<div id="filter" style="margin-left: 30px">
+			<div><div data-force="5" class="layer title title_xl">Editable list</div></div>
+
+			<div style="margin-top: -8px; margin-left: 10px" class="block__list block__list_words">
+				<ul id="editable">
+					<li>Оля<i class="js-remove">✖</i></li>
+					<li>Владимир<i class="js-remove">✖</i></li>
+					<li>Алина<i class="js-remove">✖</i></li>
+				</ul>
+
+				<button id="addUser">Add</button>
+			</div>
+		</div>
+	</div>
+
+
+	<a name="c"></a>
 	<div class="container" style="margin-top: 100px">
 		<div style="margin-left: 30px">
 			<div><div class="layer title title_xl">Code example</div></div>
@@ -281,6 +137,16 @@ var sort = new Sortable(container, {
 
 // ..
 sort.destroy();
+
+
+// Editable list
+var editableList = new Sortable(editable, {
+  filter: '.js-remove',
+  onFilter: function (evt) {
+    var el = editableList.closest(evt.item); // get dragged item
+    el && el.parentNode.removeChild(el);
+  }
+});
 </code></pre>
 		</div>
 
@@ -297,6 +163,7 @@ sort.destroy();
 
 
 	<script src="Sortable.js"></script>
+	<script src="//rubaxa.github.io/Ply/Ply.min.js"></script>
 
 	<script>
 		(function (){
@@ -309,7 +176,7 @@ sort.destroy();
 			}
 
 
-			window.x = new Sortable(foo, {
+			new Sortable(foo, {
 				group: "words",
 				store: {
 					get: function (sortable) {
@@ -343,6 +210,27 @@ sort.destroy();
 				draggable: '.tile',
 				handle: '.tile__name'
 			});
+
+
+			var editableList = new Sortable(editable, {
+				filter: '.js-remove',
+				onFilter: function (evt) {
+					var el = editableList.closest(evt.item);
+					el && el.parentNode.removeChild(el);
+				}
+			});
+
+
+			addUser.onclick = function () {
+				Ply.dialog('prompt', {
+					title: 'Add',
+					form: { name: 'name' }
+				}).done(function (ui) {
+					var el = document.createElement('li');
+					el.innerHTML = ui.data.name + '<i class="js-remove">✖</i>';
+					editableList.el.appendChild(el);
+				});
+			};
 
 
 			[].forEach.call(multi.getElementsByClassName('tile__list'), function (el){

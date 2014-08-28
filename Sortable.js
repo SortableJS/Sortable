@@ -51,6 +51,12 @@
 			return evt;
 		}
 
+		, _dispatchEvent = function (rootEl, name, targetEl) {
+			rootEl.dispatchEvent(_createEvent(name, targetEl || rootEl));
+		}
+
+		, _customEvents = 'onAdd onUpdate onRemove onStart onEnd onFilter'.split(' ')
+
 		, noop = function (){}
 		, slice = [].slice
 
@@ -70,17 +76,26 @@
 
 
 		// Defaults
-		options.group = options.group || Math.random();
-		options.store = options.store || null;
-		options.handle = options.handle || null;
-		options.draggable = options.draggable || el.children[0] && el.children[0].nodeName || (/[uo]l/i.test(el.nodeName) ? 'li' : '*');
-		options.ghostClass = options.ghostClass || 'sortable-ghost';
-		options.ignore = options.ignore || 'a, img';
+		var defaults = {
+			group: Math.random(),
+			store: null,
+			handle: null,
+			draggable: el.children[0] && el.children[0].nodeName || (/[uo]l/i.test(el.nodeName) ? 'li' : '*'),
+			ghostClass: 'sortable-ghost',
+			ignore: 'a, img',
+			filter: null
+		};
+
+		// Set default options
+		for (var name in defaults) {
+			options[name] = options[name] || defaults[name];
+		}
 
 
 		// Define events
-		'onAdd onUpdate onRemove onStart onEnd'.split(' ').forEach(function (name) {
+		_customEvents.forEach(function (name) {
 			options[name] = _bind(this, options[name] || noop);
+			_on(el, name.substr(2).toLowerCase(), options[name]);
 		});
 
 
@@ -97,12 +112,6 @@
 
 
 		// Bind events
-		_on(el, 'add', options.onAdd);
-		_on(el, 'update', options.onUpdate);
-		_on(el, 'remove', options.onRemove);
-		_on(el, 'start', options.onStart);
-		_on(el, 'stop', options.onEnd);
-
 		_on(el, 'mousedown', this._onTapStart);
 		_on(el, 'touchstart', this._onTapStart);
 		supportIEdnd && _on(el, 'selectstart', this._onTapStart);
@@ -132,7 +141,24 @@
 				, target = (touch || evt).target
 				, options =  this.options
 				, el = this.el
+				, filter = options.filter
 			;
+
+			// Check filter
+			if( typeof filter === 'function' && filter.call(this, target, this) ){
+				_dispatchEvent(el, 'filter', target);
+				return; // cancel dnd
+			}
+			else if( filter ){
+				filter = filter.split(',').filter(function (criteria) {
+					return _closest(target, criteria.trim(), el);
+				});
+
+				if (filter.length) {
+					_dispatchEvent(el, 'filter', target);
+					return; // cancel dnd
+				}
+			}
 
 			if( options.handle ){
 				target = _closest(target, options.handle, el);
@@ -192,7 +218,7 @@
 				} catch (err){ }
 
 
-				dragEl.dispatchEvent(_createEvent('start', dragEl));
+				_dispatchEvent(dragEl, 'start');
 			}
 		},
 
@@ -381,17 +407,17 @@
 
 					if( !rootEl.contains(dragEl) ){
 						// Remove event
-						rootEl.dispatchEvent(_createEvent('remove', dragEl));
+						_dispatchEvent(rootEl, 'remove', dragEl);
 
 						// Add event
-						dragEl.dispatchEvent(_createEvent('add', dragEl));
+						_dispatchEvent(dragEl, 'add');
 					}
 					else if( dragEl.nextSibling !== nextEl ){
 						// Update event
-						dragEl.dispatchEvent(_createEvent('update', dragEl));
+						_dispatchEvent(dragEl, 'update');
 					}
 
-					dragEl.dispatchEvent(_createEvent('stop', dragEl));
+					_dispatchEvent(dragEl, 'end');
 				}
 
 				// Set NULL
@@ -456,16 +482,26 @@
 
 
 		/**
+		 * For each element in the set, get the first element that matches the selector by testing the element itself and traversing up through its ancestors in the DOM tree.
+		 * @param   {HTMLElement}  el
+		 * @param   {String}       [selector]  default: `options.draggable`
+		 * @returns {HTMLElement|null}
+		 */
+		closest: function (el, selector) {
+			return _closest(el, selector || this.options.draggable, this.el);
+		},
+
+
+		/**
 		 * Destroy
 		 */
 		destroy: function () {
 			var el = this.el, options = this.options;
 
-			_off(el, 'add', options.onAdd);
-			_off(el, 'update', options.onUpdate);
-			_off(el, 'remove', options.onRemove);
-			_off(el, 'start', options.onStart);
-			_off(el, 'stop', options.onEnd);
+			_customEvents.forEach(function (name) {
+				_off(el, name.substr(2).toLowerCase(), options[name]);
+			});
+
 			_off(el, 'mousedown', this._onTapStart);
 			_off(el, 'touchstart', this._onTapStart);
 			_off(el, 'selectstart', this._onTapStart);
@@ -610,9 +646,11 @@
 			i = str.length,
 			sum = 0
 		;
+
 		while (i--) {
 			sum += str.charCodeAt(i);
 		}
+
 		return sum.toString(36);
 	}
 
@@ -625,13 +663,15 @@
 		find: _find,
 		bind: _bind,
 		closest: _closest,
-		toggleClass: _toggleClass
+		toggleClass: _toggleClass,
+		createEvent: _createEvent,
+		dispatchEvent: _dispatchEvent
 	};
 
 
-	Sortable.version = '0.4.2';
+	Sortable.version = '0.5.0';
 
 
 	// Export
-	return	Sortable;
+	return Sortable;
 });
