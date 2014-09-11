@@ -96,7 +96,7 @@
 		_customEvents.forEach(function (name) {
 			options[name] = _bind(this, options[name] || noop);
 			_on(el, name.substr(2).toLowerCase(), options[name]);
-		});
+		}, this);
 
 
 		// Export group name
