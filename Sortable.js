@@ -454,7 +454,9 @@
 
 			for (; i < n; i++) {
 				el = children[i];
-				order.push(el.getAttribute('data-id') || _generateId(el));
+				if (_closest(el, this.options.draggable, this.el)) {
+					order.push(el.getAttribute('data-id') || _generateId(el));
+				}
 			}
 
 			return order;
@@ -466,16 +468,20 @@
 		 * @param  {String[]}  order  order of the items
 		 */
 		sort: function (order) {
-			var items = {}, el = this.el;
+			var items = {}, rootEl = this.el;
 
 			this.toArray().forEach(function (id, i) {
-				items[id] = el.children[i];
-			});
+				var el = rootEl.children[i];
+
+				if (_closest(rootEl, this.options.draggable, rootEl)) {
+					items[id] = el;
+				}
+			}, this);
 
 			order.forEach(function (id) {
 				if (items[id]) {
-					el.removeChild(items[id]);
-					el.appendChild(items[id]);
+					rootEl.removeChild(items[id]);
+					rootEl.appendChild(items[id]);
 				}
 			});
 		},
