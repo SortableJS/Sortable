@@ -144,6 +144,10 @@
 				, filter = options.filter
 			;
 
+			if( evt.type === 'mousedown' && evt.button !== 0 ) {
+				return; // only left button
+			}
+
 			// Check filter
 			if( typeof filter === 'function' && filter.call(this, target, this) ){
 				_dispatchEvent(el, 'filter', target);
