@@ -53,7 +53,7 @@ new Sortable(el, {
 	},
 
 	onFilter: function (/**Event*/evt){
-		var itemEl = evt.item; // HTMLElement on which was `nousedown|tapstart` event.
+		var itemEl = evt.item; // HTMLElement on which was `mousedown|tapstart` event.
 	}
 });
 ```
