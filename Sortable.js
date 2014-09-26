@@ -477,10 +477,11 @@
 			this.toArray().forEach(function (id, i) {
 				var el = rootEl.children[i];
 
-				if (_closest(rootEl, this.options.draggable, rootEl)) {
+				if (_closest(el, this.options.draggable, rootEl)) {
 					items[id] = el;
 				}
 			}, this);
+
 
 			order.forEach(function (id) {
 				if (items[id]) {
@@ -652,7 +653,7 @@
 	 * @private
 	 */
 	function _generateId(el) {
-		var str = el.innerHTML + el.className + el.src,
+		var str = el.tagName + el.className + el.src + el.href + el.textContent,
 			i = str.length,
 			sum = 0
 		;
@@ -679,7 +680,7 @@
 	};
 
 
-	Sortable.version = '0.5.0';
+	Sortable.version = '0.5.1';
 
 
 	// Export
