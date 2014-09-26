@@ -2,11 +2,13 @@
 
 
 ## Features
-* Support touch devices and [modern](http://caniuse.com/#search=drag) browsers
-* Built using native HTML5 drag and drop API
-* Simple API
-* Lightweight, 2KB gzipped
-* No jQuery
+ * Support touch devices and [modern](http://caniuse.com/#search=drag) browsers
+ * Animation moving items when sorting (css animation)
+ * Built using native HTML5 drag and drop API
+ * Simple API
+ * Lightweight, 2KB gzipped
+ * No jQuery
+
 
 
 ### Usage
@@ -20,7 +22,7 @@
 
 ```js
 var el = document.getElementById('items');
-new Sortable(el);
+Sortable.create(el);
 ```
 
 
@@ -29,14 +31,15 @@ new Sortable(el);
 
 ### Options
 ```js
-new Sortable(el, {
+var sortabel = new Sortable(el, {
 	group: "name",
 	store: null, // @see Store
+	animation: 150, // msec, animation speed moving items when sorting, `0` — without animation
 	handle: ".my-handle", // Restricts sort start click/touch to the specified element
 	filter: ".ignor-elements", // Selectors that do not lead to dragging (String or Function)
 	draggable: ".item",   // Specifies which items inside the element should be sortable
 	ghostClass: "sortable-ghost",
-	
+
 	onStart: function (/**Event*/evt) { /* dragging */ },
 	onEnd: function (/**Event*/evt) { /* dragging */ },
 
@@ -113,7 +116,7 @@ Saving and restoring of the sort.
 ```
 
 ```js
-new Sortable(el, {
+Sortable.create(el, {
 	group: "localStorage-example",
 	store: {
 		/**

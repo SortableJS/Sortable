@@ -83,7 +83,8 @@
 			draggable: el.children[0] && el.children[0].nodeName || (/[uo]l/i.test(el.nodeName) ? 'li' : '*'),
 			ghostClass: 'sortable-ghost',
 			ignore: 'a, img',
-			filter: null
+			filter: null,
+			animation: 150
 		};
 
 		// Set default options
@@ -339,22 +340,21 @@
 				if( el.children.length === 0 || el.children[0] === ghostEl || (el === evt.target) && _ghostInBottom(el, evt) ){
 					el.appendChild(dragEl);
 				}
-				else if( target && target !== dragEl && (target.parentNode[expando] !== void 0) ){
+				else if( target && !target.animated && target !== dragEl && (target.parentNode[expando] !== void 0) ){
 					if( lastEl !== target ){
 						lastEl = target;
 						lastCSS = _css(target);
-						lastRect = target.getBoundingClientRect();
 					}
 
 
-					var
-						  rect = lastRect
-						, width = rect.right - rect.left
-						, height = rect.bottom - rect.top
+					var   dragRect = dragEl.getBoundingClientRect()
+						, targetRect = target.getBoundingClientRect()
+						, width = targetRect.right - targetRect.left
+						, height = targetRect.bottom - targetRect.top
 						, floating = /left|right|inline/.test(lastCSS.cssFloat + lastCSS.display)
 						, isWide = (target.offsetWidth > dragEl.offsetWidth)
 						, isLong = (target.offsetHeight > dragEl.offsetHeight)
-						, halfway = (floating ? (evt.clientX - rect.left)/width : (evt.clientY - rect.top)/height) > .5
+						, halfway = (floating ? (evt.clientX - targetRect.left)/width : (evt.clientY - targetRect.top)/height) > .5
 						, nextSibling = target.nextElementSibling
 						, after
 					;
@@ -370,10 +370,37 @@
 
 					if( after && !nextSibling ){
 						el.appendChild(dragEl);
+						this._animate(dragRect, dragEl);
 					} else {
 						target.parentNode.insertBefore(dragEl, after ? nextSibling : target);
+						this._animate(dragRect, dragEl);
+						this._animate(targetRect, target);
 					}
 				}
+			}
+		},
+
+		_animate: function (prevRect, target) {
+			var ms = this.options.animation;
+
+			if (ms) {
+				var currentRect = target.getBoundingClientRect();
+
+				_css(target, 'transform', 'translate3d('
+					+ (prevRect.left - currentRect.left) + 'px,'
+					+ (prevRect.top - currentRect.top) + 'px,0)'
+				);
+
+				target.offsetWidth; // repaint
+				target.animated = true;
+
+				_css(target, 'transition', 'transform ' + ms + 'ms');
+				_css(target, 'transform', 'translate3d(0,0,0)');
+
+				setTimeout(function () {
+					_css(target, 'transition', '');
+					target.animated = false;
+				}, ms);
 			}
 		},
 
@@ -680,8 +707,16 @@
 	};
 
 
-	Sortable.version = '0.5.1';
+	Sortable.version = '0.6.0';
 
+	/**
+	 * Create sortable instance
+	 * @param {HTMLElement}  el
+	 * @param {Object}      [options]
+	 */
+	Sortable.create = function (el, options) {
+		return new Sortable(el, options)
+	};
 
 	// Export
 	return Sortable;
