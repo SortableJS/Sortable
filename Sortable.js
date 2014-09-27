@@ -335,10 +335,12 @@
 				var
 					  el = this.el
 					, target = _closest(evt.target, this.options.draggable, el)
+					, dragRect = dragEl.getBoundingClientRect()
 				;
 
 				if( el.children.length === 0 || el.children[0] === ghostEl || (el === evt.target) && _ghostInBottom(el, evt) ){
 					el.appendChild(dragEl);
+					this._animate(dragRect, dragEl);
 				}
 				else if( target && !target.animated && target !== dragEl && (target.parentNode[expando] !== void 0) ){
 					if( lastEl !== target ){
@@ -347,8 +349,7 @@
 					}
 
 
-					var   dragRect = dragEl.getBoundingClientRect()
-						, targetRect = target.getBoundingClientRect()
+					var   targetRect = target.getBoundingClientRect()
 						, width = targetRect.right - targetRect.left
 						, height = targetRect.bottom - targetRect.top
 						, floating = /left|right|inline/.test(lastCSS.cssFloat + lastCSS.display)
@@ -392,12 +393,12 @@
 				);
 
 				target.offsetWidth; // repaint
-				target.animated = true;
 
 				_css(target, 'transition', 'transform ' + ms + 'ms');
 				_css(target, 'transform', 'translate3d(0,0,0)');
 
-				setTimeout(function () {
+				clearTimeout(target.animated);
+				target.animated = setTimeout(function () {
 					_css(target, 'transition', '');
 					target.animated = false;
 				}, ms);
