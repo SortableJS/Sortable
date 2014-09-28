@@ -28,7 +28,6 @@
 
 		, lastEl
 		, lastCSS
-		, lastRect
 
 		, activeGroup
 
@@ -84,7 +83,7 @@
 			ghostClass: 'sortable-ghost',
 			ignore: 'a, img',
 			filter: null,
-			animation: 150
+			animation: 0
 		};
 
 		// Set default options
@@ -387,6 +386,7 @@
 			if (ms) {
 				var currentRect = target.getBoundingClientRect();
 
+				_css(target, 'transition', 'none');
 				_css(target, 'transform', 'translate3d('
 					+ (prevRect.left - currentRect.left) + 'px,'
 					+ (prevRect.top - currentRect.top) + 'px,0)'
@@ -394,7 +394,7 @@
 
 				target.offsetWidth; // repaint
 
-				_css(target, 'transition', 'transform ' + ms + 'ms');
+				_css(target, 'transition', 'all ' + ms + 'ms');
 				_css(target, 'transform', 'translate3d(0,0,0)');
 
 				clearTimeout(target.animated);
@@ -628,7 +628,9 @@
 
 
 	function _css(el, prop, val){
-		if( el && el.style ){
+		var style = el && el.style;
+
+		if( style ){
 			if( val === void 0 ){
 				if( document.defaultView && document.defaultView.getComputedStyle ){
 					val = document.defaultView.getComputedStyle(el, '');
@@ -636,9 +638,15 @@
 				else if( el.currentStyle ){
 					val	= el.currentStyle;
 				}
-				return	prop === void 0 ? val : val[prop];
-			} else {
-				el.style[prop] = val + (typeof val === 'string' ? '' : 'px');
+
+				return prop === void 0 ? val : val[prop];
+			}
+			else {
+				if (!(prop in style)) {
+					prop = '-webkit-' + prop;
+				}
+
+				style[prop] = val + (typeof val === 'string' ? '' : 'px');
 			}
 		}
 	}
