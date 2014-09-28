@@ -6,9 +6,9 @@
 
 	<title>Sortable. No jQuery.</title>
 
-	<meta name="keywords" content="sortable, reorder, list, javascript, html5, drag and drop, dnd, rubaxa"/>
+	<meta name="keywords" content="sortable, reorder, list, javascript, html5, drag and drop, dnd, animation, effects, rubaxa"/>
 	<meta name="description" content="Sortable - is a minimalist JavaScript library for modern browsers and touch devices (No jQuery)."/>
-	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<meta name="viewport" content="width=device-width, initial-scale=0.5"/>
 
 	<link href="//rubaxa.github.io/Ply/ply.css" rel="stylesheet" type="text/css"/>
 	<link href="//fonts.googleapis.com/css?family=Roboto:300" rel="stylesheet" type="text/css"/>
@@ -128,6 +128,7 @@ new Sortable(bar, { group: "omega" });
 // Or
 var container = document.getElementById("multi");
 var sort = new Sortable(container, {
+  animation: 150, // ms, animation speed moving items when sorting, `0` — without animation
   handle: ".tile__title", // Restricts sort start click/touch to the specified element
   draggable: ".tile", // Specifies which items inside the element should be sortable
   onUpdate: function (evt/**Event*/){
@@ -178,6 +179,7 @@ var editableList = new Sortable(editable, {
 
 			new Sortable(foo, {
 				group: "words",
+				animation: 150,
 				store: {
 					get: function (sortable) {
 						var order = localStorage.getItem(sortable.options.group);
@@ -198,6 +200,7 @@ var editableList = new Sortable(editable, {
 
 			new Sortable(bar, {
 				group: "words",
+				animation: 150,
 				onAdd: function (evt){ console.log('onAdd.bar:', evt.item); },
 				onUpdate: function (evt){ console.log('onUpdate.bar:', evt.item); },
 				onRemove: function (evt){ console.log('onRemove.bar:', evt.item); },
@@ -207,12 +210,14 @@ var editableList = new Sortable(editable, {
 
 
 			new Sortable(multi, {
+				animation: 150,
 				draggable: '.tile',
 				handle: '.tile__name'
 			});
 
 
 			var editableList = new Sortable(editable, {
+				animation: 150,
 				filter: '.js-remove',
 				onFilter: function (evt) {
 					var el = editableList.closest(evt.item);
@@ -234,7 +239,10 @@ var editableList = new Sortable(editable, {
 
 
 			[].forEach.call(multi.getElementsByClassName('tile__list'), function (el){
-				new Sortable(el, { group: 'photo' });
+				new Sortable(el, {
+					group: 'photo',
+					animation: 150
+				});
 			});
 		})();
 
