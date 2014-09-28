@@ -34,7 +34,7 @@ Sortable.create(el);
 var sortabel = new Sortable(el, {
 	group: "name",
 	store: null, // @see Store
-	animation: 150, // msec, animation speed moving items when sorting, `0` — without animation
+	animation: 150, // ms, animation speed moving items when sorting, `0` — without animation
 	handle: ".my-handle", // Restricts sort start click/touch to the specified element
 	filter: ".ignor-elements", // Selectors that do not lead to dragging (String or Function)
 	draggable: ".item",   // Specifies which items inside the element should be sortable
