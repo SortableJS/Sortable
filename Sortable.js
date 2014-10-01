@@ -149,9 +149,11 @@
 			}
 
 			// Check filter
-			if( typeof filter === 'function' && filter.call(this, target, this) ){
-				_dispatchEvent(el, 'filter', target);
-				return; // cancel dnd
+			if( typeof filter === 'function' ){
+				if( filter.call(this, target, this) ){
+					_dispatchEvent(el, 'filter', target);
+					return; // cancel dnd
+				}
 			}
 			else if( filter ){
 				filter = filter.split(',').filter(function (criteria) {
@@ -680,7 +682,7 @@
 	};
 
 
-	Sortable.version = '0.5.1';
+	Sortable.version = '0.5.2';
 
 
 	// Export
