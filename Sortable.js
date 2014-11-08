@@ -472,6 +472,7 @@
 				evt.stopPropagation();
 
 				if( ghostEl ){
+					cloneEl.parentNode.removeChild(cloneEl);
 					ghostEl.parentNode.removeChild(ghostEl);
 				}
 
@@ -493,8 +494,6 @@
 
 					_dispatchEvent(dragEl, 'end');
 				}
-
-				cloneEl.parentNode.removeChild(cloneEl);
 
 				// Set NULL
 				rootEl =
