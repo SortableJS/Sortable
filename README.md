@@ -32,7 +32,7 @@ Sortable.create(el);
 ### Options
 ```js
 var sortabel = new Sortable(el, {
-	group: "name", // or { name: "..", pull: [true, false, clone], put: true }
+	group: "name", // or { name: "..", pull: [true, false, clone], put: [true, false, array] }
 	sort: true, // sorting inside list
 	store: null, // @see Store
 	animation: 150, // ms, animation speed moving items when sorting, `0` — without animation
@@ -61,6 +61,16 @@ var sortabel = new Sortable(el, {
 	}
 });
 ```
+
+---
+
+
+### `group` option
+
+ * name:`string` — group name
+ * pull:`true|false|'clone'` — ability to move from the list. `clone` — cloning drag item when moving from the list.
+ * put:`true|false|["foo", "bar"]` — the possibility of adding an element from the other list, or an array of names groups, which can be taken.
+
 
 ---
 

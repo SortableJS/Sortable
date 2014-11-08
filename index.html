@@ -297,7 +297,7 @@ var editableList = new Sortable(editable, {
 				pull: false,
 				put: true
 			}].forEach(function (opts, i) {
-				new Sortable(document.getElementById(opts.name + '-' + (i + 1)), {
+				new Sortable(document.getElementById('advanced-' + (i + 1)), {
 					group: opts,
 					animation: 150
 				});

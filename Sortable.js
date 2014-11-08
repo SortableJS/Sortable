@@ -99,6 +99,7 @@
 			options.group = { name: options.group };
 		}
 
+
 		['pull', 'put'].forEach(function (key) {
 			if (!(key in options.group)) {
 				options.group[key] = true;
@@ -356,11 +357,12 @@
 				revert,
 				options = this.options,
 				group = options.group,
+				groupPut = group.put,
 				isOwner = (activeGroup === group);
 
 			if( !_silent &&
-				(activeGroup.name === group.name) &&
-				(isOwner && (options.sort || (revert = !rootEl.contains(dragEl))) || group.put && activeGroup.pull) &&
+				(activeGroup.name === group.name || groupPut && groupPut.indexOf && groupPut.indexOf(activeGroup.name) > -1) &&
+				(isOwner && (options.sort || (revert = !rootEl.contains(dragEl))) || groupPut && activeGroup.pull) &&
 				(evt.rootEl === void 0 || evt.rootEl === this.el)
 			){
 				target = _closest(evt.target, this.options.draggable, el);
@@ -491,6 +493,8 @@
 
 					_dispatchEvent(dragEl, 'end');
 				}
+
+				cloneEl.parentNode.removeChild(cloneEl);
 
 				// Set NULL
 				rootEl =
