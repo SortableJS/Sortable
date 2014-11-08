@@ -126,6 +126,12 @@ img {
 		margin-left: 5px;
 		background-color: #fff;
 	}
+		.block__list-title {
+			margin: -20px 0 0;
+			padding: 10px;
+			text-align: center;
+			background: #5F9EDF;
+		}
 		.block__list li { cursor: move; }
 
 	.block__list_words li {

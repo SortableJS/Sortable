@@ -32,7 +32,8 @@ Sortable.create(el);
 ### Options
 ```js
 var sortabel = new Sortable(el, {
-	group: "name",
+	group: "name", // or { name: "..", pull: [true, false, clone], put: true }
+	sort: true, // sorting inside list
 	store: null, // @see Store
 	animation: 150, // ms, animation speed moving items when sorting, `0` — without animation
 	handle: ".my-handle", // Restricts sort start click/touch to the specified element
@@ -158,6 +159,7 @@ Sortable.create(el, {
 * bind(ctx`:Mixed`, fn`:Function`)`:Function` — Takes a function and returns a new one that will always have a particular context
 * closest(el`:HTMLElement`, selector`:String`[, ctx`:HTMLElement`])`:HTMLElement|Null` — for each element in the set, get the first element that matches the selector by testing the element itself and traversing up through its ancestors in the DOM tree
 * toggleClass(el`:HTMLElement`, name`:String`, state`:Boolean`) — add or remove one classes from each element
+
 
 
 ---

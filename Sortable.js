@@ -23,6 +23,7 @@
 	var
 		  dragEl
 		, ghostEl
+		, cloneEl
 		, rootEl
 		, nextEl
 
@@ -74,9 +75,10 @@
 		this.options = options = (options || {});
 
 
-		// Defaults
+		// Default options
 		var defaults = {
 			group: Math.random(),
+			sort: true,
 			store: null,
 			handle: null,
 			draggable: el.children[0] && el.children[0].nodeName || (/[uo]l/i.test(el.nodeName) ? 'li' : '*'),
@@ -86,10 +88,22 @@
 			animation: 0
 		};
 
+
 		// Set default options
 		for (var name in defaults) {
 			options[name] = options[name] || defaults[name];
 		}
+
+
+		if (!options.group.name) {
+			options.group = { name: options.group };
+		}
+
+		['pull', 'put'].forEach(function (key) {
+			if (!(key in options.group)) {
+				options.group[key] = true;
+			}
+		});
 
 
 		// Define events
@@ -100,7 +114,7 @@
 
 
 		// Export group name
-		el[expando] = options.group;
+		el[expando] = options.group.name;
 
 
 		// Bind all private methods
@@ -187,6 +201,10 @@
 				nextEl = dragEl.nextSibling;
 				activeGroup = this.options.group;
 
+				cloneEl = dragEl.cloneNode(true);
+				_css(cloneEl, 'display', 'none');
+				rootEl.insertBefore(cloneEl, dragEl);
+
 				dragEl.draggable = true;
 
 				// Disable "draggable"
@@ -235,13 +253,13 @@
 				var
 					  target = document.elementFromPoint(touchEvt.clientX, touchEvt.clientY)
 					, parent = target
-					, group = this.options.group
+					, groupName = this.options.group.name
 					, i = touchDragOverListeners.length
 				;
 
 				if( parent ){
 					do {
-						if( parent[expando] === group ){
+						if( parent[expando] === groupName ){
 							while( i-- ){
 								touchDragOverListeners[i]({
 									clientX: touchEvt.clientX,
@@ -332,12 +350,32 @@
 
 
 		_onDragOver: function (evt/**Event*/){
-			if( !_silent && (activeGroup === this.options.group) && (evt.rootEl === void 0 || evt.rootEl === this.el) ){
-				var
-					  el = this.el
-					, target = _closest(evt.target, this.options.draggable, el)
-					, dragRect = dragEl.getBoundingClientRect()
-				;
+			var el = this.el,
+				target,
+				dragRect,
+				revert,
+				options = this.options,
+				group = options.group,
+				isOwner = (activeGroup === group);
+
+			if( !_silent &&
+				(activeGroup.name === group.name) &&
+				(isOwner && (options.sort || (revert = !rootEl.contains(dragEl))) || group.put && activeGroup.pull) &&
+				(evt.rootEl === void 0 || evt.rootEl === this.el)
+			){
+				target = _closest(evt.target, this.options.draggable, el);
+				dragRect = dragEl.getBoundingClientRect();
+
+				if ((activeGroup.pull == 'clone') && (cloneEl.state !== isOwner)) {
+					_css(cloneEl, 'display', isOwner ? 'none' : '');
+					!isOwner && cloneEl.state && rootEl.insertBefore(cloneEl, dragEl);
+					cloneEl.state = isOwner;
+				}
+
+				if (revert) {
+					rootEl.insertBefore(dragEl, cloneEl);
+					return;
+				}
 
 				if( el.children.length === 0 || el.children[0] === ghostEl || (el === evt.target) && _ghostInBottom(el, evt) ){
 					el.appendChild(dragEl);
@@ -459,6 +497,7 @@
 				dragEl =
 				ghostEl =
 				nextEl =
+				cloneEl =
 
 				tapEvt =
 				touchEvt =
@@ -719,7 +758,7 @@
 
 
 	Sortable.version = '0.6.0';
-	
+
 
 	/**
 	 * Create sortable instance

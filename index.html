@@ -108,6 +108,43 @@
 	</div>
 
 
+	<a name="ag"></a>
+	<div class="container" style="margin-top: 100px;">
+		<div id="advanced" style="margin-left: 30px;">
+			<div><div data-force="5" class="layer title title_xl">Advanced groups</div></div>
+
+			<div style="width: 25%; float: left; margin-top: 15px; margin-left: 10px" class="block__list block__list_words">
+				<div class="block__list-title">pull & put</div>
+				<ul id="advanced-1">
+					<li>Meet</li>
+					<li>Potato</li>
+					<li>Tea</li>
+				</ul>
+			</div>
+
+			<div style="width: 25%; float: left; margin-top: 15px; margin-left: 10px" class="block__list block__list_words">
+				<div class="block__list-title">only pull (clone)</div>
+				<ul id="advanced-2">
+					<li>Sex</li>
+					<li>Drags</li>
+					<li>Rock'n'roll</li>
+				</ul>
+			</div>
+
+			<div style="width: 25%; float: left; margin-top: 15px; margin-left: 10px" class="block__list block__list_words">
+				<div class="block__list-title">only put</div>
+				<ul id="advanced-3">
+					<li>Money</li>
+					<li>Force</li>
+					<li>Agility</li>
+				</ul>
+			</div>
+
+			<div style="clear: both"></div>
+		</div>
+	</div>
+
+
 	<a name="c"></a>
 	<div class="container" style="margin-top: 100px">
 		<div style="margin-left: 30px">
@@ -241,6 +278,27 @@ var editableList = new Sortable(editable, {
 			[].forEach.call(multi.getElementsByClassName('tile__list'), function (el){
 				new Sortable(el, {
 					group: 'photo',
+					animation: 150
+				});
+			});
+
+
+			[{
+				name: 'advanced',
+				pull: true,
+				put: true
+			},
+			{
+				name: 'advanced',
+				pull: 'clone',
+				put: false
+			}, {
+				name: 'advanced',
+				pull: false,
+				put: true
+			}].forEach(function (opts, i) {
+				new Sortable(document.getElementById(opts.name + '-' + (i + 1)), {
+					group: opts,
 					animation: 150
 				});
 			});
