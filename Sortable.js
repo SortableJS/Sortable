@@ -91,7 +91,7 @@
 
 		// Set default options
 		for (var name in defaults) {
-			options[name] = options[name] || defaults[name];
+			!(name in options) && (options[name] = defaults[name]);
 		}
 
 
