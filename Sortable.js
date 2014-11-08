@@ -202,10 +202,6 @@
 				nextEl = dragEl.nextSibling;
 				activeGroup = this.options.group;
 
-				cloneEl = dragEl.cloneNode(true);
-				_css(cloneEl, 'display', 'none');
-				rootEl.insertBefore(cloneEl, dragEl);
-
 				dragEl.draggable = true;
 
 				// Disable "draggable"
@@ -244,6 +240,11 @@
 
 
 				_dispatchEvent(dragEl, 'start');
+
+
+				cloneEl = dragEl.cloneNode(true);
+				_css(cloneEl, 'display', 'none');
+				rootEl.insertBefore(cloneEl, dragEl);
 			}
 		},
 
