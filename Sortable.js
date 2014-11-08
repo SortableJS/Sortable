@@ -471,10 +471,8 @@
 				evt.preventDefault();
 				evt.stopPropagation();
 
-				if( ghostEl ){
-					cloneEl.parentNode.removeChild(cloneEl);
-					ghostEl.parentNode.removeChild(ghostEl);
-				}
+				cloneEl.parentNode.removeChild(cloneEl);
+				ghostEl && ghostEl.parentNode.removeChild(ghostEl);
 
 				if( dragEl ){
 					_disableDraggable(dragEl);
