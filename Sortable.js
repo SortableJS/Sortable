@@ -380,9 +380,14 @@
 					return;
 				}
 
-				if( el.children.length === 0 || el.children[0] === ghostEl || (el === evt.target) && _ghostInBottom(el, evt) ){
+				if( (el.children.length === 0) || (el.children[0] === ghostEl) ||
+					(el === evt.target) && _ghostInBottom(el, evt)
+				){
+					target && (targetRect = target.getBoundingClientRect());
+
 					el.appendChild(dragEl);
 					this._animate(dragRect, dragEl);
+					target && this._animate(targetRect, target);
 				}
 				else if( target && !target.animated && target !== dragEl && (target.parentNode[expando] !== void 0) ){
 					if( lastEl !== target ){
@@ -413,12 +418,12 @@
 
 					if( after && !nextSibling ){
 						el.appendChild(dragEl);
-						this._animate(dragRect, dragEl);
 					} else {
 						target.parentNode.insertBefore(dragEl, after ? nextSibling : target);
-						this._animate(dragRect, dragEl);
-						this._animate(targetRect, target);
 					}
+					
+					this._animate(dragRect, dragEl);
+					this._animate(targetRect, target);
 				}
 			}
 		},
