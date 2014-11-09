@@ -44,18 +44,17 @@
 
 		, _silent = false
 
-		, _createEvent = function (event/**String*/, item/**HTMLElement*/){
+		, _dispatchEvent = function (rootEl, name, targetEl, fromEl) {
 			var evt = document.createEvent('Event');
-			evt.initEvent(event, true, true);
-			evt.item = item;
-			return evt;
+
+			evt.initEvent(name, true, true);
+			evt.item = targetEl || rootEl;
+			evt.from = fromEl || rootEl;
+
+			rootEl.dispatchEvent(evt);
 		}
 
-		, _dispatchEvent = function (rootEl, name, targetEl) {
-			rootEl.dispatchEvent(_createEvent(name, targetEl || rootEl));
-		}
-
-		, _customEvents = 'onAdd onUpdate onRemove onStart onEnd onFilter'.split(' ')
+		, _customEvents = 'onAdd onUpdate onRemove onStart onEnd onFilter onSort'.split(' ')
 
 		, noop = function (){}
 		, slice = [].slice
@@ -485,18 +484,22 @@
 					_toggleClass(dragEl, this.options.ghostClass, false);
 
 					if( !rootEl.contains(dragEl) ){
-						// Remove event
-						_dispatchEvent(rootEl, 'remove', dragEl);
+						_dispatchEvent(dragEl, 'sort');
+						_dispatchEvent(rootEl, 'sort');
 
 						// Add event
-						_dispatchEvent(dragEl, 'add');
+						_dispatchEvent(dragEl, 'add', dragEl, rootEl);
+
+						// Remove event
+						_dispatchEvent(rootEl, 'remove', dragEl);
 					}
 					else if( dragEl.nextSibling !== nextEl ){
 						// Update event
 						_dispatchEvent(dragEl, 'update');
+						_dispatchEvent(dragEl, 'sort');
 					}
 
-					_dispatchEvent(dragEl, 'end');
+					_dispatchEvent(rootEl, 'end');
 				}
 
 				// Set NULL
@@ -759,7 +762,6 @@
 		bind: _bind,
 		closest: _closest,
 		toggleClass: _toggleClass,
-		createEvent: _createEvent,
 		dispatchEvent: _dispatchEvent
 	};
 

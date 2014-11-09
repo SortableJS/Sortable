@@ -5,6 +5,7 @@
  * Support touch devices and [modern](http://caniuse.com/#search=drag) browsers
  * Animation moving items when sorting (css animation)
  * Built using native HTML5 drag and drop API
+ * Support [AngularJS](#ng)
  * Simple API
  * Lightweight, 2KB gzipped
  * No jQuery
@@ -44,14 +45,23 @@ var sortabel = new Sortable(el, {
 	onStart: function (/**Event*/evt) { /* dragging */ },
 	onEnd: function (/**Event*/evt) { /* dragging */ },
 
+	// Element is added to the list
 	onAdd: function (/**Event*/evt){
 		var itemEl = evt.item; // dragged HTMLElement
+		itemEl.from; // previous list
 	},
 
+	// Changed sorting in list
 	onUpdate: function (/**Event*/evt){
 		var itemEl = evt.item; // dragged HTMLElement
 	},
 
+	// Called by any change to the list (add / update / remove)
+	onSort: function (/**Event*/evt){
+		var itemEl = evt.item; // dragged HTMLElement
+	},
+
+	// The element is removed from the list
 	onRemove: function (/**Event*/evt){
 		var itemEl = evt.item; // dragged HTMLElement
 	},
@@ -74,6 +84,38 @@ var sortabel = new Sortable(el, {
 
 ---
 
+<a name="ng"></a>
+### Support AngularJS
+Include [ng-sortable.js](ng-sortable.js)
+
+```html
+<div ng-app"myApp">
+	<ul ng-sortable>
+		<li ng-repeat="item in items">{{item}}</li>
+	</ul>
+
+	<ul ng-sortable="{ group: 'foobar' }">
+		<li ng-repeat="item in foo">{{item}}</li>
+	</ul>
+
+	<ul ng-sortable="barConfig">
+		<li ng-repeat="item in bar">{{item}}</li>
+	</ul>
+</div>
+```
+
+
+```js
+angular.module('myApp', ['ng-sortable'])
+	.controller(function () {
+		this.items = ['item 1', 'item 2'];
+		this.foo = ['foo 1', '..'];
+		this.bar = ['bar 1', '..'];
+		this.barConfig = { group: 'foobar', animation: 150 };
+	});
+```
+
+---
 
 ### Method
 

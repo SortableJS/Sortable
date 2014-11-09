@@ -215,3 +215,12 @@ img {
 	#filter .block__list {
 		padding-bottom: 0;
 	}
+
+
+
+#todos input {
+	padding: 5px;
+	font-size: 14px;
+	font-family: 'Roboto', sans-serif;
+	font-weight: 300;
+}

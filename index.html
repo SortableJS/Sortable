@@ -6,8 +6,8 @@
 
 	<title>Sortable. No jQuery.</title>
 
-	<meta name="keywords" content="sortable, reorder, list, javascript, html5, drag and drop, dnd, animation, effects, rubaxa"/>
-	<meta name="description" content="Sortable - is a minimalist JavaScript library for modern browsers and touch devices (No jQuery)."/>
+	<meta name="keywords" content="sortable, reorder, list, javascript, html5, drag and drop, dnd, animation, groups, angular, ng-sortable, effects, rubaxa"/>
+	<meta name="description" content="Sortable - is a minimalist JavaScript library for modern browsers and touch devices (No jQuery). Support AngularJS."/>
 	<meta name="viewport" content="width=device-width, initial-scale=0.5"/>
 
 	<link href="//rubaxa.github.io/Ply/ply.css" rel="stylesheet" type="text/css"/>
@@ -145,6 +145,47 @@
 	</div>
 
 
+	<a name="ng"></a>
+	<div id="todos" ng-app="todoApp" class="container" style="margin-top: 100px">
+		<div style="margin-left: 30px">
+			<div><div data-force="5" class="layer title title_xl">AngluarJS</div></div>
+
+			<div style="width: 30%; margin-top: -8px; margin-left: 10px; float: left;" class="block__list block__list_words">
+				<div ng-controller="TodoController">
+					<span style="padding-left: 20px">{{remaining()}} of {{todos.length}} remaining</span>
+					[ <a href="" ng-click="archive()">archive</a> ]
+					<ul ng-sortable="{ group: 'todo', animation: 150 }" class="unstyled">
+						<li ng-repeat="todo in todos">
+							<input type="checkbox" ng-model="todo.done">
+							<span class="done-{{todo.done}}">{{todo.text}}</span>
+						</li>
+					</ul>
+					<form ng-submit="addTodo()" style="padding-left: 20px">
+						<input type="text" ng-model="todoText" size="30"
+							   placeholder="add new todo here">
+					</form>
+				</div>
+			</div>
+
+
+			<div style="width: 30%; margin-top: -8px; margin-left: 10px; float: left;" class="block__list block__list_words">
+				<div ng-controller="TodoControllerNext">
+					<span style="padding-left: 20px">{{remaining()}} of {{todos.length}} remaining</span>
+					<ul ng-sortable="sortableConfig" class="unstyled">
+						<li ng-repeat="todo in todos">
+							<input type="checkbox" ng-model="todo.done">
+							<span class="done-{{todo.done}}">{{todo.text}}</span>
+						</li>
+					</ul>
+				</div>
+			</div>
+
+			<div style="clear: both"></div>
+		</div>
+	</div>
+
+
+
 	<a name="c"></a>
 	<div class="container" style="margin-top: 100px">
 		<div style="margin-left: 30px">
@@ -202,6 +243,8 @@ var editableList = new Sortable(editable, {
 
 	<script src="Sortable.js"></script>
 	<script src="//rubaxa.github.io/Ply/Ply.min.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
+	<script src="ng-sortable.js"></script>
 
 	<script>
 		(function (){
@@ -302,6 +345,55 @@ var editableList = new Sortable(editable, {
 					animation: 150
 				});
 			});
+
+			angular.module('todoApp', ['ng-sortable'])
+				.controller('TodoController', ['$scope', function ($scope) {
+					$scope.todos = [
+						{text: 'learn angular', done: true},
+						{text: 'build an angular app', done: false}
+					];
+
+					$scope.addTodo = function () {
+						$scope.todos.push({text: $scope.todoText, done: false});
+						$scope.todoText = '';
+					};
+
+					$scope.remaining = function () {
+						var count = 0;
+						angular.forEach($scope.todos, function (todo) {
+							count += todo.done ? 0 : 1;
+						});
+						return count;
+					};
+
+					$scope.archive = function () {
+						var oldTodos = $scope.todos;
+						$scope.todos = [];
+						angular.forEach(oldTodos, function (todo) {
+							if (!todo.done) $scope.todos.push(todo);
+						});
+					};
+				}])
+				.controller('TodoControllerNext', ['$scope', function ($scope) {
+					$scope.todos = [
+						{text: 'learn Sortable', done: true},
+						{text: 'use ng-sortable', done: false},
+						{text: 'Enjoy', done: false}
+					];
+
+					$scope.remaining = function () {
+						var count = 0;
+						angular.forEach($scope.todos, function (todo) {
+							count += todo.done ? 0 : 1;
+						});
+						return count;
+					};
+
+					$scope.sortableConfig = { group: 'todo', animation: 150 };
+					'Start End Add Update Remove Sort'.split(' ').forEach(function (name) {
+						$scope.sortableConfig['on' + name] = console.log.bind(console, name);
+					});
+				}]);
 		})();
 
 
