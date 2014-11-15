@@ -83,12 +83,13 @@
 			draggable: el.children[0] && el.children[0].nodeName || (/[uo]l/i.test(el.nodeName) ? 'li' : '*'),
 			ghostClass: 'sortable-ghost',
 			ignore: 'a, img',
+			setData: true,
 			filter: null
 		};
 
 		// Set default options
 		for (var name in defaults) {
-			options[name] = options[name] || defaults[name];
+			options[name] = typeof options[name] !== 'undefined' ? options[name] : defaults[name];
 		}
 
 
@@ -322,7 +323,10 @@
 			}
 			else {
 				dataTransfer.effectAllowed = 'move';
-				dataTransfer.setData('Text', dragEl.textContent);
+
+				if (this.options.setData) {
+					dataTransfer.setData('Text', dragEl.textContent);
+				}
 
 				_on(document, 'drop', this._onDrop);
 			}
