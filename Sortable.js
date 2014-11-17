@@ -84,7 +84,10 @@
 			ghostClass: 'sortable-ghost',
 			ignore: 'a, img',
 			filter: null,
-			animation: 0
+			animation: 0,
+			setData: function (dataTransfer, dragEl) {
+				dataTransfer.setData('Text', dragEl.textContent);
+			}
 		};
 
 
@@ -304,7 +307,8 @@
 
 
 		_onDragStart: function (evt/**Event*/, isTouch/**Boolean*/){
-			var dataTransfer = evt.dataTransfer;
+			var dataTransfer = evt.dataTransfer,
+				options = this.options;
 
 			this._offUpEvents();
 
@@ -341,7 +345,7 @@
 			}
 			else {
 				dataTransfer.effectAllowed = 'move';
-				dataTransfer.setData('Text', dragEl.textContent);
+				options.setData && options.setData.call(this, dataTransfer, dragEl);
 
 				_on(document, 'drop', this._onDrop);
 			}

@@ -1,15 +1,15 @@
 # Sortable
 
+Sortable is a minimalist JavaScript library for reorderable drag-and-drop lists.
 
 ## Features
- * Support touch devices and [modern](http://caniuse.com/#search=drag) browsers
+ * Supports touch devices and [modern](http://caniuse.com/#search=drag) browsers
+ * Can drag from one list to another or within the same list
  * Animation moving items when sorting (css animation)
  * Built using native HTML5 drag and drop API
  * Support [AngularJS](#ng)
  * Simple API
- * Lightweight, 2KB gzipped
  * No jQuery
-
 
 
 ### Usage
@@ -41,6 +41,9 @@ var sortabel = new Sortable(el, {
 	filter: ".ignor-elements", // Selectors that do not lead to dragging (String or Function)
 	draggable: ".item",   // Specifies which items inside the element should be sortable
 	ghostClass: "sortable-ghost",
+	setData: function (dataTransfer, dragEl) {
+		dataTransfer.setData('Text', dragEl.textContent);
+	},
 
 	onStart: function (/**Event*/evt) { /* dragging */ },
 	onEnd: function (/**Event*/evt) { /* dragging */ },
