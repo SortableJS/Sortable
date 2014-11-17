@@ -1,9 +1,11 @@
 # Sortable
 
+Sortable is a minimalist JavaScript library for reorderable drag-and-drop lists.
 
 ## Features
-* Support touch devices and [modern](http://caniuse.com/#search=drag) browsers
+* Supports touch devices and [modern](http://caniuse.com/#search=drag) browsers
 * Built using native HTML5 drag and drop API
+* Can drag from one list to another or within the same list
 * Simple API
 * Lightweight, 2KB gzipped
 * No jQuery
