@@ -6,7 +6,7 @@
   "authors": [
     "RubaXa <ibnRubaXa@gmail.com>"
   ],
-  "description": "Sortable is a minimalist JavaScript library for modern browsers and touch devices. No jQuery.",
+  "description": "Minimalist library for reorderable drag-and-drop lists on modern browsers and touch devices. No jQuery.",
   "keywords": [
     "sortable",
     "reorder",
