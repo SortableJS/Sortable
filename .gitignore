@@ -1,3 +1,4 @@
 node_modules
 mock.png
 .*.sw*
+.build*
