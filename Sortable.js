@@ -480,7 +480,6 @@
 				evt.preventDefault();
 				evt.stopPropagation();
 
-				cloneEl.parentNode.removeChild(cloneEl);
 				ghostEl && ghostEl.parentNode.removeChild(ghostEl);
 
 				if( dragEl ){
@@ -501,6 +500,8 @@
 						// Update event
 						_dispatchEvent(dragEl, 'update');
 						_dispatchEvent(dragEl, 'sort');
+
+						cloneEl.parentNode.removeChild(cloneEl);
 					}
 
 					_dispatchEvent(rootEl, 'end');
