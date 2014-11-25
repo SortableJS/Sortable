@@ -247,9 +247,11 @@
 				_dispatchEvent(dragEl, 'start');
 
 
-				cloneEl = dragEl.cloneNode(true);
-				_css(cloneEl, 'display', 'none');
-				rootEl.insertBefore(cloneEl, dragEl);
+				if (activeGroup.pull == 'clone') {
+					cloneEl = dragEl.cloneNode(true);
+					_css(cloneEl, 'display', 'none');
+					rootEl.insertBefore(cloneEl, dragEl);
+				}
 			}
 		},
 
@@ -375,13 +377,13 @@
 				target = _closest(evt.target, this.options.draggable, el);
 				dragRect = dragEl.getBoundingClientRect();
 
-				if ((activeGroup.pull == 'clone') && (cloneEl.state !== isOwner)) {
+				if (cloneEl && (cloneEl.state !== isOwner)) {
 					_css(cloneEl, 'display', isOwner ? 'none' : '');
 					!isOwner && cloneEl.state && rootEl.insertBefore(cloneEl, dragEl);
 					cloneEl.state = isOwner;
 				}
 
-				if (revert) {
+				if (revert && cloneEl) {
 					rootEl.insertBefore(dragEl, cloneEl);
 					return;
 				}
@@ -504,7 +506,7 @@
 						_dispatchEvent(dragEl, 'update');
 						_dispatchEvent(dragEl, 'sort');
 
-						cloneEl.parentNode.removeChild(cloneEl);
+						cloneEl && cloneEl.parentNode.removeChild(cloneEl);
 					}
 
 					_dispatchEvent(rootEl, 'end');
