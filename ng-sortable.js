@@ -5,6 +5,8 @@
 angular.module('ng-sortable', [])
 	.constant('$version', '0.1.0')
 	.directive('ngSortable', ['$parse', '$rootScope', function ($parse, $rootScope) {
+		"use strict";
+
 		var removed;
 
 		function getSource(el) {
@@ -72,7 +74,7 @@ angular.module('ng-sortable', [])
 				}
 
 
-				var sortable = Sortable.create(el, Object.keys(options).reduce(function(opts, name) {
+				var sortable = Sortable.create(el, Object.keys(options).reduce(function (opts, name) {
 					opts[name] = opts[name] || options[name];
 					return opts;
 				}, {
@@ -80,7 +82,7 @@ angular.module('ng-sortable', [])
 						$rootScope.$broadcast('sortable:start', sortable);
 						options.onStart();
 					},
-					onEnd:function () {
+					onEnd: function () {
 						$rootScope.$broadcast('sortable:end', sortable);
 						options.onEnd();
 					},
