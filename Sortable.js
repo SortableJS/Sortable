@@ -385,9 +385,14 @@
 				}
 
 				if ((el.children.length === 0) || (el.children[0] === ghostEl) ||
-					(el === evt.target) && _ghostInBottom(el, evt)
+					(el === evt.target) && (target = _ghostInBottom(el, evt))
 				) {
-					target && (targetRect = target.getBoundingClientRect());
+					if (target) {
+						if (target.animated) {
+							return;
+						}
+						targetRect = target.getBoundingClientRect();
+					}
 
 					el.appendChild(dragEl);
 					this._animate(dragRect, dragEl);
@@ -709,11 +714,13 @@
 	function _find(ctx, tagName, iterator) {
 		if (ctx) {
 			var list = ctx.getElementsByTagName(tagName), i = 0, n = list.length;
+
 			if (iterator) {
 				for (; i < n; i++) {
 					iterator(list[i], i);
 				}
 			}
+
 			return list;
 		}
 
@@ -722,7 +729,7 @@
 
 
 	function _disableDraggable(el) {
-		return (el.draggable = false);
+		el.draggable = false;
 	}
 
 
@@ -731,9 +738,10 @@
 	}
 
 
+	/** @returns {HTMLElement|false} */
 	function _ghostInBottom(el, evt) {
-		var last = el.lastElementChild.getBoundingClientRect();
-		return evt.clientY - (last.top + last.height) > 5; // min delta
+		var lastEl = el.lastElementChild, rect = lastEl.getBoundingClientRect();
+		return (evt.clientY - (rect.top + rect.height) > 5) && lastEl; // min delta
 	}
 
 
