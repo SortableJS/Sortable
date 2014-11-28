@@ -370,7 +370,7 @@
 				(isOwner && (options.sort || (revert = !rootEl.contains(dragEl))) || groupPut && activeGroup.pull) &&
 				(evt.rootEl === void 0 || evt.rootEl === this.el)
 			) {
-				target = _closest(evt.target, this.options.draggable, el);
+				target = _closest(evt.target, options.draggable, el);
 				dragRect = dragEl.getBoundingClientRect();
 
 				if (cloneEl && (cloneEl.state !== isOwner)) {
