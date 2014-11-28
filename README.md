@@ -41,11 +41,18 @@ var sortabel = new Sortable(el, {
 	filter: ".ignor-elements", // Selectors that do not lead to dragging (String or Function)
 	draggable: ".item",   // Specifies which items inside the element should be sortable
 	ghostClass: "sortable-ghost",
+<<<<<<< HEAD
 	setData: function (dataTransfer, dragEl) {
 		dataTransfer.setData('Text', dragEl.textContent);
 	},
 	scrollBuffer: 50 // Specifies distance from top/bottom when auto-scroll starts
 	scrollSpeed: 10 // Speed of scroll,
+=======
+	scrollContainer: containerEl, // Which container to scroll (element)
+	scrollBuffer: 50, // Specifies distance from top/bottom when auto-scroll starts
+	scrollSpeed: 10, // Speed of scroll
+
+>>>>>>> Add option for scroll container
 	onStart: function (/**Event*/evt) { /* dragging */ },
 	onEnd: function (/**Event*/evt) { /* dragging */ },
 
