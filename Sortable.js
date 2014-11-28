@@ -294,10 +294,9 @@
 		},
 
 		_scroll: function (y) {
-			var
-				  buffer = this.options.scrollBuffer
-				, speed = this.options.scrollSpeed
-				, scroll;
+			var buffer = this.options.scrollBuffer,
+				speed = this.options.scrollSpeed,
+				scroll;
 
 			if (y === 0) return;
 
@@ -309,7 +308,7 @@
 
 			clearInterval(scrollInterval);
 			if (scroll) {
-				scrollInterval = setInterval(function() {
+				scrollInterval = setInterval(function () {
 					window.scrollTo(window.scrollX, window.scrollY + (speed * scroll));
 				}, 10);
 			}
