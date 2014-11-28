@@ -5,67 +5,67 @@
  */
 
 
-(function (factory){
+(function (factory) {
 	"use strict";
 
-	if( typeof define === "function" && define.amd ){
+	if (typeof define === "function" && define.amd) {
 		define(factory);
 	}
-	else if( typeof module != "undefined" && typeof module.exports != "undefined" ){
+	else if (typeof module != "undefined" && typeof module.exports != "undefined") {
 		module.exports = factory();
 	}
-	else if( typeof Package !== "undefined" ){
+	else if (typeof Package !== "undefined") {
 		Sortable = factory();  // export for Meteor.js
 	}
 	else {
+		/* jshint sub:true */
 		window["Sortable"] = factory();
 	}
-})(function (){
+})(function () {
 	"use strict";
 
-	var
-		  dragEl
-		, ghostEl
-		, rootEl
-		, nextEl
+	var dragEl,
+		ghostEl,
+		cloneEl,
+		rootEl,
+		nextEl,
 
-		, lastEl
-		, lastCSS
-		, lastRect
+		lastEl,
+		lastCSS,
 
-		, activeGroup
+		activeGroup,
 
-		, tapEvt
-		, touchEvt
+		tapEvt,
+		touchEvt,
 
-		, expando = 'Sortable' + (new Date).getTime()
+		expando = 'Sortable' + (new Date).getTime(),
 
-		, win = window
-		, document = win.document
-		, parseInt = win.parseInt
-		, supportIEdnd = !!document.createElement('div').dragDrop
+		scrollInterval,
 
-		, _silent = false
+		win = window,
+		document = win.document,
+		parseInt = win.parseInt,
+		supportIEdnd = !!document.createElement('div').dragDrop,
 
-		, _createEvent = function (event/**String*/, item/**HTMLElement*/){
+		_silent = false,
+
+		_dispatchEvent = function (rootEl, name, targetEl, fromEl) {
 			var evt = document.createEvent('Event');
-			evt.initEvent(event, true, true);
-			evt.item = item;
-			return evt;
-		}
 
-		, _dispatchEvent = function (rootEl, name, targetEl) {
-			rootEl.dispatchEvent(_createEvent(name, targetEl || rootEl));
-		}
+			evt.initEvent(name, true, true);
+			evt.item = targetEl || rootEl;
+			evt.from = fromEl || rootEl;
 
-		, _customEvents = 'onAdd onUpdate onRemove onStart onEnd onFilter'.split(' ')
+			rootEl.dispatchEvent(evt);
+		},
 
-		, noop = function (){}
-		, slice = [].slice
+		_customEvents = 'onAdd onUpdate onRemove onStart onEnd onFilter onSort'.split(' '),
 
-		, touchDragOverListeners = []
+		noop = function () {},
+		slice = [].slice,
+
+		touchDragOverListeners = []
 	;
-
 
 
 	/**
@@ -73,26 +73,47 @@
 	 * @param  {HTMLElement}  el
 	 * @param  {Object}       [options]
 	 */
-	function Sortable(el, options){
+	function Sortable(el, options) {
 		this.el = el; // root element
 		this.options = options = (options || {});
 
 
-		// Defaults
+		// Default options
 		var defaults = {
 			group: Math.random(),
+			sort: true,
 			store: null,
 			handle: null,
 			draggable: el.children[0] && el.children[0].nodeName || (/[uo]l/i.test(el.nodeName) ? 'li' : '*'),
 			ghostClass: 'sortable-ghost',
 			ignore: 'a, img',
-			filter: null
+			filter: null,
+			animation: 0,
+			setData: function (dataTransfer, dragEl) {
+				dataTransfer.setData('Text', dragEl.textContent);
+			},
+			scrollContainer: null,
+			scrollBuffer: 50,
+			scrollSpeed: 10
 		};
+
 
 		// Set default options
 		for (var name in defaults) {
-			options[name] = options[name] || defaults[name];
+			!(name in options) && (options[name] = defaults[name]);
 		}
+
+
+		if (!options.group.name) {
+			options.group = { name: options.group };
+		}
+
+
+		['pull', 'put'].forEach(function (key) {
+			if (!(key in options.group)) {
+				options.group[key] = true;
+			}
+		});
 
 
 		// Define events
@@ -103,12 +124,12 @@
 
 
 		// Export group name
-		el[expando] = options.group;
+		el[expando] = options.group.name;
 
 
 		// Bind all private methods
-		for( var fn in this ){
-			if( fn.charAt(0) === '_' ){
+		for (var fn in this) {
+			if (fn.charAt(0) === '_') {
 				this[fn] = _bind(this, this[fn]);
 			}
 		}
@@ -119,6 +140,7 @@
 		_on(el, 'touchstart', this._onTapStart);
 		supportIEdnd && _on(el, 'selectstart', this._onTapStart);
 
+		_on(el, 'drag', this._onDrag);
 		_on(el, 'dragover', this._onDragOver);
 		_on(el, 'dragenter', this._onDragOver);
 
@@ -133,32 +155,31 @@
 		constructor: Sortable,
 
 
-		_applyEffects: function (){
+		_applyEffects: function () {
 			_toggleClass(dragEl, this.options.ghostClass, true);
 		},
 
 
-		_onTapStart: function (evt/**Event|TouchEvent*/){
-			var
-				  touch = evt.touches && evt.touches[0]
-				, target = (touch || evt).target
-				, options =  this.options
-				, el = this.el
-				, filter = options.filter
-			;
+		_onTapStart: function (/**Event|TouchEvent*/evt) {
+			var touch = evt.touches && evt.touches[0],
+				target = (touch || evt).target,
+				options =  this.options,
+				el = this.el,
+				filter = options.filter;
 
-			if( evt.type === 'mousedown' && evt.button !== 0 ) {
+
+			if (evt.type === 'mousedown' && evt.button !== 0) {
 				return; // only left button
 			}
 
 			// Check filter
-			if( typeof filter === 'function' ){
-				if( filter.call(this, target, this) ){
+			if (typeof filter === 'function') {
+				if (filter.call(this, target, this)) {
 					_dispatchEvent(el, 'filter', target);
 					return; // cancel dnd
 				}
 			}
-			else if( filter ){
+			else if (filter) {
 				filter = filter.split(',').filter(function (criteria) {
 					return _closest(target, criteria.trim(), el);
 				});
@@ -169,20 +190,20 @@
 				}
 			}
 
-			if( options.handle ){
+			if (options.handle) {
 				target = _closest(target, options.handle, el);
 			}
 
 			target = _closest(target, options.draggable, el);
 
 			// IE 9 Support
-			if( target && evt.type == 'selectstart' ){
-				if( target.tagName != 'A' && target.tagName != 'IMG'){
+			if (target && evt.type == 'selectstart') {
+				if (target.tagName != 'A' && target.tagName != 'IMG') {
 					target.dragDrop();
 				}
 			}
 
-			if( target && !dragEl && (target.parentNode === el) ){
+			if (target && !dragEl && (target.parentNode === el)) {
 				tapEvt = evt;
 
 				rootEl = this.el;
@@ -197,12 +218,12 @@
 					_find(target, criteria.trim(), _disableDraggable);
 				});
 
-				if( touch ){
+				if (touch) {
 					// Touch device support
 					tapEvt = {
-						  target:  target
-						, clientX: touch.clientX
-						, clientY: touch.clientY
+						target: target,
+						clientX: touch.clientX,
+						clientY: touch.clientY
 					};
 
 					this._onDragStart(tapEvt, true);
@@ -219,33 +240,39 @@
 
 
 				try {
-					if( document.selection ){
+					if (document.selection) {
 						document.selection.empty();
 					} else {
-						window.getSelection().removeAllRanges()
+						window.getSelection().removeAllRanges();
 					}
-				} catch (err){ }
+				} catch (err) {
+				}
 
 
 				_dispatchEvent(dragEl, 'start');
+
+
+				if (activeGroup.pull == 'clone') {
+					cloneEl = dragEl.cloneNode(true);
+					_css(cloneEl, 'display', 'none');
+					rootEl.insertBefore(cloneEl, dragEl);
+				}
 			}
 		},
 
-		_emulateDragOver: function (){
-			if( touchEvt ){
+		_emulateDragOver: function () {
+			if (touchEvt) {
 				_css(ghostEl, 'display', 'none');
 
-				var
-					  target = document.elementFromPoint(touchEvt.clientX, touchEvt.clientY)
-					, parent = target
-					, group = this.options.group
-					, i = touchDragOverListeners.length
-				;
+				var target = document.elementFromPoint(touchEvt.clientX, touchEvt.clientY),
+					parent = target,
+					groupName = this.options.group.name,
+					i = touchDragOverListeners.length;
 
-				if( parent ){
+				if (parent) {
 					do {
-						if( parent[expando] === group ){
-							while( i-- ){
+						if (parent[expando] === groupName) {
+							while (i--) {
 								touchDragOverListeners[i]({
 									clientX: touchEvt.clientX,
 									clientY: touchEvt.clientY,
@@ -253,27 +280,63 @@
 									rootEl: parent
 								});
 							}
+
 							break;
 						}
 
 						target = parent; // store last element
 					}
-					while( parent = parent.parentNode );
+					/* jshint boss:true */
+					while (parent = parent.parentNode);
 				}
 
 				_css(ghostEl, 'display', '');
 			}
 		},
 
+		_scroll: function (y) {
+			var buffer = this.options.scrollBuffer,
+				speed = this.options.scrollSpeed,
+				scrollContainer = this.options.scrollContainer,
+				scroll;
 
-		_onTouchMove: function (evt/**TouchEvent*/){
-			if( tapEvt ){
-				var
-					  touch = evt.touches[0]
-					, dx = touch.clientX - tapEvt.clientX
-					, dy = touch.clientY - tapEvt.clientY
-					, translate3d = 'translate3d(' + dx + 'px,' + dy + 'px,0)'
-				;
+			if (y === 0) return;
+
+			if (y > window.innerHeight - buffer) {
+				scroll = 1;
+			} else if (y < buffer) {
+				scroll = -1;
+			}
+
+			clearInterval(scrollInterval);
+
+			function createInterval() {
+				if (scrollContainer) {
+					return function () {
+						scrollContainer.scrollTop = scrollContainer.scrollTop + (speed * scroll);
+					};
+				} else {
+					return function () {
+						window.scrollTo(window.scrollX, window.scrollY + (speed * scroll));
+					};
+				}
+			}
+
+			if (scroll) {
+				scrollInterval = setInterval(createInterval(), 10);
+			}
+		},
+
+		_onDrag: function (evt) {
+			this._scroll.call(this, evt.clientY);
+		},
+
+		_onTouchMove: function (/**TouchEvent*/evt) {
+			if (tapEvt) {
+				var touch = evt.touches[0],
+					dx = touch.clientX - tapEvt.clientX,
+					dy = touch.clientY - tapEvt.clientY,
+					translate3d = 'translate3d(' + dx + 'px,' + dy + 'px,0)';
 
 				touchEvt = touch;
 
@@ -282,22 +345,23 @@
 				_css(ghostEl, 'msTransform', translate3d);
 				_css(ghostEl, 'transform', translate3d);
 
+				this._scroll.call(this, touchEvt.clientY);
+
 				evt.preventDefault();
 			}
 		},
 
 
-		_onDragStart: function (evt/**Event*/, isTouch/**Boolean*/){
-			var dataTransfer = evt.dataTransfer;
+		_onDragStart: function (/**Event*/evt, /**boolean*/isTouch) {
+			var dataTransfer = evt.dataTransfer,
+				options = this.options;
 
 			this._offUpEvents();
 
-			if( isTouch ){
-				var
-					  rect = dragEl.getBoundingClientRect()
-					, css = _css(dragEl)
-					, ghostRect
-				;
+			if (isTouch) {
+				var rect = dragEl.getBoundingClientRect(),
+					css = _css(dragEl),
+					ghostRect;
 
 				ghostEl = dragEl.cloneNode(true);
 
@@ -313,8 +377,8 @@
 
 				// Fixing dimensions.
 				ghostRect = ghostEl.getBoundingClientRect();
-				_css(ghostEl, 'width', rect.width*2 - ghostRect.width);
-				_css(ghostEl, 'height', rect.height*2 - ghostRect.height);
+				_css(ghostEl, 'width', rect.width * 2 - ghostRect.width);
+				_css(ghostEl, 'height', rect.height * 2 - ghostRect.height);
 
 				// Bind touch events
 				_on(document, 'touchmove', this._onTouchMove);
@@ -325,7 +389,7 @@
 			}
 			else {
 				dataTransfer.effectAllowed = 'move';
-				dataTransfer.setData('Text', dragEl.textContent);
+				options.setData && options.setData.call(this, dataTransfer, dragEl);
 
 				_on(document, 'drop', this._onDrop);
 			}
@@ -334,51 +398,110 @@
 		},
 
 
-		_onDragOver: function (evt/**Event*/){
-			if( !_silent && (activeGroup === this.options.group) && (evt.rootEl === void 0 || evt.rootEl === this.el) ){
-				var
-					  el = this.el
-					, target = _closest(evt.target, this.options.draggable, el)
-				;
+		_onDragOver: function (/**Event*/evt) {
+			var el = this.el,
+				target,
+				dragRect,
+				revert,
+				options = this.options,
+				group = options.group,
+				groupPut = group.put,
+				isOwner = (activeGroup === group);
 
-				if( el.children.length === 0 || el.children[0] === ghostEl || (el === evt.target) && _ghostInBottom(el, evt) ){
-					el.appendChild(dragEl);
+			if (!_silent &&
+				(activeGroup.name === group.name || groupPut && groupPut.indexOf && groupPut.indexOf(activeGroup.name) > -1) &&
+				(isOwner && (options.sort || (revert = !rootEl.contains(dragEl))) || groupPut && activeGroup.pull) &&
+				(evt.rootEl === void 0 || evt.rootEl === this.el)
+			) {
+				target = _closest(evt.target, options.draggable, el);
+				dragRect = dragEl.getBoundingClientRect();
+
+				if (cloneEl && (cloneEl.state !== isOwner)) {
+					_css(cloneEl, 'display', isOwner ? 'none' : '');
+					!isOwner && cloneEl.state && rootEl.insertBefore(cloneEl, dragEl);
+					cloneEl.state = isOwner;
 				}
-				else if( target && target !== dragEl && (target.parentNode[expando] !== void 0) ){
-					if( lastEl !== target ){
+
+				if (revert && cloneEl) {
+					rootEl.insertBefore(dragEl, cloneEl);
+					return;
+				}
+
+				if ((el.children.length === 0) || (el.children[0] === ghostEl) ||
+					(el === evt.target) && (target = _ghostInBottom(el, evt))
+				) {
+					if (target) {
+						if (target.animated) {
+							return;
+						}
+						targetRect = target.getBoundingClientRect();
+					}
+
+					el.appendChild(dragEl);
+					this._animate(dragRect, dragEl);
+					target && this._animate(targetRect, target);
+				}
+				else if (target && !target.animated && target !== dragEl && (target.parentNode[expando] !== void 0)) {
+					if (lastEl !== target) {
 						lastEl = target;
 						lastCSS = _css(target);
-						lastRect = target.getBoundingClientRect();
 					}
 
 
-					var
-						  rect = lastRect
-						, width = rect.right - rect.left
-						, height = rect.bottom - rect.top
-						, floating = /left|right|inline/.test(lastCSS.cssFloat + lastCSS.display)
-						, isWide = (target.offsetWidth > dragEl.offsetWidth)
-						, isLong = (target.offsetHeight > dragEl.offsetHeight)
-						, halfway = (floating ? (evt.clientX - rect.left)/width : (evt.clientY - rect.top)/height) > .5
-						, nextSibling = target.nextElementSibling
-						, after
+					var targetRect = target.getBoundingClientRect(),
+						width = targetRect.right - targetRect.left,
+						height = targetRect.bottom - targetRect.top,
+						floating = /left|right|inline/.test(lastCSS.cssFloat + lastCSS.display),
+						isWide = (target.offsetWidth > dragEl.offsetWidth),
+						isLong = (target.offsetHeight > dragEl.offsetHeight),
+						halfway = (floating ? (evt.clientX - targetRect.left) / width : (evt.clientY - targetRect.top) / height) > 0.5,
+						nextSibling = target.nextElementSibling,
+						after
 					;
 
 					_silent = true;
 					setTimeout(_unsilent, 30);
 
-					if( floating ){
-						after = (target.previousElementSibling === dragEl) && !isWide || halfway && isWide
+					if (floating) {
+						after = (target.previousElementSibling === dragEl) && !isWide || halfway && isWide;
 					} else {
 						after = (nextSibling !== dragEl) && !isLong || halfway && isLong;
 					}
 
-					if( after && !nextSibling ){
+					if (after && !nextSibling) {
 						el.appendChild(dragEl);
 					} else {
 						target.parentNode.insertBefore(dragEl, after ? nextSibling : target);
 					}
+					
+					this._animate(dragRect, dragEl);
+					this._animate(targetRect, target);
 				}
+			}
+		},
+
+		_animate: function (prevRect, target) {
+			var ms = this.options.animation;
+
+			if (ms) {
+				var currentRect = target.getBoundingClientRect();
+
+				_css(target, 'transition', 'none');
+				_css(target, 'transform', 'translate3d('
+					+ (prevRect.left - currentRect.left) + 'px,'
+					+ (prevRect.top - currentRect.top) + 'px,0)'
+				);
+
+				target.offsetWidth; // repaint
+
+				_css(target, 'transition', 'all ' + ms + 'ms');
+				_css(target, 'transform', 'translate3d(0,0,0)');
+
+				clearTimeout(target.animated);
+				target.animated = setTimeout(function () {
+					_css(target, 'transition', '');
+					target.animated = false;
+				}, ms);
 			}
 		},
 
@@ -389,8 +512,9 @@
 			_off(document, 'touchcancel', this._onDrop);
 		},
 
-		_onDrop: function (evt/**Event*/){
+		_onDrop: function (/**Event*/evt) {
 			clearInterval(this._loopId);
+			clearInterval(scrollInterval);
 
 			// Unbind events
 			_off(document, 'drop', this._onDrop);
@@ -402,31 +526,35 @@
 
 			this._offUpEvents();
 
-			if( evt ){
+			if (evt) {
 				evt.preventDefault();
 				evt.stopPropagation();
 
-				if( ghostEl ){
-					ghostEl.parentNode.removeChild(ghostEl);
-				}
+				ghostEl && ghostEl.parentNode.removeChild(ghostEl);
 
-				if( dragEl ){
+				if (dragEl) {
 					_disableDraggable(dragEl);
 					_toggleClass(dragEl, this.options.ghostClass, false);
 
-					if( !rootEl.contains(dragEl) ){
-						// Remove event
-						_dispatchEvent(rootEl, 'remove', dragEl);
+					if (!rootEl.contains(dragEl)) {
+						_dispatchEvent(dragEl, 'sort');
+						_dispatchEvent(rootEl, 'sort');
 
 						// Add event
-						_dispatchEvent(dragEl, 'add');
+						_dispatchEvent(dragEl, 'add', dragEl, rootEl);
+
+						// Remove event
+						_dispatchEvent(rootEl, 'remove', dragEl);
 					}
-					else if( dragEl.nextSibling !== nextEl ){
+					else if (dragEl.nextSibling !== nextEl) {
 						// Update event
 						_dispatchEvent(dragEl, 'update');
+						_dispatchEvent(dragEl, 'sort');
+
+						cloneEl && cloneEl.parentNode.removeChild(cloneEl);
 					}
 
-					_dispatchEvent(dragEl, 'end');
+					_dispatchEvent(rootEl, 'end');
 				}
 
 				// Set NULL
@@ -434,6 +562,7 @@
 				dragEl =
 				ghostEl =
 				nextEl =
+				cloneEl =
 
 				tapEvt =
 				touchEvt =
@@ -458,8 +587,7 @@
 				el,
 				children = this.el.children,
 				i = 0,
-				n = children.length
-			;
+				n = children.length;
 
 			for (; i < n; i++) {
 				el = children[i];
@@ -526,7 +654,7 @@
 			_off(el, 'dragenter', this._onDragOver);
 
 			//remove draggable attributes
-			Array.prototype.forEach.call(el.querySelectorAll('[draggable]'), function(el) {
+			Array.prototype.forEach.call(el.querySelectorAll('[draggable]'), function (el) {
 				el.removeAttribute('draggable');
 			});
 
@@ -539,115 +667,125 @@
 	};
 
 
-	function _bind(ctx, fn){
+	function _bind(ctx, fn) {
 		var args = slice.call(arguments, 2);
-		return	fn.bind ? fn.bind.apply(fn, [ctx].concat(args)) : function (){
+		return	fn.bind ? fn.bind.apply(fn, [ctx].concat(args)) : function () {
 			return fn.apply(ctx, args.concat(slice.call(arguments)));
 		};
 	}
 
 
-	function _closest(el, selector, ctx){
-		if( selector === '*' ){
+	function _closest(el, selector, ctx) {
+		if (selector === '*') {
 			return el;
 		}
-		else if( el ){
+		else if (el) {
 			ctx = ctx || document;
 			selector = selector.split('.');
 
-			var
-				  tag = selector.shift().toUpperCase()
-				, re = new RegExp('\\s('+selector.join('|')+')\\s', 'g')
-			;
+			var tag = selector.shift().toUpperCase(),
+				re = new RegExp('\\s(' + selector.join('|') + ')\\s', 'g');
 
 			do {
-				if(
-					   (tag === '' || el.nodeName == tag)
-					&& (!selector.length || ((' '+el.className+' ').match(re) || []).length == selector.length)
-				){
-					return	el;
+				if (
+					(tag === '' || el.nodeName == tag) &&
+					(!selector.length || ((' ' + el.className + ' ').match(re) || []).length == selector.length)
+				) {
+					return el;
 				}
 			}
-			while( el !== ctx && (el = el.parentNode) );
+			while (el !== ctx && (el = el.parentNode));
 		}
 
-		return	null;
+		return null;
 	}
 
 
-	function _globalDragOver(evt){
+	function _globalDragOver(evt) {
 		evt.dataTransfer.dropEffect = 'move';
 		evt.preventDefault();
 	}
 
 
-	function _on(el, event, fn){
+	function _on(el, event, fn) {
 		el.addEventListener(event, fn, false);
 	}
 
 
-	function _off(el, event, fn){
+	function _off(el, event, fn) {
 		el.removeEventListener(event, fn, false);
 	}
 
 
-	function _toggleClass(el, name, state){
-		if( el ){
-			if( el.classList ){
+	function _toggleClass(el, name, state) {
+		if (el) {
+			if (el.classList) {
 				el.classList[state ? 'add' : 'remove'](name);
 			}
 			else {
-				var className = (' '+el.className+' ').replace(/\s+/g, ' ').replace(' '+name+' ', '');
-				el.className = className + (state ? ' '+name : '')
+				var className = (' ' + el.className + ' ').replace(/\s+/g, ' ').replace(' ' + name + ' ', '');
+				el.className = className + (state ? ' ' + name : '');
 			}
 		}
 	}
 
 
-	function _css(el, prop, val){
-		if( el && el.style ){
-			if( val === void 0 ){
-				if( document.defaultView && document.defaultView.getComputedStyle ){
+	function _css(el, prop, val) {
+		var style = el && el.style;
+
+		if (style) {
+			if (val === void 0) {
+				if (document.defaultView && document.defaultView.getComputedStyle) {
 					val = document.defaultView.getComputedStyle(el, '');
 				}
-				else if( el.currentStyle ){
-					val	= el.currentStyle;
+				else if (el.currentStyle) {
+					val = el.currentStyle;
 				}
-				return	prop === void 0 ? val : val[prop];
-			} else {
-				el.style[prop] = val + (typeof val === 'string' ? '' : 'px');
+
+				return prop === void 0 ? val : val[prop];
+			}
+			else {
+				if (!(prop in style)) {
+					prop = '-webkit-' + prop;
+				}
+
+				style[prop] = val + (typeof val === 'string' ? '' : 'px');
 			}
 		}
 	}
 
 
-	function _find(ctx, tagName, iterator){
-		if( ctx ){
+	function _find(ctx, tagName, iterator) {
+		if (ctx) {
 			var list = ctx.getElementsByTagName(tagName), i = 0, n = list.length;
-			if( iterator ){
-				for( ; i < n; i++ ){
+
+			if (iterator) {
+				for (; i < n; i++) {
 					iterator(list[i], i);
 				}
 			}
-			return	list;
+
+			return list;
 		}
-		return	[];
+
+		return [];
 	}
 
 
-	function _disableDraggable(el){
-		return el.draggable = false;
+	function _disableDraggable(el) {
+		el.draggable = false;
 	}
 
 
-	function _unsilent(){
+	function _unsilent() {
 		_silent = false;
 	}
 
 
-	function _ghostInBottom(el, evt){
-		var last = el.lastElementChild.getBoundingClientRect();
-		return evt.clientY - (last.top + last.height) > 5; // min delta
+	/** @returns {HTMLElement|false} */
+	function _ghostInBottom(el, evt) {
+		var lastEl = el.lastElementChild, rect = lastEl.getBoundingClientRect();
+		return (evt.clientY - (rect.top + rect.height) > 5) && lastEl; // min delta
 	}
 
 
@@ -660,8 +798,7 @@
 	function _generateId(el) {
 		var str = el.tagName + el.className + el.src + el.href + el.textContent,
 			i = str.length,
-			sum = 0
-		;
+			sum = 0;
 
 		while (i--) {
 			sum += str.charCodeAt(i);
@@ -680,13 +817,21 @@
 		bind: _bind,
 		closest: _closest,
 		toggleClass: _toggleClass,
-		createEvent: _createEvent,
 		dispatchEvent: _dispatchEvent
 	};
 
 
-	Sortable.version = '0.5.2';
+	Sortable.version = '0.6.0';
 
+
+	/**
+	 * Create sortable instance
+	 * @param {HTMLElement}  el
+	 * @param {Object}      [options]
+	 */
+	Sortable.create = function (el, options) {
+		return new Sortable(el, options);
+	};
 
 	// Export
 	return Sortable;

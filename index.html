@@ -6,9 +6,9 @@
 
 	<title>Sortable. No jQuery.</title>
 
-	<meta name="keywords" content="sortable, reorder, list, javascript, html5, drag and drop, dnd, rubaxa"/>
-	<meta name="description" content="Sortable - is a minimalist JavaScript library for modern browsers and touch devices (No jQuery)."/>
-	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<meta name="keywords" content="sortable, reorder, list, javascript, html5, drag and drop, dnd, animation, groups, angular, ng-sortable, effects, rubaxa"/>
+	<meta name="description" content="Sortable - is a minimalist JavaScript library for modern browsers and touch devices (No jQuery). Support AngularJS."/>
+	<meta name="viewport" content="width=device-width, initial-scale=0.5"/>
 
 	<link href="//rubaxa.github.io/Ply/ply.css" rel="stylesheet" type="text/css"/>
 	<link href="//fonts.googleapis.com/css?family=Roboto:300" rel="stylesheet" type="text/css"/>
@@ -62,27 +62,27 @@
 			<div class="layer tile" data-force="30">
 				<div class="tile__name">Group A</div>
 				<div class="tile__list">
-					<img src="//fbcdn-profile-a.akamaihd.net/hprofile-ak-prn1/c9.9.113.113/s100x100/59436_1391411357920_1388516_s.jpg"/><!--
-					--><img src="//fbcdn-profile-a.akamaihd.net/hprofile-ak-ash3/c13.8.104.104/s100x100/941190_10151608397684663_1532692251_s.jpg"/><!--
-					--><img src="//fbcdn-profile-a.akamaihd.net/hprofile-ak-frc3/c0.0.103.103/s100x100/382696_10150378364701671_1792621129_a.jpg"/><!--
-					--><img src="//fbcdn-profile-a.akamaihd.net/hprofile-ak-ash3/c44.10.116.116/s100x100/552948_430685950285752_1435082176_a.jpg"/>
+					<img src="st/face-01.jpg"/><!--
+					--><img src="st/face-02.jpg"/><!--
+					--><img src="st/face-03.jpg"/><!--
+					--><img src="st/face-04.jpg"/>
 				</div>
 			</div>
 
 			<div class="layer tile" data-force="25">
 				<div class="tile__name">Group B</div>
 				<div class="tile__list">
-					<img src="//fbcdn-profile-a.akamaihd.net/hprofile-ak-ash3/c8.8.105.105/s100x100/558916_4874661741992_448469446_s.jpg"/><!--
-					--><img src="//fbcdn-profile-a.akamaihd.net/hprofile-ak-prn1/c29.9.117.117/s100x100/68347_385372304875713_1358705380_a.jpg"/><!--
-					--><img src="https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/c9.9.113.113/s100x100/424349_465457316812937_2106915541_s.jpg"/>
+					<img src="st/face-05.jpg"/><!--
+					--><img src="st/face-06.jpg"/><!--
+					--><img src="st/face-07.jpg"/>
 				</div>
 			</div>
 
 			<div class="layer tile" data-force="20">
 				<div class="tile__name">Group C</div>
 				<div class="tile__list">
-					<img src="//fbcdn-profile-a.akamaihd.net/hprofile-ak-frc3/c12.12.156.156/s100x100/303317_320632284665935_15996162_a.jpg"/><!--
-					--><img src="//fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/c9.9.109.109/s100x100/484507_4207733265938_1693034881_s.jpg"/>
+					<img src="st/face-08.jpg"/><!--
+					--><img src="st/face-09.jpg"/>
 				</div>
 			</div>
 
@@ -108,6 +108,84 @@
 	</div>
 
 
+	<a name="ag"></a>
+	<div class="container" style="margin-top: 100px;">
+		<div id="advanced" style="margin-left: 30px;">
+			<div><div data-force="5" class="layer title title_xl">Advanced groups</div></div>
+
+			<div style="width: 25%; float: left; margin-top: 15px; margin-left: 10px" class="block__list block__list_words">
+				<div class="block__list-title">pull & put</div>
+				<ul id="advanced-1">
+					<li>Meet</li>
+					<li>Potato</li>
+					<li>Tea</li>
+				</ul>
+			</div>
+
+			<div style="width: 25%; float: left; margin-top: 15px; margin-left: 10px" class="block__list block__list_words">
+				<div class="block__list-title">only pull (clone)</div>
+				<ul id="advanced-2">
+					<li>Sex</li>
+					<li>Drags</li>
+					<li>Rock'n'roll</li>
+				</ul>
+			</div>
+
+			<div style="width: 25%; float: left; margin-top: 15px; margin-left: 10px" class="block__list block__list_words">
+				<div class="block__list-title">only put</div>
+				<ul id="advanced-3">
+					<li>Money</li>
+					<li>Force</li>
+					<li>Agility</li>
+				</ul>
+			</div>
+
+			<div style="clear: both"></div>
+		</div>
+	</div>
+
+
+	<a name="ng"></a>
+	<div id="todos" ng-app="todoApp" class="container" style="margin-top: 100px">
+		<div style="margin-left: 30px">
+			<div><div data-force="5" class="layer title title_xl">AngluarJS / ng-sortable</div></div>
+
+			<div style="width: 30%; margin-top: -8px; margin-left: 10px; float: left;" class="block__list block__list_words">
+				<div ng-controller="TodoController">
+					<span style="padding-left: 20px">{{remaining()}} of {{todos.length}} remaining</span>
+					[ <a href="" ng-click="archive()">archive</a> ]
+					<ul ng-sortable="{ group: 'todo', animation: 150 }" class="unstyled">
+						<li ng-repeat="todo in todos">
+							<input type="checkbox" ng-model="todo.done">
+							<span class="done-{{todo.done}}">{{todo.text}}</span>
+						</li>
+					</ul>
+					<form ng-submit="addTodo()" style="padding-left: 20px">
+						<input type="text" ng-model="todoText" size="30"
+							   placeholder="add new todo here">
+					</form>
+				</div>
+			</div>
+
+
+			<div style="width: 30%; margin-top: -8px; margin-left: 10px; float: left;" class="block__list block__list_words">
+				<div ng-controller="TodoControllerNext">
+					<span style="padding-left: 20px">{{remaining()}} of {{todos.length}} remaining</span>
+					<ul ng-sortable="sortableConfig" class="unstyled">
+						<li ng-repeat="todo in todos">
+							<input type="checkbox" ng-model="todo.done">
+							<span class="done-{{todo.done}}">{{todo.text}}</span>
+						</li>
+					</ul>
+				</div>
+			</div>
+
+			<div style="clear: both"></div>
+		</div>
+	</div>
+
+
+
 	<a name="c"></a>
 	<div class="container" style="margin-top: 100px">
 		<div style="margin-left: 30px">
@@ -128,6 +206,7 @@ new Sortable(bar, { group: "omega" });
 // Or
 var container = document.getElementById("multi");
 var sort = new Sortable(container, {
+  animation: 150, // ms, animation speed moving items when sorting, `0` — without animation
   handle: ".tile__title", // Restricts sort start click/touch to the specified element
   draggable: ".tile", // Specifies which items inside the element should be sortable
   onUpdate: function (evt/**Event*/){
@@ -164,6 +243,8 @@ var editableList = new Sortable(editable, {
 
 	<script src="Sortable.js"></script>
 	<script src="//rubaxa.github.io/Ply/Ply.min.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
+	<script src="ng-sortable.js"></script>
 
 	<script>
 		(function (){
@@ -178,6 +259,7 @@ var editableList = new Sortable(editable, {
 
 			new Sortable(foo, {
 				group: "words",
+				animation: 150,
 				store: {
 					get: function (sortable) {
 						var order = localStorage.getItem(sortable.options.group);
@@ -198,6 +280,7 @@ var editableList = new Sortable(editable, {
 
 			new Sortable(bar, {
 				group: "words",
+				animation: 150,
 				onAdd: function (evt){ console.log('onAdd.bar:', evt.item); },
 				onUpdate: function (evt){ console.log('onUpdate.bar:', evt.item); },
 				onRemove: function (evt){ console.log('onRemove.bar:', evt.item); },
@@ -207,12 +290,14 @@ var editableList = new Sortable(editable, {
 
 
 			new Sortable(multi, {
+				animation: 150,
 				draggable: '.tile',
 				handle: '.tile__name'
 			});
 
 
 			var editableList = new Sortable(editable, {
+				animation: 150,
 				filter: '.js-remove',
 				onFilter: function (evt) {
 					var el = editableList.closest(evt.item);
@@ -234,8 +319,81 @@ var editableList = new Sortable(editable, {
 
 
 			[].forEach.call(multi.getElementsByClassName('tile__list'), function (el){
-				new Sortable(el, { group: 'photo' });
+				new Sortable(el, {
+					group: 'photo',
+					animation: 150
+				});
 			});
+
+
+			[{
+				name: 'advanced',
+				pull: true,
+				put: true
+			},
+			{
+				name: 'advanced',
+				pull: 'clone',
+				put: false
+			}, {
+				name: 'advanced',
+				pull: false,
+				put: true
+			}].forEach(function (opts, i) {
+				new Sortable(document.getElementById('advanced-' + (i + 1)), {
+					group: opts,
+					animation: 150
+				});
+			});
+
+			angular.module('todoApp', ['ng-sortable'])
+				.controller('TodoController', ['$scope', function ($scope) {
+					$scope.todos = [
+						{text: 'learn angular', done: true},
+						{text: 'build an angular app', done: false}
+					];
+
+					$scope.addTodo = function () {
+						$scope.todos.push({text: $scope.todoText, done: false});
+						$scope.todoText = '';
+					};
+
+					$scope.remaining = function () {
+						var count = 0;
+						angular.forEach($scope.todos, function (todo) {
+							count += todo.done ? 0 : 1;
+						});
+						return count;
+					};
+
+					$scope.archive = function () {
+						var oldTodos = $scope.todos;
+						$scope.todos = [];
+						angular.forEach(oldTodos, function (todo) {
+							if (!todo.done) $scope.todos.push(todo);
+						});
+					};
+				}])
+				.controller('TodoControllerNext', ['$scope', function ($scope) {
+					$scope.todos = [
+						{text: 'learn Sortable', done: true},
+						{text: 'use ng-sortable', done: false},
+						{text: 'Enjoy', done: false}
+					];
+
+					$scope.remaining = function () {
+						var count = 0;
+						angular.forEach($scope.todos, function (todo) {
+							count += todo.done ? 0 : 1;
+						});
+						return count;
+					};
+
+					$scope.sortableConfig = { group: 'todo', animation: 150 };
+					'Start End Add Update Remove Sort'.split(' ').forEach(function (name) {
+						$scope.sortableConfig['on' + name] = console.log.bind(console, name);
+					});
+				}]);
 		})();
 
 

@@ -3,12 +3,13 @@
 Sortable is a minimalist JavaScript library for reorderable drag-and-drop lists.
 
 ## Features
-* Supports touch devices and [modern](http://caniuse.com/#search=drag) browsers
-* Built using native HTML5 drag and drop API
-* Can drag from one list to another or within the same list
-* Simple API
-* Lightweight, 2KB gzipped
-* No jQuery
+ * Supports touch devices and [modern](http://caniuse.com/#search=drag) browsers
+ * Can drag from one list to another or within the same list
+ * Animation moving items when sorting (css animation)
+ * Built using native HTML5 drag and drop API
+ * Support [AngularJS](#ng)
+ * Simple API
+ * No jQuery
 
 
 ### Usage
@@ -22,7 +23,7 @@ Sortable is a minimalist JavaScript library for reorderable drag-and-drop lists.
 
 ```js
 var el = document.getElementById('items');
-new Sortable(el);
+Sortable.create(el);
 ```
 
 
@@ -31,25 +32,47 @@ new Sortable(el);
 
 ### Options
 ```js
-new Sortable(el, {
-	group: "name",
+var sortabel = new Sortable(el, {
+	group: "name", // or { name: "..", pull: [true, false, clone], put: [true, false, array] }
+	sort: true, // sorting inside list
 	store: null, // @see Store
+	animation: 150, // ms, animation speed moving items when sorting, `0` — without animation
 	handle: ".my-handle", // Restricts sort start click/touch to the specified element
 	filter: ".ignor-elements", // Selectors that do not lead to dragging (String or Function)
 	draggable: ".item",   // Specifies which items inside the element should be sortable
 	ghostClass: "sortable-ghost",
-	
+<<<<<<< HEAD
+	setData: function (dataTransfer, dragEl) {
+		dataTransfer.setData('Text', dragEl.textContent);
+	},
+	scrollBuffer: 50 // Specifies distance from top/bottom when auto-scroll starts
+	scrollSpeed: 10 // Speed of scroll,
+=======
+	scrollContainer: containerEl, // Which container to scroll (element)
+	scrollBuffer: 50, // Specifies distance from top/bottom when auto-scroll starts
+	scrollSpeed: 10, // Speed of scroll
+
+>>>>>>> Add option for scroll container
 	onStart: function (/**Event*/evt) { /* dragging */ },
 	onEnd: function (/**Event*/evt) { /* dragging */ },
 
+	// Element is added to the list
 	onAdd: function (/**Event*/evt){
 		var itemEl = evt.item; // dragged HTMLElement
+		itemEl.from; // previous list
 	},
 
+	// Changed sorting in list
 	onUpdate: function (/**Event*/evt){
 		var itemEl = evt.item; // dragged HTMLElement
 	},
 
+	// Called by any change to the list (add / update / remove)
+	onSort: function (/**Event*/evt){
+		var itemEl = evt.item; // dragged HTMLElement
+	},
+
+	// The element is removed from the list
 	onRemove: function (/**Event*/evt){
 		var itemEl = evt.item; // dragged HTMLElement
 	},
@@ -62,6 +85,48 @@ new Sortable(el, {
 
 ---
 
+
+### `group` option
+
+ * name:`string` — group name
+ * pull:`true|false|'clone'` — ability to move from the list. `clone` — cloning drag item when moving from the list.
+ * put:`true|false|["foo", "bar"]` — the possibility of adding an element from the other list, or an array of names groups, which can be taken.
+
+
+---
+
+<a name="ng"></a>
+### Support AngularJS
+Include [ng-sortable.js](ng-sortable.js)
+
+```html
+<div ng-app"myApp">
+	<ul ng-sortable>
+		<li ng-repeat="item in items">{{item}}</li>
+	</ul>
+
+	<ul ng-sortable="{ group: 'foobar' }">
+		<li ng-repeat="item in foo">{{item}}</li>
+	</ul>
+
+	<ul ng-sortable="barConfig">
+		<li ng-repeat="item in bar">{{item}}</li>
+	</ul>
+</div>
+```
+
+
+```js
+angular.module('myApp', ['ng-sortable'])
+	.controller(function () {
+		this.items = ['item 1', 'item 2'];
+		this.foo = ['foo 1', '..'];
+		this.bar = ['bar 1', '..'];
+		this.barConfig = { group: 'foobar', animation: 150 };
+	});
+```
+
+---
 
 ### Method
 
@@ -115,7 +180,7 @@ Saving and restoring of the sort.
 ```
 
 ```js
-new Sortable(el, {
+Sortable.create(el, {
 	group: "localStorage-example",
 	store: {
 		/**
@@ -157,6 +222,7 @@ new Sortable(el, {
 * bind(ctx`:Mixed`, fn`:Function`)`:Function` — Takes a function and returns a new one that will always have a particular context
 * closest(el`:HTMLElement`, selector`:String`[, ctx`:HTMLElement`])`:HTMLElement|Null` — for each element in the set, get the first element that matches the selector by testing the element itself and traversing up through its ancestors in the DOM tree
 * toggleClass(el`:HTMLElement`, name`:String`, state`:Boolean`) — add or remove one classes from each element
+
 
 
 ---
