@@ -40,6 +40,8 @@
 
 		expando = 'Sortable' + (new Date).getTime(),
 
+		scrollInterval,
+
 		win = window,
 		document = win.document,
 		parseInt = win.parseInt,
@@ -66,7 +68,6 @@
 	;
 
 
-
 	/**
 	 * @class  Sortable
 	 * @param  {HTMLElement}  el
@@ -90,7 +91,10 @@
 			animation: 0,
 			setData: function (dataTransfer, dragEl) {
 				dataTransfer.setData('Text', dragEl.textContent);
-			}
+			},
+			scrollContainer: null,
+			scrollBuffer: 50,
+			scrollSpeed: 10
 		};
 
 
@@ -136,6 +140,7 @@
 		_on(el, 'touchstart', this._onTapStart);
 		supportIEdnd && _on(el, 'selectstart', this._onTapStart);
 
+		_on(el, 'drag', this._onDrag);
 		_on(el, 'dragover', this._onDragOver);
 		_on(el, 'dragenter', this._onDragOver);
 
@@ -289,6 +294,42 @@
 			}
 		},
 
+		_scroll: function (y) {
+			var buffer = this.options.scrollBuffer,
+				speed = this.options.scrollSpeed,
+				scrollContainer = this.options.scrollContainer,
+				scroll;
+
+			if (y === 0) return;
+
+			if (y > window.innerHeight - buffer) {
+				scroll = 1;
+			} else if (y < buffer) {
+				scroll = -1;
+			}
+
+			clearInterval(scrollInterval);
+
+			function createInterval() {
+				if (scrollContainer) {
+					return function () {
+						scrollContainer.scrollTop = scrollContainer.scrollTop + (speed * scroll);
+					};
+				} else {
+					return function () {
+						window.scrollTo(window.scrollX, window.scrollY + (speed * scroll));
+					};
+				}
+			}
+
+			if (scroll) {
+				scrollInterval = setInterval(createInterval(), 10);
+			}
+		},
+
+		_onDrag: function (evt) {
+			this._scroll.call(this, evt.clientY);
+		},
 
 		_onTouchMove: function (/**TouchEvent*/evt) {
 			if (tapEvt) {
@@ -303,6 +344,8 @@
 				_css(ghostEl, 'mozTransform', translate3d);
 				_css(ghostEl, 'msTransform', translate3d);
 				_css(ghostEl, 'transform', translate3d);
+
+				this._scroll.call(this, touchEvt.clientY);
 
 				evt.preventDefault();
 			}
@@ -471,6 +514,7 @@
 
 		_onDrop: function (/**Event*/evt) {
 			clearInterval(this._loopId);
+			clearInterval(scrollInterval);
 
 			// Unbind events
 			_off(document, 'drop', this._onDrop);
