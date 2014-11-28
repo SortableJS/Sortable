@@ -92,6 +92,7 @@
 			setData: function (dataTransfer, dragEl) {
 				dataTransfer.setData('Text', dragEl.textContent);
 			},
+			scrollContainer: null,
 			scrollBuffer: 50,
 			scrollSpeed: 10
 		};
@@ -296,6 +297,7 @@
 		_scroll: function (y) {
 			var buffer = this.options.scrollBuffer,
 				speed = this.options.scrollSpeed,
+				scrollContainer = this.options.scrollContainer,
 				scroll;
 
 			if (y === 0) return;
@@ -307,10 +309,21 @@
 			}
 
 			clearInterval(scrollInterval);
+
+			function createInterval() {
+				if (scrollContainer) {
+					return function () {
+						scrollContainer.scrollTop = scrollContainer.scrollTop + (speed * scroll);
+					};
+				} else {
+					return function () {
+						window.scrollTo(window.scrollX, window.scrollY + (speed * scroll));
+					};
+				}
+			}
+
 			if (scroll) {
-				scrollInterval = setInterval(function () {
-					window.scrollTo(window.scrollX, window.scrollY + (speed * scroll));
-				}, 10);
+				scrollInterval = setInterval(createInterval(), 10);
 			}
 		},
 
