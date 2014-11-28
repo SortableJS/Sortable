@@ -44,7 +44,8 @@ var sortabel = new Sortable(el, {
 	setData: function (dataTransfer, dragEl) {
 		dataTransfer.setData('Text', dragEl.textContent);
 	},
-
+	scrollBuffer: 50 // Specifies distance from top/bottom when auto-scroll starts
+	scrollSpeed: 10 // Speed of scroll,
 	onStart: function (/**Event*/evt) { /* dragging */ },
 	onEnd: function (/**Event*/evt) { /* dragging */ },
 
