@@ -28,6 +28,7 @@
 		ghostEl,
 		cloneEl,
 		rootEl,
+		scrollEl,
 		nextEl,
 
 		lastEl,
@@ -60,6 +61,8 @@
 		_customEvents = 'onAdd onUpdate onRemove onStart onEnd onFilter onSort'.split(' '),
 
 		noop = function () {},
+
+		abs = Math.abs,
 		slice = [].slice,
 
 		touchDragOverListeners = []
@@ -83,6 +86,9 @@
 			sort: true,
 			store: null,
 			handle: null,
+			scroll: true,
+			scrollSensitivity: 30,
+			scrollSpeed: 10,
 			draggable: el.children[0] && el.children[0].nodeName || (/[uo]l/i.test(el.nodeName) ? 'li' : '*'),
 			ghostClass: 'sortable-ghost',
 			ignore: 'a, img',
@@ -229,8 +235,9 @@
 				_on(document, 'touchend', this._onDrop);
 				_on(document, 'touchcancel', this._onDrop);
 
-				_on(this.el, 'dragstart', this._onDragStart);
-				_on(this.el, 'dragend', this._onDrop);
+				_on(rootEl, 'dragstart', this._onDragStart);
+				_on(rootEl, 'dragend', this._onDrop);
+
 				_on(document, 'dragover', _globalDragOver);
 
 
@@ -351,8 +358,56 @@
 				_on(document, 'drop', this._onDrop);
 			}
 
-			setTimeout(this._applyEffects);
+			setTimeout(this._applyEffects, 0);
+
+			scrollEl = options.scroll;
+
+			if (scrollEl === true) {
+				scrollEl = dragEl;
+
+				do {
+					if ((scrollEl.offsetWidth < scrollEl.scrollWidth) ||
+						(scrollEl.offsetHeight < scrollEl.scrollHeight)
+					) {
+						break;
+					}
+				/* jshint boss:true */
+				} while (scrollEl = scrollEl.parentNode);
+			}
 		},
+
+
+		_onDrag: _throttle(function (/**Event*/evt) {
+			if (rootEl && this.options.scroll) {
+				var options = this.options,
+					sens = options.scrollSensitivity,
+					speed = options.scrollSpeed,
+					rect = rootEl.getBoundingClientRect(),
+
+					x = evt.clientX,
+					y = evt.clientY,
+
+					winWidth = window.innerWidth,
+					winHeight = window.innerHeight,
+
+					vx = (winWidth - x <= sens) ? (rect.right > winWidth) : -(rect.left < 0 && x <= sens),
+					vy = (winHeight - y <= sens) ? (rect.bottom > winHeight) : -(rect.top < 0 && y <= sens)
+				;
+
+
+				if (vx || vy) {
+					win.scrollTo(win.scrollX + vx * speed, win.scrollY + vy * speed);
+				}
+				else if (scrollEl) {
+					rect = scrollEl.getBoundingClientRect();
+					vx = (abs(rect.right - x) <= sens) - (abs(rect.left - x) <= sens);
+					vy = (abs(rect.bottom - y) <= sens) - (abs(rect.top - y) <= sens);
+
+					vy && (scrollEl.scrollTop += vy * speed);
+					vx && (scrollEl.scrollLeft += vx * speed);
+				}
+			}
+		}, 30),
 
 
 		_onDragOver: function (/**Event*/evt) {
@@ -364,6 +419,9 @@
 				group = options.group,
 				groupPut = group.put,
 				isOwner = (activeGroup === group);
+
+			// Because bug: https://bugzilla.mozilla.org/show_bug.cgi?id=505521
+			this._onDrag(evt);
 
 			if (!_silent &&
 				(activeGroup.name === group.name || groupPut && groupPut.indexOf && groupPut.indexOf(activeGroup.name) > -1) &&
@@ -476,9 +534,9 @@
 			_off(document, 'drop', this._onDrop);
 			_off(document, 'dragover', _globalDragOver);
 
-			_off(this.el, 'dragend', this._onDrop);
-			_off(this.el, 'dragstart', this._onDragStart);
-			_off(this.el, 'selectstart', this._onTapStart);
+			_off(rootEl, 'dragend', this._onDrop);
+			_off(rootEl, 'dragstart', this._onDragStart);
+			_off(rootEl, 'selectstart', this._onTapStart);
 
 			this._offUpEvents();
 
@@ -764,6 +822,28 @@
 	}
 
 
+	function _throttle(callback, ms) {
+		var args, _this;
+
+		return function () {
+			if (args === void 0) {
+				args = arguments;
+				_this = this;
+
+				setTimeout(function () {
+					if (args.length === 1) {
+						callback.call(_this, args[0]);
+					} else {
+						callback.apply(_this, args);
+					}
+
+					args = void 0;
+				}, ms);
+			}
+		};
+	}
+
+
 	// Export utils
 	Sortable.utils = {
 		on: _on,
@@ -771,6 +851,7 @@
 		css: _css,
 		find: _find,
 		bind: _bind,
+		throttle: _throttle,
 		closest: _closest,
 		toggleClass: _toggleClass,
 		dispatchEvent: _dispatchEvent

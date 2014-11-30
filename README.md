@@ -6,6 +6,7 @@ Sortable is a minimalist JavaScript library for reorderable drag-and-drop lists.
  * Supports touch devices and [modern](http://caniuse.com/#search=drag) browsers
  * Can drag from one list to another or within the same list
  * Animation moving items when sorting (css animation)
+ * Smart auto-scrolling
  * Built using native HTML5 drag and drop API
  * Support [AngularJS](#ng)
  * Simple API
@@ -36,6 +37,9 @@ var sortabel = new Sortable(el, {
 	group: "name", // or { name: "..", pull: [true, false, clone], put: [true, false, array] }
 	sort: true, // sorting inside list
 	store: null, // @see Store
+	scroll: true, // or HTMLElement
+	scrollSensitivity: 30, // px, how near the mouse must be to an edge to start scrolling.
+	scrollSpeed: 10, // px
 	animation: 150, // ms, animation speed moving items when sorting, `0` — without animation
 	handle: ".my-handle", // Restricts sort start click/touch to the specified element
 	filter: ".ignor-elements", // Selectors that do not lead to dragging (String or Function)
