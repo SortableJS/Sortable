@@ -123,7 +123,7 @@
 			</div>
 
 			<div style="width: 25%; float: left; margin-top: 15px; margin-left: 10px" class="block__list block__list_words">
-				<div class="block__list-title">only pull (clone)</div>
+				<div class="block__list-title">only pull (clone), no reordering</div>
 				<ul id="advanced-2">
 					<li>Sex</li>
 					<li>Drugs</li>
@@ -334,7 +334,8 @@ var editableList = new Sortable(editable, {
 			{
 				name: 'advanced',
 				pull: 'clone',
-				put: false
+				put: false,
+				sort: false
 			}, {
 				name: 'advanced',
 				pull: false,
