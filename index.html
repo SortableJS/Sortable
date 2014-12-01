@@ -116,17 +116,17 @@
 			<div style="width: 25%; float: left; margin-top: 15px; margin-left: 10px" class="block__list block__list_words">
 				<div class="block__list-title">pull & put</div>
 				<ul id="advanced-1">
-					<li>Meet</li>
+					<li>Meat</li>
 					<li>Potato</li>
 					<li>Tea</li>
 				</ul>
 			</div>
 
 			<div style="width: 25%; float: left; margin-top: 15px; margin-left: 10px" class="block__list block__list_words">
-				<div class="block__list-title">only pull (clone)</div>
+				<div class="block__list-title">only pull (clone), no reordering</div>
 				<ul id="advanced-2">
 					<li>Sex</li>
-					<li>Drags</li>
+					<li>Drugs</li>
 					<li>Rock'n'roll</li>
 				</ul>
 			</div>
@@ -137,6 +137,25 @@
 					<li>Money</li>
 					<li>Force</li>
 					<li>Agility</li>
+				</ul>
+			</div>
+
+			<div style="clear: both"></div>
+		</div>
+	</div>
+
+
+	<a name="h"></a>
+	<div class="container" style="margin-top: 100px;">
+		<div id="handle" style="margin-left: 30px;">
+			<div><div data-force="5" class="layer title title_xl">Drag handle and selectable text</div></div>
+
+			<div style="width: 30%; float: left; margin-top: 15px; margin-left: 10px" class="block__list_words">
+				<div class="block__list-title">Drag handles</div>
+				<ul id="handle-1">
+					<li><span class="drag-handle">≡</span>Select text freely</li>
+					<li><span class="drag-handle">≡</span>Drag my handle</li>
+					<li><span class="drag-handle">≡</span>Best of both worlds</li>
 				</ul>
 			</div>
 
@@ -339,12 +358,19 @@ var editableList = new Sortable(editable, {
 				name: 'advanced',
 				pull: false,
 				put: true
-			}].forEach(function (opts, i) {
+			}].forEach(function (groupOpts, i) {
 				new Sortable(document.getElementById('advanced-' + (i + 1)), {
-					group: opts,
+					sort: (i != 1),
+					group: groupOpts,
 					animation: 150
 				});
 			});
+
+			new Sortable(document.getElementById('handle-1'), {
+				handle: '.drag-handle',
+				animation: 150
+			});
+
 
 			angular.module('todoApp', ['ng-sortable'])
 				.controller('TodoController', ['$scope', function ($scope) {
