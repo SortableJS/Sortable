@@ -45,14 +45,17 @@ new Sortable(el, {
 	onStart: function (/**Event*/evt) { /* dragging */ },
 	onEnd: function (/**Event*/evt) { /* dragging */ },
 
+	// Element is dropped into the list from another list
 	onAdd: function (/**Event*/evt){
 		var itemEl = evt.item; // dragged HTMLElement
 	},
 
+	// Changed sorting within list
 	onUpdate: function (/**Event*/evt){
 		var itemEl = evt.item; // dragged HTMLElement
 	},
 
+	// Element is removed from the list into another list
 	onRemove: function (/**Event*/evt){
 		var itemEl = evt.item; // dragged HTMLElement
 	},
@@ -62,6 +65,12 @@ new Sortable(el, {
 	}
 });
 ```
+
+### group
+
+To drag elements from one list into another, both lists must have the same `group` value.
+
+In the [upcoming dev version](https://github.com/RubaXa/Sortable/tree/dev), you can also define whether lists can give away, give and keep a copy (clone), and receive elements.
 
 #### handle
 
