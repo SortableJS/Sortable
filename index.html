@@ -334,14 +334,14 @@ var editableList = new Sortable(editable, {
 			{
 				name: 'advanced',
 				pull: 'clone',
-				put: false,
-				sort: false
+				put: false
 			}, {
 				name: 'advanced',
 				pull: false,
 				put: true
 			}].forEach(function (opts, i) {
 				new Sortable(document.getElementById('advanced-' + (i + 1)), {
+					sort: (i != 1),
 					group: opts,
 					animation: 150
 				});
