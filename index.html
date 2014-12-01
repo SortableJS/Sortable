@@ -145,6 +145,25 @@
 	</div>
 
 
+	<a name="h"></a>
+	<div class="container" style="margin-top: 100px;">
+		<div id="handle" style="margin-left: 30px;">
+			<div><div data-force="5" class="layer title title_xl">Drag handle and selectable text</div></div>
+
+			<div style="width: 30%; float: left; margin-top: 15px; margin-left: 10px" class="block__list_words">
+				<div class="block__list-title">Drag handles</div>
+				<ul id="handle-1">
+					<li><span class="drag-handle">≡</span>Select text freely</li>
+					<li><span class="drag-handle">≡</span>Drag my handle</li>
+					<li><span class="drag-handle">≡</span>Best of both worlds</li>
+				</ul>
+			</div>
+
+			<div style="clear: both"></div>
+		</div>
+	</div>
+
+
 	<a name="ng"></a>
 	<div id="todos" ng-app="todoApp" class="container" style="margin-top: 100px">
 		<div style="margin-left: 30px">
@@ -346,7 +365,12 @@ var editableList = new Sortable(editable, {
 					animation: 150
 				});
 			});
-			
+
+			new Sortable(document.getElementById('handle-1'), {
+				handle: '.drag-handle',
+				animation: 150
+			});
+
 
 			angular.module('todoApp', ['ng-sortable'])
 				.controller('TodoController', ['$scope', function ($scope) {
