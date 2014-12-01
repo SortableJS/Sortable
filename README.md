@@ -78,6 +78,12 @@ new Sortable(el, {
 </ul>
 ```
 
+```css
+.my-handle {
+	cursor: move
+}
+```
+
 ---
 
 
