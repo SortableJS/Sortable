@@ -216,7 +216,12 @@ img {
 		padding-bottom: 0;
 	}
 
-
+.drag-handle {
+	margin-right: 0.25em;
+	color: blue;
+	cursor: move;
+	cursor: -webkit-grabbing;  /* overrides 'move' */
+}
 
 #todos input {
 	padding: 5px;
