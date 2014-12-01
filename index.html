@@ -339,13 +339,14 @@ var editableList = new Sortable(editable, {
 				name: 'advanced',
 				pull: false,
 				put: true
-			}].forEach(function (opts, i) {
+			}].forEach(function (groupOpts, i) {
 				new Sortable(document.getElementById('advanced-' + (i + 1)), {
 					sort: (i != 1),
-					group: opts,
+					group: groupOpts,
 					animation: 150
 				});
 			});
+			
 
 			angular.module('todoApp', ['ng-sortable'])
 				.controller('TodoController', ['$scope', function ($scope) {
