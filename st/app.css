@@ -217,8 +217,9 @@ img {
 	}
 
 .drag-handle {
-	margin-right: 0.25em;
-	color: blue;
+	margin-right: 10px;
+	font: bold 20px Sans-Serif;
+	color: #5F9EDF;
 	cursor: move;
 	cursor: -webkit-grabbing;  /* overrides 'move' */
 }
