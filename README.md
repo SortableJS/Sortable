@@ -2,10 +2,13 @@
 
 Sortable is a minimalist JavaScript library for reorderable drag-and-drop lists.
 
+Demo: http://rubaxa.github.io/Sortable/
+
 ## Features
 * Supports touch devices and [modern](http://caniuse.com/#search=drag) browsers
 * Built using native HTML5 drag and drop API
 * Can drag from one list to another or within the same list
+* Supports drag handles *and selectable text* (better than voidberg's html5sortable)
 * Simple API
 * Lightweight, 2KB gzipped
 * No jQuery
@@ -34,8 +37,8 @@ new Sortable(el);
 new Sortable(el, {
 	group: "name",
 	store: null, // @see Store
-	handle: ".my-handle", // Restricts sort start click/touch to the specified element
-	filter: ".ignor-elements", // Selectors that do not lead to dragging (String or Function)
+	handle: ".my-handle", // Drag handle selector within list items
+	filter: ".ignore-elements", // Selectors that do not lead to dragging (String or Function)
 	draggable: ".item",   // Specifies which items inside the element should be sortable
 	ghostClass: "sortable-ghost",
 	
@@ -60,10 +63,33 @@ new Sortable(el, {
 });
 ```
 
+#### handle
+
+To make list items draggable, Sortable disables text selection by the user. That's not always desirable. To allow text selection, define a drag handler, which is an area of every list element that allows it to be dragged around.
+
+```js
+new Sortable(el, {
+        handle: ".my-handle",
+});
+```
+
+```html
+<ul>
+	<li><span class="my-handle">:: </span> list item text one
+	<li><span class="my-handle">:: </span> list item text two
+</ul>
+```
+
+```css
+.my-handle {
+	cursor: move
+}
+```
+
 ---
 
 
-### Method
+### Methods
 
 ##### closest(el:`String`[, selector:`HTMLElement`]):`HTMLElement|null`
 For each element in the set, get the first element that matches the selector by testing the element itself and traversing up through its ancestors in the DOM tree.
