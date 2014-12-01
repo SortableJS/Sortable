@@ -63,7 +63,7 @@ new Sortable(el, {
 
 #### handle
 
-To make list items draggable, Sortable disables text selection by the user. That's not always desirable. To allow tesxt selection, define a drag handler, which is an area of every list element that allows it to be dragged around.
+To make list items draggable, Sortable disables text selection by the user. That's not always desirable. To allow text selection, define a drag handler, which is an area of every list element that allows it to be dragged around.
 
 ```js
 new Sortable(el, {
