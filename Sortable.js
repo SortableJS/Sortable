@@ -49,14 +49,14 @@
 
 		_silent = false,
 
-		_dispatchEvent = function (rootEl, name, targetEl, fromEl) {
+		_dispatchEvent = function (el, name, targetEl, fromEl) {
 			var evt = document.createEvent('Event');
 
 			evt.initEvent(name, true, true);
-			evt.item = targetEl || rootEl;
-			evt.from = fromEl || rootEl;
+			evt.item = targetEl || el;
+			evt.from = fromEl || el;
 
-			rootEl.dispatchEvent(evt);
+			el.dispatchEvent(evt);
 		},
 
 		_customEvents = 'onAdd onUpdate onRemove onStart onEnd onFilter onSort'.split(' '),
@@ -357,7 +357,7 @@
 				dataTransfer.effectAllowed = 'move';
 				options.setData && options.setData.call(this, dataTransfer, dragEl);
 
-				_on(document, 'drop', this._onDrop);
+				_on(document, 'drop', this);
 			}
 
 			setTimeout(this._applyEffects, 0);
@@ -365,7 +365,7 @@
 			scrollEl = options.scroll;
 
 			if (scrollEl === true) {
-				scrollEl = rootEl;
+				scrollEl = dragEl;
 
 				do {
 					if ((scrollEl.offsetWidth < scrollEl.scrollWidth) ||
@@ -544,16 +544,17 @@
 		},
 
 		_onDrop: function (/**Event*/evt) {
+			var el = this.el;
+
 			clearInterval(this._loopId);
 			clearInterval(autoScroll.pid);
 
 			// Unbind events
-			_off(document, 'drop', this._onDrop);
+			_off(document, 'drop', this);
 			_off(document, 'dragover', this);
 
-			_off(rootEl, 'dragend', this._onDrop);
-			_off(rootEl, 'dragstart', this._onDragStart);
-			_off(rootEl, 'selectstart', this._onTapStart);
+			_off(el, 'dragend', this._onDrop);
+			_off(el, 'dragstart', this._onDragStart);
 
 			this._offUpEvents();
 
@@ -615,6 +616,9 @@
 			if (type === 'dragover') {
 				this._onDrag(evt);
 				_globalDragOver(evt);
+			}
+			else if (type === 'drop') {
+				this._onDrop(evt);
 			}
 		},
 
