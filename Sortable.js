@@ -365,7 +365,7 @@
 			scrollEl = options.scroll;
 
 			if (scrollEl === true) {
-				scrollEl = dragEl;
+				scrollEl = rootEl;
 
 				do {
 					if ((scrollEl.offsetWidth < scrollEl.scrollWidth) ||
