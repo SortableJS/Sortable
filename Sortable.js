@@ -35,6 +35,7 @@
 		lastCSS,
 
 		activeGroup,
+		autoScroll = {},
 
 		tapEvt,
 		touchEvt,
@@ -238,7 +239,7 @@
 				_on(rootEl, 'dragstart', this._onDragStart);
 				_on(rootEl, 'dragend', this._onDrop);
 
-				_on(document, 'dragover', _globalDragOver);
+				_on(document, 'dragover', this);
 
 
 				try {
@@ -311,6 +312,7 @@
 				_css(ghostEl, 'msTransform', translate3d);
 				_css(ghostEl, 'transform', translate3d);
 
+				this._onDrag(touch);
 				evt.preventDefault();
 			}
 		},
@@ -376,13 +378,14 @@
 			}
 		},
 
-
 		_onDrag: _throttle(function (/**Event*/evt) {
+			// Bug: https://bugzilla.mozilla.org/show_bug.cgi?id=505521
 			if (rootEl && this.options.scroll) {
-				var options = this.options,
+				var el,
+					rect,
+					options = this.options,
 					sens = options.scrollSensitivity,
 					speed = options.scrollSpeed,
-					rect = rootEl.getBoundingClientRect(),
 
 					x = evt.clientX,
 					y = evt.clientY,
@@ -390,21 +393,37 @@
 					winWidth = window.innerWidth,
 					winHeight = window.innerHeight,
 
-					vx = (winWidth - x <= sens) ? (rect.right > winWidth) : -(rect.left < 0 && x <= sens),
-					vy = (winHeight - y <= sens) ? (rect.bottom > winHeight) : -(rect.top < 0 && y <= sens)
+					vx = (winWidth - x <= sens) - (x <= sens),
+					vy = (winHeight - y <= sens) - (y <= sens)
 				;
 
-
 				if (vx || vy) {
-					win.scrollTo(win.scrollX + vx * speed, win.scrollY + vy * speed);
+					el = win;
 				}
 				else if (scrollEl) {
+					el = scrollEl;
 					rect = scrollEl.getBoundingClientRect();
 					vx = (abs(rect.right - x) <= sens) - (abs(rect.left - x) <= sens);
 					vy = (abs(rect.bottom - y) <= sens) - (abs(rect.top - y) <= sens);
+				}
 
-					vy && (scrollEl.scrollTop += vy * speed);
-					vx && (scrollEl.scrollLeft += vx * speed);
+				if (autoScroll.vx !== vx || autoScroll.vy !== vy || autoScroll.el !== el) {
+					autoScroll.el = el;
+					autoScroll.vx = vx;
+					autoScroll.vy = vy;
+
+					clearInterval(autoScroll.pid);
+
+					if (el) {
+						autoScroll.pid = setInterval(function () {
+							if (el === win) {
+								win.scrollTo(win.scrollX + vx * speed, win.scrollY + vy * speed);
+							} else {
+								vy && (el.scrollTop += vy * speed);
+								vx && (el.scrollLeft += vx * speed);
+							}
+						}, 24);
+					}
 				}
 			}
 		}, 30),
@@ -419,9 +438,6 @@
 				group = options.group,
 				groupPut = group.put,
 				isOwner = (activeGroup === group);
-
-			// Because bug: https://bugzilla.mozilla.org/show_bug.cgi?id=505521
-			this._onDrag(evt);
 
 			if (!_silent &&
 				(activeGroup.name === group.name || groupPut && groupPut.indexOf && groupPut.indexOf(activeGroup.name) > -1) &&
@@ -529,10 +545,11 @@
 
 		_onDrop: function (/**Event*/evt) {
 			clearInterval(this._loopId);
+			clearInterval(autoScroll.pid);
 
 			// Unbind events
 			_off(document, 'drop', this._onDrop);
-			_off(document, 'dragover', _globalDragOver);
+			_off(document, 'dragover', this);
 
 			_off(rootEl, 'dragend', this._onDrop);
 			_off(rootEl, 'dragstart', this._onDragStart);
@@ -588,6 +605,16 @@
 
 				// Save sorting
 				this.options.store && this.options.store.set(this);
+			}
+		},
+
+
+		handleEvent: function (/**Event*/evt) {
+			var type = evt.type;
+
+			if (type === 'dragover') {
+				this._onDrag(evt);
+				_globalDragOver(evt);
 			}
 		},
 
