@@ -52,13 +52,13 @@ var sortabel = new Sortable(el, {
 	onStart: function (/**Event*/evt) { /* dragging */ },
 	onEnd: function (/**Event*/evt) { /* dragging */ },
 
-	// Element is added to the list
+	// Element is dropped into the list from another list
 	onAdd: function (/**Event*/evt){
 		var itemEl = evt.item; // dragged HTMLElement
 		itemEl.from; // previous list
 	},
 
-	// Changed sorting in list
+	// Changed sorting within list
 	onUpdate: function (/**Event*/evt){
 		var itemEl = evt.item; // dragged HTMLElement
 	},
@@ -68,7 +68,7 @@ var sortabel = new Sortable(el, {
 		var itemEl = evt.item; // dragged HTMLElement
 	},
 
-	// The element is removed from the list
+	// Element is removed from the list into another list
 	onRemove: function (/**Event*/evt){
 		var itemEl = evt.item; // dragged HTMLElement
 	},
@@ -79,13 +79,13 @@ var sortabel = new Sortable(el, {
 });
 ```
 
-
 ---
 
 
 #### `handle` option
-
-To make list items draggable, Sortable disables text selection by the user. That's not always desirable. To allow text selection, define a drag handler, which is an area of every list element that allows it to be dragged around.
+To make list items draggable, Sortable disables text selection by the user.
+That's not always desirable. To allow text selection, define a drag handler,
+which is an area of every list element that allows it to be dragged around.
 
 ```js
 var sortable = new Sortable(el, {
@@ -110,7 +110,9 @@ var sortable = new Sortable(el, {
 ---
 
 
-### `group` option
+#### `group` option
+To drag elements from one list into another, both lists must have the same `group` value.
+You can also define whether lists can give away, give and keep a copy (`clone`), and receive elements.
 
  * name:`string` — group name
  * pull:`true|false|'clone'` — ability to move from the list. `clone` — cloning drag item when moving from the list.
@@ -118,6 +120,7 @@ var sortable = new Sortable(el, {
 
 
 ---
+
 
 <a name="ng"></a>
 ### Support AngularJS
