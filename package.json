@@ -1,12 +1,13 @@
 {
   "name": "sortable",
   "exportName": "Sortable",
-  "version": "0.5.2",
+  "version": "0.7.0",
   "devDependencies": {
     "grunt": "*",
     "grunt-version": "*",
-    "grunt-contrib-uglify": "*",
-    "grunt-shell": "*"
+    "grunt-shell": "*",
+    "grunt-contrib-jshint": "0.9.2",
+    "grunt-contrib-uglify": "*"
   },
   "description": "Minimalist library for reorderable drag-and-drop lists on modern browsers and touch devices. No jQuery.",
   "main": "Sortable.js",

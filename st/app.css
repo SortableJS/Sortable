@@ -126,6 +126,12 @@ img {
 		margin-left: 5px;
 		background-color: #fff;
 	}
+		.block__list-title {
+			margin: -20px 0 0;
+			padding: 10px;
+			text-align: center;
+			background: #5F9EDF;
+		}
 		.block__list li { cursor: move; }
 
 	.block__list_words li {
@@ -209,3 +215,17 @@ img {
 	#filter .block__list {
 		padding-bottom: 0;
 	}
+
+.drag-handle {
+	margin-right: 0.25em;
+	color: blue;
+	cursor: move;
+	cursor: -webkit-grabbing;  /* overrides 'move' */
+}
+
+#todos input {
+	padding: 5px;
+	font-size: 14px;
+	font-family: 'Roboto', sans-serif;
+	font-weight: 300;
+}
