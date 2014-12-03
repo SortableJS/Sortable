@@ -363,11 +363,14 @@
 				options = this.options,
 				group = options.group,
 				groupPut = group.put,
-				isOwner = (activeGroup === group);
+				isOwner = (activeGroup === group),
+				canSort = options.sort;
 
 			if (!_silent &&
-				(activeGroup.name === group.name || groupPut && groupPut.indexOf && groupPut.indexOf(activeGroup.name) > -1) &&
-				(isOwner && (options.sort || (revert = !rootEl.contains(dragEl))) || groupPut && activeGroup.pull) &&
+				(isOwner
+					? canSort || (revert = !rootEl.contains(dragEl))
+					: activeGroup.pull && activeGroup.name === group.name && groupPut && (groupPut.indexOf ? groupPut.indexOf(activeGroup.name) > -1 : groupPut)
+				) &&
 				(evt.rootEl === void 0 || evt.rootEl === this.el)
 			) {
 				target = _closest(evt.target, options.draggable, el);
@@ -379,8 +382,14 @@
 					cloneEl.state = isOwner;
 				}
 
-				if (revert && cloneEl) {
-					rootEl.insertBefore(dragEl, cloneEl);
+				if (revert) {
+					if (cloneEl || nextEl) {
+						rootEl.insertBefore(dragEl, cloneEl || nextEl);
+					}
+					else if (!canSort) {
+						rootEl.appendChild(dragEl);
+					}
+
 					return;
 				}
 
@@ -589,6 +598,23 @@
 		 */
 		closest: function (el, selector) {
 			return _closest(el, selector || this.options.draggable, this.el);
+		},
+
+
+		/**
+		 * Set/get option
+		 * @param   {string} name
+		 * @param   {*}      [value]
+		 * @returns {*}
+		 */
+		option: function (name, value) {
+			var options = this.options;
+
+			if (value === void 0) {
+				return options[name];
+			} else {
+				options[name] = value;
+			}
 		},
 
 

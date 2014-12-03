@@ -122,6 +122,12 @@ angular.module('myApp', ['ng-sortable'])
 
 ### Method
 
+
+##### option(name:`String`[, value:`*`]):`*`
+Get or set the option.
+
+
+
 ##### closest(el:`String`[, selector:`HTMLElement`]):`HTMLElement|null`
 For each element in the set, get the first element that matches the selector by testing the element itself and traversing up through its ancestors in the DOM tree.
 
@@ -148,6 +154,7 @@ Serializes the sortable's item `data-id`'s into an array of string.
 
 ##### sort(order:`String[]`)
 Sorts the elements according to the array.
+
 ```js
 var order = sortable.toArray();
 sortable.sort(order.reverse()); // apply
@@ -155,6 +162,7 @@ sortable.sort(order.reverse()); // apply
 
 
 ##### destroy()
+Removes the sortable functionality completely.
 
 
 ---
