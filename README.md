@@ -11,7 +11,7 @@ Demo: http://rubaxa.github.io/Sortable/
  * Animation moving items when sorting (css animation)
  * Supports drag handles *and selectable text* (better than voidberg's html5sortable)
  * Built using native HTML5 drag and drop API
- * Support [AngularJS](#ng)
+ * Supports [AngularJS](#ng) and and any CSS library, e.g. [Bootstrap](#bs)
  * Simple API
  * No jQuery
 
@@ -242,6 +242,36 @@ Sortable.create(el, {
 })
 ```
 
+
+---
+
+
+<a name="bs"></a>
+### Bootstrap
+Demo: http://jsbin.com/luxero/1/edit
+
+```html
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css"/>
+
+
+<!-- Latest Sortable -->
+<script src="http://rubaxa.github.io/Sortable/Sortable.js"></script>
+
+
+<!-- Simple List -->
+<ul id="simpleList" class="list-group">
+	<li class="list-group-item">This is <a href="http://rubaxa.github.io/Sortable/">Sortable</a></li>
+	<li class="list-group-item">It works with Bootstrap...</li>
+	<li class="list-group-item">...out of the box.</li>
+	<li class="list-group-item">It has support for touch devices.</li>
+	<li class="list-group-item">Just drag some elements around.</li>
+</ul>
+
+<script>
+    // Simple list
+    Sortable.create(simpleList, { /* options */ });
+</script>
 
 
 ---
