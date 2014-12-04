@@ -44,39 +44,39 @@ var sortable = new Sortable(el, {
 	store: null,  // @see Store
 	animation: 150,  // ms, animation speed moving items when sorting, `0` — without animation
 	handle: ".my-handle",  // Drag handle selector within list items
-	filter: ".ignor-elements",  // Selectors that do not lead to dragging (String or Function)
+	filter: ".ignore-elements",  // Selectors that do not lead to dragging (String or Function)
 	draggable: ".item",  // Specifies which items inside the element should be sortable
-	ghostClass: "sortable-ghost",  // Class name for the drop placeholder. See http://jsbin.com/luxero/3
+	ghostClass: "sortable-ghost",  // Class name for the drop placeholder - jsbin.com/luxero/3
 	setData: function (dataTransfer, dragEl) {
 		dataTransfer.setData('Text', dragEl.textContent);
 	},
 
-	onStart: function (/**Event*/evt) { /* dragging */ },
-	onEnd: function (/**Event*/evt) { /* dragging */ },
+	onStart: function (/*Event*/evt) { /* dragging started*/ },
+	onEnd: function (/*Event*/evt) { /* dragging ended */ },
 
 	// Element is dropped into the list from another list
-	onAdd: function (/**Event*/evt){
+	onAdd: function (/*Event*/evt){
 		var itemEl = evt.item; // dragged HTMLElement
 		itemEl.from; // previous list
 	},
 
 	// Changed sorting within list
-	onUpdate: function (/**Event*/evt){
+	onUpdate: function (/*Event*/evt){
 		var itemEl = evt.item; // dragged HTMLElement
 	},
 
 	// Called by any change to the list (add / update / remove)
-	onSort: function (/**Event*/evt){
+	onSort: function (/*Event*/evt){
 		var itemEl = evt.item; // dragged HTMLElement
 	},
 
 	// Element is removed from the list into another list
-	onRemove: function (/**Event*/evt){
+	onRemove: function (/*Event*/evt){
 		var itemEl = evt.item; // dragged HTMLElement
 	},
 
-	onFilter: function (/**Event*/evt){
-		var itemEl = evt.item; // HTMLElement on which was `mousedown|tapstart` event.
+	onFilter: function (/*Event*/evt){
+		var itemEl = evt.item; // HTMLElement receiving the `mousedown|tapstart` event.
 	}
 });
 ```
