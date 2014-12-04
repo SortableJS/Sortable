@@ -8,7 +8,7 @@ Demo: http://rubaxa.github.io/Sortable/
 
  * Supports touch devices and [modern](http://caniuse.com/#search=drag) browsers
  * Can drag from one list to another or within the same list
- * Animation moving items when sorting (css animation)
+ * CSS animation when moving items
  * Supports drag handles *and selectable text* (better than voidberg's html5sortable)
  * Built using native HTML5 drag and drop API
  * Supports [AngularJS](#ng) and and any CSS library, e.g. [Bootstrap](#bs)
@@ -29,6 +29,8 @@ Demo: http://rubaxa.github.io/Sortable/
 var el = document.getElementById('items');
 var sortable = Sortable.create(el);
 ```
+
+You can use any element for the list and its elements, not just `ul`/`li`. Here is an [example with `div`s](http://jsbin.com/luxero/2/edit?html,js,output).
 
 
 ---
@@ -114,9 +116,9 @@ var sortable = new Sortable(el, {
 To drag elements from one list into another, both lists must have the same `group` value.
 You can also define whether lists can give away, give and keep a copy (`clone`), and receive elements.
 
- * name:`string` — group name
- * pull:`true|false|'clone'` — ability to move from the list. `clone` — cloning drag item when moving from the list.
- * put:`true|false|["foo", "bar"]` — the possibility of adding an element from the other list, or an array of names groups, which can be taken.
+ * name: `String` — group name
+ * pull: `true|false|'clone'` — ability to move from the list. `clone` — copy the item, rather than move.
+ * put: `true|false|["foo", "bar"]` — whether elements can be added from other lists, or an array of group names from which elements can be taken
 
 
 ---
@@ -248,7 +250,7 @@ Sortable.create(el, {
 
 <a name="bs"></a>
 ### Bootstrap
-Demo: http://jsbin.com/luxero/1/edit
+Demo: http://jsbin.com/luxero/2/edit?html,js,output
 
 ```html
 <!-- Latest compiled and minified CSS -->
@@ -297,7 +299,7 @@ Demo: http://jsbin.com/luxero/1/edit
 
 
 ## MIT LICENSE
-Copyright 2013 Lebedev Konstantin <ibnRubaXa@gmail.com>
+Copyright 2013-2014 Lebedev Konstantin <ibnRubaXa@gmail.com>
 http://rubaxa.github.io/Sortable/
 
 Permission is hereby granted, free of charge, to any person obtaining
