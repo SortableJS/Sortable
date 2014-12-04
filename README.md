@@ -39,14 +39,14 @@ You can use any element for the list and its elements, not just `ul`/`li`. Here 
 ### Options
 ```js
 var sortable = new Sortable(el, {
-	group: "name", // or { name: "..", pull: [true, false, clone], put: [true, false, array] }
-	sort: true, // sorting inside list
-	store: null, // @see Store
-	animation: 150, // ms, animation speed moving items when sorting, `0` — without animation
-	handle: ".my-handle", // Drag handle selector within list items
-	filter: ".ignor-elements", // Selectors that do not lead to dragging (String or Function)
-	draggable: ".item",   // Specifies which items inside the element should be sortable
-	ghostClass: "sortable-ghost",
+	group: "name",  // or { name: "..", pull: [true, false, clone], put: [true, false, array] }
+	sort: true,  // sorting inside list
+	store: null,  // @see Store
+	animation: 150,  // ms, animation speed moving items when sorting, `0` — without animation
+	handle: ".my-handle",  // Drag handle selector within list items
+	filter: ".ignor-elements",  // Selectors that do not lead to dragging (String or Function)
+	draggable: ".item",  // Specifies which items inside the element should be sortable
+	ghostClass: "sortable-ghost",  // Class name for the drop placeholder. See http://jsbin.com/luxero/3
 	setData: function (dataTransfer, dragEl) {
 		dataTransfer.setData('Text', dragEl.textContent);
 	},
