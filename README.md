@@ -36,7 +36,7 @@ var sortable = Sortable.create(el);
 
 ### Options
 ```js
-var sortabel = new Sortable(el, {
+var sortable = new Sortable(el, {
 	group: "name", // or { name: "..", pull: [true, false, clone], put: [true, false, array] }
 	sort: true, // sorting inside list
 	store: null, // @see Store
@@ -89,7 +89,7 @@ which is an area of every list element that allows it to be dragged around.
 
 ```js
 var sortable = new Sortable(el, {
-        handle: ".my-handle",
+        handle: ".my-handle"
 });
 ```
 
@@ -272,7 +272,7 @@ Demo: http://jsbin.com/luxero/1/edit
     // Simple list
     Sortable.create(simpleList, { /* options */ });
 </script>
-
+```
 
 ---
 
