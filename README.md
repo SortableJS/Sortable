@@ -126,8 +126,10 @@ You can also define whether lists can give away, give and keep a copy (`clone`),
 ### Support AngularJS
 Include [ng-sortable.js](ng-sortable.js)
 
+Demo: http://jsbin.com/naduvo/1/edit?html,js,output
+
 ```html
-<div ng-app"myApp">
+<div ng-app="myApp" ng-controller="demo">
 	<ul ng-sortable>
 		<li ng-repeat="item in items">{{item}}</li>
 	</ul>
@@ -145,12 +147,12 @@ Include [ng-sortable.js](ng-sortable.js)
 
 ```js
 angular.module('myApp', ['ng-sortable'])
-	.controller(function () {
-		this.items = ['item 1', 'item 2'];
-		this.foo = ['foo 1', '..'];
-		this.bar = ['bar 1', '..'];
-		this.barConfig = { group: 'foobar', animation: 150 };
-	});
+	.controller('demo', ['$scope', function ($scope) {
+		$scope.items = ['item 1', 'item 2'];
+		$scope.foo = ['foo 1', '..'];
+		$scope.bar = ['bar 1', '..'];
+		$scope.barConfig = { group: 'foobar', animation: 150 };
+	}]);
 ```
 
 
