@@ -369,7 +369,10 @@
 			if (!_silent &&
 				(isOwner
 					? canSort || (revert = !rootEl.contains(dragEl))
-					: activeGroup.pull && activeGroup.name === group.name && groupPut && (groupPut.indexOf ? groupPut.indexOf(activeGroup.name) > -1 : groupPut)
+					: activeGroup.pull && groupPut && (
+						(activeGroup.name === group.name) || // by Name
+						(groupPut.indexOf && ~groupPut.indexOf(activeGroup.name)) // by Array
+					)
 				) &&
 				(evt.rootEl === void 0 || evt.rootEl === this.el)
 			) {
@@ -439,7 +442,7 @@
 					} else {
 						target.parentNode.insertBefore(dragEl, after ? nextSibling : target);
 					}
-					
+
 					this._animate(dragRect, dragEl);
 					this._animate(targetRect, target);
 				}
@@ -803,7 +806,7 @@
 	};
 
 
-	Sortable.version = '0.7.0';
+	Sortable.version = '0.7.1';
 
 
 	/**
