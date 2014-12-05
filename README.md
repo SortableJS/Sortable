@@ -39,44 +39,44 @@ You can use any element for the list and its elements, not just `ul`/`li`. Here 
 ### Options
 ```js
 var sortable = new Sortable(el, {
-	group: "name", // or { name: "..", pull: [true, false, clone], put: [true, false, array] }
-	sort: true, // sorting inside list
-	store: null, // @see Store
-	animation: 150, // ms, animation speed moving items when sorting, `0` — without animation
-	handle: ".my-handle", // Drag handle selector within list items
-	filter: ".ignor-elements", // Selectors that do not lead to dragging (String or Function)
-	draggable: ".item",   // Specifies which items inside the element should be sortable
-	ghostClass: "sortable-ghost",
+	group: "name",  // or { name: "..", pull: [true, false, clone], put: [true, false, array] }
+	sort: true,  // sorting inside list
+	store: null,  // @see Store
+	animation: 150,  // ms, animation speed moving items when sorting, `0` — without animation
+	handle: ".my-handle",  // Drag handle selector within list items
+	filter: ".ignore-elements",  // Selectors that do not lead to dragging (String or Function)
+	draggable: ".item",  // Specifies which items inside the element should be sortable
+	ghostClass: "sortable-ghost",  // Class name for the drop placeholder - jsbin.com/luxero/3
 	setData: function (dataTransfer, dragEl) {
 		dataTransfer.setData('Text', dragEl.textContent);
 	},
 
-	onStart: function (/**Event*/evt) { /* dragging */ },
-	onEnd: function (/**Event*/evt) { /* dragging */ },
+	onStart: function (/*Event*/evt) { /* dragging started*/ },
+	onEnd: function (/*Event*/evt) { /* dragging ended */ },
 
 	// Element is dropped into the list from another list
-	onAdd: function (/**Event*/evt){
+	onAdd: function (/*Event*/evt){
 		var itemEl = evt.item; // dragged HTMLElement
 		itemEl.from; // previous list
 	},
 
 	// Changed sorting within list
-	onUpdate: function (/**Event*/evt){
+	onUpdate: function (/*Event*/evt){
 		var itemEl = evt.item; // dragged HTMLElement
 	},
 
 	// Called by any change to the list (add / update / remove)
-	onSort: function (/**Event*/evt){
+	onSort: function (/*Event*/evt){
 		var itemEl = evt.item; // dragged HTMLElement
 	},
 
 	// Element is removed from the list into another list
-	onRemove: function (/**Event*/evt){
+	onRemove: function (/*Event*/evt){
 		var itemEl = evt.item; // dragged HTMLElement
 	},
 
-	onFilter: function (/**Event*/evt){
-		var itemEl = evt.item; // HTMLElement on which was `mousedown|tapstart` event.
+	onFilter: function (/*Event*/evt){
+		var itemEl = evt.item; // HTMLElement receiving the `mousedown|tapstart` event.
 	}
 });
 ```
@@ -118,7 +118,7 @@ You can also define whether lists can give away, give and keep a copy (`clone`),
 
  * name: `String` — group name
  * pull: `true|false|'clone'` — ability to move from the list. `clone` — copy the item, rather than move.
- * put: `true|false|["foo", "bar"]` — whether elements can be added from other lists, or an array of group names from which elements can be taken
+ * put: `true|false|["foo", "bar"]` — whether elements can be added from other lists, or an array of group names from which elements can be taken. Demo: http://jsbin.com/naduvo/2/edit?html,js,output
 
 
 ---
@@ -227,7 +227,7 @@ Sortable.create(el, {
 		/**
 		 * Get the order of elements. Called once during initialization.
 		 * @param   {Sortable}  sortable
-		 * @retruns {Array}
+		 * @returns {Array}
 		 */
 		get: function (sortable) {
 			var order = localStorage.getItem(sortable.options.group);
@@ -235,7 +235,7 @@ Sortable.create(el, {
 		},
 
 		/**
-		 * Save the order of elements. Called every time at the drag end.
+		 * Save the order of elements. Called onEnd (when the item is dropped).
 		 * @param {Sortable}  sortable
 		 */
 		set: function (sortable) {
