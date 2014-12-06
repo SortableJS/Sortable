@@ -3,9 +3,9 @@
  * @licence MIT
  */
 angular.module('ng-sortable', [])
-	.constant('$version', '0.1.0')
+	.constant('$version', '0.2.0')
 	.directive('ngSortable', ['$parse', '$rootScope', function ($parse, $rootScope) {
-		"use strict";
+		'use strict';
 
 		var removed;
 
@@ -14,7 +14,7 @@ angular.module('ng-sortable', [])
 			var ngRepeat = [].filter.call(el.childNodes, function (node) {
 				return (
 						(node.nodeType === 8) &&
-						(node.nodeValue.indexOf("ngRepeat:") !== -1)
+						(node.nodeValue.indexOf('ngRepeat:') !== -1)
 					);
 			})[0];
 			ngRepeat = ngRepeat.nodeValue.match(/ngRepeat:\s*([^\s]+)\s+in\s+([^\s|]+)/);
@@ -34,17 +34,23 @@ angular.module('ng-sortable', [])
 		}
 
 
+		// Export
 		return {
 			restrict: 'AC',
 			link: function (scope, $el, attrs) {
-				var el = $el[0];
-				var options = scope.$eval(attrs.ngSortable) || {};
-				var _order = [];
-				var source = getSource(el);
+				var el = $el[0],
+					ngSortable = attrs.ngSortable,
+					options = scope.$eval(ngSortable) || {},
+					source = getSource(el),
+					sortable,
+					_order = []
+				;
+
 
 				'Start End Add Update Remove Sort'.split(' ').forEach(function (name) {
 					options['on' + name] = options['on' + name] || function () {};
 				});
+
 
 				function _sync(evt) {
 					sortable.toArray().forEach(function (id, i) {
@@ -74,7 +80,7 @@ angular.module('ng-sortable', [])
 				}
 
 
-				var sortable = Sortable.create(el, Object.keys(options).reduce(function (opts, name) {
+				sortable = Sortable.create(el, Object.keys(options).reduce(function (opts, name) {
 					opts[name] = opts[name] || options[name];
 					return opts;
 				}, {
@@ -94,7 +100,7 @@ angular.module('ng-sortable', [])
 						_sync(evt);
 						options.onUpdate(source.items, source.item(evt.item));
 					},
-					onRemove: function (evt) {
+					onRemove: function () {
 						options.onRemove(source.items, removed);
 					},
 					onSort: function () {
@@ -103,9 +109,20 @@ angular.module('ng-sortable', [])
 				}));
 
 
+				if (!/{|}/.test(ngSortable)) { // todo: ugly
+					angular.forEach(sortable.options, function (v, name) {
+						scope.$watch(ngSortable + '.' + name, function (value) {
+							options[name] = value;
+							sortable.option(name, value);
+						});
+					});
+				}
+
+
 				$rootScope.$on('sortable:start', function () {
 					_order = sortable.toArray();
 				});
+
 
 				$el.on('$destroy', function () {
 					el.sortable = null;
