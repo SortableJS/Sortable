@@ -41,6 +41,7 @@ You can use any element for the list and its elements, not just `ul`/`li`. Here 
 var sortable = new Sortable(el, {
 	group: "name",  // or { name: "..", pull: [true, false, clone], put: [true, false, array] }
 	sort: true,  // sorting inside list
+	disabled: false, // Disables the sortable if set to true.
 	store: null,  // @see Store
 	animation: 150,  // ms, animation speed moving items when sorting, `0` — without animation
 	handle: ".my-handle",  // Drag handle selector within list items

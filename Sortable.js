@@ -81,6 +81,7 @@
 		var defaults = {
 			group: Math.random(),
 			sort: true,
+			disabled: false,
 			store: null,
 			handle: null,
 			draggable: el.children[0] && el.children[0].nodeName || (/[uo]l/i.test(el.nodeName) ? 'li' : '*'),
@@ -163,8 +164,8 @@
 				filter = options.filter;
 
 
-			if (evt.type === 'mousedown' && evt.button !== 0) {
-				return; // only left button
+			if (evt.type === 'mousedown' && evt.button !== 0 || options.disabled) {
+				return; // only left button or enabled
 			}
 
 			// Check filter
