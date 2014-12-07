@@ -506,8 +506,8 @@
 					_toggleClass(dragEl, this.options.ghostClass, false);
 
 					if (!rootEl.contains(dragEl)) {
-						_dispatchEvent(dragEl, 'sort');
-						_dispatchEvent(rootEl, 'sort');
+						_dispatchEvent(dragEl, 'sort', dragEl, dragEl.parentNode);
+						_dispatchEvent(rootEl, 'sort', dragEl);
 
 						// Add event
 						_dispatchEvent(dragEl, 'add', dragEl, rootEl);
