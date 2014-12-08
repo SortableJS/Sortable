@@ -3,7 +3,7 @@
  * @licence MIT
  */
 angular.module('ng-sortable', [])
-	.constant('$version', '0.2.0')
+	.constant('$version', '0.2.1')
 	.directive('ngSortable', ['$parse', '$rootScope', function ($parse, $rootScope) {
 		'use strict';
 
@@ -19,16 +19,18 @@ angular.module('ng-sortable', [])
 			})[0];
 			ngRepeat = ngRepeat.nodeValue.match(/ngRepeat:\s*([^\s]+)\s+in\s+([^\s|]+)/);
 
-			var item = $parse(ngRepeat[1]);
-			var items = $parse(ngRepeat[2]);
+			var itemExpr = $parse(ngRepeat[1]);
+			var itemsExpr = $parse(ngRepeat[2]);
 
 			return {
 				item: function (el) {
-					return item(angular.element(el).scope());
+					return itemExpr(angular.element(el).scope());
 				},
-				items: items(scope),
+				items: function () {
+					return itemsExpr(scope);
+				},
 				upd: function () {
-					items.assign(scope, this.items);
+					itemsExpr.assign(scope, this.items());
 				}
 			};
 		}
@@ -55,22 +57,24 @@ angular.module('ng-sortable', [])
 				function _sync(evt) {
 					sortable.toArray().forEach(function (id, i) {
 						if (_order[i] !== id) {
-							var idx = _order.indexOf(id);
+							var idx = _order.indexOf(id),
+								items = source.items();
 
 							if (idx === -1) {
-								var remoteSource = getSource(evt.from);
+								var remoteSource = getSource(evt.from),
+									remoteItems = remoteSource.items();
 
-								idx = remoteSource.items.indexOf(remoteSource.item(evt.item));
-								removed = remoteSource.items.splice(idx, 1)[0];
+								idx = remoteItems.indexOf(remoteSource.item(evt.item));
+								removed = remoteItems.splice(idx, 1)[0];
 
 								_order.splice(i, 0, id);
-								source.items.splice(i, 0, removed);
+								items.splice(i, 0, removed);
 								remoteSource.upd();
 
 								evt.from.appendChild(evt.item); // revert element
 							} else {
 								_order.splice(i, 0, _order.splice(idx, 1)[0]);
-								source.items.splice(i, 0, source.items.splice(idx, 1)[0]);
+								items.splice(i, 0, items.splice(idx, 1)[0]);
 							}
 						}
 					});
@@ -94,23 +98,23 @@ angular.module('ng-sortable', [])
 					},
 					onAdd: function (evt) {
 						_sync(evt);
-						options.onAdd(source.items, removed);
+						options.onAdd(source.items(), removed);
 					},
 					onUpdate: function (evt) {
 						_sync(evt);
-						options.onUpdate(source.items, source.item(evt.item));
+						options.onUpdate(source.items(), source.item(evt.item));
 					},
 					onRemove: function () {
-						options.onRemove(source.items, removed);
+						options.onRemove(source.items(), removed);
 					},
 					onSort: function () {
-						options.onSort(source.items);
+						options.onSort(source.items());
 					}
 				}));
 
 
 				if (!/{|}/.test(ngSortable)) { // todo: ugly
-					angular.forEach(sortable.options, function (v, name) {
+					angular.forEach(['sort', 'disabled', 'draggable', 'handle', 'animation'], function (name) {
 						scope.$watch(ngSortable + '.' + name, function (value) {
 							options[name] = value;
 							sortable.option(name, value);
