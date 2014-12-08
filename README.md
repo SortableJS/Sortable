@@ -39,7 +39,7 @@ You can use any element for the list and its elements, not just `ul`/`li`. Here 
 ### Options
 ```js
 var sortable = new Sortable(el, {
-	group: "name",  // or { name: "..", pull: [true, false, clone], put: [true, false, array] }
+	group: "name",  // or { name: "...", pull: [true, false, clone], put: [true, false, array] }
 	sort: true,  // sorting inside list
 	disabled: false, // Disables the sortable if set to true.
 	store: null,  // @see Store
@@ -52,32 +52,42 @@ var sortable = new Sortable(el, {
 		dataTransfer.setData('Text', dragEl.textContent);
 	},
 
-	onStart: function (/*Event*/evt) { /* dragging started*/ },
-	onEnd: function (/*Event*/evt) { /* dragging ended */ },
+	// dragging started
+	onStart: function (/**Event*/evt) {
+		evt.oldIndex;  // element index within parent
+	},
+	
+	// dragging ended
+	onEnd: function (/**Event*/evt) {
+		evt.oldIndex;  // element's old index within parent
+		evt.newIndex;  // element's new index within parent
+	},
 
 	// Element is dropped into the list from another list
-	onAdd: function (/*Event*/evt){
-		var itemEl = evt.item; // dragged HTMLElement
-		itemEl.from; // previous list
+	onAdd: function (/**Event*/evt) {
+		var itemEl = evt.item;  // dragged HTMLElement
+		itemEl.from;  // previous list
+		// + indexes from onEnd
 	},
 
 	// Changed sorting within list
-	onUpdate: function (/*Event*/evt){
-		var itemEl = evt.item; // dragged HTMLElement
+	onUpdate: function (/**Event*/evt) {
+		var itemEl = evt.item;  // dragged HTMLElement
+		// + indexes from onEnd
 	},
 
 	// Called by any change to the list (add / update / remove)
-	onSort: function (/*Event*/evt){
-		var itemEl = evt.item; // dragged HTMLElement
+	onSort: function (/**Event*/evt) {
+		// same properties as onUpdate
 	},
 
 	// Element is removed from the list into another list
-	onRemove: function (/*Event*/evt){
-		var itemEl = evt.item; // dragged HTMLElement
+	onRemove: function (/**Event*/evt) {
+		// same properties as onUpdate
 	},
 
-	onFilter: function (/*Event*/evt){
-		var itemEl = evt.item; // HTMLElement receiving the `mousedown|tapstart` event.
+	onFilter: function (/**Event*/evt) {
+		var itemEl = evt.item;  // HTMLElement receiving the `mousedown|tapstart` event.
 	}
 });
 ```
