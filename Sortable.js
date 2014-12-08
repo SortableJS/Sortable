@@ -52,10 +52,12 @@
 			var evt = document.createEvent('Event');
 
 			evt.initEvent(name, true, true);
+
 			evt.item = targetEl || rootEl;
 			evt.from = fromEl || rootEl;
-			if (startIndex !== undefined) evt.oldIndex = startIndex;
-			if (newIndex !== undefined) evt.newIndex = newIndex;
+
+			evt.oldIndex = startIndex;
+			evt.newIndex = newIndex;
 
 			rootEl.dispatchEvent(evt);
 		},
@@ -250,7 +252,8 @@
 				}
 
 
-				_dispatchEvent(dragEl, 'start', undefined, undefined, startIndex);
+				// Drag start event
+				_dispatchEvent(rootEl, 'start', dragEl, rootEl, startIndex);
 
 
 				if (activeGroup.pull == 'clone') {
@@ -514,24 +517,25 @@
 
 					if (!rootEl.contains(dragEl)) {
 						// drag from one list and drop into another
-						_dispatchEvent(dragEl, 'sort', dragEl, dragEl.parentNode, startIndex, newIndex);
-						_dispatchEvent(rootEl, 'sort', dragEl, undefined, startIndex, newIndex);
+						_dispatchEvent(dragEl.parentNode, 'sort', dragEl, rootEl, startIndex, newIndex);
+						_dispatchEvent(rootEl, 'sort', dragEl, rootEl, startIndex, newIndex);
 
 						// Add event
 						_dispatchEvent(dragEl, 'add', dragEl, rootEl, startIndex, newIndex);
 
 						// Remove event
-						_dispatchEvent(rootEl, 'remove', dragEl, undefined, startIndex, newIndex);
+						_dispatchEvent(rootEl, 'remove', dragEl, rootEl, startIndex, newIndex);
 					}
 					else if (dragEl.nextSibling !== nextEl) {
 						// drag & drop within the same list
-						_dispatchEvent(dragEl, 'update', undefined, undefined, startIndex, newIndex);
-						_dispatchEvent(dragEl, 'sort', undefined, undefined, startIndex, newIndex);
+						_dispatchEvent(rootEl, 'update', dragEl, rootEl, startIndex, newIndex);
+						_dispatchEvent(rootEl, 'sort', dragEl, rootEl, startIndex, newIndex);
 
 						cloneEl && cloneEl.parentNode.removeChild(cloneEl);
 					}
 
-					_dispatchEvent(rootEl, 'end', undefined, undefined, startIndex, newIndex);
+					// Drag end event
+					_dispatchEvent(rootEl, 'end', dragEl, rootEl, startIndex, newIndex);
 				}
 
 				// Set NULL
