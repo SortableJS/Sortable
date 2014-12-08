@@ -164,33 +164,13 @@
 		_onTapStart: function (/**Event|TouchEvent*/evt) {
 			var touch = evt.touches && evt.touches[0],
 				target = (touch || evt).target,
+				originalTarget = target,
 				options =  this.options,
 				el = this.el,
 				filter = options.filter;
 
-			// get the index of the dragged element within its parent
-			startIndex = _index(target);
-
 			if (evt.type === 'mousedown' && evt.button !== 0 || options.disabled) {
 				return; // only left button or enabled
-			}
-
-			// Check filter
-			if (typeof filter === 'function') {
-				if (filter.call(this, target, this)) {
-					_dispatchEvent(el, 'filter', target);
-					return; // cancel dnd
-				}
-			}
-			else if (filter) {
-				filter = filter.split(',').filter(function (criteria) {
-					return _closest(target, criteria.trim(), el);
-				});
-
-				if (filter.length) {
-					_dispatchEvent(el, 'filter', target);
-					return; // cancel dnd
-				}
 			}
 
 			if (options.handle) {
@@ -198,6 +178,31 @@
 			}
 
 			target = _closest(target, options.draggable, el);
+
+			// get the index of the dragged element within its parent
+			startIndex = _index(target);
+
+			// Check filter
+			if (typeof filter === 'function') {
+				if (filter.call(this, evt, target, this)) {
+					_dispatchEvent(originalTarget, 'filter', target, el, startIndex);
+					return; // cancel dnd
+				}
+			}
+			else if (filter) {
+				filter = filter.split(',').some(function (criteria) {
+					criteria = _closest(originalTarget, criteria.trim(), el);
+
+					if (criteria) {
+						_dispatchEvent(criteria, 'filter', target, el, startIndex);
+						return true;
+					}
+				});
+
+				if (filter.length) {
+					return; // cancel dnd
+				}
+			}
 
 			// IE 9 Support
 			if (target && evt.type == 'selectstart') {
@@ -673,7 +678,7 @@
 	}
 
 
-	function _closest(el, selector, ctx) {
+	function _closest(/**HTMLElement*/el, /**String*/selector, /**HTMLElement*/ctx) {
 		if (selector === '*') {
 			return el;
 		}
@@ -699,7 +704,7 @@
 	}
 
 
-	function _globalDragOver(evt) {
+	function _globalDragOver(/**Event*/evt) {
 		evt.dataTransfer.dropEffect = 'move';
 		evt.preventDefault();
 	}
@@ -808,11 +813,12 @@
 	/**
 	 * Returns the index of an element within its parent
 	 * @param el
-	 * @returns {HTMLElement}
+	 * @returns {number}
+	 * @private
 	 */
 	function _index(/**HTMLElement*/el) {
 		var index = 0;
-		while ((el = el.previousElementSibling)) {
+		while (el && (el = el.previousElementSibling)) {
 			index++;
 		}
 		return index;
@@ -825,6 +831,9 @@
 		css: _css,
 		find: _find,
 		bind: _bind,
+		is: function (el, selector) {
+			return !!_closest(el, selector, el);
+		},
 		closest: _closest,
 		toggleClass: _toggleClass,
 		dispatchEvent: _dispatchEvent,

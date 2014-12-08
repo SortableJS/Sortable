@@ -86,6 +86,7 @@ var sortable = new Sortable(el, {
 		// same properties as onUpdate
 	},
 
+	// Attempt to drag a filtered element
 	onFilter: function (/**Event*/evt) {
 		var itemEl = evt.item;  // HTMLElement receiving the `mousedown|tapstart` event.
 	}
@@ -130,6 +131,29 @@ You can also define whether lists can give away, give and keep a copy (`clone`),
  * name: `String` — group name
  * pull: `true|false|'clone'` — ability to move from the list. `clone` — copy the item, rather than move.
  * put: `true|false|["foo", "bar"]` — whether elements can be added from other lists, or an array of group names from which elements can be taken. Demo: http://jsbin.com/naduvo/2/edit?html,js,output
+
+
+---
+
+
+#### `filter` option
+
+
+```js
+Sortable.create(list, {
+	filter: ".js-remove, .js-edit",
+	onFilter: function (evt) {
+		var item = el.item;
+
+		if (Sortable.utils.is(evt.target, ".js-remove")) {  // Click on remove button
+			el.parentNode.removeChild(el); // remove sortable item
+		}
+		else if (Sortable.utils.is(evt.target, ".js-edit")) {  // Click on edit link
+			// ...
+		}
+	}
+})
+```
 
 
 ---
@@ -182,22 +206,6 @@ Get or set the option.
 
 ##### closest(el:`String`[, selector:`HTMLElement`]):`HTMLElement|null`
 For each element in the set, get the first element that matches the selector by testing the element itself and traversing up through its ancestors in the DOM tree.
-
-```js
-var editableList = new Sortable(list, {
-	filter: ".js-remove, .js-edit",
-	onFilter: function (evt) {
-		var el = editableList.closest(evt.item); // list item
-
-		if (editableList.closest(evt.item, ".js-remove")) { // Click on remove button
-			el.parentNode.removeChild(el); // remove sortable item
-		}
-		else if (editableList.closest(evt.item, ".js-edit")) { // Click on edit link
-			// ...
-		}
-	}
-})
-```
 
 
 ##### toArray():`String[]`
