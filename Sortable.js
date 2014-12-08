@@ -25,6 +25,7 @@
 	"use strict";
 
 	var dragEl,
+		startIndex,
 		ghostEl,
 		cloneEl,
 		rootEl,
@@ -47,12 +48,14 @@
 
 		_silent = false,
 
-		_dispatchEvent = function (rootEl, name, targetEl, fromEl) {
+		_dispatchEvent = function (rootEl, name, targetEl, fromEl, startIndex, newIndex) {
 			var evt = document.createEvent('Event');
 
 			evt.initEvent(name, true, true);
 			evt.item = targetEl || rootEl;
 			evt.from = fromEl || rootEl;
+			if (startIndex !== undefined) evt.oldIndex = startIndex;
+			if (newIndex !== undefined) evt.newIndex = newIndex;
 
 			rootEl.dispatchEvent(evt);
 		},
@@ -163,6 +166,8 @@
 				el = this.el,
 				filter = options.filter;
 
+			// get the index of the dragged element within its parent
+			startIndex = _index(target);
 
 			if (evt.type === 'mousedown' && evt.button !== 0 || options.disabled) {
 				return; // only left button or enabled
@@ -245,7 +250,7 @@
 				}
 
 
-				_dispatchEvent(dragEl, 'start');
+				_dispatchEvent(dragEl, 'start', undefined, undefined, startIndex);
 
 
 				if (activeGroup.pull == 'clone') {
@@ -502,28 +507,31 @@
 				ghostEl && ghostEl.parentNode.removeChild(ghostEl);
 
 				if (dragEl) {
+					// get the index of the dragged element within its parent
+					var newIndex = _index(dragEl);
 					_disableDraggable(dragEl);
 					_toggleClass(dragEl, this.options.ghostClass, false);
 
 					if (!rootEl.contains(dragEl)) {
-						_dispatchEvent(dragEl, 'sort', dragEl, dragEl.parentNode);
-						_dispatchEvent(rootEl, 'sort', dragEl);
+						// drag from one list and drop into another
+						_dispatchEvent(dragEl, 'sort', dragEl, dragEl.parentNode, startIndex, newIndex);
+						_dispatchEvent(rootEl, 'sort', dragEl, undefined, startIndex, newIndex);
 
 						// Add event
-						_dispatchEvent(dragEl, 'add', dragEl, rootEl);
+						_dispatchEvent(dragEl, 'add', dragEl, rootEl, startIndex, newIndex);
 
 						// Remove event
-						_dispatchEvent(rootEl, 'remove', dragEl);
+						_dispatchEvent(rootEl, 'remove', dragEl, undefined, startIndex, newIndex);
 					}
 					else if (dragEl.nextSibling !== nextEl) {
-						// Update event
-						_dispatchEvent(dragEl, 'update');
-						_dispatchEvent(dragEl, 'sort');
+						// drag & drop within the same list
+						_dispatchEvent(dragEl, 'update', undefined, undefined, startIndex, newIndex);
+						_dispatchEvent(dragEl, 'sort', undefined, undefined, startIndex, newIndex);
 
 						cloneEl && cloneEl.parentNode.removeChild(cloneEl);
 					}
 
-					_dispatchEvent(rootEl, 'end');
+					_dispatchEvent(rootEl, 'end', undefined, undefined, startIndex, newIndex);
 				}
 
 				// Set NULL
@@ -793,6 +801,18 @@
 		return sum.toString(36);
 	}
 
+	/**
+	 * Returns the index of an element within its parent
+	 * @param el
+	 * @returns {HTMLElement}
+	 */
+	function _index(/**HTMLElement*/el) {
+		var index = 0;
+		while ((el = el.previousElementSibling)) {
+			index++;
+		}
+		return index;
+	}
 
 	// Export utils
 	Sortable.utils = {
@@ -803,11 +823,12 @@
 		bind: _bind,
 		closest: _closest,
 		toggleClass: _toggleClass,
-		dispatchEvent: _dispatchEvent
+		dispatchEvent: _dispatchEvent,
+		index: _index
 	};
 
 
-	Sortable.version = '0.7.1';
+	Sortable.version = '0.7.2';
 
 
 	/**
