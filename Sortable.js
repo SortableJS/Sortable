@@ -162,21 +162,28 @@
 		_onTapStart: function (/**Event|TouchEvent*/evt) {
 			var touch = evt.touches && evt.touches[0],
 				target = (touch || evt).target,
+				originalTarget = target,
 				options =  this.options,
 				el = this.el,
 				filter = options.filter;
-
-			// get the index of the dragged element within its parent
-			startIndex = _index(target);
 
 			if (evt.type === 'mousedown' && evt.button !== 0 || options.disabled) {
 				return; // only left button or enabled
 			}
 
+			if (options.handle) {
+				target = _closest(target, options.handle, el);
+			}
+
+			target = _closest(target, options.draggable, el);
+
+			// get the index of the dragged element within its parent
+			startIndex = _index(target);
+
 			// Check filter
 			if (typeof filter === 'function') {
 				if (filter.call(this, target, this)) {
-					_dispatchEvent(el, 'filter', target);
+					_dispatchEvent(el, 'filter', target, undefined, startIndex);
 					return; // cancel dnd
 				}
 			}
@@ -186,16 +193,10 @@
 				});
 
 				if (filter.length) {
-					_dispatchEvent(el, 'filter', target);
+					_dispatchEvent(originalTarget, 'filter', target, undefined, startIndex);
 					return; // cancel dnd
 				}
 			}
-
-			if (options.handle) {
-				target = _closest(target, options.handle, el);
-			}
-
-			target = _closest(target, options.draggable, el);
 
 			// IE 9 Support
 			if (target && evt.type == 'selectstart') {
@@ -695,7 +696,7 @@
 	}
 
 
-	function _globalDragOver(evt) {
+	function _globalDragOver(/**Event*/evt) {
 		evt.dataTransfer.dropEffect = 'move';
 		evt.preventDefault();
 	}
@@ -804,11 +805,12 @@
 	/**
 	 * Returns the index of an element within its parent
 	 * @param el
-	 * @returns {HTMLElement}
+	 * @returns {number}
+	 * @private
 	 */
 	function _index(/**HTMLElement*/el) {
 		var index = 0;
-		while ((el = el.previousElementSibling)) {
+		while (el && (el = el.previousElementSibling)) {
 			index++;
 		}
 		return index;

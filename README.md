@@ -86,6 +86,7 @@ var sortable = new Sortable(el, {
 		// same properties as onUpdate
 	},
 
+	// Attempt to drag a filtered element
 	onFilter: function (/**Event*/evt) {
 		var itemEl = evt.item;  // HTMLElement receiving the `mousedown|tapstart` event.
 	}
@@ -187,12 +188,12 @@ For each element in the set, get the first element that matches the selector by 
 var editableList = new Sortable(list, {
 	filter: ".js-remove, .js-edit",
 	onFilter: function (evt) {
-		var el = editableList.closest(evt.item); // list item
+		var el = editableList.closest(evt.target);  // list item
 
-		if (editableList.closest(evt.item, ".js-remove")) { // Click on remove button
+		if (editableList.closest(evt.item, ".js-remove")) {  // Click on remove button
 			el.parentNode.removeChild(el); // remove sortable item
 		}
-		else if (editableList.closest(evt.item, ".js-edit")) { // Click on edit link
+		else if (editableList.closest(evt.item, ".js-edit")) {  // Click on edit link
 			// ...
 		}
 	}
