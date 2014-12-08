@@ -276,7 +276,7 @@ var editableList = new Sortable(editable, {
 			}
 
 
-			new Sortable(foo, {
+			Sortable.create(foo, {
 				group: "words",
 				animation: 150,
 				store: {
@@ -297,7 +297,7 @@ var editableList = new Sortable(editable, {
 			});
 
 
-			new Sortable(bar, {
+			Sortable.create(bar, {
 				group: "words",
 				animation: 150,
 				onAdd: function (evt){ console.log('onAdd.bar:', evt.item); },
@@ -308,19 +308,18 @@ var editableList = new Sortable(editable, {
 			});
 
 
-			new Sortable(multi, {
+			Sortable.create(multi, {
 				animation: 150,
 				draggable: '.tile',
 				handle: '.tile__name'
 			});
 
 
-			var editableList = new Sortable(editable, {
+			var editableList = Sortable.create(editable, {
 				animation: 150,
 				filter: '.js-remove',
 				onFilter: function (evt) {
-					var el = editableList.closest(evt.item);
-					el && el.parentNode.removeChild(el);
+					evt.item.parentNode.removeChild(evt.item);
 				}
 			});
 
@@ -338,7 +337,7 @@ var editableList = new Sortable(editable, {
 
 
 			[].forEach.call(multi.getElementsByClassName('tile__list'), function (el){
-				new Sortable(el, {
+				Sortable.create(el, {
 					group: 'photo',
 					animation: 150
 				});
@@ -359,14 +358,14 @@ var editableList = new Sortable(editable, {
 				pull: false,
 				put: true
 			}].forEach(function (groupOpts, i) {
-				new Sortable(document.getElementById('advanced-' + (i + 1)), {
+				Sortable.create(document.getElementById('advanced-' + (i + 1)), {
 					sort: (i != 1),
 					group: groupOpts,
 					animation: 150
 				});
 			});
 
-			new Sortable(document.getElementById('handle-1'), {
+			Sortable.create(document.getElementById('handle-1'), {
 				handle: '.drag-handle',
 				animation: 150
 			});

@@ -182,18 +182,22 @@
 
 			// Check filter
 			if (typeof filter === 'function') {
-				if (filter.call(this, target, this)) {
-					_dispatchEvent(el, 'filter', target, undefined, startIndex);
+				if (filter.call(this, evt, target, this)) {
+					_dispatchEvent(originalTarget, 'filter', target, el, startIndex);
 					return; // cancel dnd
 				}
 			}
 			else if (filter) {
-				filter = filter.split(',').filter(function (criteria) {
-					return _closest(target, criteria.trim(), el);
+				filter = filter.split(',').some(function (criteria) {
+					criteria = _closest(originalTarget, criteria.trim(), el);
+
+					if (criteria) {
+						_dispatchEvent(criteria, 'filter', target, el, startIndex);
+						return true;
+					}
 				});
 
 				if (filter.length) {
-					_dispatchEvent(originalTarget, 'filter', target, undefined, startIndex);
 					return; // cancel dnd
 				}
 			}
@@ -670,7 +674,7 @@
 	}
 
 
-	function _closest(el, selector, ctx) {
+	function _closest(/**HTMLElement*/el, /**String*/selector, /**HTMLElement*/ctx) {
 		if (selector === '*') {
 			return el;
 		}
@@ -823,6 +827,9 @@
 		css: _css,
 		find: _find,
 		bind: _bind,
+		is: function (el, selector) {
+			return !!_closest(el, selector, el);
+		},
 		closest: _closest,
 		toggleClass: _toggleClass,
 		dispatchEvent: _dispatchEvent,

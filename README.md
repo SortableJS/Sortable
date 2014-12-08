@@ -136,6 +136,29 @@ You can also define whether lists can give away, give and keep a copy (`clone`),
 ---
 
 
+#### `filter` option
+
+
+```js
+Sortable.create(list, {
+	filter: ".js-remove, .js-edit",
+	onFilter: function (evt) {
+		var item = el.item;
+
+		if (Sortable.utils.is(evt.target, ".js-remove")) {  // Click on remove button
+			el.parentNode.removeChild(el); // remove sortable item
+		}
+		else if (Sortable.utils.is(evt.target, ".js-edit")) {  // Click on edit link
+			// ...
+		}
+	}
+})
+```
+
+
+---
+
+
 <a name="ng"></a>
 ### Support AngularJS
 Include [ng-sortable.js](ng-sortable.js)
@@ -183,22 +206,6 @@ Get or set the option.
 
 ##### closest(el:`String`[, selector:`HTMLElement`]):`HTMLElement|null`
 For each element in the set, get the first element that matches the selector by testing the element itself and traversing up through its ancestors in the DOM tree.
-
-```js
-var editableList = new Sortable(list, {
-	filter: ".js-remove, .js-edit",
-	onFilter: function (evt) {
-		var el = editableList.closest(evt.target);  // list item
-
-		if (editableList.closest(evt.item, ".js-remove")) {  // Click on remove button
-			el.parentNode.removeChild(el); // remove sortable item
-		}
-		else if (editableList.closest(evt.item, ".js-edit")) {  // Click on edit link
-			// ...
-		}
-	}
-})
-```
 
 
 ##### toArray():`String[]`
