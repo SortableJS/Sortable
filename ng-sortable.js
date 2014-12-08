@@ -3,8 +3,8 @@
  * @licence MIT
  */
 angular.module('ng-sortable', [])
-	.constant('$version', '0.2.1')
-	.directive('ngSortable', ['$parse', '$rootScope', function ($parse, $rootScope) {
+	.constant('$version', '0.3.0')
+	.directive('ngSortable', ['$parse', function ($parse) {
 		'use strict';
 
 		var removed;
@@ -44,8 +44,7 @@ angular.module('ng-sortable', [])
 					ngSortable = attrs.ngSortable,
 					options = scope.$eval(ngSortable) || {},
 					source = getSource(el),
-					sortable,
-					_order = []
+					sortable
 				;
 
 
@@ -55,29 +54,24 @@ angular.module('ng-sortable', [])
 
 
 				function _sync(evt) {
-					sortable.toArray().forEach(function (id, i) {
-						if (_order[i] !== id) {
-							var idx = _order.indexOf(id),
-								items = source.items();
+					var oldIndex = evt.oldIndex,
+						newIndex = evt.newIndex,
+						items = source.items();
 
-							if (idx === -1) {
-								var remoteSource = getSource(evt.from),
-									remoteItems = remoteSource.items();
+					if (el !== evt.from) {
+						var prevSource = getSource(evt.from),
+							prevItems = prevSource.items();
 
-								idx = remoteItems.indexOf(remoteSource.item(evt.item));
-								removed = remoteItems.splice(idx, 1)[0];
+						oldIndex = prevItems.indexOf(prevSource.item(evt.item));
+						removed = prevItems.splice(oldIndex, 1)[0];
 
-								_order.splice(i, 0, id);
-								items.splice(i, 0, removed);
-								remoteSource.upd();
+						items.splice(newIndex, 0, removed);
+						prevSource.upd();
 
-								evt.from.appendChild(evt.item); // revert element
-							} else {
-								_order.splice(i, 0, _order.splice(idx, 1)[0]);
-								items.splice(i, 0, items.splice(idx, 1)[0]);
-							}
-						}
-					});
+						evt.from.appendChild(evt.item); // revert element
+					} else {
+						items.splice(newIndex, 0, items.splice(oldIndex, 1)[0]);
+					}
 
 					source.upd();
 					scope.$apply();
@@ -89,12 +83,10 @@ angular.module('ng-sortable', [])
 					return opts;
 				}, {
 					onStart: function () {
-						$rootScope.$broadcast('sortable:start', sortable);
-						options.onStart();
+						options.onStart(source.items());
 					},
 					onEnd: function () {
-						$rootScope.$broadcast('sortable:end', sortable);
-						options.onEnd();
+						options.onEnd(source.items());
 					},
 					onAdd: function (evt) {
 						_sync(evt);
@@ -121,17 +113,6 @@ angular.module('ng-sortable', [])
 						});
 					});
 				}
-
-
-				$rootScope.$on('sortable:start', function () {
-					_order = sortable.toArray();
-				});
-
-
-				$el.on('$destroy', function () {
-					el.sortable = null;
-					sortable.destroy();
-				});
 			}
 		};
 	}])
