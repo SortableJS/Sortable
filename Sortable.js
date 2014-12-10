@@ -104,7 +104,8 @@
 			setData: function (dataTransfer, dragEl) {
 				dataTransfer.setData('Text', dragEl.textContent);
 			}
-		};
+		},
+		group;
 
 
 		// Set default options
@@ -116,11 +117,12 @@
 		if (!options.group.name) {
 			options.group = { name: options.group };
 		}
+		group = options.group;
 
 
 		['pull', 'put'].forEach(function (key) {
-			if (!(key in options.group)) {
-				options.group[key] = true;
+			if (!(key in group)) {
+				group[key] = true;
 			}
 		});
 
@@ -133,7 +135,7 @@
 
 
 		// Export group name
-		el[expando] = options.group.name;
+		el[expando] = group.name + ' ' + (group.put.join ? group.put.join(' ') : '');
 
 
 		// Bind all private methods
@@ -249,8 +251,8 @@
 				_on(document, 'touchend', this._onDrop);
 				_on(document, 'touchcancel', this._onDrop);
 
+				_on(dragEl, 'dragend', this);
 				_on(rootEl, 'dragstart', this._onDragStart);
-				_on(rootEl, 'dragend', this._onDrop);
 
 				_on(document, 'dragover', this);
 
@@ -282,29 +284,19 @@
 				_css(ghostEl, 'display', 'none');
 
 				var target = document.elementFromPoint(touchEvt.clientX, touchEvt.clientY),
-					parent = target,
+					parent = target.parentNode,
 					groupName = this.options.group.name,
 					i = touchDragOverListeners.length;
 
-				if (parent) {
-					do {
-						if (parent[expando] === groupName) {
-							while (i--) {
-								touchDragOverListeners[i]({
-									clientX: touchEvt.clientX,
-									clientY: touchEvt.clientY,
-									target: target,
-									rootEl: parent
-								});
-							}
-
-							break;
-						}
-
-						target = parent; // store last element
+				if (parent && (' ' + parent[expando] + ' ').indexOf(groupName) > -1) {
+					while (i--) {
+						touchDragOverListeners[i]({
+							clientX: touchEvt.clientX,
+							clientY: touchEvt.clientY,
+							target: target,
+							rootEl: parent
+						});
 					}
-					/* jshint boss:true */
-					while (parent = parent.parentNode);
 				}
 
 				_css(ghostEl, 'display', '');
@@ -579,7 +571,6 @@
 			_off(document, 'drop', this);
 			_off(document, 'dragover', this);
 
-			_off(el, 'dragend', this._onDrop);
 			_off(el, 'dragstart', this._onDragStart);
 
 			this._offUpEvents();
@@ -591,8 +582,11 @@
 				ghostEl && ghostEl.parentNode.removeChild(ghostEl);
 
 				if (dragEl) {
+					_off(dragEl, 'dragend', this);
+
 					// get the index of the dragged element within its parent
 					var newIndex = _index(dragEl);
+
 					_disableDraggable(dragEl);
 					_toggleClass(dragEl, this.options.ghostClass, false);
 
@@ -647,7 +641,7 @@
 				this._onDrag(evt);
 				_globalDragOver(evt);
 			}
-			else if (type === 'drop') {
+			else if (type === 'drop' || type === 'dragend') {
 				this._onDrop(evt);
 			}
 		},
