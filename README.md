@@ -93,36 +93,6 @@ var sortable = new Sortable(el, {
 });
 ```
 
----
-
-
-#### `handle` option
-To make list items draggable, Sortable disables text selection by the user.
-That's not always desirable. To allow text selection, define a drag handler,
-which is an area of every list element that allows it to be dragged around.
-
-Demo: http://jsbin.com/newize/1/edit?html,js,output
-
-```js
-Sortable.create(el, {
-	handle: ".my-handle"
-});
-```
-
-```html
-<ul>
-	<li><span class="my-handle">::</span> list item text one
-	<li><span class="my-handle">::</span> list item text two
-</ul>
-```
-
-```css
-.my-handle {
-	cursor: move;
-	cursor: -webkit-grabbing;
-}
-```
-
 
 ---
 
@@ -161,6 +131,37 @@ document.getElementById("switcher").onclick = function () {
 
 	sortable.option("disabled", !state); // set
 };
+```
+
+
+---
+
+
+#### `handle` option
+To make list items draggable, Sortable disables text selection by the user.
+That's not always desirable. To allow text selection, define a drag handler,
+which is an area of every list element that allows it to be dragged around.
+
+Demo: http://jsbin.com/newize/1/edit?html,js,output
+
+```js
+Sortable.create(el, {
+	handle: ".my-handle"
+});
+```
+
+```html
+<ul>
+	<li><span class="my-handle">::</span> list item text one
+	<li><span class="my-handle">::</span> list item text two
+</ul>
+```
+
+```css
+.my-handle {
+	cursor: move;
+	cursor: -webkit-grabbing;
+}
 ```
 
 
