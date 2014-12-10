@@ -101,9 +101,11 @@ To make list items draggable, Sortable disables text selection by the user.
 That's not always desirable. To allow text selection, define a drag handler,
 which is an area of every list element that allows it to be dragged around.
 
+Demo: http://jsbin.com/newize/1/edit?html,js,output
+
 ```js
-var sortable = new Sortable(el, {
-        handle: ".my-handle"
+Sortable.create(el, {
+	handle: ".my-handle"
 });
 ```
 
@@ -116,7 +118,8 @@ var sortable = new Sortable(el, {
 
 ```css
 .my-handle {
-	cursor: move
+	cursor: move;
+	cursor: -webkit-grabbing;
 }
 ```
 
@@ -136,6 +139,34 @@ You can also define whether lists can give away, give and keep a copy (`clone`),
 ---
 
 
+#### `sort` option
+Sorting inside list
+
+Demo: http://jsbin.com/xizeh/2/edit?html,js,output
+
+
+---
+
+
+#### `disabled` options
+Disables the sortable if set to `true`.
+
+Demo: http://jsbin.com/xiloqu/1/edit?html,js,output
+
+```js
+var sortable = Sortable.create(list);
+
+document.getElementById("switcher").onclick = function () {
+	var state = sortable.option("disabled"); // get
+
+	sortable.option("disabled", !state); // set
+};
+```
+
+
+---
+
+
 #### `filter` option
 
 
@@ -143,12 +174,13 @@ You can also define whether lists can give away, give and keep a copy (`clone`),
 Sortable.create(list, {
 	filter: ".js-remove, .js-edit",
 	onFilter: function (evt) {
-		var item = el.item;
+		var item = el.item,
+			ctrl = evt.target;
 
-		if (Sortable.utils.is(evt.target, ".js-remove")) {  // Click on remove button
-			el.parentNode.removeChild(el); // remove sortable item
+		if (Sortable.utils.is(ctrl, ".js-remove")) {  // Click on remove button
+			item.parentNode.removeChild(item); // remove sortable item
 		}
-		else if (Sortable.utils.is(evt.target, ".js-edit")) {  // Click on edit link
+		else if (Sortable.utils.is(ctrl, ".js-edit")) {  // Click on edit link
 			// ...
 		}
 	}
