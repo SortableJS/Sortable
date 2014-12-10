@@ -29,12 +29,14 @@
 		ghostEl,
 		cloneEl,
 		rootEl,
+		scrollEl,
 		nextEl,
 
 		lastEl,
 		lastCSS,
 
 		activeGroup,
+		autoScroll = {},
 
 		tapEvt,
 		touchEvt,
@@ -65,6 +67,8 @@
 		_customEvents = 'onAdd onUpdate onRemove onStart onEnd onFilter onSort'.split(' '),
 
 		noop = function () {},
+
+		abs = Math.abs,
 		slice = [].slice,
 
 		touchDragOverListeners = []
@@ -89,6 +93,9 @@
 			disabled: false,
 			store: null,
 			handle: null,
+			scroll: true,
+			scrollSensitivity: 30,
+			scrollSpeed: 10,
 			draggable: el.children[0] && el.children[0].nodeName || (/[uo]l/i.test(el.nodeName) ? 'li' : '*'),
 			ghostClass: 'sortable-ghost',
 			ignore: 'a, img',
@@ -242,9 +249,10 @@
 				_on(document, 'touchend', this._onDrop);
 				_on(document, 'touchcancel', this._onDrop);
 
-				_on(this.el, 'dragstart', this._onDragStart);
-				_on(this.el, 'dragend', this._onDrop);
-				_on(document, 'dragover', _globalDragOver);
+				_on(rootEl, 'dragstart', this._onDragStart);
+				_on(rootEl, 'dragend', this._onDrop);
+
+				_on(document, 'dragover', this);
 
 
 				try {
@@ -318,6 +326,7 @@
 				_css(ghostEl, 'msTransform', translate3d);
 				_css(ghostEl, 'transform', translate3d);
 
+				this._onDrag(touch);
 				evt.preventDefault();
 			}
 		},
@@ -362,11 +371,76 @@
 				dataTransfer.effectAllowed = 'move';
 				options.setData && options.setData.call(this, dataTransfer, dragEl);
 
-				_on(document, 'drop', this._onDrop);
+				_on(document, 'drop', this);
 			}
 
-			setTimeout(this._applyEffects);
+			setTimeout(this._applyEffects, 0);
+
+			scrollEl = options.scroll;
+
+			if (scrollEl === true) {
+				scrollEl = rootEl;
+
+				do {
+					if ((scrollEl.offsetWidth < scrollEl.scrollWidth) ||
+						(scrollEl.offsetHeight < scrollEl.scrollHeight)
+					) {
+						break;
+					}
+				/* jshint boss:true */
+				} while (scrollEl = scrollEl.parentNode);
+			}
 		},
+
+		_onDrag: _throttle(function (/**Event*/evt) {
+			// Bug: https://bugzilla.mozilla.org/show_bug.cgi?id=505521
+			if (rootEl && this.options.scroll) {
+				var el,
+					rect,
+					options = this.options,
+					sens = options.scrollSensitivity,
+					speed = options.scrollSpeed,
+
+					x = evt.clientX,
+					y = evt.clientY,
+
+					winWidth = window.innerWidth,
+					winHeight = window.innerHeight,
+
+					vx = (winWidth - x <= sens) - (x <= sens),
+					vy = (winHeight - y <= sens) - (y <= sens)
+				;
+
+				if (vx || vy) {
+					el = win;
+				}
+				else if (scrollEl) {
+					el = scrollEl;
+					rect = scrollEl.getBoundingClientRect();
+					vx = (abs(rect.right - x) <= sens) - (abs(rect.left - x) <= sens);
+					vy = (abs(rect.bottom - y) <= sens) - (abs(rect.top - y) <= sens);
+				}
+
+				if (autoScroll.vx !== vx || autoScroll.vy !== vy || autoScroll.el !== el) {
+					autoScroll.el = el;
+					autoScroll.vx = vx;
+					autoScroll.vy = vy;
+
+					clearInterval(autoScroll.pid);
+
+					if (el) {
+						autoScroll.pid = setInterval(function () {
+							if (el === win) {
+								win.scrollTo(win.scrollX + vx * speed, win.scrollY + vy * speed);
+							} else {
+								vy && (el.scrollTop += vy * speed);
+								vx && (el.scrollLeft += vx * speed);
+							}
+						}, 24);
+					}
+				}
+			}
+		}, 30),
 
 
 		_onDragOver: function (/**Event*/evt) {
@@ -496,15 +570,17 @@
 		},
 
 		_onDrop: function (/**Event*/evt) {
+			var el = this.el;
+
 			clearInterval(this._loopId);
+			clearInterval(autoScroll.pid);
 
 			// Unbind events
-			_off(document, 'drop', this._onDrop);
-			_off(document, 'dragover', _globalDragOver);
+			_off(document, 'drop', this);
+			_off(document, 'dragover', this);
 
-			_off(this.el, 'dragend', this._onDrop);
-			_off(this.el, 'dragstart', this._onDragStart);
-			_off(this.el, 'selectstart', this._onTapStart);
+			_off(el, 'dragend', this._onDrop);
+			_off(el, 'dragstart', this._onDragStart);
 
 			this._offUpEvents();
 
@@ -560,6 +636,19 @@
 
 				// Save sorting
 				this.options.store && this.options.store.set(this);
+			}
+		},
+
+
+		handleEvent: function (/**Event*/evt) {
+			var type = evt.type;
+
+			if (type === 'dragover') {
+				this._onDrag(evt);
+				_globalDragOver(evt);
+			}
+			else if (type === 'drop') {
+				this._onDrop(evt);
 			}
 		},
 
@@ -824,6 +913,28 @@
 		return index;
 	}
 
+	function _throttle(callback, ms) {
+		var args, _this;
+
+		return function () {
+			if (args === void 0) {
+				args = arguments;
+				_this = this;
+
+				setTimeout(function () {
+					if (args.length === 1) {
+						callback.call(_this, args[0]);
+					} else {
+						callback.apply(_this, args);
+					}
+
+					args = void 0;
+				}, ms);
+			}
+		};
+	}
+
+
 	// Export utils
 	Sortable.utils = {
 		on: _on,
@@ -834,6 +945,7 @@
 		is: function (el, selector) {
 			return !!_closest(el, selector, el);
 		},
+		throttle: _throttle,
 		closest: _closest,
 		toggleClass: _toggleClass,
 		dispatchEvent: _dispatchEvent,
