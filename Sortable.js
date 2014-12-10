@@ -96,7 +96,7 @@
 			scroll: true,
 			scrollSensitivity: 30,
 			scrollSpeed: 10,
-			draggable: el.children[0] && el.children[0].nodeName || (/[uo]l/i.test(el.nodeName) ? 'li' : '*'),
+			draggable: /[uo]l/i.test(el.nodeName) ? 'li' : '>*',
 			ghostClass: 'sortable-ghost',
 			ignore: 'a, img',
 			filter: null,
@@ -762,10 +762,7 @@
 
 
 	function _closest(/**HTMLElement*/el, /**String*/selector, /**HTMLElement*/ctx) {
-		if (selector === '*') {
-			return el;
-		}
-		else if (el) {
+		if (el) {
 			ctx = ctx || document;
 			selector = selector.split('.');
 
@@ -774,8 +771,10 @@
 
 			do {
 				if (
-					(tag === '' || el.nodeName == tag) &&
-					(!selector.length || ((' ' + el.className + ' ').match(re) || []).length == selector.length)
+					(tag === '>*' && el.parentNode === ctx) || (
+						(tag === '' || el.nodeName == tag) &&
+						(!selector.length || ((' ' + el.className + ' ').match(re) || []).length == selector.length)
+					)
 				) {
 					return el;
 				}
