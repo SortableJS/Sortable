@@ -10,6 +10,7 @@ Demo: http://rubaxa.github.io/Sortable/
  * Can drag from one list to another or within the same list
  * CSS animation when moving items
  * Supports drag handles *and selectable text* (better than voidberg's html5sortable)
+ * Smart auto-scrolling
  * Built using native HTML5 drag and drop API
  * Supports [AngularJS](#ng) and and any CSS library, e.g. [Bootstrap](#bs)
  * Simple API
@@ -47,7 +48,12 @@ var sortable = new Sortable(el, {
 	handle: ".my-handle",  // Drag handle selector within list items
 	filter: ".ignore-elements",  // Selectors that do not lead to dragging (String or Function)
 	draggable: ".item",  // Specifies which items inside the element should be sortable
-	ghostClass: "sortable-ghost",  // Class name for the drop placeholder - jsbin.com/luxero/3
+	ghostClass: "sortable-ghost",  // Class name for the drop placeholder
+	
+	scroll: true, // or HTMLElement
+	scrollSensitivity: 30, // px, how near the mouse must be to an edge to start scrolling.
+	scrollSpeed: 10, // px
+	
 	setData: function (dataTransfer, dragEl) {
 		dataTransfer.setData('Text', dragEl.textContent);
 	},
@@ -187,6 +193,52 @@ Sortable.create(list, {
 	}
 })
 ```
+
+
+---
+
+
+#### `ghostClass` option
+Class name for the drop placeholder.
+
+Demo: http://jsbin.com/boqugumiqi/1/edit?css,js,output
+
+```css
+.ghost {
+  opacity: 0.4;
+}
+```
+
+```js
+Sortable.create(list, {
+  ghostClass: "ghost"
+});
+```
+
+
+---
+
+
+#### `scroll` option
+If set to `true`, the page (or sortable-area) scrolls when coming to an edge.
+
+Demo:
+ - `window`: http://jsbin.com/boqugumiqi/1/edit?html,js,output 
+ - `overflow: hidden`: http://jsbin.com/kohamakiwi/1/edit?html,js,output
+
+
+---
+
+
+#### `scrollSensitivity` option
+Defines how near the mouse must be to an edge to start scrolling.
+
+
+---
+
+
+#### `scrollSpeed` option
+The speed at which the window should scroll once the mouse pointer gets within the `scrollSensitivity` distance.
 
 
 ---
