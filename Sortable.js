@@ -496,7 +496,6 @@
 
 			_off(this.el, 'dragend', this._onDrop);
 			_off(this.el, 'dragstart', this._onDragStart);
-			_off(this.el, 'selectstart', this._onTapStart);
 
 			this._offUpEvents();
 
