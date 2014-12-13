@@ -446,7 +446,7 @@
 				isOwner = (activeGroup === group),
 				canSort = options.sort;
 
-			if (!_silent &&
+			if (!_silent && activeGroup &&
 				(isOwner
 					? canSort || (revert = !rootEl.contains(dragEl))
 					: activeGroup.pull && groupPut && (

@@ -3,7 +3,7 @@
  * @licence MIT
  */
 angular.module('ng-sortable', [])
-	.constant('$version', '0.3.0')
+	.constant('$version', '0.3.1')
 	.directive('ngSortable', ['$parse', function ($parse) {
 		'use strict';
 
@@ -104,12 +104,18 @@ angular.module('ng-sortable', [])
 					}
 				}));
 
+				$el.on('$destroy', function () {
+					sortable.destroy();
+					sortable = null;
+				});
 
 				if (!/{|}/.test(ngSortable)) { // todo: ugly
 					angular.forEach(['sort', 'disabled', 'draggable', 'handle', 'animation'], function (name) {
 						scope.$watch(ngSortable + '.' + name, function (value) {
-							options[name] = value;
-							sortable.option(name, value);
+							if (value !== void 0) {
+								options[name] = value;
+								sortable.option(name, value);
+							}
 						});
 					});
 				}
