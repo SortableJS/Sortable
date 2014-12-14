@@ -900,7 +900,7 @@
 	 */
 	function _index(/**HTMLElement*/el) {
 		var index = 0;
-		while (el && (el = el.previousElementSibling)) {
+		while (el && (el = el.previousElementSibling) && (el.nodeName !== 'TEMPLATE')) {
 			index++;
 		}
 		return index;
