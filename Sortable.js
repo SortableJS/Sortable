@@ -276,6 +276,8 @@
 					_css(cloneEl, 'display', 'none');
 					rootEl.insertBefore(cloneEl, dragEl);
 				}
+
+				Sortable.active = this;
 			}
 		},
 
@@ -445,6 +447,8 @@
 				groupPut = group.put,
 				isOwner = (activeGroup === group),
 				canSort = options.sort;
+
+			(evt.stopPropagation !== void 0) && evt.stopPropagation();
 
 			if (!_silent && activeGroup &&
 				(isOwner
@@ -626,7 +630,8 @@
 				lastEl =
 				lastCSS =
 
-				activeGroup = null;
+				activeGroup =
+				Sortable.active = null;
 
 				// Save sorting
 				this.options.store && this.options.store.set(this);
