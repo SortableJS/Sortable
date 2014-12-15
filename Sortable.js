@@ -195,6 +195,7 @@
 			if (typeof filter === 'function') {
 				if (filter.call(this, evt, target, this)) {
 					_dispatchEvent(originalTarget, 'filter', target, el, startIndex);
+					evt.preventDefault();
 					return; // cancel dnd
 				}
 			}
@@ -208,7 +209,8 @@
 					}
 				});
 
-				if (filter.length) {
+				if (filter) {
+					evt.preventDefault();
 					return; // cancel dnd
 				}
 			}
