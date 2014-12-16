@@ -72,7 +72,7 @@ var sortable = new Sortable(el, {
 	// Element is dropped into the list from another list
 	onAdd: function (/**Event*/evt) {
 		var itemEl = evt.item;  // dragged HTMLElement
-		itemEl.from;  // previous list
+		evt.from;  // previous list
 		// + indexes from onEnd
 	},
 

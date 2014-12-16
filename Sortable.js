@@ -195,6 +195,7 @@
 			if (typeof filter === 'function') {
 				if (filter.call(this, evt, target, this)) {
 					_dispatchEvent(originalTarget, 'filter', target, el, startIndex);
+					evt.preventDefault();
 					return; // cancel dnd
 				}
 			}
@@ -208,7 +209,8 @@
 					}
 				});
 
-				if (filter.length) {
+				if (filter) {
+					evt.preventDefault();
 					return; // cancel dnd
 				}
 			}
@@ -276,6 +278,8 @@
 					_css(cloneEl, 'display', 'none');
 					rootEl.insertBefore(cloneEl, dragEl);
 				}
+
+				Sortable.active = this;
 			}
 		},
 
@@ -446,6 +450,8 @@
 				isOwner = (activeGroup === group),
 				canSort = options.sort;
 
+			(evt.stopPropagation !== void 0) && evt.stopPropagation();
+
 			if (!_silent && activeGroup &&
 				(isOwner
 					? canSort || (revert = !rootEl.contains(dragEl))
@@ -459,13 +465,10 @@
 				target = _closest(evt.target, options.draggable, el);
 				dragRect = dragEl.getBoundingClientRect();
 
-				if (cloneEl && (cloneEl.state !== isOwner)) {
-					_css(cloneEl, 'display', isOwner ? 'none' : '');
-					!isOwner && cloneEl.state && rootEl.insertBefore(cloneEl, dragEl);
-					cloneEl.state = isOwner;
-				}
 
 				if (revert) {
+					_cloneHide(true);
+
 					if (cloneEl || nextEl) {
 						rootEl.insertBefore(dragEl, cloneEl || nextEl);
 					}
@@ -476,6 +479,7 @@
 					return;
 				}
 
+
 				if ((el.children.length === 0) || (el.children[0] === ghostEl) ||
 					(el === evt.target) && (target = _ghostInBottom(el, evt))
 				) {
@@ -485,6 +489,8 @@
 						}
 						targetRect = target.getBoundingClientRect();
 					}
+
+					_cloneHide(isOwner);
 
 					el.appendChild(dragEl);
 					this._animate(dragRect, dragEl);
@@ -510,6 +516,8 @@
 
 					_silent = true;
 					setTimeout(_unsilent, 30);
+
+					_cloneHide(isOwner);
 
 					if (floating) {
 						after = (target.previousElementSibling === dragEl) && !isWide || halfway && isWide;
@@ -626,7 +634,8 @@
 				lastEl =
 				lastCSS =
 
-				activeGroup = null;
+				activeGroup =
+				Sortable.active = null;
 
 				// Save sorting
 				this.options.store && this.options.store.set(this);
@@ -751,6 +760,15 @@
 			this.el = null;
 		}
 	};
+
+
+	function _cloneHide(state) {
+		if (cloneEl && (cloneEl.state !== state)) {
+			_css(cloneEl, 'display', state ? 'none' : '');
+			!state && cloneEl.state && rootEl.insertBefore(cloneEl, dragEl);
+			cloneEl.state = state;
+		}
+	}
 
 
 	function _bind(ctx, fn) {
@@ -900,7 +918,7 @@
 	 */
 	function _index(/**HTMLElement*/el) {
 		var index = 0;
-		while (el && (el = el.previousElementSibling)) {
+		while (el && (el = el.previousElementSibling) && (el.nodeName !== 'TEMPLATE')) {
 			index++;
 		}
 		return index;
@@ -946,7 +964,7 @@
 	};
 
 
-	Sortable.version = '0.7.2';
+	Sortable.version = '0.7.3';
 
 
 	/**
