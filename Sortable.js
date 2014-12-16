@@ -465,13 +465,10 @@
 				target = _closest(evt.target, options.draggable, el);
 				dragRect = dragEl.getBoundingClientRect();
 
-				if (cloneEl && (cloneEl.state !== isOwner)) {
-					_css(cloneEl, 'display', isOwner ? 'none' : '');
-					!isOwner && cloneEl.state && rootEl.insertBefore(cloneEl, dragEl);
-					cloneEl.state = isOwner;
-				}
 
 				if (revert) {
+					_cloneHide(true);
+
 					if (cloneEl || nextEl) {
 						rootEl.insertBefore(dragEl, cloneEl || nextEl);
 					}
@@ -482,6 +479,7 @@
 					return;
 				}
 
+
 				if ((el.children.length === 0) || (el.children[0] === ghostEl) ||
 					(el === evt.target) && (target = _ghostInBottom(el, evt))
 				) {
@@ -491,6 +489,8 @@
 						}
 						targetRect = target.getBoundingClientRect();
 					}
+
+					_cloneHide(isOwner);
 
 					el.appendChild(dragEl);
 					this._animate(dragRect, dragEl);
@@ -516,6 +516,8 @@
 
 					_silent = true;
 					setTimeout(_unsilent, 30);
+
+					_cloneHide(isOwner);
 
 					if (floating) {
 						after = (target.previousElementSibling === dragEl) && !isWide || halfway && isWide;
@@ -760,6 +762,15 @@
 	};
 
 
+	function _cloneHide(state) {
+		if (cloneEl && (cloneEl.state !== state)) {
+			_css(cloneEl, 'display', state ? 'none' : '');
+			!state && cloneEl.state && rootEl.insertBefore(cloneEl, dragEl);
+			cloneEl.state = state;
+		}
+	}
+
+
 	function _bind(ctx, fn) {
 		var args = slice.call(arguments, 2);
 		return	fn.bind ? fn.bind.apply(fn, [ctx].concat(args)) : function () {
@@ -953,7 +964,7 @@
 	};
 
 
-	Sortable.version = '0.7.2';
+	Sortable.version = '0.7.3';
 
 
 	/**
