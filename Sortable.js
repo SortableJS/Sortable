@@ -638,7 +638,7 @@
 				Sortable.active = null;
 
 				// Save sorting
-				this.options.store && this.options.store.set(this);
+				this.save()
 			}
 		},
 
@@ -693,13 +693,21 @@
 				}
 			}, this);
 
-
 			order.forEach(function (id) {
 				if (items[id]) {
 					rootEl.removeChild(items[id]);
 					rootEl.appendChild(items[id]);
 				}
 			});
+		},
+
+
+		/**
+		 * Save the current sorting
+		 */
+		save: function () {
+			var store = this.options.store;
+			store && store.set(this);
 		},
 
 

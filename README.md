@@ -306,6 +306,10 @@ sortable.sort(order.reverse()); // apply
 ```
 
 
+##### save()
+Save the current sorting (see [store](#store))
+
+
 ##### destroy()
 Removes the sortable functionality completely.
 
@@ -313,6 +317,7 @@ Removes the sortable functionality completely.
 ---
 
 
+<a name="store"></a>
 ### Store
 Saving and restoring of the sort.
 
