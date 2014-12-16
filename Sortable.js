@@ -105,7 +105,8 @@
 				dataTransfer.setData('Text', dragEl.textContent);
 			}
 		},
-		group;
+
+		group = options.group;
 
 
 		// Set default options
@@ -114,10 +115,9 @@
 		}
 
 
-		if (!options.group.name) {
-			options.group = { name: options.group };
+		if (!group || typeof group != 'object') {
+			group = options.group = { name: group };
 		}
-		group = options.group;
 
 
 		['pull', 'put'].forEach(function (key) {
@@ -450,7 +450,10 @@
 				isOwner = (activeGroup === group),
 				canSort = options.sort;
 
-			(evt.stopPropagation !== void 0) && evt.stopPropagation();
+			if (evt.preventDefault !== void 0) {
+				evt.preventDefault();
+				evt.stopPropagation();
+			}
 
 			if (!_silent && activeGroup &&
 				(isOwner
@@ -638,7 +641,7 @@
 				Sortable.active = null;
 
 				// Save sorting
-				this.options.store && this.options.store.set(this);
+				this.save()
 			}
 		},
 
@@ -693,13 +696,21 @@
 				}
 			}, this);
 
-
 			order.forEach(function (id) {
 				if (items[id]) {
 					rootEl.removeChild(items[id]);
 					rootEl.appendChild(items[id]);
 				}
 			});
+		},
+
+
+		/**
+		 * Save the current sorting
+		 */
+		save: function () {
+			var store = this.options.store;
+			store && store.set(this);
 		},
 
 
