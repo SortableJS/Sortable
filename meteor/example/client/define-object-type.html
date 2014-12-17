@@ -1,0 +1,50 @@
+<head>
+  <title>RubaXa:Sortable Demo</title>
+</head>
+
+<body>
+  <div class="container">
+    <div class="page-header">
+      <h1>Custom attributes</h1>
+    </div>
+
+    {{> typeDefinition}}
+  </div>
+</body>
+
+<template name="typeDefinition">
+
+  <div class="row">
+    <div class="list-pair col-sm-12">
+
+      <div class="sortable source list-group" id="types">
+        {{#sortable items=types options=typesOptions}}
+          <div class="list-group-item well well-sm">
+            {{{icon}}} {{name}}
+          </div>
+        {{/sortable}}
+      </div>
+
+      <div class="sortable target" id="object">
+        {{#sortable items=attributes animation="0" handle=".sortable-handle" ghostClass="sortable-ghost" options=attributesOptions}}
+          {{> sortableItemTarget}}
+        {{/sortable}}
+      </div>
+
+    </div>
+  </div>
+
+
+</template>
+
+<template name="sortableItemTarget">
+  <div data-id="{{order}}" class="sortable-item removable well well-sm">
+    {{{icon}}}
+    <i class="sortable-handle mdi-action-view-headline pull-right"></i>
+    <span class="name">{{name}}</span>
+    <span class="badge">{{order}}</span>
+    <button type="button" class="close" data-dismiss="alert">
+      <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+    </button>
+  </div>
+</template>
