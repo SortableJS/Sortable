@@ -7,5 +7,6 @@ meteor-platform
 autopublish
 insecure
 rubaxa:sortable
+dburles:mongo-collection-instances
 fezvrasta:bootstrap-material-design
 # twbs:bootstrap
