@@ -641,7 +641,7 @@
 				Sortable.active = null;
 
 				// Save sorting
-				this.save()
+				this.save();
 			}
 		},
 
@@ -975,7 +975,7 @@
 	};
 
 
-	Sortable.version = '0.7.3';
+	Sortable.version = '1.0.0';
 
 
 	/**
