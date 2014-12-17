@@ -42,7 +42,7 @@ reactive-var@1.0.3
 reload@1.1.1
 retry@1.0.1
 routepolicy@1.0.2
-rubaxa:sortable@0.7.3
+rubaxa:sortable@1.0.0
 session@1.0.4
 spacebars-compiler@1.0.3
 spacebars@1.0.3
