@@ -12,7 +12,8 @@ Demo: http://rubaxa.github.io/Sortable/
  * Supports drag handles *and selectable text* (better than voidberg's html5sortable)
  * Smart auto-scrolling
  * Built using native HTML5 drag and drop API
- * Supports [AngularJS](#ng) and and any CSS library, e.g. [Bootstrap](#bs)
+ * Supports [Meteor](meteor/README.md) and [AngularJS](#ng)
+ * Supports any CSS library, e.g. [Bootstrap](#bs)
  * Simple API
  * No jQuery
 
