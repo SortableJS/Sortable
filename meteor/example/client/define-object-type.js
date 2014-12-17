@@ -32,12 +32,12 @@ Template.typeDefinition.helpers({
       delete event.data._id; // Generate a new id when inserting in the Attributes collection. Otherwise, if we add the same type twice, we'll get an error that the ids are not unique.
       delete event.data.icon;
       event.data.type = event.data.name;
-      event.data.name = 'Rename me'
+      event.data.name = 'Rename me (double click)'
     },
     // event handler for reordering attributes
     onSort: function (event) {
-      console.log('Moved object %d from %d to %d',
-          event.data.order, event.oldIndex, event.newIndex
+      console.log('Item %s went from #%d to #%d',
+          event.data.name, event.oldIndex, event.newIndex
       );
     }
   }
@@ -59,17 +59,23 @@ Template.sortableItemTarget.events({
     input.focus();
   },
   'blur input[type=text]': function (event, template) {
-    // commit the change to the name
+    // commit the change to the name, if any
     var input = template.$('input');
     input.hide();
     template.$('.name').show();
     // TODO - what is the collection here? We'll hard-code for now.
     // https://github.com/meteor/meteor/issues/3303
-    Attributes.update(this._id, {$set: {name: input.val()}});
+    if (this.name !== input.val() && this.name !== '')
+      Attributes.update(this._id, {$set: {name: input.val()}});
   },
-  'keydown input[type=text]': function(event) {
-    // ESC or ENTER
-    if (event.which === 27 || event.which === 13) {
+  'keydown input[type=text]': function (event, template) {
+    if (event.which === 27) {
+      // ESC - discard edits and keep existing value
+      template.$('input').val(this.name);
+      event.preventDefault();
+      event.target.blur();
+    } else if (event.which === 13) {
+      // ENTER
       event.preventDefault();
       event.target.blur();
     }
@@ -81,5 +87,15 @@ Template.sortable.events({
   'click .close': function (event, template) {
     // `this` is the data context set by the enclosing block helper (#each, here)
     template.collection.remove(this._id);
+    // custom code, working on a specific collection
+    if (Attributes.find().count() === 0) {
+      Meteor.setTimeout(function () {
+        Attributes.insert({
+          name: 'Not nice to delete the entire list! Add some attributes instead.',
+          type: 'String',
+          order: 0
+        })
+      }, 1000);
+    }
   }
 });

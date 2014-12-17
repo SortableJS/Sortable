@@ -7,8 +7,8 @@ int_trap() {
 }
 trap int_trap INT
 
-ln -s "meteor/package.js" ../../package.js
-ln -s "../../package.json" package.json
+ln -s "meteor/package.js" ../../package.js 2>/dev/null
+ln -s "../../package.json" package.json 2>/dev/null
 
 meteor run "$@"
 
