@@ -58,7 +58,7 @@ Template.sortableItemTarget.events({
     name.hide();
     input.focus();
   },
-  'blur input': function (event, template) {
+  'blur input[type=text]': function (event, template) {
     // commit the change to the name
     var input = template.$('input');
     input.hide();
@@ -66,6 +66,13 @@ Template.sortableItemTarget.events({
     // TODO - what is the collection here? We'll hard-code for now.
     // https://github.com/meteor/meteor/issues/3303
     Attributes.update(this._id, {$set: {name: input.val()}});
+  },
+  'keydown input[type=text]': function(event) {
+    // ESC or ENTER
+    if (event.which === 27 || event.which === 13) {
+      event.preventDefault();
+      event.target.blur();
+    }
   }
 });
 
