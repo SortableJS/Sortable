@@ -3,7 +3,7 @@
  * @licence MIT
  */
 angular.module('ng-sortable', [])
-	.constant('$version', '0.3.1')
+	.constant('$version', '0.3.2')
 	.directive('ngSortable', ['$parse', function ($parse) {
 		'use strict';
 
@@ -28,9 +28,6 @@ angular.module('ng-sortable', [])
 				},
 				items: function () {
 					return itemsExpr(scope);
-				},
-				upd: function () {
-					itemsExpr.assign(scope, this.items());
 				}
 			};
 		}
@@ -66,14 +63,12 @@ angular.module('ng-sortable', [])
 						removed = prevItems.splice(oldIndex, 1)[0];
 
 						items.splice(newIndex, 0, removed);
-						prevSource.upd();
 
 						evt.from.appendChild(evt.item); // revert element
 					} else {
 						items.splice(newIndex, 0, items.splice(oldIndex, 1)[0]);
 					}
 
-					source.upd();
 					scope.$apply();
 				}
 
