@@ -77,6 +77,7 @@ the data context in `event.data`. You can access `event.data.order` this way:
 
 ```handlebars
 {{sortable items=players options=playersOptions}}
+```
 
 ```js
 Template.myTemplate.helpers({
