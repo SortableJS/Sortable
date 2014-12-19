@@ -165,20 +165,27 @@
 		constructor: Sortable,
 
 
-		_applyEffects: function () {
+		_dragStarted: function () {
+			// Apply effect
 			_toggleClass(dragEl, this.options.ghostClass, true);
+
+			Sortable.active = this;
+
+			// Drag start event
+			_dispatchEvent(rootEl, 'start', dragEl, rootEl, startIndex);
 		},
 
 
 		_onTapStart: function (/**Event|TouchEvent*/evt) {
-			var touch = evt.touches && evt.touches[0],
+			var type = evt.type,
+				touch = evt.touches && evt.touches[0],
 				target = (touch || evt).target,
 				originalTarget = target,
 				options =  this.options,
 				el = this.el,
 				filter = options.filter;
 
-			if (evt.type === 'mousedown' && evt.button !== 0 || options.disabled) {
+			if (type === 'mousedown' && evt.button !== 0 || options.disabled) {
 				return; // only left button or enabled
 			}
 
@@ -215,14 +222,11 @@
 				}
 			}
 
-			// IE 9 Support
-			if (target && evt.type == 'selectstart') {
-				if (target.tagName != 'A' && target.tagName != 'IMG') {
-					target.dragDrop();
-				}
-			}
-
+			// Prepare `dragstart`
 			if (target && !dragEl && (target.parentNode === el)) {
+				// IE 9 Support
+				(type === 'selectstart') && target.dragDrop();
+
 				tapEvt = evt;
 
 				rootEl = this.el;
@@ -269,17 +273,11 @@
 				}
 
 
-				// Drag start event
-				_dispatchEvent(rootEl, 'start', dragEl, rootEl, startIndex);
-
-
 				if (activeGroup.pull == 'clone') {
 					cloneEl = dragEl.cloneNode(true);
 					_css(cloneEl, 'display', 'none');
 					rootEl.insertBefore(cloneEl, dragEl);
 				}
-
-				Sortable.active = this;
 			}
 		},
 
@@ -370,8 +368,6 @@
 				_on(document, 'drop', this);
 			}
 
-			setTimeout(this._applyEffects, 0);
-
 			scrollEl = options.scroll;
 
 			if (scrollEl === true) {
@@ -386,6 +382,8 @@
 				/* jshint boss:true */
 				} while (scrollEl = scrollEl.parentNode);
 			}
+
+			setTimeout(this._dragStarted, 0);
 		},
 
 		_onDrag: _throttle(function (/**Event*/evt) {
@@ -621,7 +619,7 @@
 					}
 
 					// Drag end event
-					_dispatchEvent(rootEl, 'end', dragEl, rootEl, startIndex, newIndex);
+					Sortable.active && _dispatchEvent(rootEl, 'end', dragEl, rootEl, startIndex, newIndex);
 				}
 
 				// Set NULL
