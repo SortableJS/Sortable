@@ -104,9 +104,7 @@
 			setData: function (dataTransfer, dragEl) {
 				dataTransfer.setData('Text', dragEl.textContent);
 			}
-		},
-
-		group = options.group;
+		};
 
 
 		// Set default options
@@ -114,6 +112,8 @@
 			!(name in options) && (options[name] = defaults[name]);
 		}
 
+
+		var group = options.group;
 
 		if (!group || typeof group != 'object') {
 			group = options.group = { name: group };
@@ -286,19 +286,29 @@
 				_css(ghostEl, 'display', 'none');
 
 				var target = document.elementFromPoint(touchEvt.clientX, touchEvt.clientY),
-					parent = target.parentNode,
+					parent = target && target.parentNode,
 					groupName = this.options.group.name,
 					i = touchDragOverListeners.length;
 
-				if (parent && (' ' + parent[expando] + ' ').indexOf(groupName) > -1) {
-					while (i--) {
-						touchDragOverListeners[i]({
-							clientX: touchEvt.clientX,
-							clientY: touchEvt.clientY,
-							target: target,
-							rootEl: parent
-						});
+				if (parent) {
+					do {
+						if ((' ' + parent[expando] + ' ').indexOf(groupName) > -1) {
+							while (i--) {
+								touchDragOverListeners[i]({
+									clientX: touchEvt.clientX,
+									clientY: touchEvt.clientY,
+									target: target,
+									rootEl: parent
+								});
+							}
+
+							break;
+						}
+
+						target = parent; // store last element
 					}
+					/* jshint boss:true */
+					while (parent = parent.parentNode);
 				}
 
 				_css(ghostEl, 'display', '');
