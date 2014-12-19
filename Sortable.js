@@ -104,9 +104,7 @@
 			setData: function (dataTransfer, dragEl) {
 				dataTransfer.setData('Text', dragEl.textContent);
 			}
-		},
-
-		group = options.group;
+		};
 
 
 		// Set default options
@@ -114,6 +112,8 @@
 			!(name in options) && (options[name] = defaults[name]);
 		}
 
+
+		var group = options.group;
 
 		if (!group || typeof group != 'object') {
 			group = options.group = { name: group };
@@ -165,20 +165,27 @@
 		constructor: Sortable,
 
 
-		_applyEffects: function () {
+		_dragStarted: function () {
+			// Apply effect
 			_toggleClass(dragEl, this.options.ghostClass, true);
+
+			Sortable.active = this;
+
+			// Drag start event
+			_dispatchEvent(rootEl, 'start', dragEl, rootEl, startIndex);
 		},
 
 
 		_onTapStart: function (/**Event|TouchEvent*/evt) {
-			var touch = evt.touches && evt.touches[0],
+			var type = evt.type,
+				touch = evt.touches && evt.touches[0],
 				target = (touch || evt).target,
 				originalTarget = target,
 				options =  this.options,
 				el = this.el,
 				filter = options.filter;
 
-			if (evt.type === 'mousedown' && evt.button !== 0 || options.disabled) {
+			if (type === 'mousedown' && evt.button !== 0 || options.disabled) {
 				return; // only left button or enabled
 			}
 
@@ -215,14 +222,11 @@
 				}
 			}
 
-			// IE 9 Support
-			if (target && evt.type == 'selectstart') {
-				if (target.tagName != 'A' && target.tagName != 'IMG') {
-					target.dragDrop();
-				}
-			}
-
+			// Prepare `dragstart`
 			if (target && !dragEl && (target.parentNode === el)) {
+				// IE 9 Support
+				(type === 'selectstart') && target.dragDrop();
+
 				tapEvt = evt;
 
 				rootEl = this.el;
@@ -269,17 +273,11 @@
 				}
 
 
-				// Drag start event
-				_dispatchEvent(rootEl, 'start', dragEl, rootEl, startIndex);
-
-
 				if (activeGroup.pull == 'clone') {
 					cloneEl = dragEl.cloneNode(true);
 					_css(cloneEl, 'display', 'none');
 					rootEl.insertBefore(cloneEl, dragEl);
 				}
-
-				Sortable.active = this;
 			}
 		},
 
@@ -288,19 +286,29 @@
 				_css(ghostEl, 'display', 'none');
 
 				var target = document.elementFromPoint(touchEvt.clientX, touchEvt.clientY),
-					parent = target.parentNode,
+					parent = target && target.parentNode,
 					groupName = this.options.group.name,
 					i = touchDragOverListeners.length;
 
-				if (parent && (' ' + parent[expando] + ' ').indexOf(groupName) > -1) {
-					while (i--) {
-						touchDragOverListeners[i]({
-							clientX: touchEvt.clientX,
-							clientY: touchEvt.clientY,
-							target: target,
-							rootEl: parent
-						});
+				if (parent) {
+					do {
+						if ((' ' + parent[expando] + ' ').indexOf(groupName) > -1) {
+							while (i--) {
+								touchDragOverListeners[i]({
+									clientX: touchEvt.clientX,
+									clientY: touchEvt.clientY,
+									target: target,
+									rootEl: parent
+								});
+							}
+
+							break;
+						}
+
+						target = parent; // store last element
 					}
+					/* jshint boss:true */
+					while (parent = parent.parentNode);
 				}
 
 				_css(ghostEl, 'display', '');
@@ -370,8 +378,6 @@
 				_on(document, 'drop', this);
 			}
 
-			setTimeout(this._applyEffects, 0);
-
 			scrollEl = options.scroll;
 
 			if (scrollEl === true) {
@@ -386,6 +392,8 @@
 				/* jshint boss:true */
 				} while (scrollEl = scrollEl.parentNode);
 			}
+
+			setTimeout(this._dragStarted, 0);
 		},
 
 		_onDrag: _throttle(function (/**Event*/evt) {
@@ -601,7 +609,7 @@
 					_disableDraggable(dragEl);
 					_toggleClass(dragEl, this.options.ghostClass, false);
 
-					if (!rootEl.contains(dragEl)) {
+					if (rootEl !== dragEl.parentNode) {
 						// drag from one list and drop into another
 						_dispatchEvent(dragEl.parentNode, 'sort', dragEl, rootEl, startIndex, newIndex);
 						_dispatchEvent(rootEl, 'sort', dragEl, rootEl, startIndex, newIndex);
@@ -621,7 +629,7 @@
 					}
 
 					// Drag end event
-					_dispatchEvent(rootEl, 'end', dragEl, rootEl, startIndex, newIndex);
+					Sortable.active && _dispatchEvent(rootEl, 'end', dragEl, rootEl, startIndex, newIndex);
 				}
 
 				// Set NULL
@@ -641,7 +649,7 @@
 				Sortable.active = null;
 
 				// Save sorting
-				this.save()
+				this.save();
 			}
 		},
 
@@ -975,7 +983,7 @@
 	};
 
 
-	Sortable.version = '0.7.3';
+	Sortable.version = '1.0.0';
 
 
 	/**

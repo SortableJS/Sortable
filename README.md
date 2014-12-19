@@ -12,7 +12,8 @@ Demo: http://rubaxa.github.io/Sortable/
  * Supports drag handles *and selectable text* (better than voidberg's html5sortable)
  * Smart auto-scrolling
  * Built using native HTML5 drag and drop API
- * Supports [AngularJS](#ng) and and any CSS library, e.g. [Bootstrap](#bs)
+ * Supports [Meteor](meteor/README.md) and [AngularJS](#ng)
+ * Supports any CSS library, e.g. [Bootstrap](#bs)
  * Simple API
  * No jQuery
 
@@ -387,11 +388,29 @@ Demo: http://jsbin.com/luxero/2/edit?html,js,output
 </script>
 ```
 
+
 ---
 
 
+### Static methods & properties
 
-### Sortable.utils
+
+
+##### Sortable.create(el:`HTMLElement`[, options:`Object`]):`Sortable`
+Create new instance.
+
+
+---
+
+
+##### Sortable.active:`Sortable`
+Link to the active instance.
+
+
+---
+
+
+##### Sortable.utils
 * on(el`:HTMLElement`, event`:String`, fn`:Function`) — attach an event handler function
 * off(el`:HTMLElement`, event`:String`, fn`:Function`) — remove an event handler
 * css(el`:HTMLElement`)`:Object` — get the values of all the CSS properties
@@ -400,6 +419,7 @@ Demo: http://jsbin.com/luxero/2/edit?html,js,output
 * css(el`:HTMLElement`, props`:Object`) — set more CSS properties
 * find(ctx`:HTMLElement`, tagName`:String`[, iterator`:Function`])`:Array` — get elements by tag name
 * bind(ctx`:Mixed`, fn`:Function`)`:Function` — Takes a function and returns a new one that will always have a particular context
+* is(el`:HTMLElement`, selector`:String`)`:Boolean` — check the current matched set of elements against a selector
 * closest(el`:HTMLElement`, selector`:String`[, ctx`:HTMLElement`])`:HTMLElement|Null` — for each element in the set, get the first element that matches the selector by testing the element itself and traversing up through its ancestors in the DOM tree
 * toggleClass(el`:HTMLElement`, name`:String`, state`:Boolean`) — add or remove one classes from each element
 
