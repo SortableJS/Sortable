@@ -599,7 +599,7 @@
 					_disableDraggable(dragEl);
 					_toggleClass(dragEl, this.options.ghostClass, false);
 
-					if (!rootEl.contains(dragEl)) {
+					if (rootEl !== dragEl.parentNode) {
 						// drag from one list and drop into another
 						_dispatchEvent(dragEl.parentNode, 'sort', dragEl, rootEl, startIndex, newIndex);
 						_dispatchEvent(rootEl, 'sort', dragEl, rootEl, startIndex, newIndex);
