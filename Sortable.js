@@ -286,7 +286,7 @@
 				_css(ghostEl, 'display', 'none');
 
 				var target = document.elementFromPoint(touchEvt.clientX, touchEvt.clientY),
-					parent = target && target.parentNode,
+					parent = target,
 					groupName = this.options.group.name,
 					i = touchDragOverListeners.length;
 
