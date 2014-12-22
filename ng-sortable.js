@@ -3,7 +3,7 @@
  * @licence MIT
  */
 angular.module('ng-sortable', [])
-	.constant('$version', '0.3.2')
+	.constant('$version', '0.3.3')
 	.directive('ngSortable', ['$parse', function ($parse) {
 		'use strict';
 
@@ -17,6 +17,8 @@ angular.module('ng-sortable', [])
 						(node.nodeValue.indexOf('ngRepeat:') !== -1)
 					);
 			})[0];
+			
+			// tests: http://jsbin.com/kosubutilo/1/edit?js,output
 			ngRepeat = ngRepeat.nodeValue.match(/ngRepeat:\s*(?:\(.*?,\s*)?([^\s)]+)[\s)]+in\s+([^\s|]+)/);
 
 			var itemExpr = $parse(ngRepeat[1]);
