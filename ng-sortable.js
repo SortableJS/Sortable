@@ -17,7 +17,7 @@ angular.module('ng-sortable', [])
 						(node.nodeValue.indexOf('ngRepeat:') !== -1)
 					);
 			})[0];
-			ngRepeat = ngRepeat.nodeValue.match(/ngRepeat:\s*([^\s]+)\s+in\s+([^\s|]+)/);
+			ngRepeat = ngRepeat.nodeValue.match(/ngRepeat:\s*(?:\(.*?,\s*)?([^\s)]+)[\s)]+in\s+([^\s|]+)/);
 
 			var itemExpr = $parse(ngRepeat[1]);
 			var itemsExpr = $parse(ngRepeat[2]);
