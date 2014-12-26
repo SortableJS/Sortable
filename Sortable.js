@@ -372,8 +372,10 @@
 				this._loopId = setInterval(this._emulateDragOver, 150);
 			}
 			else {
-				dataTransfer.effectAllowed = 'move';
-				options.setData && options.setData.call(this, dataTransfer, dragEl);
+				if (dataTransfer) {
+					dataTransfer.effectAllowed = 'move';
+					options.setData && options.setData.call(this, dataTransfer, dragEl);
+				}
 
 				_on(document, 'drop', this);
 			}
