@@ -809,7 +809,7 @@
 			do {
 				if (
 					(tag === '>*' && el.parentNode === ctx) || (
-						(tag === '' || el.nodeName == tag) &&
+						(tag === '' || el.nodeName.toUpperCase() == tag) &&
 						(!selector.length || ((' ' + el.className + ' ').match(re) || []).length == selector.length)
 					)
 				) {
@@ -937,7 +937,7 @@
 	 */
 	function _index(/**HTMLElement*/el) {
 		var index = 0;
-		while (el && (el = el.previousElementSibling) && (el.nodeName !== 'TEMPLATE')) {
+		while (el && (el = el.previousElementSibling) && (el.nodeName.toUpperCase() !== 'TEMPLATE')) {
 			index++;
 		}
 		return index;
