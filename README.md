@@ -438,7 +438,8 @@ To assemble plugin for jQuery, perform the following steps:
   grunt jquery
 ```
 
-Now you can use `jquery.fn.sortable.js` (or `jquery.fn.sortable.min.js` if you run `grunt jquery:min`):
+Now you can use `jquery.fn.sortable.js`:<br/>
+(or `jquery.fn.sortable.min.js` if you run `grunt jquery:min`)
 
 ```js
   $("#list").sortable({ /* options */ }); // init
