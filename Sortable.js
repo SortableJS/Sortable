@@ -593,7 +593,9 @@
 			_off(el, 'dragstart', this._onDragStart);
 
 			this._offUpEvents();
-
+			// FIX : if newIndex > startIndex is always comes with +1
+			if (newIndex > startIndex)
+				newIndex--;
 			if (evt) {
 				evt.preventDefault();
 				evt.stopPropagation();
