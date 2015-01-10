@@ -25,7 +25,6 @@
 	"use strict";
 
 	var dragEl,
-		startIndex,
 		ghostEl,
 		cloneEl,
 		rootEl,
@@ -34,6 +33,9 @@
 
 		lastEl,
 		lastCSS,
+
+		oldIndex,
+		newIndex,
 
 		activeGroup,
 		autoScroll = {},
@@ -173,7 +175,7 @@
 			Sortable.active = this;
 
 			// Drag start event
-			_dispatchEvent(rootEl, 'start', dragEl, rootEl, startIndex);
+			_dispatchEvent(rootEl, 'start', dragEl, rootEl, oldIndex);
 		},
 
 
@@ -197,12 +199,12 @@
 			target = _closest(target, options.draggable, el);
 
 			// get the index of the dragged element within its parent
-			startIndex = _index(target);
+			oldIndex = _index(target);
 
 			// Check filter
 			if (typeof filter === 'function') {
 				if (filter.call(this, evt, target, this)) {
-					_dispatchEvent(originalTarget, 'filter', target, el, startIndex);
+					_dispatchEvent(originalTarget, 'filter', target, el, oldIndex);
 					evt.preventDefault();
 					return; // cancel dnd
 				}
@@ -212,7 +214,7 @@
 					criteria = _closest(originalTarget, criteria.trim(), el);
 
 					if (criteria) {
-						_dispatchEvent(criteria, 'filter', target, el, startIndex);
+						_dispatchEvent(criteria, 'filter', target, el, oldIndex);
 						return true;
 					}
 				});
@@ -606,33 +608,36 @@
 				if (dragEl) {
 					_off(dragEl, 'dragend', this);
 
-					// get the index of the dragged element within its parent
-					var newIndex = _index(dragEl);
-
 					_disableDraggable(dragEl);
 					_toggleClass(dragEl, this.options.ghostClass, false);
 
 					if (rootEl !== dragEl.parentNode) {
+						newIndex = _index(dragEl);
+
 						// drag from one list and drop into another
-						_dispatchEvent(dragEl.parentNode, 'sort', dragEl, rootEl, startIndex, newIndex);
-						_dispatchEvent(rootEl, 'sort', dragEl, rootEl, startIndex, newIndex);
+						_dispatchEvent(dragEl.parentNode, 'sort', dragEl, rootEl, oldIndex, newIndex);
+						_dispatchEvent(rootEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
 
 						// Add event
-						_dispatchEvent(dragEl, 'add', dragEl, rootEl, startIndex, newIndex);
+						_dispatchEvent(dragEl, 'add', dragEl, rootEl, oldIndex, newIndex);
 
 						// Remove event
-						_dispatchEvent(rootEl, 'remove', dragEl, rootEl, startIndex, newIndex);
+						_dispatchEvent(rootEl, 'remove', dragEl, rootEl, oldIndex, newIndex);
 					}
 					else if (dragEl.nextSibling !== nextEl) {
-						// drag & drop within the same list
-						_dispatchEvent(rootEl, 'update', dragEl, rootEl, startIndex, newIndex);
-						_dispatchEvent(rootEl, 'sort', dragEl, rootEl, startIndex, newIndex);
-
+						// (1) Remove clone
 						cloneEl && cloneEl.parentNode.removeChild(cloneEl);
+
+ 						// (2) Get the index of the dragged element within its parent
+						newIndex = _index(dragEl);
+
+						// drag & drop within the same list
+						_dispatchEvent(rootEl, 'update', dragEl, rootEl, oldIndex, newIndex);
+						_dispatchEvent(rootEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
 					}
 
 					// Drag end event
-					Sortable.active && _dispatchEvent(rootEl, 'end', dragEl, rootEl, startIndex, newIndex);
+					Sortable.active && _dispatchEvent(rootEl, 'end', dragEl, rootEl, oldIndex, newIndex);
 				}
 
 				// Set NULL
