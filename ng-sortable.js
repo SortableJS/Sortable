@@ -74,6 +74,13 @@
 
 							items.splice(newIndex, 0, removed);
 
+							if (evt.clone) {
+								newIndex = Sortable.utils.index(evt.clone);
+								prevItems.splice(newIndex, 0, removed);
+
+								evt.from.removeChild(evt.clone);
+							}
+
 							evt.from.appendChild(evt.item); // revert element
 						} else {
 							items.splice(newIndex, 0, items.splice(oldIndex, 1)[0]);
@@ -114,7 +121,7 @@
 						sortable = null;
 					});
 
-					if (!/{|}/.test(ngSortable)) { // todo: ugly
+					if (ngSortable && !/{|}/.test(ngSortable)) { // todo: ugly
 						angular.forEach(['sort', 'disabled', 'draggable', 'handle', 'animation'], function (name) {
 							scope.$watch(ngSortable + '.' + name, function (value) {
 								if (value !== void 0) {

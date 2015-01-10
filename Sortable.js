@@ -57,6 +57,7 @@
 
 			evt.item = targetEl || rootEl;
 			evt.from = fromEl || rootEl;
+			evt.clone = cloneEl;
 
 			evt.oldIndex = startIndex;
 			evt.newIndex = newIndex;
