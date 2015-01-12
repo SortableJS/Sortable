@@ -106,7 +106,9 @@
 			animation: 0,
 			setData: function (dataTransfer, dragEl) {
 				dataTransfer.setData('Text', dragEl.textContent);
-			}
+			},
+			dropBubble: false,
+			dragoverBubble: false
 		};
 
 
@@ -465,7 +467,7 @@
 
 			if (evt.preventDefault !== void 0) {
 				evt.preventDefault();
-				evt.stopPropagation();
+				!options.dragoverBubble && evt.stopPropagation();
 			}
 
 			if (!_silent && activeGroup &&
@@ -586,7 +588,8 @@
 		},
 
 		_onDrop: function (/**Event*/evt) {
-			var el = this.el;
+			var el = this.el,
+				options = this.options;
 
 			clearInterval(this._loopId);
 			clearInterval(autoScroll.pid);
@@ -601,7 +604,7 @@
 
 			if (evt) {
 				evt.preventDefault();
-				evt.stopPropagation();
+				!options.dropBubble && evt.stopPropagation();
 
 				ghostEl && ghostEl.parentNode.removeChild(ghostEl);
 
