@@ -430,7 +430,7 @@ Link to the active instance.
 
 
 ## MIT LICENSE
-Copyright 2013-2014 Lebedev Konstantin <ibnRubaXa@gmail.com>
+Copyright 2013-2015 Lebedev Konstantin <ibnRubaXa@gmail.com>
 http://rubaxa.github.io/Sortable/
 
 Permission is hereby granted, free of charge, to any person obtaining
