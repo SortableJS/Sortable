@@ -12,7 +12,7 @@ Demo: http://rubaxa.github.io/Sortable/
  * Supports drag handles *and selectable text* (better than voidberg's html5sortable)
  * Smart auto-scrolling
  * Built using native HTML5 drag and drop API
- * Supports [Meteor](meteor/README.md) and [AngularJS](#ng)
+ * Supports [Meteor](meteor/README.md), [AngularJS](#ng) and [React](#react)
  * Supports any CSS library, e.g. [Bootstrap](#bs)
  * Simple API
  * No jQuery (but there is [support](#jq))
@@ -276,6 +276,38 @@ angular.module('myApp', ['ng-sortable'])
 		$scope.bar = ['bar 1', '..'];
 		$scope.barConfig = { group: 'foobar', animation: 150 };
 	}]);
+```
+
+
+---
+
+
+<a name="react"></a>
+### Support React
+Include [react-sortable-mixin.js](react-sortable-mixin.js).
+See more [here](react-sortable-mixin.js#L37).
+
+
+```jsx
+var SortableList = React.createClass({
+	mixins: [SortableMixin],
+
+	getInitialState: function() {
+		return {
+			items: ['Mixin', 'Sortable']
+		};
+	},
+
+	render: function() {
+		return <ul>{
+			this.state.items.map(function (text) {
+				return <li>{text}</li>
+			})
+		}</ul>
+	}
+});
+
+React.render(<SortableList />, document.body);
 ```
 
 

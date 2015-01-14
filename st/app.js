@@ -1,5 +1,41 @@
 (function () {
+	'use strict';
+
 	var byId = function (id) { return document.getElementById(id); },
+
+		loadScripts = function (desc, callback) {
+			var deps = [], key, idx = 0;
+
+			for (key in desc) {
+				deps.push(key);
+			}
+
+			(function _next() {
+				var pid,
+					name = deps[idx],
+					script = document.createElement('script');
+
+				script.type = 'text/javascript';
+				script.src = desc[deps[idx]];
+
+				pid = setInterval(function () {
+					if (window[name]) {
+						clearTimeout(pid);
+
+						deps[idx++] = window[name];
+
+						if (deps[idx]) {
+							_next();
+						} else {
+							callback.apply(null, deps);
+						}
+					}
+				}, 30);
+
+				document.getElementsByTagName('head')[0].appendChild(script);
+			})()
+		},
+
 		console = window.console;
 
 
@@ -159,7 +195,45 @@
 				$scope.sortableConfig['on' + name] = console.log.bind(console, name);
 			});
 		}]);
+
+
+
+	// React
+	loadScripts({
+		'React': '//fb.me/react-0.12.2.js',
+		'SortableMixin': 'react-sortable-mixin.js'
+	}, function (React, SortableMixin) {
+		var SortableList = React.createClass({
+			mixins: [SortableMixin],
+
+			getInitialState: function() {
+				return {
+					items: [
+						'Mixin',
+						'Sortable'
+					]
+				};
+			},
+
+			render: function() {
+				return React.DOM.div(null,
+					React.DOM.h4({ children: 'React mixin', className: 'layer title title_xl', style: { marginBottom: 0 } }),
+					React.DOM.div({ style: { width: '30%', marginLeft: '10px', cursor: 'move' }, className: 'block__list_words' },
+						React.DOM.ul({
+							ref: 'list',
+							children: this.state.items.map(function (v) {
+								return React.DOM.li(null, v);
+							})
+						})
+					)
+				);
+			}
+		});
+
+		React.render(React.createElement(SortableList, {}), byId('react-box'));
+	});
 })();
+
 
 
 // Background

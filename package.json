@@ -22,7 +22,11 @@
   "keywords": [
     "sortable",
     "reorder",
-    "drag"
+    "drag",
+    "meteor",
+    "angular",
+    "react",
+    "mixin"
   ],
   "author": "Konstantin Lebedev <ibnRubaXa@gmail.com>",
   "license": "MIT"
