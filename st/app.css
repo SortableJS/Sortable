@@ -220,6 +220,7 @@ img {
 	margin-right: 10px;
 	font: bold 20px Sans-Serif;
 	color: #5F9EDF;
+	display: inline-block;
 	cursor: move;
 	cursor: -webkit-grabbing;  /* overrides 'move' */
 }
