@@ -202,7 +202,7 @@ Sortable.create(list, {
 #### `ghostClass` option
 Class name for the drop placeholder.
 
-Demo: http://jsbin.com/boqugumiqi/1/edit?css,js,output
+Demo: http://jsbin.com/hunifu/1/edit?css,js,output
 
 ```css
 .ghost {
