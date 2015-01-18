@@ -25,5 +25,12 @@
     "drag"
   ],
   "author": "Konstantin Lebedev <ibnRubaXa@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "spm": {
+    "main": "Sortable.js",
+    "ignore": [
+      "meteor",
+      "st"
+    ]
+  }
 }
