@@ -15,7 +15,7 @@
 	'use strict';
 
 	angular.module('ng-sortable', [])
-		.constant('$version', '0.3.2')
+		.constant('$version', '0.3.3')
 		.directive('ngSortable', ['$parse', function ($parse) {
 			var removed;
 
@@ -76,7 +76,7 @@
 
 							if (evt.clone) {
 								newIndex = Sortable.utils.index(evt.clone);
-								prevItems.splice(newIndex, 0, removed);
+								prevItems.splice(oldIndex, 0, removed);
 
 								evt.from.removeChild(evt.clone);
 							}
