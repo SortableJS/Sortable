@@ -96,7 +96,7 @@
 						opts[name] = opts[name] || options[name];
 						return opts;
 					}, {
-						onStart: function (/**Event*/) {
+						onStart: function (/**Event*/evt) {
 							nextSibling = evt.item.nextSibling;
 							options.onStart(source.items());
 						},
