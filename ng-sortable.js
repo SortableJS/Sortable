@@ -17,7 +17,8 @@
 	angular.module('ng-sortable', [])
 		.constant('$version', '0.3.3')
 		.directive('ngSortable', ['$parse', function ($parse) {
-			var removed;
+			var removed,
+				nextSibling;
 
 			function getSource(el) {
 				var scope = angular.element(el).scope();
@@ -70,19 +71,20 @@
 								prevItems = prevSource.items();
 
 							oldIndex = prevItems.indexOf(prevSource.item(evt.item));
-							removed = prevItems.splice(oldIndex, 1)[0];
+							removed = prevItems[oldIndex];
+
+							if (evt.clone) {
+								evt.from.removeChild(evt.clone);
+							}
+							else {
+								prevItems.splice(oldIndex, 1);
+							}
 
 							items.splice(newIndex, 0, removed);
 
-							if (evt.clone) {
-								newIndex = Sortable.utils.index(evt.clone);
-								prevItems.splice(oldIndex, 0, removed);
-
-								evt.from.removeChild(evt.clone);
-							}
-
-							evt.from.appendChild(evt.item); // revert element
-						} else {
+							evt.from.insertBefore(evt.item, nextSibling); // revert element
+						}
+						else {
 							items.splice(newIndex, 0, items.splice(oldIndex, 1)[0]);
 						}
 
@@ -94,17 +96,18 @@
 						opts[name] = opts[name] || options[name];
 						return opts;
 					}, {
-						onStart: function () {
+						onStart: function (/**Event*/) {
+							nextSibling = evt.item.nextSibling;
 							options.onStart(source.items());
 						},
 						onEnd: function () {
 							options.onEnd(source.items());
 						},
-						onAdd: function (evt) {
+						onAdd: function (/**Event*/evt) {
 							_sync(evt);
 							options.onAdd(source.items(), removed);
 						},
-						onUpdate: function (evt) {
+						onUpdate: function (/**Event*/evt) {
 							_sync(evt);
 							options.onUpdate(source.items(), source.item(evt.item));
 						},
@@ -119,6 +122,7 @@
 					$el.on('$destroy', function () {
 						sortable.destroy();
 						sortable = null;
+						nextSibling = null;
 					});
 
 					if (ngSortable && !/{|}/.test(ngSortable)) { // todo: ugly
