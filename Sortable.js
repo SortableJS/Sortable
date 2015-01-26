@@ -276,13 +276,6 @@
 					}
 				} catch (err) {
 				}
-
-
-				if (activeGroup.pull == 'clone') {
-					cloneEl = dragEl.cloneNode(true);
-					_css(cloneEl, 'display', 'none');
-					rootEl.insertBefore(cloneEl, dragEl);
-				}
 			}
 		},
 
@@ -346,6 +339,12 @@
 				options = this.options;
 
 			this._offUpEvents();
+
+			if (activeGroup.pull == 'clone') {
+				cloneEl = dragEl.cloneNode(true);
+				_css(cloneEl, 'display', 'none');
+				rootEl.insertBefore(cloneEl, dragEl);
+			}
 
 			if (isTouch) {
 				var rect = dragEl.getBoundingClientRect(),
