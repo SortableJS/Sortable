@@ -626,16 +626,18 @@
 						// Remove event
 						_dispatchEvent(rootEl, 'remove', dragEl, rootEl, oldIndex, newIndex);
 					}
-					else if (dragEl.nextSibling !== nextEl) {
-						// (1) Remove clone
+					else {
+						// Remove clone
 						cloneEl && cloneEl.parentNode.removeChild(cloneEl);
 
- 						// (2) Get the index of the dragged element within its parent
-						newIndex = _index(dragEl);
+						if (dragEl.nextSibling !== nextEl) {
+							// Get the index of the dragged element within its parent
+							newIndex = _index(dragEl);
 
-						// drag & drop within the same list
-						_dispatchEvent(rootEl, 'update', dragEl, rootEl, oldIndex, newIndex);
-						_dispatchEvent(rootEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
+							// drag & drop within the same list
+							_dispatchEvent(rootEl, 'update', dragEl, rootEl, oldIndex, newIndex);
+							_dispatchEvent(rootEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
+						}
 					}
 
 					// Drag end event
@@ -819,7 +821,7 @@
 			do {
 				if (
 					(tag === '>*' && el.parentNode === ctx) || (
-						(tag === '' || el.nodeName == tag) &&
+						(tag === '' || el.nodeName.toUpperCase() == tag) &&
 						(!selector.length || ((' ' + el.className + ' ').match(re) || []).length == selector.length)
 					)
 				) {
@@ -947,7 +949,7 @@
 	 */
 	function _index(/**HTMLElement*/el) {
 		var index = 0;
-		while (el && (el = el.previousElementSibling) && (el.nodeName !== 'TEMPLATE')) {
+		while (el && (el = el.previousElementSibling) && (el.nodeName.toUpperCase() !== 'TEMPLATE')) {
 			index++;
 		}
 		return index;
@@ -993,7 +995,7 @@
 	};
 
 
-	Sortable.version = '1.0.0';
+	Sortable.version = '1.0.1';
 
 
 	/**

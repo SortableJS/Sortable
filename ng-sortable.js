@@ -15,7 +15,7 @@
 	'use strict';
 
 	angular.module('ng-sortable', [])
-		.constant('$version', '0.3.3')
+		.constant('$version', '0.3.4')
 		.directive('ngSortable', ['$parse', function ($parse) {
 			var removed,
 				nextSibling;
@@ -28,7 +28,9 @@
 							(node.nodeValue.indexOf('ngRepeat:') !== -1)
 						);
 				})[0];
-				ngRepeat = ngRepeat.nodeValue.match(/ngRepeat:\s*([^\s]+)\s+in\s+([^\s|]+)/);
+
+				// tests: http://jsbin.com/kosubutilo/1/edit?js,output
+				ngRepeat = ngRepeat.nodeValue.match(/ngRepeat:\s*(?:\(.*?,\s*)?([^\s)]+)[\s)]+in\s+([^\s|]+)/);
 
 				var itemExpr = $parse(ngRepeat[1]);
 				var itemsExpr = $parse(ngRepeat[2]);
