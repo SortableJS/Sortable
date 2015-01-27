@@ -3,11 +3,12 @@
 <head>
 	<meta charset="utf-8"/>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+	<meta property="og:image" content="/st/og-image.png"/>
 
 	<title>Sortable. No jQuery.</title>
 
 	<meta name="keywords" content="sortable, reorder, list, javascript, html5, drag and drop, dnd, animation, groups, angular, ng-sortable, effects, rubaxa"/>
-	<meta name="description" content="Sortable - is a minimalist JavaScript library for modern browsers and touch devices (No jQuery). Support AngularJS."/>
+	<meta name="description" content="Sortable - is a minimalist JavaScript library for reorderable drag-and-drop lists on modern browsers and touch devices. No jQuery. Supports Meteor and AngularJS and any CSS library, e.g. Bootstrap."/>
 	<meta name="viewport" content="width=device-width, initial-scale=0.5"/>
 
 	<link href="//rubaxa.github.io/Ply/ply.css" rel="stylesheet" type="text/css"/>
@@ -27,6 +28,7 @@
 	</div>
 
 
+	<!-- Connected lists -->
 	<div class="container" style="height: 520px">
 		<div data-force="30" class="layer block" style="left: 14.5%; top: 0; width: 37%">
 			<div class="layer title">List A</div>
@@ -54,6 +56,7 @@
 	</div>
 
 
+	<!-- Multi connected lists -->
 	<a name="m"></a>
 	<div class="container">
 		<div id="multi" style="margin-left: 30px">
@@ -90,6 +93,7 @@
 	</div>
 
 
+	<!-- Editable list -->
 	<a name="e"></a>
 	<div class="container" style="margin-top: 100px">
 		<div id="filter" style="margin-left: 30px">
@@ -108,6 +112,7 @@
 	</div>
 
 
+	<!-- Advanced connected lists -->
 	<a name="ag"></a>
 	<div class="container" style="margin-top: 100px;">
 		<div id="advanced" style="margin-left: 30px;">
@@ -123,7 +128,7 @@
 			</div>
 
 			<div style="width: 25%; float: left; margin-top: 15px; margin-left: 10px" class="block__list block__list_words">
-				<div class="block__list-title">only pull (clone), no reordering</div>
+				<div class="block__list-title">only pull (clone) no&nbsp;reordering</div>
 				<ul id="advanced-2">
 					<li>Sex</li>
 					<li>Drugs</li>
@@ -145,17 +150,17 @@
 	</div>
 
 
+	<!-- 'handle' option -->
 	<a name="h"></a>
 	<div class="container" style="margin-top: 100px;">
 		<div id="handle" style="margin-left: 30px;">
 			<div><div data-force="5" class="layer title title_xl">Drag handle and selectable text</div></div>
 
-			<div style="width: 30%; float: left; margin-top: 15px; margin-left: 10px" class="block__list_words">
-				<div class="block__list-title">Drag handles</div>
+			<div style="width: 30%; margin-left: 10px" class="block__list_words">
 				<ul id="handle-1">
-					<li><span class="drag-handle">≡</span>Select text freely</li>
-					<li><span class="drag-handle">≡</span>Drag my handle</li>
-					<li><span class="drag-handle">≡</span>Best of both worlds</li>
+					<li><span class="drag-handle">&#9776;</span>Select text freely</li>
+					<li><span class="drag-handle">&#9776;</span>Drag my handle</li>
+					<li><span class="drag-handle">&#9776;</span>Best of both worlds</li>
 				</ul>
 			</div>
 
@@ -164,6 +169,7 @@
 	</div>
 
 
+	<!-- Angular -->
 	<a name="ng"></a>
 	<div id="todos" ng-app="todoApp" class="container" style="margin-top: 100px">
 		<div style="margin-left: 30px">
@@ -204,27 +210,27 @@
 	</div>
 
 
-
+	<!-- Code example -->
 	<a name="c"></a>
 	<div class="container" style="margin-top: 100px">
 		<div style="margin-left: 30px">
 			<div><div class="layer title title_xl">Code example</div></div>
 			<pre data-force="100" class="layer javascript" style="margin-top: -8px; margin-left: 10px; width: 90%"><code>// Simple list
 var list = document.getElementById("my-ui-list");
-new Sortable(list); // That's all.
+Sortable.create(list); // That's all.
 
 
 // Grouping
 var foo = document.getElementById("foo");
-new Sortable(foo, { group: "omega" });
+Sortable.create(foo, { group: "omega" });
 
 var bar = document.getElementById("bar");
-new Sortable(bar, { group: "omega" });
+Sortable.create(bar, { group: "omega" });
 
 
 // Or
 var container = document.getElementById("multi");
-var sort = new Sortable(container, {
+var sort = Sortable.create(container, {
   animation: 150, // ms, animation speed moving items when sorting, `0` — without animation
   handle: ".tile__title", // Restricts sort start click/touch to the specified element
   draggable: ".tile", // Specifies which items inside the element should be sortable
@@ -238,7 +244,7 @@ sort.destroy();
 
 
 // Editable list
-var editableList = new Sortable(editable, {
+var editableList = Sortable.create(editable, {
   filter: '.js-remove',
   onFilter: function (evt) {
     var el = editableList.closest(evt.item); // get dragged item
@@ -265,188 +271,7 @@ var editableList = new Sortable(editable, {
 	<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
 	<script src="ng-sortable.js"></script>
 
-	<script>
-		(function (){
-			var console = window.console;
-
-			if( !console.log ){
-				console.log = function (){
-					alert([].join.apply(arguments, ' '));
-				};
-			}
-
-
-			new Sortable(foo, {
-				group: "words",
-				animation: 150,
-				store: {
-					get: function (sortable) {
-						var order = localStorage.getItem(sortable.options.group);
-						return order ? order.split('|') : [];
-					},
-					set: function (sortable) {
-						var order = sortable.toArray();
-						localStorage.setItem(sortable.options.group, order.join('|'));
-					}
-				},
-				onAdd: function (evt){ console.log('onAdd.foo:', evt.item); },
-				onUpdate: function (evt){ console.log('onUpdate.foo:', evt.item); },
-				onRemove: function (evt){ console.log('onRemove.foo:', evt.item); },
-				onStart:function(evt){ console.log('onStart.foo:',evt.item);},
-				onEnd: function(evt){ console.log('onEnd.foo:', evt.item);}
-			});
-
-
-			new Sortable(bar, {
-				group: "words",
-				animation: 150,
-				onAdd: function (evt){ console.log('onAdd.bar:', evt.item); },
-				onUpdate: function (evt){ console.log('onUpdate.bar:', evt.item); },
-				onRemove: function (evt){ console.log('onRemove.bar:', evt.item); },
-				onStart:function(evt){ console.log('onStart.foo:', evt.item);},
-				onEnd: function(evt){ console.log('onEnd.foo:', evt.item);}
-			});
-
-
-			new Sortable(multi, {
-				animation: 150,
-				draggable: '.tile',
-				handle: '.tile__name'
-			});
-
-
-			var editableList = new Sortable(editable, {
-				animation: 150,
-				filter: '.js-remove',
-				onFilter: function (evt) {
-					var el = editableList.closest(evt.item);
-					el && el.parentNode.removeChild(el);
-				}
-			});
-
-
-			addUser.onclick = function () {
-				Ply.dialog('prompt', {
-					title: 'Add',
-					form: { name: 'name' }
-				}).done(function (ui) {
-					var el = document.createElement('li');
-					el.innerHTML = ui.data.name + '<i class="js-remove">✖</i>';
-					editableList.el.appendChild(el);
-				});
-			};
-
-
-			[].forEach.call(multi.getElementsByClassName('tile__list'), function (el){
-				new Sortable(el, {
-					group: 'photo',
-					animation: 150
-				});
-			});
-
-
-			[{
-				name: 'advanced',
-				pull: true,
-				put: true
-			},
-			{
-				name: 'advanced',
-				pull: 'clone',
-				put: false
-			}, {
-				name: 'advanced',
-				pull: false,
-				put: true
-			}].forEach(function (groupOpts, i) {
-				new Sortable(document.getElementById('advanced-' + (i + 1)), {
-					sort: (i != 1),
-					group: groupOpts,
-					animation: 150
-				});
-			});
-
-			new Sortable(document.getElementById('handle-1'), {
-				handle: '.drag-handle',
-				animation: 150
-			});
-
-
-			angular.module('todoApp', ['ng-sortable'])
-				.controller('TodoController', ['$scope', function ($scope) {
-					$scope.todos = [
-						{text: 'learn angular', done: true},
-						{text: 'build an angular app', done: false}
-					];
-
-					$scope.addTodo = function () {
-						$scope.todos.push({text: $scope.todoText, done: false});
-						$scope.todoText = '';
-					};
-
-					$scope.remaining = function () {
-						var count = 0;
-						angular.forEach($scope.todos, function (todo) {
-							count += todo.done ? 0 : 1;
-						});
-						return count;
-					};
-
-					$scope.archive = function () {
-						var oldTodos = $scope.todos;
-						$scope.todos = [];
-						angular.forEach(oldTodos, function (todo) {
-							if (!todo.done) $scope.todos.push(todo);
-						});
-					};
-				}])
-				.controller('TodoControllerNext', ['$scope', function ($scope) {
-					$scope.todos = [
-						{text: 'learn Sortable', done: true},
-						{text: 'use ng-sortable', done: false},
-						{text: 'Enjoy', done: false}
-					];
-
-					$scope.remaining = function () {
-						var count = 0;
-						angular.forEach($scope.todos, function (todo) {
-							count += todo.done ? 0 : 1;
-						});
-						return count;
-					};
-
-					$scope.sortableConfig = { group: 'todo', animation: 150 };
-					'Start End Add Update Remove Sort'.split(' ').forEach(function (name) {
-						$scope.sortableConfig['on' + name] = console.log.bind(console, name);
-					});
-				}]);
-		})();
-
-
-
-		// Background
-		document.addEventListener( "DOMContentLoaded", function (){
-			function setNoiseBackground(el, width, height, opacity){
-				var canvas = document.createElement("canvas");
-				var context = canvas.getContext("2d");
-
-				canvas.width = width;
-				canvas.height = height;
-
-				for( var i = 0; i < width; i++ ){
-					for( var j = 0; j < height; j++ ){
-						var val = Math.floor(Math.random() * 255);
-						context.fillStyle = "rgba(" + val + "," + val + "," + val + "," + opacity + ")";
-						context.fillRect(i, j, 1, 1);
-					}
-				}
-
-				el.style.background = "url(" + canvas.toDataURL("image/png") + ")";
-			}
-
-			setNoiseBackground(document.getElementsByTagName('body')[0], 50, 50, 0.02);
-		}, false );
-	</script>
+	<script src="st/app.js"></script>
 
 
 

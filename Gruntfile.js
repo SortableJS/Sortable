@@ -12,28 +12,7 @@ module.exports = function (grunt) {
 			all: ['*.js', '!*.min.js'],
 
 			options: {
-				strict: true,
-				newcap: false,	// "Tolerate uncapitalized constructors"
-				node: true,
-				expr: true, // - true && call() "Expected an assignment or function call and instead saw an expression."
-				supernew: true, // - "Missing '()' invoking a constructor."
-				laxbreak: true,
-				white: true,
-				globals: {
-					define: true,
-					test: true,
-					expect: true,
-					module: true,
-					asyncTest: true,
-					start: true,
-					ok: true,
-					equal: true,
-					notEqual: true,
-					deepEqual: true,
-					window: true,
-					document: true,
-					performance: true
-				}
+				jshintrc: true
 			}
 		},
 
@@ -45,34 +24,58 @@ module.exports = function (grunt) {
 				files: {
 					'<%= pkg.exportName %>.min.js': ['<%= pkg.exportName %>.js']
 				}
+			},
+			jquery: {
+				files: {
+					'jquery.fn.sortable.min.js': 'jquery.fn.sortable.js'
+				}
 			}
 		},
 
-		shell: {
+		exec: {
 			'meteor-test': {
 				command: 'meteor/runtests.sh'
 			},
 			'meteor-publish': {
 				command: 'meteor/publish.sh'
 			}
-		}
+		},
 
+		jquery: {}
+	});
+
+
+	grunt.registerTask('jquery', function (arg) {
+		var fs = require('fs'),
+			filename = 'jquery.fn.sortable.js';
+
+		grunt.log.oklns(filename);
+
+		fs.writeFileSync(
+			filename,
+			(fs.readFileSync('jquery.binding.js') + '')
+				.replace('/* CODE */',
+					(fs.readFileSync('Sortable.js') + '')
+						.replace(/^[\s\S]*?function[\s\S]*?(var[\s\S]+)\/\/\s+Export[\s\S]+/, '$1')
+				)
+		);
+
+		if (arg === 'min') {
+			grunt.task.run('uglify:jquery');
+		}
 	});
 
 
 	grunt.loadNpmTasks('grunt-version');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
-	grunt.loadNpmTasks('grunt-shell');
+	grunt.loadNpmTasks('grunt-exec');
 
 	// Meteor tasks
-	grunt.registerTask('meteor-test', 'shell:meteor-test');
-	grunt.registerTask('meteor-publish', 'shell:meteor-publish');
-	// ideally we'd run tests before publishing, but the chances of tests breaking (given that
-	// Meteor is orthogonal to the library) are so small that it's not worth the maintainer's time
-	// grunt.regsterTask('meteor', ['shell:meteor-test', 'shell:meteor-publish']);
-	grunt.registerTask('meteor', 'shell:meteor-publish');
+	grunt.registerTask('meteor-test', 'exec:meteor-test');
+	grunt.registerTask('meteor-publish', 'exec:meteor-publish');
+	grunt.registerTask('meteor', ['meteor-test', 'meteor-publish']);
 
 	grunt.registerTask('tests', ['jshint']);
-	grunt.registerTask('default', ['tests', 'version', 'uglify']);
+	grunt.registerTask('default', ['tests', 'version', 'uglify:dist']);
 };
