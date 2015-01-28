@@ -77,6 +77,7 @@
 
 							if (evt.clone) {
 								evt.from.removeChild(evt.clone);
+								removed = angular.copy(removed);
 							}
 							else {
 								prevItems.splice(oldIndex, 1);
