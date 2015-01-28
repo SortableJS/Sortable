@@ -35,33 +35,33 @@
 		 */
 		_sortableInstance: null,
 
-
+		sortable_default_config: {
+	        ref: 'list',
+	        model: 'items',
+	
+	        animation: 100,
+	        onStart: 'handleStart',
+	        onEnd: 'handleEnd',
+	        onAdd: 'handleAdd',
+	        onUpdate: 'handleUpdate',
+	        onRemove: 'handleRemove',
+	        onSort: 'handleSort',
+	        onFilter: 'handleFilter'
+	     },
 		/**
 		 * Sortable options
 		 * @returns {object}
 		 */
 		getDefaultProps: function () {
 			return {
-				sortable: {
-					ref: 'list',
-					model: 'items',
-
-					animation: 100,
-					onStart: 'handleStart',
-					onEnd: 'handleEnd',
-					onAdd: 'handleAdd',
-					onUpdate: 'handleUpdate',
-					onRemove: 'handleRemove',
-					onSort: 'handleSort',
-					onFilter: 'handleFilter'
-				}
+				sortable: this.sortable_default_config
 			};
 		},
 
 
 		componentDidMount: function () {
 			var nextSibling,
-				sortableProps = this.props.sortable,
+				sortableProps = this.sortable_default_config,
 				sortableOptions = {},
 
 				callMethod = function (/** string */type, /** Event */evt) {
@@ -69,7 +69,9 @@
 					method && method.call(this, evt, this._sortableInstance);
 				}.bind(this);
 
-
+			for (var key in this.props.sortable) {
+                sortableProps[key] = this.props.sortable[key];
+            }
 			// Pass through unrecognized options
 			for (var key in sortableProps) {
 				sortableOptions[key] = sortableProps[key];
