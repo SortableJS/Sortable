@@ -299,7 +299,7 @@ var SortableList = React.createClass({
 	},
 
 	render: function() {
-		return <ul>{
+		return <ul ref='list'>{
 			this.state.items.map(function (text) {
 				return <li>{text}</li>
 			})
