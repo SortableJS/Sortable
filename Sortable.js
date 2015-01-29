@@ -228,46 +228,46 @@
 			}
 
 			// Prepare `dragstart`
-			if (target && !dragEl && (target.parentNode === el)) {
+			if (target && (target.parentNode === el)) {
 				// IE 9 Support
-				(type === 'selectstart') && target.dragDrop();
+				if (type === 'selectstart') {
+					target.dragDrop();
+				} else if (!dragEl) {
+					tapEvt = evt;
 
-				tapEvt = evt;
+					rootEl = this.el;
+					dragEl = target;
+					nextEl = dragEl.nextSibling;
+					activeGroup = this.options.group;
 
-				rootEl = this.el;
-				dragEl = target;
-				nextEl = dragEl.nextSibling;
-				activeGroup = this.options.group;
+					dragEl.draggable = true;
 
-				dragEl.draggable = true;
+					// Disable "draggable"
+					options.ignore.split(',').forEach(function (criteria) {
+						_find(target, criteria.trim(), _disableDraggable);
+					});
 
-				// Disable "draggable"
-				options.ignore.split(',').forEach(function (criteria) {
-					_find(target, criteria.trim(), _disableDraggable);
-				});
+					if (touch) {
+						// Touch device support
+						tapEvt = {
+							target: target,
+							clientX: touch.clientX,
+							clientY: touch.clientY
+						};
 
-				if (touch) {
-					// Touch device support
-					tapEvt = {
-						target: target,
-						clientX: touch.clientX,
-						clientY: touch.clientY
-					};
+						this._onDragStart(tapEvt, true);
+						evt.preventDefault();
+					}
 
-					this._onDragStart(tapEvt, true);
-					evt.preventDefault();
+					_on(document, 'mouseup', this._onDrop);
+					_on(document, 'touchend', this._onDrop);
+					_on(document, 'touchcancel', this._onDrop);
+
+					_on(dragEl, 'dragend', this);
+					_on(rootEl, 'dragstart', this._onDragStart);
+
+					_on(document, 'dragover', this);
 				}
-
-				_on(document, 'mouseup', this._onDrop);
-				_on(document, 'touchend', this._onDrop);
-				_on(document, 'touchcancel', this._onDrop);
-
-				_on(dragEl, 'dragend', this);
-				_on(rootEl, 'dragstart', this._onDragStart);
-
-				_on(document, 'dragover', this);
-
-
 				try {
 					if (document.selection) {
 						document.selection.empty();
@@ -469,7 +469,7 @@
 				!options.dragoverBubble && evt.stopPropagation();
 			}
 
-			if (!_silent && activeGroup &&
+			if (!_silent && activeGroup && !options.disabled &&
 				(isOwner
 					? canSort || (revert = !rootEl.contains(dragEl))
 					: activeGroup.pull && groupPut && (
@@ -496,7 +496,6 @@
 					return;
 				}
 
-
 				if ((el.children.length === 0) || (el.children[0] === ghostEl) ||
 					(el === evt.target) && (target = _ghostInBottom(el, evt))
 				) {
@@ -508,7 +507,6 @@
 					}
 
 					_cloneHide(isOwner);
-
 					el.appendChild(dragEl);
 					this._animate(dragRect, dragEl);
 					target && this._animate(targetRect, target);
@@ -535,7 +533,6 @@
 					setTimeout(_unsilent, 30);
 
 					_cloneHide(isOwner);
-
 					if (floating) {
 						after = (target.previousElementSibling === dragEl) && !isWide || halfway && isWide;
 					} else {
@@ -949,8 +946,10 @@
 	 */
 	function _index(/**HTMLElement*/el) {
 		var index = 0;
-		while (el && (el = el.previousElementSibling) && (el.nodeName.toUpperCase() !== 'TEMPLATE')) {
-			index++;
+		while (el && (el = el.previousElementSibling)) {
+			if (el.nodeName.toUpperCase() !== 'TEMPLATE') {
+				index++;
+			}
 		}
 		return index;
 	}
