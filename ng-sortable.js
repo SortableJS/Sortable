@@ -15,7 +15,7 @@
 	'use strict';
 
 	angular.module('ng-sortable', [])
-		.constant('$version', '0.3.4')
+		.constant('$version', '0.3.5')
 		.directive('ngSortable', ['$parse', function ($parse) {
 			var removed,
 				nextSibling;
@@ -77,6 +77,7 @@
 
 							if (evt.clone) {
 								evt.from.removeChild(evt.clone);
+								removed = angular.copy(removed);
 							}
 							else {
 								prevItems.splice(oldIndex, 1);
@@ -101,13 +102,16 @@
 						onStart: function (/**Event*/evt) {
 							nextSibling = evt.item.nextSibling;
 							options.onStart(source.items());
+							scope.$apply();
 						},
 						onEnd: function () {
 							options.onEnd(source.items());
+							scope.$apply();
 						},
 						onAdd: function (/**Event*/evt) {
 							_sync(evt);
 							options.onAdd(source.items(), removed);
+							scope.$apply();
 						},
 						onUpdate: function (/**Event*/evt) {
 							_sync(evt);
