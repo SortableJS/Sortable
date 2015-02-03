@@ -464,9 +464,9 @@
 				isOwner = (activeGroup === group),
 				canSort = options.sort;
 
-			if (evt.preventDefault !== void 0) {
+			if (evt.preventDefault !== void 0 && !options.dragoverBubble) {
 				evt.preventDefault();
-				!options.dragoverBubble && evt.stopPropagation();
+				evt.stopPropagation();
 			}
 
 			if (!_silent && activeGroup &&
