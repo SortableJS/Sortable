@@ -100,24 +100,24 @@
 					}, {
 						onStart: function (/**Event*/evt) {
 							nextSibling = evt.item.nextSibling;
-							options.onStart(source.items());
+							options.onStart(source.items(), scope);
 						},
 						onEnd: function () {
-							options.onEnd(source.items());
+							options.onEnd(source.items(), scope);
 						},
-						onAdd: function (/**Event*/evt) {
+						onAdd: function (evt) {
 							_sync(evt);
-							options.onAdd(source.items(), removed);
+							options.onAdd(source.items(), removed, scope);
 						},
-						onUpdate: function (/**Event*/evt) {
+						onUpdate: function (evt) {
 							_sync(evt);
-							options.onUpdate(source.items(), source.item(evt.item));
+							options.onUpdate(source.items(), source.item(evt.item), scope);
 						},
 						onRemove: function () {
-							options.onRemove(source.items(), removed);
+							options.onRemove(source.items(), removed, scope);
 						},
 						onSort: function () {
-							options.onSort(source.items());
+							options.onSort(source.items(), scope);
 						}
 					}));
 
