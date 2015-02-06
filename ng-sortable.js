@@ -15,9 +15,10 @@
 	'use strict';
 
 	angular.module('ng-sortable', [])
-		.constant('$version', '0.3.2')
+		.constant('$version', '0.3.5')
 		.directive('ngSortable', ['$parse', function ($parse) {
-			var removed;
+			var removed,
+				nextSibling;
 
 			function getSource(el) {
 				var scope = angular.element(el).scope();
@@ -27,7 +28,9 @@
 							(node.nodeValue.indexOf('ngRepeat:') !== -1)
 						);
 				})[0];
-				ngRepeat = ngRepeat.nodeValue.match(/ngRepeat:\s*([^\s]+)\s+in\s+([^\s|]+)/);
+
+				// tests: http://jsbin.com/kosubutilo/1/edit?js,output
+				ngRepeat = ngRepeat.nodeValue.match(/ngRepeat:\s*(?:\(.*?,\s*)?([^\s)]+)[\s)]+in\s+([^\s|]+)/);
 
 				var itemExpr = $parse(ngRepeat[1]);
 				var itemsExpr = $parse(ngRepeat[2]);
@@ -70,19 +73,21 @@
 								prevItems = prevSource.items();
 
 							oldIndex = prevItems.indexOf(prevSource.item(evt.item));
-							removed = prevItems.splice(oldIndex, 1)[0];
+							removed = prevItems[oldIndex];
+
+							if (evt.clone) {
+								evt.from.removeChild(evt.clone);
+								removed = angular.copy(removed);
+							}
+							else {
+								prevItems.splice(oldIndex, 1);
+							}
 
 							items.splice(newIndex, 0, removed);
 
-							if (evt.clone) {
-								newIndex = Sortable.utils.index(evt.clone);
-								prevItems.splice(newIndex, 0, removed);
-
-								evt.from.removeChild(evt.clone);
-							}
-
-							evt.from.appendChild(evt.item); // revert element
-						} else {
+							evt.from.insertBefore(evt.item, nextSibling); // revert element
+						}
+						else {
 							items.splice(newIndex, 0, items.splice(oldIndex, 1)[0]);
 						}
 
@@ -94,17 +99,21 @@
 						opts[name] = opts[name] || options[name];
 						return opts;
 					}, {
-						onStart: function () {
+						onStart: function (/**Event*/evt) {
+							nextSibling = evt.item.nextSibling;
 							options.onStart(source.items());
+							scope.$apply();
 						},
 						onEnd: function () {
 							options.onEnd(source.items());
+							scope.$apply();
 						},
-						onAdd: function (evt) {
+						onAdd: function (/**Event*/evt) {
 							_sync(evt);
 							options.onAdd(source.items(), removed);
+							scope.$apply();
 						},
-						onUpdate: function (evt) {
+						onUpdate: function (/**Event*/evt) {
 							_sync(evt);
 							options.onUpdate(source.items(), source.item(evt.item));
 						},
@@ -119,6 +128,7 @@
 					$el.on('$destroy', function () {
 						sortable.destroy();
 						sortable = null;
+						nextSibling = null;
 					});
 
 					if (ngSortable && !/{|}/.test(ngSortable)) { // todo: ugly

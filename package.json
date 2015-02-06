@@ -1,7 +1,7 @@
 {
   "name": "sortablejs",
   "exportName": "Sortable",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "devDependencies": {
     "grunt": "*",
     "grunt-version": "*",
@@ -25,9 +25,17 @@
     "drag",
     "meteor",
     "angular",
+    "ng-srotable",
     "react",
     "mixin"
   ],
   "author": "Konstantin Lebedev <ibnRubaXa@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "spm": {
+    "main": "Sortable.js",
+    "ignore": [
+      "meteor",
+      "st"
+    ]
+  }
 }
