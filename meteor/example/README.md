@@ -17,7 +17,7 @@ run script:
 
 ### Windows
 
-    git clone git@github.com:RubaXa/Sortable.git
+    git clone https://github.com/RubaXa/Sortable.git
     cd Sortable
     git checkout dev
     cd meteor\example
@@ -25,7 +25,7 @@ run script:
 
 ### Elsewhere
 
-    git clone git@github.com:RubaXa/Sortable.git
+    git clone https://github.com/RubaXa/Sortable.git
     cd Sortable
     git checkout dev
     meteor/example./run.sh
