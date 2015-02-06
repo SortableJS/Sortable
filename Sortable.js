@@ -266,7 +266,6 @@
 				_on(document, 'dragover', this);
 
 				if (!supportDraggable) {
-					_on(document, 'mousemove', this);
 					this._onDragStart(tapEvt, true);
 				}
 
@@ -604,6 +603,7 @@
 			// Unbind events
 			_off(document, 'drop', this);
 			_off(document, 'dragover', this);
+			_off(document, 'mousemove', this._onTouchMove);
 
 			_off(el, 'dragstart', this._onDragStart);
 
