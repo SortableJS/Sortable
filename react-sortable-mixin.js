@@ -23,7 +23,6 @@
 
 	var _activeComponent;
 
-
 	var _defaultOptions = {
 		ref: 'list',
 		model: 'items',
