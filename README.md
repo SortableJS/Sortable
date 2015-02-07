@@ -298,7 +298,7 @@ var SortableList = React.createClass({
 		};
 	},
 
-	onSort: function (/** Event */evt) { /*..*/ },
+	handleSort: function (/** Event */evt) { /*..*/ },
 
 	render: function() {
 		return <ul>{
