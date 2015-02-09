@@ -156,8 +156,8 @@
 		_on(el, 'touchstart', this._onTapStart);
 		supportIEdnd && _on(el, 'selectstart', this._onTapStart);
 
-		_on(el, 'dragover', this._onDragOver);
-		_on(el, 'dragenter', this._onDragOver);
+		_on(el, 'dragover', this);
+		_on(el, 'dragenter', this);
 
 		touchDragOverListeners.push(this._onDragOver);
 
@@ -266,9 +266,6 @@
 
 				_on(dragEl, 'dragend', this);
 				_on(rootEl, 'dragstart', this._onDragStart);
-
-				_on(document, 'dragover', this);
-
 
 				try {
 					if (document.selection) {
@@ -597,8 +594,6 @@
 
 			// Unbind events
 			_off(document, 'drop', this);
-			_off(document, 'dragover', this);
-
 			_off(el, 'dragstart', this._onDragStart);
 
 			this._offUpEvents();
@@ -671,8 +666,9 @@
 		handleEvent: function (/**Event*/evt) {
 			var type = evt.type;
 
-			if (type === 'dragover') {
+			if (type === 'dragover' || type === 'dragenter') {
 				this._onDrag(evt);
+				this._onDragOver(evt);
 				_globalDragOver(evt);
 			}
 			else if (type === 'drop' || type === 'dragend') {
@@ -778,8 +774,8 @@
 			_off(el, 'touchstart', this._onTapStart);
 			_off(el, 'selectstart', this._onTapStart);
 
-			_off(el, 'dragover', this._onDragOver);
-			_off(el, 'dragenter', this._onDragOver);
+			_off(el, 'dragover', this);
+			_off(el, 'dragenter', this);
 
 			//remove draggable attributes
 			Array.prototype.forEach.call(el.querySelectorAll('[draggable]'), function (el) {
