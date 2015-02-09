@@ -274,7 +274,13 @@ angular.module('myApp', ['ng-sortable'])
 		$scope.items = ['item 1', 'item 2'];
 		$scope.foo = ['foo 1', '..'];
 		$scope.bar = ['bar 1', '..'];
-		$scope.barConfig = { group: 'foobar', animation: 150 };
+		$scope.barConfig = {
+			group: 'foobar',
+			animation: 150,
+			onSort: function (/** ngSortEvent */evt){
+				// @see https://github.com/RubaXa/Sortable/blob/master/ng-sortable.js#L18-L24
+			}
+		};
 	}]);
 ```
 
