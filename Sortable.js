@@ -157,8 +157,8 @@
 		_on(el, 'mousedown', this._onTapStart);
 		_on(el, 'touchstart', this._onTapStart);
 
-		_on(el, 'dragover', this._onDragOver);
-		_on(el, 'dragenter', this._onDragOver);
+		_on(el, 'dragover', this);
+		_on(el, 'dragenter', this);
 
 		touchDragOverListeners.push(this._onDragOver);
 
@@ -172,13 +172,15 @@
 
 
 		_dragStarted: function () {
-			// Apply effect
-			_toggleClass(dragEl, this.options.ghostClass, true);
+			if (rootEl && dragEl) {
+				// Apply effect
+				_toggleClass(dragEl, this.options.ghostClass, true);
 
-			Sortable.active = this;
+				Sortable.active = this;
 
-			// Drag start event
-			_dispatchEvent(rootEl, 'start', dragEl, rootEl, oldIndex);
+				// Drag start event
+				_dispatchEvent(rootEl, 'start', dragEl, rootEl, oldIndex);
+			}
 		},
 
 
@@ -262,8 +264,6 @@
 
 				_on(dragEl, 'dragend', this);
 				_on(rootEl, 'dragstart', this._onDragStart);
-
-				_on(document, 'dragover', this);
 
 				if (!supportDraggable) {
 					this._onDragStart(tapEvt, true);
@@ -602,9 +602,7 @@
 
 			// Unbind events
 			_off(document, 'drop', this);
-			_off(document, 'dragover', this);
 			_off(document, 'mousemove', this._onTouchMove);
-
 			_off(el, 'dragstart', this._onDragStart);
 
 			this._offUpEvents();
@@ -677,8 +675,9 @@
 		handleEvent: function (/**Event*/evt) {
 			var type = evt.type;
 
-			if (type === 'dragover') {
+			if (type === 'dragover' || type === 'dragenter') {
 				this._onDrag(evt);
+				this._onDragOver(evt);
 				_globalDragOver(evt);
 			}
 			else if (type === 'drop' || type === 'dragend') {
@@ -783,8 +782,8 @@
 			_off(el, 'mousedown', this._onTapStart);
 			_off(el, 'touchstart', this._onTapStart);
 
-			_off(el, 'dragover', this._onDragOver);
-			_off(el, 'dragenter', this._onDragOver);
+			_off(el, 'dragover', this);
+			_off(el, 'dragenter', this);
 
 			//remove draggable attributes
 			Array.prototype.forEach.call(el.querySelectorAll('[draggable]'), function (el) {
