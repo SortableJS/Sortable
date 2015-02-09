@@ -39,6 +39,11 @@
 						);
 				})[0];
 
+				if (!ngRepeat) {
+					// Without ng-repeat
+					return null;
+				}
+
 				// tests: http://jsbin.com/kosubutilo/1/edit?js,output
 				ngRepeat = ngRepeat.nodeValue.match(/ngRepeat:\s*(?:\(.*?,\s*)?([^\s)]+)[\s)]+in\s+([^\s|]+)/);
 
@@ -74,7 +79,7 @@
 						/* jshint expr:true */
 						options[name] && options[name]({
 							model: item,
-							models: source.items(),
+							models: source && source.items(),
 							oldIndex: evt.oldIndex,
 							newIndex: evt.newIndex
 						});
@@ -82,6 +87,11 @@
 
 
 					function _sync(/**Event*/evt) {
+						if (!source) {
+							// Without ng-repeat
+							return;
+						}
+
 						var oldIndex = evt.oldIndex,
 							newIndex = evt.newIndex,
 							items = source.items();
@@ -133,13 +143,13 @@
 						},
 						onUpdate: function (/**Event*/evt) {
 							_sync(evt);
-							_emitEvent(evt, source.item(evt.item));
+							_emitEvent(evt, source && source.item(evt.item));
 						},
 						onRemove: function (/**Event*/evt) {
 							_emitEvent(evt, removed);
 						},
 						onSort: function (/**Event*/evt) {
-							_emitEvent(evt, source.item(evt.item));
+							_emitEvent(evt, source && source.item(evt.item));
 						}
 					}));
 
