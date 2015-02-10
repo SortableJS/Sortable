@@ -6,7 +6,7 @@ Demo: http://rubaxa.github.io/Sortable/
 
 ## Features
 
- * Supports touch devices and [modern](http://caniuse.com/#search=drag) browsers
+ * Supports touch devices and [modern](http://caniuse.com/#search=drag) browsers (including IE9)
  * Can drag from one list to another or within the same list
  * CSS animation when moving items
  * Supports drag handles *and selectable text* (better than voidberg's html5sortable)
