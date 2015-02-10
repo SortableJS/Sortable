@@ -588,6 +588,7 @@
 
 		_offUpEvents: function () {
 			_off(document, 'mouseup', this._onDrop);
+			_off(document, 'mousemove', this._onTouchMove);
 			_off(document, 'touchmove', this._onTouchMove);
 			_off(document, 'touchend', this._onDrop);
 			_off(document, 'touchcancel', this._onDrop);
