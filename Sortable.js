@@ -424,19 +424,27 @@
 					winWidth = window.innerWidth,
 					winHeight = window.innerHeight,
 
-					vx = (winWidth - x <= sens) - (x <= sens),
-					vy = (winHeight - y <= sens) - (y <= sens)
+					vx,
+					vy
 				;
 
-				if (vx || vy) {
-					el = win;
-				}
-				else if (scrollEl) {
+
+				if (scrollEl) {
 					el = scrollEl;
 					rect = scrollEl.getBoundingClientRect();
 					vx = (abs(rect.right - x) <= sens) - (abs(rect.left - x) <= sens);
 					vy = (abs(rect.bottom - y) <= sens) - (abs(rect.top - y) <= sens);
 				}
+
+
+				if (!(vx || vy)) {
+					vx = (winWidth - x <= sens) - (x <= sens);
+					vy = (winHeight - y <= sens) - (y <= sens);
+
+					/* jshint expr:true */
+					(vx || vy) && (el = win);
+				}
+
 
 				if (autoScroll.vx !== vx || autoScroll.vy !== vy || autoScroll.el !== el) {
 					autoScroll.el = el;
