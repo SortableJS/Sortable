@@ -19,6 +19,17 @@ Demo: http://rubaxa.github.io/Sortable/
  * No jQuery (but there is [support](#jq))
 
 
+---
+
+
+### Articles
+ * [Sortable v1.0 — New capabilities](wiki/Sortable-v1.0-—-New-capabilities/) (December 22, 2014)
+ * [Sorting with the help of HTML5 Drag'n'Drop API](wiki/Sorting-with-the-help-of-HTML5-Drag'n'Drop-API/) (December 23, 2013)
+
+
+---
+
+
 ### Usage
 ```html
 <ul id="items">
