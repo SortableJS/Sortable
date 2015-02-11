@@ -28,8 +28,10 @@
 		ghostEl,
 		cloneEl,
 		rootEl,
-		scrollEl,
 		nextEl,
+
+		scrollEl,
+		scrollParentEl,
 
 		lastEl,
 		lastCSS,
@@ -76,7 +78,82 @@
 		abs = Math.abs,
 		slice = [].slice,
 
-		touchDragOverListeners = []
+		touchDragOverListeners = [],
+
+		_autoScroll = _throttle(function (/**Event*/evt, /**Object*/options, /**HTMLElement*/rootEl) {
+			// Bug: https://bugzilla.mozilla.org/show_bug.cgi?id=505521
+			if (rootEl && options.scroll) {
+				var el,
+					rect,
+					sens = options.scrollSensitivity,
+					speed = options.scrollSpeed,
+
+					x = evt.clientX,
+					y = evt.clientY,
+
+					winWidth = window.innerWidth,
+					winHeight = window.innerHeight,
+
+					vx,
+					vy
+				;
+
+				// Delect scrollEl
+				if (scrollParentEl !== rootEl) {
+					scrollEl = options.scroll;
+					scrollParentEl = rootEl;
+
+					if (scrollEl === true) {
+						scrollEl = rootEl;
+
+						do {
+							if ((scrollEl.offsetWidth < scrollEl.scrollWidth) ||
+								(scrollEl.offsetHeight < scrollEl.scrollHeight)
+							) {
+								break;
+							}
+							/* jshint boss:true */
+						} while (scrollEl = scrollEl.parentNode);
+					}
+				}
+
+				if (scrollEl) {
+					el = scrollEl;
+					rect = scrollEl.getBoundingClientRect();
+					vx = (abs(rect.right - x) <= sens) - (abs(rect.left - x) <= sens);
+					vy = (abs(rect.bottom - y) <= sens) - (abs(rect.top - y) <= sens);
+				}
+
+
+				if (!(vx || vy)) {
+					vx = (winWidth - x <= sens) - (x <= sens);
+					vy = (winHeight - y <= sens) - (y <= sens);
+
+					/* jshint expr:true */
+					(vx || vy) && (el = win);
+				}
+
+
+				if (autoScroll.vx !== vx || autoScroll.vy !== vy || autoScroll.el !== el) {
+					autoScroll.el = el;
+					autoScroll.vx = vx;
+					autoScroll.vy = vy;
+
+					clearInterval(autoScroll.pid);
+
+					if (el) {
+						autoScroll.pid = setInterval(function () {
+							if (el === win) {
+								win.scrollTo(win.scrollX + vx * speed, win.scrollY + vy * speed);
+							} else {
+								vy && (el.scrollTop += vy * speed);
+								vx && (el.scrollLeft += vx * speed);
+							}
+						}, 24);
+					}
+				}
+			}
+		}, 30)
 	;
 
 
@@ -141,8 +218,9 @@
 		}, this);
 
 
-		// Export group name
-		el[expando] = group.name + ' ' + (group.put.join ? group.put.join(' ') : '');
+		// Export options
+		options.groups = ' ' + group.name + (group.put.join ? ' ' + group.put.join(' ') : '') + ' ';
+		el[expando] = options;
 
 
 		// Bind all private methods
@@ -286,12 +364,12 @@
 
 				var target = document.elementFromPoint(touchEvt.clientX, touchEvt.clientY),
 					parent = target,
-					groupName = this.options.group.name,
+					groupName = ' ' + this.options.group.name + '',
 					i = touchDragOverListeners.length;
 
 				if (parent) {
 					do {
-						if ((' ' + parent[expando] + ' ').indexOf(groupName) > -1) {
+						if (parent[expando] && parent[expando].groups.indexOf(groupName) > -1) {
 							while (i--) {
 								touchDragOverListeners[i]({
 									clientX: touchEvt.clientX,
@@ -391,82 +469,8 @@
 				_on(document, 'drop', this);
 			}
 
-			scrollEl = options.scroll;
-
-			if (scrollEl === true) {
-				scrollEl = rootEl;
-
-				do {
-					if ((scrollEl.offsetWidth < scrollEl.scrollWidth) ||
-						(scrollEl.offsetHeight < scrollEl.scrollHeight)
-					) {
-						break;
-					}
-				/* jshint boss:true */
-				} while (scrollEl = scrollEl.parentNode);
-			}
-
 			setTimeout(this._dragStarted, 0);
 		},
-
-		_onDrag: _throttle(function (/**Event*/evt) {
-			// Bug: https://bugzilla.mozilla.org/show_bug.cgi?id=505521
-			if (rootEl && this.options.scroll) {
-				var el,
-					rect,
-					options = this.options,
-					sens = options.scrollSensitivity,
-					speed = options.scrollSpeed,
-
-					x = evt.clientX,
-					y = evt.clientY,
-
-					winWidth = window.innerWidth,
-					winHeight = window.innerHeight,
-
-					vx,
-					vy
-				;
-
-
-				if (scrollEl) {
-					el = scrollEl;
-					rect = scrollEl.getBoundingClientRect();
-					vx = (abs(rect.right - x) <= sens) - (abs(rect.left - x) <= sens);
-					vy = (abs(rect.bottom - y) <= sens) - (abs(rect.top - y) <= sens);
-				}
-
-
-				if (!(vx || vy)) {
-					vx = (winWidth - x <= sens) - (x <= sens);
-					vy = (winHeight - y <= sens) - (y <= sens);
-
-					/* jshint expr:true */
-					(vx || vy) && (el = win);
-				}
-
-
-				if (autoScroll.vx !== vx || autoScroll.vy !== vy || autoScroll.el !== el) {
-					autoScroll.el = el;
-					autoScroll.vx = vx;
-					autoScroll.vy = vy;
-
-					clearInterval(autoScroll.pid);
-
-					if (el) {
-						autoScroll.pid = setInterval(function () {
-							if (el === win) {
-								win.scrollTo(win.scrollX + vx * speed, win.scrollY + vy * speed);
-							} else {
-								vy && (el.scrollTop += vy * speed);
-								vx && (el.scrollLeft += vx * speed);
-							}
-						}, 24);
-					}
-				}
-			}
-		}, 30),
-
 
 		_onDragOver: function (/**Event*/evt) {
 			var el = this.el,
@@ -487,6 +491,8 @@
 				evt.preventDefault();
 				!options.dragoverBubble && evt.stopPropagation();
 			}
+
+			_autoScroll(evt, options, this.el);
 
 			if (!_silent && activeGroup && !options.disabled &&
 				(isOwner
@@ -662,12 +668,15 @@
 					Sortable.active && _dispatchEvent(rootEl, 'end', dragEl, rootEl, oldIndex, newIndex);
 				}
 
-				// Set NULL
+				// Nulling
 				rootEl =
 				dragEl =
 				ghostEl =
 				nextEl =
 				cloneEl =
+
+				scrollEl =
+				scrollParentEl =
 
 				tapEvt =
 				touchEvt =
@@ -688,7 +697,6 @@
 			var type = evt.type;
 
 			if (type === 'dragover' || type === 'dragenter') {
-				this._onDrag(evt);
 				this._onDragOver(evt);
 				_globalDragOver(evt);
 			}
