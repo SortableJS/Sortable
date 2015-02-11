@@ -479,6 +479,10 @@
 				isOwner = (activeGroup === group),
 				canSort = options.sort;
 
+			if (evt.dataTransfer && evt.dataTransfer.effectAllowed !== 'move') {
+				return;
+			}
+
 			if (evt.preventDefault !== void 0) {
 				evt.preventDefault();
 				!options.dragoverBubble && evt.stopPropagation();
