@@ -152,7 +152,8 @@ Template.sortable.rendered = function () {
 		// Insert the new element at the end of the list and move it where it was dropped.
 		// We could insert it at the beginning, but that would lead to negative orders.
 		var sortSpecifier = {}; sortSpecifier[orderField] = -1;
-		event.data.order = templateInstance.collection.findOne({}, { sort: sortSpecifier, limit: 1 }).order + 1;
+		var endItem = templateInstance.collection.findOne({}, { sort: sortSpecifier, limit: 1 });
+		event.data.order = endItem ? endItem[orderField] + 1 : 1;
 		// TODO: this can obviously be optimized by setting the order directly as the arithmetic average, with the caveats described above
 		var newElementId = templateInstance.collection.insert(event.data);
 		event.data._id = newElementId;
