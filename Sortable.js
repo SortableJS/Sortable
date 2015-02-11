@@ -407,7 +407,6 @@
 				_css(ghostEl, 'msTransform', translate3d);
 				_css(ghostEl, 'transform', translate3d);
 
-				this._onDrag(touch);
 				evt.preventDefault();
 			}
 		},
@@ -492,9 +491,7 @@
 				!options.dragoverBubble && evt.stopPropagation();
 			}
 
-			_autoScroll(evt, options, this.el);
-
-			if (!_silent && activeGroup && !options.disabled &&
+			if (activeGroup && !options.disabled &&
 				(isOwner
 					? canSort || (revert = !rootEl.contains(dragEl))
 					: activeGroup.pull && groupPut && (
@@ -504,6 +501,13 @@
 				) &&
 				(evt.rootEl === void 0 || evt.rootEl === this.el)
 			) {
+				// Smart auto-scrolling
+				_autoScroll(evt, options, this.el);
+
+				if (_silent) {
+					return;
+				}
+
 				target = _closest(evt.target, options.draggable, el);
 				dragRect = dragEl.getBoundingClientRect();
 
