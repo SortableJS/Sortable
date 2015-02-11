@@ -488,6 +488,14 @@ Now you can use `jquery.fn.sortable.js`:<br/>
 ---
 
 
+### Contributing (Issue/PR)
+
+Please, [read this](CONTRIBUTING.md). 
+
+
+---
+
+
 ## MIT LICENSE
 Copyright 2013-2015 Lebedev Konstantin <ibnRubaXa@gmail.com>
 http://rubaxa.github.io/Sortable/
