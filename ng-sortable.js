@@ -9,7 +9,7 @@
 		factory(angular, Sortable);
 	}
 	else if (typeof define === 'function' && define.amd) {
-		define(['angular', 'sortable'], factory);
+		define(['angular', './Sortable'], factory);
 	}
 })(function (angular, Sortable) {
 	'use strict';

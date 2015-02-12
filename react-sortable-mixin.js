@@ -7,10 +7,10 @@
 	'use strict';
 
 	if (typeof module != 'undefined' && typeof module.exports != 'undefined') {
-		module.exports = factory(require('Sortable'));
+		module.exports = factory(require('./Sortable'));
 	}
 	else if (typeof define === 'function' && define.amd) {
-		define(['sortable'], factory);
+		define(['./Sortable'], factory);
 	}
 	else {
 		/* jshint sub:true */
