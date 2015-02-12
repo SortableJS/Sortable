@@ -23,8 +23,11 @@
     "sortable",
     "reorder",
     "drag",
+    "meteor",
+    "angular",
     "ng-srotable",
-    "angular"
+    "react",
+    "mixin"
   ],
   "author": "Konstantin Lebedev <ibnRubaXa@gmail.com>",
   "license": "MIT",

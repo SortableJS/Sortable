@@ -171,13 +171,15 @@
 
 
 		_dragStarted: function () {
-			// Apply effect
-			_toggleClass(dragEl, this.options.ghostClass, true);
+			if (rootEl && dragEl) {
+				// Apply effect
+				_toggleClass(dragEl, this.options.ghostClass, true);
 
-			Sortable.active = this;
+				Sortable.active = this;
 
-			// Drag start event
-			_dispatchEvent(rootEl, 'start', dragEl, rootEl, oldIndex);
+				// Drag start event
+				_dispatchEvent(rootEl, 'start', dragEl, rootEl, oldIndex);
+			}
 		},
 
 
@@ -469,7 +471,7 @@
 				!options.dragoverBubble && evt.stopPropagation();
 			}
 
-			if (!_silent && activeGroup &&
+			if (!_silent && activeGroup && !options.disabled &&
 				(isOwner
 					? canSort || (revert = !rootEl.contains(dragEl))
 					: activeGroup.pull && groupPut && (
@@ -949,8 +951,10 @@
 	 */
 	function _index(/**HTMLElement*/el) {
 		var index = 0;
-		while (el && (el = el.previousElementSibling) && (el.nodeName.toUpperCase() !== 'TEMPLATE')) {
-			index++;
+		while (el && (el = el.previousElementSibling)) {
+			if (el.nodeName.toUpperCase() !== 'TEMPLATE') {
+				index++;
+			}
 		}
 		return index;
 	}
