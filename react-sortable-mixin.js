@@ -6,11 +6,11 @@
 (function (factory) {
 	'use strict';
 
-	if (typeof define === 'function' && define.amd) {
-		define(['sortable'], factory);
-	}
-	else if (typeof module != 'undefined' && typeof module.exports != 'undefined') {
+	if (typeof module != 'undefined' && typeof module.exports != 'undefined') {
 		module.exports = factory(require('Sortable'));
+	}
+	else if (typeof define === 'function' && define.amd) {
+		define(['sortable'], factory);
 	}
 	else {
 		/* jshint sub:true */
