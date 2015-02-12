@@ -12,7 +12,7 @@ Demo: http://rubaxa.github.io/Sortable/
  * Supports drag handles *and selectable text* (better than voidberg's html5sortable)
  * Smart auto-scrolling
  * Built using native HTML5 drag and drop API
- * Supports [Meteor](meteor/README.md) and [AngularJS](#ng)
+ * Supports [Meteor](meteor/README.md), [AngularJS](#ng) and [React](#react)
  * Supports any CSS library, e.g. [Bootstrap](#bs)
  * Simple API
  * [CDN](#cdn)
@@ -294,6 +294,92 @@ angular.module('myApp', ['ng-sortable'])
 			}
 		};
 	}]);
+```
+
+
+---
+
+
+<a name="react"></a>
+### Support React
+Include [react-sortable-mixin.js](react-sortable-mixin.js).
+See [more options](react-sortable-mixin.js#L26).
+
+
+```jsx
+var SortableList = React.createClass({
+	mixins: [SortableMixin],
+
+	getInitialState: function() {
+		return {
+			items: ['Mixin', 'Sortable']
+		};
+	},
+
+	handleSort: function (/** Event */evt) { /*..*/ },
+
+	render: function() {
+		return <ul>{
+			this.state.items.map(function (text) {
+				return <li>{text}</li>
+			})
+		}</ul>
+	}
+});
+
+React.render(<SortableList />, document.body);
+
+
+//
+// Groups
+//
+var AllUsers = React.createClass({
+	mixins: [SortableMixin],
+
+	sortableOptions: {
+		ref: "user",
+		group: "shared",
+		model: "users"
+	},
+
+	getInitialState: function() {
+		return { users: ['Abbi', 'Adela', 'Bud', 'Cate', 'Davis', 'Eric']; };
+	},
+
+	render: function() {
+		return (
+			<h1>Users</h1>
+			<ul ref="users">{
+				this.state.users.map(function (text) {
+					return <li>{text}</li>
+				})
+			}</ul>
+		);
+	}
+});
+
+var ApprovedUsers = React.createClass({
+	mixins: [SortableMixin],
+	sortableOptions: { group: "shared" },
+
+	getInitialState: function() {
+		return { items: ['Hal', 'Judy']; };
+	},
+
+	render: function() {
+		return <ul>{
+			this.state.items.map(function (text) {
+				return <li>{text}</li>
+			})
+		}</ul>
+	}
+});
+
+React.render(<div>
+	<AllUsers/>
+	<hr/>
+	<ApprovedUsers/>
+</div>, document.body);
 ```
 
 
