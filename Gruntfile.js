@@ -5,7 +5,16 @@ module.exports = function (grunt) {
 		pkg: grunt.file.readJSON('package.json'),
 
 		version: {
-			src: ['<%= pkg.exportName %>.js', '*.json']
+			js: {
+				src: ['<%= pkg.exportName %>.js', '*.json']
+			},
+			cdn: {
+				options: {
+					prefix: '(cdnjs\\.cloudflare\\.com\\/ajax\\/libs\\/Sortable|cdn\\.jsdelivr\\.net\\/sortable)\\/',
+					replace: '[0-9\\.]+'
+				},
+				src: ['README.md']
+			}
 		},
 
 		jshint: {

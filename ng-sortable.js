@@ -9,13 +9,23 @@
 		factory(angular, Sortable);
 	}
 	else if (typeof define === 'function' && define.amd) {
-		define(['angular', 'sortable'], factory);
+		define(['angular', './Sortable'], factory);
 	}
 })(function (angular, Sortable) {
 	'use strict';
 
+
+	/**
+	 * @typedef   {Object}        ngSortEvent
+	 * @property  {*}             model      List item
+	 * @property  {Object|Array}  models     List of items
+	 * @property  {number}        oldIndex   before sort
+	 * @property  {number}        newIndex   after sort
+	 */
+
+
 	angular.module('ng-sortable', [])
-		.constant('$version', '0.3.4')
+		.constant('$version', '0.3.5')
 		.directive('ngSortable', ['$parse', function ($parse) {
 			var removed,
 				nextSibling;
@@ -28,6 +38,11 @@
 							(node.nodeValue.indexOf('ngRepeat:') !== -1)
 						);
 				})[0];
+
+				if (!ngRepeat) {
+					// Without ng-repeat
+					return null;
+				}
 
 				// tests: http://jsbin.com/kosubutilo/1/edit?js,output
 				ngRepeat = ngRepeat.nodeValue.match(/ngRepeat:\s*(?:\(.*?,\s*)?([^\s)]+)[\s)]+in\s+([^\s|]+)/);
@@ -58,12 +73,25 @@
 					;
 
 
-					'Start End Add Update Remove Sort'.split(' ').forEach(function (name) {
-						options['on' + name] = options['on' + name] || function () {};
-					});
+					function _emitEvent(/**Event*/evt, /*Mixed*/item) {
+						var name = 'on' + evt.type.charAt(0).toUpperCase() + evt.type.substr(1);
+
+						/* jshint expr:true */
+						options[name] && options[name]({
+							model: item,
+							models: source && source.items(),
+							oldIndex: evt.oldIndex,
+							newIndex: evt.newIndex
+						});
+					}
 
 
-					function _sync(evt) {
+					function _sync(/**Event*/evt) {
+						if (!source) {
+							// Without ng-repeat
+							return;
+						}
+
 						var oldIndex = evt.oldIndex,
 							newIndex = evt.newIndex,
 							items = source.items();
@@ -77,6 +105,7 @@
 
 							if (evt.clone) {
 								evt.from.removeChild(evt.clone);
+								removed = angular.copy(removed);
 							}
 							else {
 								prevItems.splice(oldIndex, 1);
@@ -100,24 +129,27 @@
 					}, {
 						onStart: function (/**Event*/evt) {
 							nextSibling = evt.item.nextSibling;
-							options.onStart(source.items());
+							_emitEvent(evt);
+							scope.$apply();
 						},
-						onEnd: function () {
-							options.onEnd(source.items());
+						onEnd: function (/**Event*/evt) {
+							_emitEvent(evt, removed);
+							scope.$apply();
 						},
 						onAdd: function (/**Event*/evt) {
 							_sync(evt);
-							options.onAdd(source.items(), removed);
+							_emitEvent(evt, removed);
+							scope.$apply();
 						},
 						onUpdate: function (/**Event*/evt) {
 							_sync(evt);
-							options.onUpdate(source.items(), source.item(evt.item));
+							_emitEvent(evt, source && source.item(evt.item));
 						},
-						onRemove: function () {
-							options.onRemove(source.items(), removed);
+						onRemove: function (/**Event*/evt) {
+							_emitEvent(evt, removed);
 						},
-						onSort: function () {
-							options.onSort(source.items());
+						onSort: function (/**Event*/evt) {
+							_emitEvent(evt, source && source.item(evt.item));
 						}
 					}));
 
