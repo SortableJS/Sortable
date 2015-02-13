@@ -163,6 +163,31 @@ Template.sortable.rendered = function () {
 		} else {
 			// do nothing - inserted after the last element
 		}
+
+		// From: http://stackoverflow.com/questions/10716986/swap-2-html-elements-and-preserve-event-listeners-on-them
+		function swapElements(obj1, obj2) {
+			// create marker element and insert it where obj1 is
+			var temp = document.createElement("div");
+			obj1.parentNode.insertBefore(temp, obj1);
+
+			// move obj1 to right before obj2
+			obj2.parentNode.insertBefore(obj1, obj2);
+
+			// move obj2 to right before where obj1 used to be
+			temp.parentNode.insertBefore(obj2, temp);
+
+			// remove temporary marker node
+			temp.parentNode.removeChild(temp);
+		}
+
+		// We swap our cloned element with the dragged one to keep blaze
+		// information on the originally cloned element
+		// See bug: https://github.com/RubaXa/Sortable/issues/275
+		if (typeof(event.clone) !== 'undefined') {
+			swapElements(itemEl, event.clone);
+			itemEl = event.clone;
+		}
+
 		// remove the dropped HTMLElement from the list because we have inserted it in the collection, which will update the template
 		itemEl.parentElement.removeChild(itemEl);
 	};
