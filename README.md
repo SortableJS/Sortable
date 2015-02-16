@@ -62,6 +62,7 @@ var sortable = new Sortable(el, {
 	filter: ".ignore-elements",  // Selectors that do not lead to dragging (String or Function)
 	draggable: ".item",  // Specifies which items inside the element should be sortable
 	ghostClass: "sortable-ghost",  // Class name for the drop placeholder
+	dataIdAttr: 'data-id',
 	
 	scroll: true, // or HTMLElement
 	scrollSensitivity: 30, // px, how near the mouse must be to an edge to start scrolling.
@@ -399,7 +400,7 @@ For each element in the set, get the first element that matches the selector by 
 
 
 ##### toArray():`String[]`
-Serializes the sortable's item `data-id`'s into an array of string.
+Serializes the sortable's item `data-id`'s (`dataIdAttr` option) into an array of string.
 
 
 ##### sort(order:`String[]`)
