@@ -733,7 +733,7 @@
 			for (; i < n; i++) {
 				el = children[i];
 				if (_closest(el, options.draggable, this.el)) {
-					order.push(el.getAttribute(options.dataAttr) || _generateId(el));
+					order.push(el.getAttribute(options.dataIdAttr) || _generateId(el));
 				}
 			}
 
