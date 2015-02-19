@@ -489,7 +489,7 @@
 				isOwner = (activeGroup === group),
 				canSort = options.sort;
 
-			if (evt.dataTransfer && evt.dataTransfer.effectAllowed !== 'move') {
+			if (!dragEl) {
 				return;
 			}
 
