@@ -1034,7 +1034,7 @@
 	};
 
 
-	Sortable.version = '1.1.0';
+	Sortable.version = '1.1.1';
 
 
 	/**
