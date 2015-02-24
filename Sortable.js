@@ -275,11 +275,11 @@
 				return; // only left button or enabled
 			}
 
-			if (options.handle) {
-				target = _closest(target, options.handle, el);
-			}
-
 			target = _closest(target, options.draggable, el);
+
+			if (!target) {
+				return;
+			}
 
 			// get the index of the dragged element within its parent
 			oldIndex = _index(target);
@@ -307,6 +307,12 @@
 					return; // cancel dnd
 				}
 			}
+
+
+			if (options.handle && !_closest(originalTarget, options.handle, el)) {
+				return;
+			}
+
 
 			// Prepare `dragstart`
 			if (target && !dragEl && (target.parentNode === el)) {
@@ -482,7 +488,7 @@
 				isOwner = (activeGroup === group),
 				canSort = options.sort;
 
-			if (evt.dataTransfer && evt.dataTransfer.effectAllowed !== 'move') {
+			if (!dragEl) {
 				return;
 			}
 
@@ -1028,7 +1034,7 @@
 	};
 
 
-	Sortable.version = '1.1.0';
+	Sortable.version = '1.1.1';
 
 
 	/**
