@@ -896,7 +896,10 @@
 				el.classList[state ? 'add' : 'remove'](name);
 			}
 			else {
-				var className = (' ' + el.className + ' ').replace(/\s+/g, ' ').replace(' ' + name + ' ', '');
+				var className = (' ' + el.className + ' ')
+					.replace(/\s+/g, ' ')
+					.replace(' ' + name + ' ', ' ')
+					.replace(/  /, ' ');
 				el.className = className + (state ? ' ' + name : '');
 			}
 		}
