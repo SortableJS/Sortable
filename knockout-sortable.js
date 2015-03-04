@@ -1,6 +1,8 @@
 ﻿(function () {
+    "use strict";
 
     var init = function (element, valueAccessor, allBindings, viewModel, bindingContext, sortableOptions) {
+
         var options = buildOptions(valueAccessor, sortableOptions);
 
         //It's seems that we cannot update the eventhandlers after we've created the sortable, so define them in init instead of update
@@ -27,14 +29,14 @@
         ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
             viewModel._sortable.destroy();
         });
-        return ko.bindingHandlers['template']['init'](element, valueAccessor);
+        return ko.bindingHandlers.template.init(element, valueAccessor);
     },
     update = function (element, valueAccessor, allBindings, viewModel, bindingContext, sortableOptions) {
 
         //There seems to be some problems with updating the options of a sortable
         //Tested to change eventhandlers and the group options without any luck
 
-        return ko.bindingHandlers['template']['update'](element, valueAccessor, allBindings, viewModel, bindingContext);
+        return ko.bindingHandlers.template.update(element, valueAccessor, allBindings, viewModel, bindingContext);
     },
     eventHandlers = (function (handlers) {
 
@@ -93,7 +95,7 @@
         handlers.onUpdate = function (e, itemVM, parentVM, collection, parentBindings) {
             //This will be performed as a sort since the to/from collections reference the same collection and clone is set to false
             moveItem(itemVM, collection, collection, false, e);
-        }
+        };
 
         return handlers;
     })({}),
@@ -116,7 +118,8 @@
             return into;
         },
         //unwrap the supplied options
-        unwrappedOptions = ko.utils.peekObservable(bindingOptions()).options || {},
+        unwrappedOptions = ko.utils.peekObservable(bindingOptions()).options || {};
+
         //Make sure that we don't modify the provided settings object
         options = merge({}, options);
 
@@ -153,6 +156,6 @@
         update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
             return update(element, valueAccessor, allBindings, viewModel, bindingContext, ko.bindingHandlers.sortable.sortableOptions);
         }
-    }
+    };
 
 })();
