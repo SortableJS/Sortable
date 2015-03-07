@@ -80,7 +80,13 @@
                 //Unwrapping this allows us to manipulate the actual array
                 var fromArray = from(),
                     //It's not certain that the items actual index is the same as the index reported by sortable due to filtering etc.
-                    originalIndex = fromArray.indexOf(itemVM);
+                    originalIndex = fromArray.indexOf(itemVM),
+                    newIndex = e.newIndex;
+
+                if (e.item.previousElementSibling)
+                    newIndex = fromArray.indexOf(ko.dataFor(e.item.previousElementSibling));
+                if (originalIndex > newIndex)
+                    newIndex = newIndex + 1;
 
                 //Remove sortables "unbound" element
                 e.item.parentNode.removeChild(e.item);
@@ -98,7 +104,7 @@
                     from.valueHasMutated();
                 }
                 //Insert the item on its new position
-                to().splice(e.newIndex, 0, itemVM);
+                to().splice(newIndex, 0, itemVM);
                 //Make sure to tell knockout that we've modified the actual array.
                 to.valueHasMutated();
             };
