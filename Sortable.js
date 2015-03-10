@@ -144,7 +144,7 @@
 					if (el) {
 						autoScroll.pid = setInterval(function () {
 							if (el === win) {
-								win.scrollTo(win.scrollX + vx * speed, win.scrollY + vy * speed);
+								win.scrollTo(win.pageXOffset + vx * speed, win.pageYOffset + vy * speed);
 							} else {
 								vy && (el.scrollTop += vy * speed);
 								vx && (el.scrollLeft += vx * speed);
