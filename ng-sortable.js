@@ -25,7 +25,7 @@
 
 
 	angular.module('ng-sortable', [])
-		.constant('$version', '0.3.5')
+		.constant('version', '0.3.6')
 		.directive('ngSortable', ['$parse', function ($parse) {
 			var removed,
 				nextSibling;
