@@ -892,6 +892,8 @@
 		el.removeEventListener(event, fn, false);
 	}
 
+	/** @const */
+	var RSPACE = /\s+/g;
 
 	function _toggleClass(el, name, state) {
 		if (el) {
@@ -899,8 +901,8 @@
 				el.classList[state ? 'add' : 'remove'](name);
 			}
 			else {
-				var className = (' ' + el.className + ' ').replace(/\s+/g, ' ').replace(' ' + name + ' ', '');
-				el.className = className + (state ? ' ' + name : '');
+				var className = (' ' + el.className + ' ').replace(RSPACE, ' ').replace(' ' + name + ' ', ' ');
+				el.className = (className + (state ? ' ' + name : '')).replace(RSPACE, ' ');
 			}
 		}
 	}
