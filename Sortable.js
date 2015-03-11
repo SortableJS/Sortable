@@ -165,7 +165,7 @@
 	 */
 	function Sortable(el, options) {
 		this.el = el; // root element
-		this.options = options = (options || {});
+		this.options = options = _extend({}, options);
 
 
 		// Default options
@@ -1017,6 +1017,18 @@
 		};
 	}
 
+	function _extend(dst, src) {
+		if (dst && src) {
+			for (var key in src) {
+				if (src.hasOwnProperty(key)) {
+					dst[key] = src[key];
+				}
+			}
+		}
+
+		return dst;
+	}
+
 
 	// Export utils
 	Sortable.utils = {
@@ -1028,6 +1040,7 @@
 		is: function (el, selector) {
 			return !!_closest(el, selector, el);
 		},
+		extend: _extend,
 		throttle: _throttle,
 		closest: _closest,
 		toggleClass: _toggleClass,
