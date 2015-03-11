@@ -269,8 +269,9 @@
 				target = (touch || evt).target,
 				originalTarget = target,
 				options =  this.options,
+				filter = options.filter,
 				el = this.el,
-				filter = options.filter;
+				ownerDocument = el.ownerDocument; // for correct working with/into iframe
 
 			if (type === 'mousedown' && evt.button !== 0 || options.disabled) {
 				return; // only left button or enabled
@@ -343,9 +344,9 @@
 					evt.preventDefault();
 				}
 
-				_on(document, 'mouseup', this._onDrop);
-				_on(document, 'touchend', this._onDrop);
-				_on(document, 'touchcancel', this._onDrop);
+				_on(ownerDocument, 'mouseup', this._onDrop);
+				_on(ownerDocument, 'touchend', this._onDrop);
+				_on(ownerDocument, 'touchcancel', this._onDrop);
 
 				_on(dragEl, 'dragend', this);
 				_on(rootEl, 'dragstart', this._onDragStart);
@@ -617,10 +618,12 @@
 		},
 
 		_offUpEvents: function () {
-			_off(document, 'mouseup', this._onDrop);
+			var ownerDocument = this.el.ownerDocument;
+
 			_off(document, 'touchmove', this._onTouchMove);
-			_off(document, 'touchend', this._onDrop);
-			_off(document, 'touchcancel', this._onDrop);
+			_off(ownerDocument, 'mouseup', this._onDrop);
+			_off(ownerDocument, 'touchend', this._onDrop);
+			_off(ownerDocument, 'touchcancel', this._onDrop);
 		},
 
 		_onDrop: function (/**Event*/evt) {
