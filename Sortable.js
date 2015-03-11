@@ -45,6 +45,9 @@
 		tapEvt,
 		touchEvt,
 
+		/** @const */
+		RSPACE = /\s+/g,
+
 		expando = 'Sortable' + (new Date).getTime(),
 
 		win = window,
@@ -52,7 +55,6 @@
 		parseInt = win.parseInt,
 
 		supportDraggable = !!('draggable' in document.createElement('div')),
-
 
 		_silent = false,
 
@@ -892,8 +894,6 @@
 		el.removeEventListener(event, fn, false);
 	}
 
-	/** @const */
-	var RSPACE = /\s+/g;
 
 	function _toggleClass(el, name, state) {
 		if (el) {
