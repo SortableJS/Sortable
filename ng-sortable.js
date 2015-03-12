@@ -160,7 +160,10 @@
 					});
 
 					if (ngSortable && !/{|}/.test(ngSortable)) { // todo: ugly
-						angular.forEach(['sort', 'disabled', 'draggable', 'handle', 'animation'], function (name) {
+						angular.forEach([
+							'sort', 'disabled', 'draggable', 'handle', 'animation',
+							'onStart', 'onEnd', 'onAdd', 'onUpdate', 'onRemove', 'onSort'
+						], function (name) {
 							scope.$watch(ngSortable + '.' + name, function (value) {
 								if (value !== void 0) {
 									options[name] = value;
