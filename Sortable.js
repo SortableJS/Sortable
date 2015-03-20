@@ -172,6 +172,7 @@
 		var defaults = {
 			group: Math.random(),
 			sort: true,
+			delay: 0,
 			disabled: false,
 			store: null,
 			handle: null,
@@ -261,6 +262,68 @@
 			}
 		},
 
+		_trigerDragStart: function (target, touch) {
+			if (touch) {
+				// Touch device support
+				tapEvt = {
+					target: target,
+					clientX: touch.clientX,
+					clientY: touch.clientY
+				};
+
+				this._onDragStart(tapEvt, 'touch');
+			}
+
+			_on(dragEl, 'dragend', this);
+			_on(rootEl, 'dragstart', this._onDragStart);
+
+			if (!supportDraggable) {
+				this._onDragStart(tapEvt, true);
+			}
+
+			try {
+				if (document.selection) {
+					document.selection.empty();
+				} else {
+					window.getSelection().removeAllRanges();
+				}
+			} catch (err) {
+			}
+		},
+
+		_prepareDragStart: function (evt, target, el, touch) {
+			var that = this;
+
+			if (target && !dragEl && (target.parentNode === el)) {
+				tapEvt = evt;
+
+				rootEl = this.el;
+				dragEl = target;
+				nextEl = dragEl.nextSibling;
+				activeGroup = this.options.group;
+
+				dragEl.draggable = true;
+
+				// Disable "draggable"
+				this.options.ignore.split(',').forEach(function (criteria) {
+					_find(target, criteria.trim(), _disableDraggable);
+				});
+
+				if (this.options.delay) {
+					console.log(this.options.delay);
+					evt.preventDefault();
+
+					_on(document, 'mouseup', this._onDrop);
+					_on(document, 'touchend', this._onDrop);
+					_on(document, 'touchcancel', this._onDrop);
+
+					this.dragStartTimer = setTimeout(function () {
+
+						that._trigerDragStart(target, touch);
+					}, this.options.delay || 0);
+				}
+			}
+		},
 
 		_onTapStart: function (/**Event|TouchEvent*/evt) {
 			var type = evt.type,
@@ -308,60 +371,12 @@
 				}
 			}
 
-
 			if (options.handle && !_closest(originalTarget, options.handle, el)) {
 				return;
 			}
 
-
 			// Prepare `dragstart`
-			if (target && !dragEl && (target.parentNode === el)) {
-				tapEvt = evt;
-
-				rootEl = this.el;
-				dragEl = target;
-				nextEl = dragEl.nextSibling;
-				activeGroup = this.options.group;
-
-				dragEl.draggable = true;
-
-				// Disable "draggable"
-				options.ignore.split(',').forEach(function (criteria) {
-					_find(target, criteria.trim(), _disableDraggable);
-				});
-
-				if (touch) {
-					// Touch device support
-					tapEvt = {
-						target: target,
-						clientX: touch.clientX,
-						clientY: touch.clientY
-					};
-
-					this._onDragStart(tapEvt, 'touch');
-					evt.preventDefault();
-				}
-
-				_on(document, 'mouseup', this._onDrop);
-				_on(document, 'touchend', this._onDrop);
-				_on(document, 'touchcancel', this._onDrop);
-
-				_on(dragEl, 'dragend', this);
-				_on(rootEl, 'dragstart', this._onDragStart);
-
-				if (!supportDraggable) {
-					this._onDragStart(tapEvt, true);
-				}
-
-				try {
-					if (document.selection) {
-						document.selection.empty();
-					} else {
-						window.getSelection().removeAllRanges();
-					}
-				} catch (err) {
-				}
-			}
+			this._prepareDragStart(evt, target, el, touch);
 		},
 
 		_emulateDragOver: function () {
@@ -623,11 +638,12 @@
 		},
 
 		_onDrop: function (/**Event*/evt) {
-			var el = this.el,
+			var el    = this.el,
 				options = this.options;
 
 			clearInterval(this._loopId);
 			clearInterval(autoScroll.pid);
+			clearTimeout(this.dragStartTimer);
 
 			// Unbind events
 			_off(document, 'drop', this);
