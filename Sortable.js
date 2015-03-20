@@ -58,22 +58,23 @@
 
 		_silent = false,
 
-		_dispatchEvent = function (rootEl, name, targetEl, fromEl, startIndex, newIndex) {
+		_dispatchEvent = function (rootEl, name, targetEl, fromEl, hoverEl, startIndex, newIndex) {
 			var evt = document.createEvent('Event');
 
 			evt.initEvent(name, true, true);
 
 			evt.item = targetEl || rootEl;
 			evt.from = fromEl || rootEl;
+			evt.hover = hoverEl || null;
 			evt.clone = cloneEl;
 
 			evt.oldIndex = startIndex;
 			evt.newIndex = newIndex;
 
-			rootEl.dispatchEvent(evt);
+			return rootEl.dispatchEvent(evt);
 		},
 
-		_customEvents = 'onAdd onUpdate onRemove onStart onEnd onFilter onSort'.split(' '),
+		_customEvents = 'onAdding onAdd onUpdate onRemove onStart onEnd onFilter onSort'.split(' '),
 
 		noop = function () {},
 
@@ -260,7 +261,7 @@
 				Sortable.active = this;
 
 				// Drag start event
-				_dispatchEvent(rootEl, 'start', dragEl, rootEl, oldIndex);
+				_dispatchEvent(rootEl, 'start', dragEl, rootEl, null, oldIndex);
 			}
 		},
 
@@ -291,7 +292,7 @@
 			// Check filter
 			if (typeof filter === 'function') {
 				if (filter.call(this, evt, target, this)) {
-					_dispatchEvent(originalTarget, 'filter', target, el, oldIndex);
+					_dispatchEvent(originalTarget, 'filter', target, el, null, oldIndex);
 					evt.preventDefault();
 					return; // cancel dnd
 				}
@@ -301,7 +302,7 @@
 					criteria = _closest(originalTarget, criteria.trim(), el);
 
 					if (criteria) {
-						_dispatchEvent(criteria, 'filter', target, el, oldIndex);
+						_dispatchEvent(criteria, 'filter', target, el, null, oldIndex);
 						return true;
 					}
 				});
@@ -630,7 +631,8 @@
 
 		_onDrop: function (/**Event*/evt) {
 			var el = this.el,
-				options = this.options;
+				options = this.options,
+				isDragEnd = evt.type === 'dragend';
 
 			clearInterval(this._loopId);
 			clearInterval(autoScroll.pid);
@@ -646,44 +648,7 @@
 				evt.preventDefault();
 				!options.dropBubble && evt.stopPropagation();
 
-				ghostEl && ghostEl.parentNode.removeChild(ghostEl);
-
-				if (dragEl) {
-					_off(dragEl, 'dragend', this);
-
-					_disableDraggable(dragEl);
-					_toggleClass(dragEl, this.options.ghostClass, false);
-
-					if (rootEl !== dragEl.parentNode) {
-						newIndex = _index(dragEl);
-
-						// drag from one list and drop into another
-						_dispatchEvent(dragEl.parentNode, 'sort', dragEl, rootEl, oldIndex, newIndex);
-						_dispatchEvent(rootEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
-
-						// Add event
-						_dispatchEvent(dragEl, 'add', dragEl, rootEl, oldIndex, newIndex);
-
-						// Remove event
-						_dispatchEvent(rootEl, 'remove', dragEl, rootEl, oldIndex, newIndex);
-					}
-					else {
-						// Remove clone
-						cloneEl && cloneEl.parentNode.removeChild(cloneEl);
-
-						if (dragEl.nextSibling !== nextEl) {
-							// Get the index of the dragged element within its parent
-							newIndex = _index(dragEl);
-
-							// drag & drop within the same list
-							_dispatchEvent(rootEl, 'update', dragEl, rootEl, oldIndex, newIndex);
-							_dispatchEvent(rootEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
-						}
-					}
-
-					// Drag end event
-					Sortable.active && _dispatchEvent(rootEl, 'end', dragEl, rootEl, oldIndex, newIndex);
-				}
+				isDragEnd ? this._cancelDrop() : this._completeDrop();
 
 				// Nulling
 				rootEl =
@@ -709,6 +674,82 @@
 			}
 		},
 
+		_completeDrop : function () {
+
+			ghostEl && ghostEl.parentNode && ghostEl.parentNode.removeChild(ghostEl);
+
+			if (dragEl) {
+				_off(dragEl, 'dragend', this);
+
+				_disableDraggable(dragEl);
+				_toggleClass(dragEl, this.options.ghostClass, false);
+
+				if (rootEl !== dragEl.parentNode) {
+					newIndex = _index(dragEl);
+
+					// drag from one list and drop into another
+					_dispatchEvent(dragEl.parentNode, 'sort', dragEl, rootEl, null, oldIndex, newIndex);
+					_dispatchEvent(rootEl, 'sort', dragEl, rootEl, oldIndex, null, newIndex);
+
+					// give
+					var addCancelled = !_dispatchEvent(dragEl, 'adding', dragEl, rootEl, dragEl.parentNode, 0, 0);
+					if (addCancelled) {
+						this._cancelDrop();
+					} else {
+						// Add event
+						_dispatchEvent(dragEl, 'add', dragEl, rootEl, dragEl.parentNode, oldIndex, newIndex);
+						// Remove event
+						_dispatchEvent(rootEl, 'remove', dragEl, rootEl, dragEl.parentNode, oldIndex, newIndex);
+					}
+				}
+				else {
+					// Remove clone
+					cloneEl && cloneEl.parentNode.removeChild(cloneEl);
+
+					if (dragEl.nextSibling !== nextEl) {
+						// Get the index of the dragged element within its parent
+						newIndex = _index(dragEl);
+
+						// drag & drop within the same list
+						_dispatchEvent(rootEl, 'update', dragEl, rootEl, null, oldIndex, newIndex);
+						_dispatchEvent(rootEl, 'sort', dragEl, rootEl, null, oldIndex, newIndex);
+					}
+				}
+
+				// Drag end event
+				Sortable.active && _dispatchEvent(rootEl, 'end', dragEl, rootEl, null, oldIndex, newIndex);
+			}
+		},
+
+		_cancelDrop : function () {
+			var el = this.el,
+				options = this.options;
+
+			if (dragEl) {
+				ghostEl && ghostEl.parentNode && ghostEl.parentNode.removeChild(ghostEl);
+				_toggleClass(dragEl, this.options.ghostClass, false);
+
+				_cloneHide(true);
+
+				// remove from dropped locaiton
+				var par = dragEl.parentNode;
+				par.removeChild(dragEl);
+			}
+
+			// put back in original spot
+			this._insertNode(rootEl, dragEl, oldIndex);
+		},
+
+		_insertNode: function (/**HTMLElement*/container, /**HTMLElement*/sourceEl, /**int*/sourceIndex) {
+			// find where it's going to go based on old location
+
+			if (container.children.length === 0) {
+				container.appendChild(sourceEl);
+			} else {
+				var prevNode = container.children[sourceIndex > 0 ? sourceIndex - 1 : 0];
+				prevNode.parentNode.insertBefore(sourceEl, sourceIndex === 0 ? prevNode : prevNode.nextSibling);
+			}
+		},
 
 		handleEvent: function (/**Event*/evt) {
 			var type = evt.type;
