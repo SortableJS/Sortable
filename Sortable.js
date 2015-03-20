@@ -309,6 +309,7 @@
 					_find(target, criteria.trim(), _disableDraggable);
 				});
 
+				this.options.delay = this.options.delay || 1;
 				if (this.options.delay) {
 					evt.preventDefault();
 
@@ -319,7 +320,7 @@
 					this.dragStartTimer = setTimeout(function () {
 
 						that._trigerDragStart(target, touch);
-					}, this.options.delay || 1);
+					}, this.options.delay);
 				}
 			}
 		},
