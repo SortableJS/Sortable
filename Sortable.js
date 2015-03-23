@@ -272,6 +272,9 @@
 				};
 
 				this._onDragStart(tapEvt, 'touch');
+			} else if (supportDraggable) {
+				// Handle desktop (mousedown)
+				this._onDragStart(tapEvt, true);
 			}
 
 			_on(dragEl, 'dragend', this);
@@ -474,7 +477,7 @@
 					_on(document, 'touchend', this._onDrop);
 					_on(document, 'touchcancel', this._onDrop);
 				} else {
-					// Old brwoser
+					// Old browser
 					_on(document, 'mousemove', this._onTouchMove);
 					_on(document, 'mouseup', this._onDrop);
 				}
