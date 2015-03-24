@@ -262,7 +262,8 @@
 			}
 		},
 
-		_trigerDragStart: function (target, touch) {
+		_triggerDragStart: function (evt, target, touch) {
+			evt.preventDefault();
 			if (touch) {
 				// Touch device support
 				tapEvt = {
@@ -314,15 +315,12 @@
 
 				this.options.delay = this.options.delay || 1;
 				if (this.options.delay) {
-					evt.preventDefault();
-
 					_on(document, 'mouseup', this._onDrop);
 					_on(document, 'touchend', this._onDrop);
 					_on(document, 'touchcancel', this._onDrop);
 
 					this.dragStartTimer = setTimeout(function () {
-
-						that._trigerDragStart(target, touch);
+						that._triggerDragStart(evt, target, touch);
 					}, this.options.delay);
 				}
 			}
