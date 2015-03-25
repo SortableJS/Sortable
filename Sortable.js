@@ -264,6 +264,7 @@
 
 		_triggerDragStart: function (evt, target, touch) {
 			evt.preventDefault();
+
 			if (touch) {
 				// Touch device support
 				tapEvt = {
@@ -275,7 +276,7 @@
 				this._onDragStart(tapEvt, 'touch');
 			} else if (supportDraggable) {
 				// Handle desktop (mousedown)
-				this._onDragStart(tapEvt, true);
+				this._onDragStart(tapEvt);
 			}
 
 			_on(dragEl, 'dragend', this);
@@ -295,6 +296,22 @@
 			}
 		},
 
+		_enableDragStart: function (dragEl, target) {
+			dragEl.draggable = true;
+
+			// Disable "draggable"
+			this.options.ignore.split(',').forEach(function (criteria) {
+				_find(target, criteria.trim(), _disableDraggable);
+			});
+		},
+
+		_disableDelayedDrag: function () {
+			clearTimeout(this.dragStartTimer);
+
+			_off(document, 'mousemove', this._disableDelayedDrag);
+			_off(document, 'touchmove', this._disableDelayedDrag);
+		},
+
 		_prepareDragStart: function (evt, target, el, touch) {
 			var that = this;
 
@@ -306,20 +323,26 @@
 				nextEl = dragEl.nextSibling;
 				activeGroup = this.options.group;
 
-				dragEl.draggable = true;
-
-				// Disable "draggable"
-				this.options.ignore.split(',').forEach(function (criteria) {
-					_find(target, criteria.trim(), _disableDraggable);
-				});
-
 				this.options.delay = this.options.delay || 1;
 				if (this.options.delay) {
 					_on(document, 'mouseup', this._onDrop);
 					_on(document, 'touchend', this._onDrop);
 					_on(document, 'touchcancel', this._onDrop);
 
+					// If the user moves the pointer before the delay has been reached:
+					// disable the delayed drag
+					_on(document, 'mousemove', this._disableDelayedDrag);
+					_on(document, 'touchmove', this._disableDelayedDrag);
+
 					this.dragStartTimer = setTimeout(function () {
+						// Delayed drag has been triggered
+						// we can re-enable the events: touchmove/mousemove
+						_off(document, 'mousemove', that._disableDelayedDrag);
+						_off(document, 'touchmove', that._disableDelayedDrag);
+
+						// Make the element draggable
+						that._enableDragStart(dragEl, target);
+						// Bind the events: dragstart/dragend
 						that._triggerDragStart(evt, target, touch);
 					}, this.options.delay);
 				}
