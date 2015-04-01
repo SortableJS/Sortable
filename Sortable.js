@@ -188,10 +188,7 @@
 			},
 			dropBubble: false,
 			dragoverBubble: false,
-			delay: 0,
-			// Not supported by the HTML5 native drag 'n' drop
-			// Thus only use on mobile and older browers
-			verticalOnly: false
+			delay: 0
 		};
 
 
@@ -445,7 +442,7 @@
 		_onTouchMove: function (/**TouchEvent*/evt) {
 			if (tapEvt) {
 				var touch = evt.touches ? evt.touches[0] : evt,
-					dx = this.options.verticalOnly ? 0 : touch.clientX - tapEvt.clientX,
+					dx = touch.clientX - tapEvt.clientX,
 					dy = touch.clientY - tapEvt.clientY,
 					translate3d = evt.touches ? 'translate3d(' + dx + 'px,' + dy + 'px,0)' : 'translate(' + dx + 'px,' + dy + 'px)';
 
