@@ -68,7 +68,7 @@
 			evt.oldIndex = startIndex;
 			evt.newIndex = newIndex;
 
-			rootEl.dispatchEvent(evt);
+			rootEl && rootEl.dispatchEvent(evt);
 		},
 
 		_customEvents = 'onAdd onUpdate onRemove onStart onEnd onFilter onSort'.split(' '),
@@ -187,7 +187,11 @@
 				dataTransfer.setData('Text', dragEl.textContent);
 			},
 			dropBubble: false,
-			dragoverBubble: false
+			dragoverBubble: false,
+			delay: 0,
+			// Not supported by the HTML5 native drag 'n' drop
+			// Thus only use on mobile and older browers
+			verticalOnly: false
 		};
 
 
@@ -261,6 +265,92 @@
 			}
 		},
 
+		_triggerDragStart: function (evt, target, touch) {
+			evt.preventDefault();
+
+			if (touch) {
+				// Touch device support
+				tapEvt = {
+					target: target,
+					clientX: touch.clientX,
+					clientY: touch.clientY
+				};
+
+				this._onDragStart(tapEvt, 'touch');
+			} else if (supportDraggable) {
+				// Handle desktop (mousedown)
+				this._onDragStart(tapEvt);
+			}
+
+			_on(dragEl, 'dragend', this);
+			_on(rootEl, 'dragstart', this._onDragStart);
+
+			if (!supportDraggable) {
+				this._onDragStart(tapEvt, true);
+			}
+
+			try {
+				if (document.selection) {
+					document.selection.empty();
+				} else {
+					window.getSelection().removeAllRanges();
+				}
+			} catch (err) {
+			}
+		},
+
+		_enableDragStart: function (dragEl, target) {
+			dragEl.draggable = true;
+
+			// Disable "draggable"
+			this.options.ignore.split(',').forEach(function (criteria) {
+				_find(target, criteria.trim(), _disableDraggable);
+			});
+		},
+
+		_disableDelayedDrag: function () {
+			clearTimeout(this.dragStartTimer);
+
+			_off(document, 'mousemove', this._disableDelayedDrag);
+			_off(document, 'touchmove', this._disableDelayedDrag);
+		},
+
+		_prepareDragStart: function (evt, target, el, touch) {
+			var that = this;
+
+			if (target && !dragEl && (target.parentNode === el)) {
+				tapEvt = evt;
+
+				rootEl = this.el;
+				dragEl = target;
+				nextEl = dragEl.nextSibling;
+				activeGroup = this.options.group;
+
+				this.options.delay = this.options.delay || 1;
+				if (this.options.delay) {
+					_on(document, 'mouseup', this._onDrop);
+					_on(document, 'touchend', this._onDrop);
+					_on(document, 'touchcancel', this._onDrop);
+
+					// If the user moves the pointer before the delay has been reached:
+					// disable the delayed drag
+					_on(document, 'mousemove', this._disableDelayedDrag);
+					_on(document, 'touchmove', this._disableDelayedDrag);
+
+					this.dragStartTimer = setTimeout(function () {
+						// Delayed drag has been triggered
+						// we can re-enable the events: touchmove/mousemove
+						_off(document, 'mousemove', that._disableDelayedDrag);
+						_off(document, 'touchmove', that._disableDelayedDrag);
+
+						// Make the element draggable
+						that._enableDragStart(dragEl, target);
+						// Bind the events: dragstart/dragend
+						that._triggerDragStart(evt, target, touch);
+					}, this.options.delay);
+				}
+			}
+		},
 
 		_onTapStart: function (/**Event|TouchEvent*/evt) {
 			var type = evt.type,
@@ -313,55 +403,8 @@
 				return;
 			}
 
-
 			// Prepare `dragstart`
-			if (target && !dragEl && (target.parentNode === el)) {
-				tapEvt = evt;
-
-				rootEl = this.el;
-				dragEl = target;
-				nextEl = dragEl.nextSibling;
-				activeGroup = this.options.group;
-
-				dragEl.draggable = true;
-
-				// Disable "draggable"
-				options.ignore.split(',').forEach(function (criteria) {
-					_find(target, criteria.trim(), _disableDraggable);
-				});
-
-				if (touch) {
-					// Touch device support
-					tapEvt = {
-						target: target,
-						clientX: touch.clientX,
-						clientY: touch.clientY
-					};
-
-					this._onDragStart(tapEvt, 'touch');
-					evt.preventDefault();
-				}
-
-				_on(document, 'mouseup', this._onDrop);
-				_on(document, 'touchend', this._onDrop);
-				_on(document, 'touchcancel', this._onDrop);
-
-				_on(dragEl, 'dragend', this);
-				_on(rootEl, 'dragstart', this._onDragStart);
-
-				if (!supportDraggable) {
-					this._onDragStart(tapEvt, true);
-				}
-
-				try {
-					if (document.selection) {
-						document.selection.empty();
-					} else {
-						window.getSelection().removeAllRanges();
-					}
-				} catch (err) {
-				}
-			}
+			this._prepareDragStart(evt, target, el, touch);
 		},
 
 		_emulateDragOver: function () {
@@ -402,7 +445,7 @@
 		_onTouchMove: function (/**TouchEvent*/evt) {
 			if (tapEvt) {
 				var touch = evt.touches ? evt.touches[0] : evt,
-					dx = touch.clientX - tapEvt.clientX,
+					dx = this.options.verticalOnly ? 0 : touch.clientX - tapEvt.clientX,
 					dy = touch.clientY - tapEvt.clientY,
 					translate3d = evt.touches ? 'translate3d(' + dx + 'px,' + dy + 'px,0)' : 'translate(' + dx + 'px,' + dy + 'px)';
 
@@ -458,7 +501,7 @@
 					_on(document, 'touchend', this._onDrop);
 					_on(document, 'touchcancel', this._onDrop);
 				} else {
-					// Old brwoser
+					// Old browser
 					_on(document, 'mousemove', this._onTouchMove);
 					_on(document, 'mouseup', this._onDrop);
 				}
@@ -623,11 +666,13 @@
 		},
 
 		_onDrop: function (/**Event*/evt) {
-			var el = this.el,
+			var el    = this.el,
 				options = this.options;
 
 			clearInterval(this._loopId);
 			clearInterval(autoScroll.pid);
+
+			clearTimeout(this.dragStartTimer);
 
 			// Unbind events
 			_off(document, 'drop', this);
