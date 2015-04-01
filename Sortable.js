@@ -68,7 +68,7 @@
 			evt.oldIndex = startIndex;
 			evt.newIndex = newIndex;
 
-			rootEl && rootEl.dispatchEvent(evt);
+			rootEl.dispatchEvent(evt);
 		},
 
 		_customEvents = 'onAdd onUpdate onRemove onStart onEnd onFilter onSort'.split(' '),
