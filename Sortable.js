@@ -274,16 +274,11 @@
 				};
 
 				this._onDragStart(tapEvt, 'touch');
-			} else if (supportDraggable) {
-				// Handle desktop (mousedown)
-				this._onDragStart(tapEvt);
-			}
-
-			_on(dragEl, 'dragend', this);
-			_on(rootEl, 'dragstart', this._onDragStart);
-
-			if (!supportDraggable) {
+			} else if (!supportDraggable) {
 				this._onDragStart(tapEvt, true);
+			} else {
+				_on(dragEl, 'dragend', this);
+				_on(rootEl, 'dragstart', this._onDragStart);
 			}
 
 			try {
@@ -313,7 +308,7 @@
 		},
 
 		_prepareDragStart: function (evt, target, el, touch) {
-			var that = this;
+			var _this = this;
 
 			if (target && !dragEl && (target.parentNode === el)) {
 				tapEvt = evt;
@@ -337,13 +332,13 @@
 					this.dragStartTimer = setTimeout(function () {
 						// Delayed drag has been triggered
 						// we can re-enable the events: touchmove/mousemove
-						_off(document, 'mousemove', that._disableDelayedDrag);
-						_off(document, 'touchmove', that._disableDelayedDrag);
+						_off(document, 'mousemove', _this._disableDelayedDrag);
+						_off(document, 'touchmove', _this._disableDelayedDrag);
 
 						// Make the element draggable
-						that._enableDragStart(dragEl, target);
+						_this._enableDragStart(dragEl, target);
 						// Bind the events: dragstart/dragend
-						that._triggerDragStart(evt, target, touch);
+						_this._triggerDragStart(evt, target, touch);
 					}, this.options.delay);
 				}
 			}
@@ -663,7 +658,7 @@
 		},
 
 		_onDrop: function (/**Event*/evt) {
-			var el    = this.el,
+			var el = this.el,
 				options = this.options;
 
 			clearInterval(this._loopId);
