@@ -445,6 +445,9 @@
 				_css(ghostEl, 'position', 'fixed');
 				_css(ghostEl, 'zIndex', '100000');
 
+				// Add ghostClass on fallback and touch devices
+				ghostEl.className = options.ghostClass;
+
 				rootEl.appendChild(ghostEl);
 
 				// Fixing dimensions.
