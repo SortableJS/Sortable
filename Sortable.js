@@ -271,6 +271,10 @@
 				el = this.el,
 				filter = options.filter;
 
+			// stop propagation to avoid the event firing also on outer sortable
+			// elements when bubbling up causing wrong values for `oldIndex`
+			evt.stopImmediatePropagation();
+
 			if (type === 'mousedown' && evt.button !== 0 || options.disabled) {
 				return; // only left button or enabled
 			}
