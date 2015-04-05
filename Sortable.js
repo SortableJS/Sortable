@@ -190,7 +190,8 @@
 			},
 			dropBubble: false,
 			dragoverBubble: false,
-			dataIdAttr: 'data-id'
+			dataIdAttr: 'data-id',
+			delay: 0
 		};
 
 
@@ -264,6 +265,87 @@
 			}
 		},
 
+	_triggerDragStart: function (evt, target, touch) {
+			evt.preventDefault();
+
+			if (touch) {
+				// Touch device support
+				tapEvt = {
+					target: target,
+					clientX: touch.clientX,
+					clientY: touch.clientY
+				};
+
+				this._onDragStart(tapEvt, 'touch');
+			} else if (!supportDraggable) {
+				this._onDragStart(tapEvt, true);
+			} else {
+				_on(dragEl, 'dragend', this);
+				_on(rootEl, 'dragstart', this._onDragStart);
+			}
+
+			try {
+				if (document.selection) {
+					document.selection.empty();
+				} else {
+					window.getSelection().removeAllRanges();
+				}
+			} catch (err) {
+			}
+		},
+
+		_enableDragStart: function (dragEl, target) {
+			dragEl.draggable = true;
+
+			// Disable "draggable"
+			this.options.ignore.split(',').forEach(function (criteria) {
+				_find(target, criteria.trim(), _disableDraggable);
+			});
+		},
+
+		_disableDelayedDrag: function () {
+			clearTimeout(this.dragStartTimer);
+
+			_off(document, 'mousemove', this._disableDelayedDrag);
+			_off(document, 'touchmove', this._disableDelayedDrag);
+		},
+
+		_prepareDragStart: function (evt, target, el, touch) {
+			var _this = this;
+
+			if (target && !dragEl && (target.parentNode === el)) {
+				tapEvt = evt;
+
+				rootEl = this.el;
+				dragEl = target;
+				nextEl = dragEl.nextSibling;
+				activeGroup = this.options.group;
+
+				this.options.delay = this.options.delay || 1;
+				if (this.options.delay) {
+					_on(document, 'mouseup', this._onDrop);
+					_on(document, 'touchend', this._onDrop);
+					_on(document, 'touchcancel', this._onDrop);
+
+					// If the user moves the pointer before the delay has been reached:
+					// disable the delayed drag
+					_on(document, 'mousemove', this._disableDelayedDrag);
+					_on(document, 'touchmove', this._disableDelayedDrag);
+
+					this.dragStartTimer = setTimeout(function () {
+						// Delayed drag has been triggered
+						// we can re-enable the events: touchmove/mousemove
+						_off(document, 'mousemove', _this._disableDelayedDrag);
+						_off(document, 'touchmove', _this._disableDelayedDrag);
+
+						// Make the element draggable
+						_this._enableDragStart(dragEl, target);
+						// Bind the events: dragstart/dragend
+						_this._triggerDragStart(evt, target, touch);
+					}, this.options.delay);
+				}
+			}
+		},
 
 		_onTapStart: function (/**Event|TouchEvent*/evt) {
 			var type = evt.type,
@@ -317,55 +399,8 @@
 				return;
 			}
 
-
 			// Prepare `dragstart`
-			if (target && !dragEl && (target.parentNode === el)) {
-				tapEvt = evt;
-
-				rootEl = this.el;
-				dragEl = target;
-				nextEl = dragEl.nextSibling;
-				activeGroup = this.options.group;
-
-				dragEl.draggable = true;
-
-				// Disable "draggable"
-				options.ignore.split(',').forEach(function (criteria) {
-					_find(target, criteria.trim(), _disableDraggable);
-				});
-
-				if (touch) {
-					// Touch device support
-					tapEvt = {
-						target: target,
-						clientX: touch.clientX,
-						clientY: touch.clientY
-					};
-
-					this._onDragStart(tapEvt, 'touch');
-					evt.preventDefault();
-				}
-
-				_on(ownerDocument, 'mouseup', this._onDrop);
-				_on(ownerDocument, 'touchend', this._onDrop);
-				_on(ownerDocument, 'touchcancel', this._onDrop);
-
-				_on(dragEl, 'dragend', this);
-				_on(rootEl, 'dragstart', this._onDragStart);
-
-				if (!supportDraggable) {
-					this._onDragStart(tapEvt, true);
-				}
-
-				try {
-					if (document.selection) {
-						document.selection.empty();
-					} else {
-						window.getSelection().removeAllRanges();
-					}
-				} catch (err) {
-				}
-			}
+			this._prepareDragStart(evt, target, el, touch);
 		},
 
 		_emulateDragOver: function () {
@@ -634,6 +669,8 @@
 
 			clearInterval(this._loopId);
 			clearInterval(autoScroll.pid);
+
+			clearTimeout(this.dragStartTimer);
 
 			// Unbind events
 			_off(document, 'drop', this);
