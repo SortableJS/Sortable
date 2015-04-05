@@ -252,7 +252,6 @@
 	Sortable.prototype = /** @lends Sortable.prototype */ {
 		constructor: Sortable,
 
-
 		_dragStarted: function () {
 			if (rootEl && dragEl) {
 				// Apply effect
@@ -265,21 +264,21 @@
 			}
 		},
 
-	_triggerDragStart: function (evt, target, touch) {
-			evt.preventDefault();
-
+		_triggerDragStart: function (/** Touch */touch) {
 			if (touch) {
 				// Touch device support
 				tapEvt = {
-					target: target,
+					target: dragEl,
 					clientX: touch.clientX,
 					clientY: touch.clientY
 				};
 
 				this._onDragStart(tapEvt, 'touch');
-			} else if (!supportDraggable) {
+			}
+			else if (!supportDraggable) {
 				this._onDragStart(tapEvt, true);
-			} else {
+			}
+			else {
 				_on(dragEl, 'dragend', this);
 				_on(rootEl, 'dragstart', this._onDragStart);
 			}
@@ -294,68 +293,73 @@
 			}
 		},
 
-		_enableDragStart: function (dragEl, target) {
-			dragEl.draggable = true;
-
-			// Disable "draggable"
-			this.options.ignore.split(',').forEach(function (criteria) {
-				_find(target, criteria.trim(), _disableDraggable);
-			});
-		},
-
 		_disableDelayedDrag: function () {
-			clearTimeout(this.dragStartTimer);
+			var ownerDocument = this.el.ownerDocument;
 
-			_off(document, 'mousemove', this._disableDelayedDrag);
-			_off(document, 'touchmove', this._disableDelayedDrag);
+			clearTimeout(this._dragStartTimer);
+
+			_off(ownerDocument, 'mousemove', this._disableDelayedDrag);
+			_off(ownerDocument, 'touchmove', this._disableDelayedDrag);
 		},
 
-		_prepareDragStart: function (evt, target, el, touch) {
-			var _this = this;
+		_prepareDragStart: function (/** Event */evt, /** Touch */touch, /** HTMLElement */target) {
+			var _this = this,
+				el = _this.el,
+				options = _this.options,
+				ownerDocument = el.ownerDocument,
+				dragStartFn;
 
 			if (target && !dragEl && (target.parentNode === el)) {
 				tapEvt = evt;
 
-				rootEl = this.el;
+				rootEl = el;
 				dragEl = target;
 				nextEl = dragEl.nextSibling;
-				activeGroup = this.options.group;
+				activeGroup = options.group;
 
-				this.options.delay = this.options.delay || 1;
-				if (this.options.delay) {
-					_on(document, 'mouseup', this._onDrop);
-					_on(document, 'touchend', this._onDrop);
-					_on(document, 'touchcancel', this._onDrop);
+				dragStartFn = function () {
+					// Delayed drag has been triggered
+					// we can re-enable the events: touchmove/mousemove
+					_this._disableDelayedDrag();
 
+					// Make the element draggable
+					dragEl.draggable = true;
+
+					// Disable "draggable"
+					options.ignore.split(',').forEach(function (criteria) {
+						_find(dragEl, criteria.trim(), _disableDraggable);
+					});
+
+					// Bind the events: dragstart/dragend
+					_this._triggerDragStart(touch);
+				};
+
+				_on(ownerDocument, 'mouseup', _this._onDrop);
+				_on(ownerDocument, 'touchend', _this._onDrop);
+				_on(ownerDocument, 'touchcancel', _this._onDrop);
+
+				if (options.delay) {
 					// If the user moves the pointer before the delay has been reached:
 					// disable the delayed drag
-					_on(document, 'mousemove', this._disableDelayedDrag);
-					_on(document, 'touchmove', this._disableDelayedDrag);
+					_on(ownerDocument, 'mousemove', _this._disableDelayedDrag);
+					_on(ownerDocument, 'touchmove', _this._disableDelayedDrag);
 
-					this.dragStartTimer = setTimeout(function () {
-						// Delayed drag has been triggered
-						// we can re-enable the events: touchmove/mousemove
-						_off(document, 'mousemove', _this._disableDelayedDrag);
-						_off(document, 'touchmove', _this._disableDelayedDrag);
-
-						// Make the element draggable
-						_this._enableDragStart(dragEl, target);
-						// Bind the events: dragstart/dragend
-						_this._triggerDragStart(evt, target, touch);
-					}, this.options.delay);
+					_this._dragStartTimer = setTimeout(dragStartFn, options.delay);
+				} else {
+					dragStartFn();
 				}
 			}
 		},
 
-		_onTapStart: function (/**Event|TouchEvent*/evt) {
-			var type = evt.type,
+		_onTapStart: function (/** Event|TouchEvent */evt) {
+			var el = this.el,
+				options = this.options,
+				type = evt.type,
 				touch = evt.touches && evt.touches[0],
 				target = (touch || evt).target,
 				originalTarget = target,
-				options =  this.options,
-				filter = options.filter,
-				el = this.el,
-				ownerDocument = el.ownerDocument; // for correct working with/into iframe
+				filter = options.filter;
+
 
 			if (type === 'mousedown' && evt.button !== 0 || options.disabled) {
 				return; // only left button or enabled
@@ -399,8 +403,9 @@
 				return;
 			}
 
+
 			// Prepare `dragstart`
-			this._prepareDragStart(evt, target, el, touch);
+			this._prepareDragStart(evt, touch, target);
 		},
 
 		_emulateDragOver: function () {
