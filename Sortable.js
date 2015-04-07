@@ -303,7 +303,6 @@
 				});
 
 				if (filter) {
-					evt.preventDefault();
 					return; // cancel dnd
 				}
 			}
