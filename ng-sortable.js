@@ -167,7 +167,10 @@
 							scope.$watch(ngSortable + '.' + name, function (value) {
 								if (value !== void 0) {
 									options[name] = value;
-									sortable.option(name, value);
+
+									if (!/^on[A-Z]/.test(name)) {
+										sortable.option(name, value);
+									}
 								}
 							});
 						});

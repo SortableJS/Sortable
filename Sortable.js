@@ -58,8 +58,10 @@
 
 		_silent = false,
 
-		_dispatchEvent = function (rootEl, name, targetEl, fromEl, startIndex, newIndex) {
-			var evt = document.createEvent('Event');
+		_dispatchEvent = function (sortable, rootEl, name, targetEl, fromEl, startIndex, newIndex) {
+			var evt = document.createEvent('Event'),
+				options = (sortable || rootEl[expando]).options,
+				onName = 'on' + name.charAt(0).toUpperCase() + name.substr(1);
 
 			evt.initEvent(name, true, true);
 
@@ -70,12 +72,12 @@
 			evt.oldIndex = startIndex;
 			evt.newIndex = newIndex;
 
+			if (options[onName]) {
+				options[onName].call(sortable, evt);
+			}
+
 			rootEl.dispatchEvent(evt);
 		},
-
-		_customEvents = 'onAdd onUpdate onRemove onStart onEnd onFilter onSort'.split(' '),
-
-		noop = function () {},
 
 		abs = Math.abs,
 		slice = [].slice,
@@ -170,6 +172,10 @@
 		this.options = options = _extend({}, options);
 
 
+		// Export instance
+		el[expando] = this;
+
+
 		// Default options
 		var defaults = {
 			group: Math.random(),
@@ -215,16 +221,7 @@
 		});
 
 
-		// Define events
-		_customEvents.forEach(function (name) {
-			options[name] = _bind(this, options[name] || noop);
-			_on(el, name.substr(2).toLowerCase(), options[name]);
-		}, this);
-
-
-		// Export options
 		options.groups = ' ' + group.name + (group.put.join ? ' ' + group.put.join(' ') : '') + ' ';
-		el[expando] = options;
 
 
 		// Bind all private methods
@@ -253,7 +250,8 @@
 		constructor: Sortable,
 
 		_onTapStart: function (/** Event|TouchEvent */evt) {
-			var el = this.el,
+			var _this = this,
+				el = this.el,
 				options = this.options,
 				type = evt.type,
 				touch = evt.touches && evt.touches[0],
@@ -278,7 +276,7 @@
 			// Check filter
 			if (typeof filter === 'function') {
 				if (filter.call(this, evt, target, this)) {
-					_dispatchEvent(originalTarget, 'filter', target, el, oldIndex);
+					_dispatchEvent(_this, originalTarget, 'filter', target, el, oldIndex);
 					evt.preventDefault();
 					return; // cancel dnd
 				}
@@ -288,7 +286,7 @@
 					criteria = _closest(originalTarget, criteria.trim(), el);
 
 					if (criteria) {
-						_dispatchEvent(criteria, 'filter', target, el, oldIndex);
+						_dispatchEvent(_this, criteria, 'filter', target, el, oldIndex);
 						return true;
 					}
 				});
@@ -404,7 +402,7 @@
 				Sortable.active = this;
 
 				// Drag start event
-				_dispatchEvent(rootEl, 'start', dragEl, rootEl, oldIndex);
+				_dispatchEvent(this, rootEl, 'start', dragEl, rootEl, oldIndex);
 			}
 		},
 
@@ -419,7 +417,7 @@
 
 				if (parent) {
 					do {
-						if (parent[expando] && parent[expando].groups.indexOf(groupName) > -1) {
+						if (parent[expando] && parent[expando].options.groups.indexOf(groupName) > -1) {
 							while (i--) {
 								touchDragOverListeners[i]({
 									clientX: touchEvt.clientX,
@@ -700,14 +698,14 @@
 						newIndex = _index(dragEl);
 
 						// drag from one list and drop into another
-						_dispatchEvent(dragEl.parentNode, 'sort', dragEl, rootEl, oldIndex, newIndex);
-						_dispatchEvent(rootEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
+						_dispatchEvent(null, dragEl.parentNode, 'sort', dragEl, rootEl, oldIndex, newIndex);
+						_dispatchEvent(this, rootEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
 
 						// Add event
-						_dispatchEvent(dragEl, 'add', dragEl, rootEl, oldIndex, newIndex);
+						_dispatchEvent(null, dragEl.parentNode, 'add', dragEl, rootEl, oldIndex, newIndex);
 
 						// Remove event
-						_dispatchEvent(rootEl, 'remove', dragEl, rootEl, oldIndex, newIndex);
+						_dispatchEvent(this, rootEl, 'remove', dragEl, rootEl, oldIndex, newIndex);
 					}
 					else {
 						// Remove clone
@@ -718,13 +716,13 @@
 							newIndex = _index(dragEl);
 
 							// drag & drop within the same list
-							_dispatchEvent(rootEl, 'update', dragEl, rootEl, oldIndex, newIndex);
-							_dispatchEvent(rootEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
+							_dispatchEvent(this, rootEl, 'update', dragEl, rootEl, oldIndex, newIndex);
+							_dispatchEvent(this, rootEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
 						}
 					}
 
 					// Drag end event
-					Sortable.active && _dispatchEvent(rootEl, 'end', dragEl, rootEl, oldIndex, newIndex);
+					Sortable.active && _dispatchEvent(this, rootEl, 'end', dragEl, rootEl, oldIndex, newIndex);
 				}
 
 				// Nulling
@@ -853,11 +851,9 @@
 		 * Destroy
 		 */
 		destroy: function () {
-			var el = this.el, options = this.options;
+			var el = this.el;
 
-			_customEvents.forEach(function (name) {
-				_off(el, name.substr(2).toLowerCase(), options[name]);
-			});
+			el[expando] = null;
 
 			_off(el, 'mousedown', this._onTapStart);
 			_off(el, 'touchstart', this._onTapStart);
@@ -865,7 +861,7 @@
 			_off(el, 'dragover', this);
 			_off(el, 'dragenter', this);
 
-			//remove draggable attributes
+			// Remove draggable attributes
 			Array.prototype.forEach.call(el.querySelectorAll('[draggable]'), function (el) {
 				el.removeAttribute('draggable');
 			});
@@ -874,7 +870,7 @@
 
 			this._onDrop();
 
-			this.el = null;
+			this.el = el = null;
 		}
 	};
 
@@ -1091,7 +1087,6 @@
 		throttle: _throttle,
 		closest: _closest,
 		toggleClass: _toggleClass,
-		dispatchEvent: _dispatchEvent,
 		index: _index
 	};
 
