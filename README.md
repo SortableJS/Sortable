@@ -563,11 +563,11 @@ Link to the active instance.
 
 ```html
 <!-- CDNJS :: Sortable (https://cdnjs.com/) -->
-<script src="//cdnjs.cloudflare.com/ajax/libs/Sortable/1.0.1/Sortable.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/Sortable/1.1.1/Sortable.min.js"></script>
 
 
 <!-- jsDelivr :: Sortable (http://www.jsdelivr.com/) -->
-<script src="//cdn.jsdelivr.net/sortable/1.0.1/Sortable.min.js"></script>
+<script src="//cdn.jsdelivr.net/sortable/1.1.1/Sortable.min.js"></script>
 
 
 <!-- jsDelivr :: Sortable :: Latest (http://www.jsdelivr.com/) -->
@@ -602,6 +602,14 @@ Now you can use `jquery.fn.sortable.js`:<br/>
   
   $("#list").sortable("{method-name}", "foo", "bar"); // call an instance method with parameters
 ```
+
+
+---
+
+
+### Contributing (Issue/PR)
+
+Please, [read this](CONTRIBUTING.md). 
 
 
 ---
