@@ -25,7 +25,7 @@
 
 
 	angular.module('ng-sortable', [])
-		.constant('version', '0.3.6')
+		.constant('version', '0.3.7')
 		.directive('ngSortable', ['$parse', function ($parse) {
 			var removed,
 				nextSibling;
@@ -78,7 +78,7 @@
 
 						/* jshint expr:true */
 						options[name] && options[name]({
-							model: item,
+							model: item || source && source.item(evt.item),
 							models: source && source.items(),
 							oldIndex: evt.oldIndex,
 							newIndex: evt.newIndex
@@ -143,13 +143,13 @@
 						},
 						onUpdate: function (/**Event*/evt) {
 							_sync(evt);
-							_emitEvent(evt, source && source.item(evt.item));
+							_emitEvent(evt);
 						},
 						onRemove: function (/**Event*/evt) {
 							_emitEvent(evt, removed);
 						},
 						onSort: function (/**Event*/evt) {
-							_emitEvent(evt, source && source.item(evt.item));
+							_emitEvent(evt);
 						}
 					}));
 
