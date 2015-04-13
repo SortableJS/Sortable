@@ -96,6 +96,8 @@
 							newIndex = evt.newIndex,
 							items = source.items();
 
+						if (el !== evt.target) { return }
+
 						if (el !== evt.from) {
 							var prevSource = getSource(evt.from),
 								prevItems = prevSource.items();
