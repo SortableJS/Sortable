@@ -603,6 +603,7 @@ Now you can use `jquery.fn.sortable.js`:<br/>
   $("#list").sortable("{method-name}", "foo", "bar"); // call an instance method with parameters
 ```
 
+And `grunt jquery:mySortableFunc` → `jquery.fn.mySortableFunc.js`
 
 ---
 
