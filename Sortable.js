@@ -561,7 +561,7 @@
 
 					_cloneHide(isOwner);
 
-					if (_onMove(rootEl, el, dragEl, dragRect, target, targetRect)) {
+					if (_onMove(rootEl, el, dragEl, dragRect, target, targetRect) !== false) {
 						el.appendChild(dragEl);
 						this._animate(dragRect, dragEl);
 						target && this._animate(targetRect, target);
@@ -582,16 +582,20 @@
 						isLong = (target.offsetHeight > dragEl.offsetHeight),
 						halfway = (floating ? (evt.clientX - targetRect.left) / width : (evt.clientY - targetRect.top) / height) > 0.5,
 						nextSibling = target.nextElementSibling,
+						moveVector = _onMove(rootEl, el, dragEl, dragRect, target, targetRect),
 						after
 					;
 
-					if (_onMove(rootEl, el, dragEl, dragRect, target, targetRect)) {
+					if (moveVector !== false) {
 						_silent = true;
 						setTimeout(_unsilent, 30);
 
 						_cloneHide(isOwner);
 
-						if (floating) {
+						if (moveVector === 1 || moveVector === -1) {
+							after = (moveVector === 1);
+						}
+						else if (floating) {
 							after = (target.previousElementSibling === dragEl) && !isWide || halfway && isWide;
 						} else {
 							after = (nextSibling !== dragEl) && !isLong || halfway && isLong;
@@ -1013,7 +1017,7 @@
 			retVal = onMoveFn.call(sortable, evt);
 		}
 
-		return retVal !== false;
+		return retVal;
 	}
 
 
