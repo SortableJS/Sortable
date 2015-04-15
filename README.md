@@ -109,6 +109,16 @@ var sortable = new Sortable(el, {
 	// Attempt to drag a filtered element
 	onFilter: function (/**Event*/evt) {
 		var itemEl = evt.item;  // HTMLElement receiving the `mousedown|tapstart` event.
+	},
+	
+	// Event when you move an item in the list or between lists
+	onMove: function (/**Event*/evt) {
+		// Example: http://jsbin.com/tuyafe/1/edit?js,output
+		evt.dragged; // dragged HTMLElement
+		evt.draggedRect; // TextRectangle {left, top, right и bottom}
+		evt.related; // HTMLElement on which have guided
+		evt.relatedRect; // TextRectangle
+		// retrun false; — for cancel
 	}
 });
 ```
