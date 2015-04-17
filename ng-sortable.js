@@ -69,6 +69,7 @@
 						ngSortable = attrs.ngSortable,
 						options = scope.$eval(ngSortable) || {},
 						source = getSource(el),
+						watchers = [],
 						sortable
 					;
 
@@ -154,7 +155,11 @@
 					}));
 
 					$el.on('$destroy', function () {
+						angular.forEach(watchers, function (/** Function */unwatch) {
+							unwatch();
+						});
 						sortable.destroy();
+						watchers = null;
 						sortable = null;
 						nextSibling = null;
 					});
@@ -164,7 +169,7 @@
 							'sort', 'disabled', 'draggable', 'handle', 'animation',
 							'onStart', 'onEnd', 'onAdd', 'onUpdate', 'onRemove', 'onSort'
 						], function (name) {
-							scope.$watch(ngSortable + '.' + name, function (value) {
+							watchers.push(scope.$watch(ngSortable + '.' + name, function (value) {
 								if (value !== void 0) {
 									options[name] = value;
 
@@ -172,7 +177,7 @@
 										sortable.option(name, value);
 									}
 								}
-							});
+							}));
 						});
 					}
 				}
