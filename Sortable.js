@@ -447,7 +447,12 @@
 
 			if (activeGroup.pull == 'clone') {
 				cloneEl = dragEl.cloneNode(true);
-				cloneEl.shadowRoot.innerHTML = dragEl.shadowRoot.innerHTML; //copy shadow root for polymer templates
+				//if shadow-root exists, copy shadow root for polymer templates
+				if (dragEl.shadowRoot)
+			    	{
+			    		cloneEl.shadowRoot.innerHTML = dragEl.shadowRoot.innerHTML;
+			    	}
+				
 				_css(cloneEl, 'display', 'none');
 				rootEl.insertBefore(cloneEl, dragEl);
 			}
