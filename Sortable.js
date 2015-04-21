@@ -550,7 +550,7 @@
 
 
 				if ((el.children.length === 0) || (el.children[0] === ghostEl) ||
-					(el === evt.target) && (target = _ghostInBottom(el, evt))
+					(el === evt.target) && (target = _ghostInBottom(el, options, evt))
 				) {
 					if (target) {
 						if (target.animated) {
@@ -562,7 +562,7 @@
 					_cloneHide(isOwner);
 
 					if (_onMove(rootEl, el, dragEl, dragRect, target, targetRect) !== false) {
-						el.appendChild(dragEl);
+						el.insertBefore(dragEl, _lastDraggable(el, options).nextSibling);
 						this._animate(dragRect, dragEl);
 						target && this._animate(targetRect, target);
 					}
@@ -601,11 +601,7 @@
 							after = (nextSibling !== dragEl) && !isLong || halfway && isLong;
 						}
 
-						if (after && !nextSibling) {
-							el.appendChild(dragEl);
-						} else {
-							target.parentNode.insertBefore(dragEl, after ? nextSibling : target);
-						}
+						target.parentNode.insertBefore(dragEl, after ? target.nextSibling : target);
 
 						this._animate(dragRect, dragEl);
 						this._animate(targetRect, target);
@@ -1033,9 +1029,19 @@
 	}
 
 
+	function _lastDraggable(el, options) {
+		var elements = el.querySelectorAll(options.draggable);
+		var i = elements.length - 1;
+		while (i--) {
+			if (elements[i].getAttribute('draggable') === false)
+				return elements[i];
+		}
+		return elements[0];
+	}
+
 	/** @returns {HTMLElement|false} */
-	function _ghostInBottom(el, evt) {
-		var lastEl = el.lastElementChild, rect = lastEl.getBoundingClientRect();
+	function _ghostInBottom(el, options, evt) {
+		var lastEl = _lastDraggable(el, options), rect = lastEl.getBoundingClientRect();
 		return (evt.clientY - (rect.top + rect.height) > 5) && lastEl; // min delta
 	}
 
