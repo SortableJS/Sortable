@@ -64,10 +64,10 @@
 			// Export
 			return {
 				restrict: 'AC',
+				scope: { ngSortable: "=?" },
 				link: function (scope, $el, attrs) {
 					var el = $el[0],
-						ngSortable = attrs.ngSortable,
-						options = scope.$eval(ngSortable) || {},
+						options = scope.ngSortable || {},
 						source = getSource(el),
 						watchers = [],
 						sortable
@@ -164,22 +164,20 @@
 						nextSibling = null;
 					});
 
-					if (ngSortable && !/{|}/.test(ngSortable)) { // todo: ugly
-						angular.forEach([
-							'sort', 'disabled', 'draggable', 'handle', 'animation',
-							'onStart', 'onEnd', 'onAdd', 'onUpdate', 'onRemove', 'onSort'
-						], function (name) {
-							watchers.push(scope.$watch(ngSortable + '.' + name, function (value) {
-								if (value !== void 0) {
-									options[name] = value;
+					angular.forEach([
+						'sort', 'disabled', 'draggable', 'handle', 'animation',
+						'onStart', 'onEnd', 'onAdd', 'onUpdate', 'onRemove', 'onSort'
+					], function (name) {
+						watchers.push(scope.$watch('ngSortable.' + name, function (value) {
+							if (value !== void 0) {
+								options[name] = value;
 
-									if (!/^on[A-Z]/.test(name)) {
-										sortable.option(name, value);
-									}
+								if (!/^on[A-Z]/.test(name)) {
+									sortable.option(name, value);
 								}
-							}));
-						});
-					}
+							}
+						}));
+					});
 				}
 			};
 		}]);
