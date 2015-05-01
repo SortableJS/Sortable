@@ -152,7 +152,7 @@ Template.sortable.rendered = function () {
 		// Insert the new element at the end of the list and move it where it was dropped.
 		// We could insert it at the beginning, but that would lead to negative orders.
 		var sortSpecifier = {}; sortSpecifier[orderField] = -1;
-		if (templateInstance.collection.find().fetch().length === 0) {
+		if (templateInstance.collection.find().count() === 0) {
 			event.data.order = 0
 		} else {
 			event.data.order = templateInstance.collection.findOne({}, { sort: sortSpecifier, limit: 1 }).order + 1;
