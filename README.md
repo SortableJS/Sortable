@@ -150,7 +150,7 @@ Demo: http://jsbin.com/xizeh/2/edit?html,js,output
 
 
 #### `delay` option
-time in milliseconds to define when the sorting should start.
+Time in milliseconds to define when the sorting should start.
 
 Demo: http://jsbin.com/xizeh/4/edit?html,js,output
 
