@@ -991,11 +991,11 @@
 		evt.oldIndex = startIndex;
 		evt.newIndex = newIndex;
 
+		rootEl.dispatchEvent(evt);
+
 		if (options[onName]) {
 			options[onName].call(sortable, evt);
 		}
-
-		rootEl.dispatchEvent(evt);
 	}
 
 
