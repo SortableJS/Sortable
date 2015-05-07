@@ -35,9 +35,7 @@ module.exports = function (grunt) {
 				}
 			},
 			jquery: {
-				files: {
-					'jquery.fn.sortable.min.js': 'jquery.fn.sortable.js'
-				}
+				files: {}
 			}
 		},
 
@@ -54,22 +52,37 @@ module.exports = function (grunt) {
 	});
 
 
-	grunt.registerTask('jquery', function (arg) {
+	grunt.registerTask('jquery', function (exportName, uglify) {
+		if (exportName == 'min') {
+			exportName = null;
+			uglify = 'min';
+		}
+
+		if (!exportName) {
+			exportName = 'sortable';
+		}
+
 		var fs = require('fs'),
-			filename = 'jquery.fn.sortable.js';
+			filename = 'jquery.fn.' + exportName + '.js';
 
 		grunt.log.oklns(filename);
 
 		fs.writeFileSync(
 			filename,
 			(fs.readFileSync('jquery.binding.js') + '')
+				.replace('$.fn.sortable', '$.fn.' + exportName)
 				.replace('/* CODE */',
 					(fs.readFileSync('Sortable.js') + '')
 						.replace(/^[\s\S]*?function[\s\S]*?(var[\s\S]+)\/\/\s+Export[\s\S]+/, '$1')
 				)
 		);
 
-		if (arg === 'min') {
+		if (uglify) {
+			var opts = {};
+
+			opts['jquery.fn.' + exportName + '.min.js'] = filename;
+			grunt.config.set('uglify.jquery.files', opts);
+
 			grunt.task.run('uglify:jquery');
 		}
 	});

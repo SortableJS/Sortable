@@ -25,7 +25,7 @@
 
 
 	angular.module('ng-sortable', [])
-		.constant('$version', '0.3.5')
+		.constant('version', '0.3.7')
 		.directive('ngSortable', ['$parse', function ($parse) {
 			var removed,
 				nextSibling;
@@ -78,7 +78,7 @@
 
 						/* jshint expr:true */
 						options[name] && options[name]({
-							model: item,
+							model: item || source && source.item(evt.item),
 							models: source && source.items(),
 							oldIndex: evt.oldIndex,
 							newIndex: evt.newIndex
@@ -143,13 +143,13 @@
 						},
 						onUpdate: function (/**Event*/evt) {
 							_sync(evt);
-							_emitEvent(evt, source && source.item(evt.item));
+							_emitEvent(evt);
 						},
 						onRemove: function (/**Event*/evt) {
 							_emitEvent(evt, removed);
 						},
 						onSort: function (/**Event*/evt) {
-							_emitEvent(evt, source && source.item(evt.item));
+							_emitEvent(evt);
 						}
 					}));
 
@@ -160,11 +160,17 @@
 					});
 
 					if (ngSortable && !/{|}/.test(ngSortable)) { // todo: ugly
-						angular.forEach(['sort', 'disabled', 'draggable', 'handle', 'animation'], function (name) {
+						angular.forEach([
+							'sort', 'disabled', 'draggable', 'handle', 'animation',
+							'onStart', 'onEnd', 'onAdd', 'onUpdate', 'onRemove', 'onSort'
+						], function (name) {
 							scope.$watch(ngSortable + '.' + name, function (value) {
 								if (value !== void 0) {
 									options[name] = value;
-									sortable.option(name, value);
+
+									if (!/^on[A-Z]/.test(name)) {
+										sortable.option(name, value);
+									}
 								}
 							});
 						});

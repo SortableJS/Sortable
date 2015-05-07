@@ -62,6 +62,7 @@ var sortable = new Sortable(el, {
 	filter: ".ignore-elements",  // Selectors that do not lead to dragging (String or Function)
 	draggable: ".item",  // Specifies which items inside the element should be sortable
 	ghostClass: "sortable-ghost",  // Class name for the drop placeholder
+	dataIdAttr: 'data-id',
 	
 	scroll: true, // or HTMLElement
 	scrollSensitivity: 30, // px, how near the mouse must be to an edge to start scrolling.
@@ -108,6 +109,16 @@ var sortable = new Sortable(el, {
 	// Attempt to drag a filtered element
 	onFilter: function (/**Event*/evt) {
 		var itemEl = evt.item;  // HTMLElement receiving the `mousedown|tapstart` event.
+	},
+	
+	// Event when you move an item in the list or between lists
+	onMove: function (/**Event*/evt) {
+		// Example: http://jsbin.com/tuyafe/1/edit?js,output
+		evt.dragged; // dragged HTMLElement
+		evt.draggedRect; // TextRectangle {left, top, right и bottom}
+		evt.related; // HTMLElement on which have guided
+		evt.relatedRect; // TextRectangle
+		// retrun false; — for cancel
 	}
 });
 ```
@@ -386,6 +397,32 @@ React.render(<div>
 ---
 
 
+<a name="ko"></a>
+### Support KnockoutJS
+Include [knockout-sortable.js](knockout-sortable.js)
+
+```html
+<div data-bind="sortable: {foreach: yourObservableArray, options: {/* sortable options here */}}">
+	<!-- optional item template here -->
+</div>
+
+<div data-bind="draggable: {foreach: yourObservableArray, options: {/* sortable options here */}}">
+	<!-- optional item template here -->
+</div>
+```
+
+Using this bindingHandler sorts the observableArray when the user sorts the HTMLElements.
+
+The sortable/draggable bindingHandlers supports the same syntax as Knockouts built in [template](http://knockoutjs.com/documentation/template-binding.html) binding except for the `data` option, meaning that you could supply the name of a template or specify a separate templateEngine. The difference between the sortable and draggable handlers is that the draggable has the sortable `group` option set to `{pull:'clone',put: false}` and the `sort` option set to false by default (overridable).
+
+Other attributes are:
+*	options: an object that contains settings for the underlaying sortable, ie `group`,`handle`, events etc.
+*	collection: if your `foreach` array is a computed then you would supply the underlaying observableArray that you would like to sort here.
+
+
+---
+
+
 ### Method
 
 
@@ -399,7 +436,7 @@ For each element in the set, get the first element that matches the selector by 
 
 
 ##### toArray():`String[]`
-Serializes the sortable's item `data-id`'s into an array of string.
+Serializes the sortable's item `data-id`'s (`dataIdAttr` option) into an array of string.
 
 
 ##### sort(order:`String[]`)
@@ -536,11 +573,11 @@ Link to the active instance.
 
 ```html
 <!-- CDNJS :: Sortable (https://cdnjs.com/) -->
-<script src="//cdnjs.cloudflare.com/ajax/libs/Sortable/1.1.1/Sortable.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/Sortable/1.2.0/Sortable.min.js"></script>
 
 
 <!-- jsDelivr :: Sortable (http://www.jsdelivr.com/) -->
-<script src="//cdn.jsdelivr.net/sortable/1.1.1/Sortable.min.js"></script>
+<script src="//cdn.jsdelivr.net/sortable/1.2.0/Sortable.min.js"></script>
 
 
 <!-- jsDelivr :: Sortable :: Latest (http://www.jsdelivr.com/) -->
@@ -576,6 +613,7 @@ Now you can use `jquery.fn.sortable.js`:<br/>
   $("#list").sortable("{method-name}", "foo", "bar"); // call an instance method with parameters
 ```
 
+And `grunt jquery:mySortableFunc` → `jquery.fn.mySortableFunc.js`
 
 ---
 
