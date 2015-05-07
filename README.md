@@ -55,6 +55,7 @@ You can use any element for the list and its elements, not just `ul`/`li`. Here 
 var sortable = new Sortable(el, {
 	group: "name",  // or { name: "...", pull: [true, false, clone], put: [true, false, array] }
 	sort: true,  // sorting inside list
+	delay: 0, // time in milliseconds to define when the sorting should start
 	disabled: false, // Disables the sortable if set to true.
 	store: null,  // @see Store
 	animation: 150,  // ms, animation speed moving items when sorting, `0` — without animation
@@ -140,9 +141,18 @@ You can also define whether lists can give away, give and keep a copy (`clone`),
 
 
 #### `sort` option
-Sorting inside list
+Sorting inside list.
 
 Demo: http://jsbin.com/xizeh/2/edit?html,js,output
+
+
+---
+
+
+#### `delay` option
+time in milliseconds to define when the sorting should start.
+
+Demo: http://jsbin.com/xizeh/4/edit?html,js,output
 
 
 ---
