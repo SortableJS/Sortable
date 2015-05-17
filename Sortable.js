@@ -486,6 +486,7 @@
 				_css(ghostEl, 'opacity', '0.8');
 				_css(ghostEl, 'position', 'fixed');
 				_css(ghostEl, 'zIndex', '100000');
+				_css(ghostEl, 'display', 'none');
 
 				rootEl.appendChild(ghostEl);
 
