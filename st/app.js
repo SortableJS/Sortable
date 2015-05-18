@@ -148,6 +148,9 @@
 
 	// Angular example
 	angular.module('todoApp', ['ng-sortable'])
+		.constant('ngSortableConfig', {onEnd: function() {
+			console.log('default onEnd()');
+		}})
 		.controller('TodoController', ['$scope', function ($scope) {
 			$scope.todos = [
 				{text: 'learn angular', done: true},
