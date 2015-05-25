@@ -25,8 +25,16 @@ Simplest invocation - order will be lost when the page is refreshed:
 
 Persist the sort order in the 'order' field of each document in the collection:
 
+*Client:*
+
 ```handlebars
 {{#sortable items=<collection|cursor|array> sortField="order"}}
+```
+
+*Server:*
+
+```js
+Sortable.collections = <collectionName>;  // the name, not the variable
 ```
 
 Along with `items`, `sortField` is the only Meteor-specific option. If it's missing, the package will
@@ -35,6 +43,10 @@ assume there is a field called "order" in the collection, holding unique `Number
 Try not to depend on a particular format for this field; it *is* though guaranteed that a `sort` will
 produce lexicographical order, and that the order will be maintained after an arbitrary number of
 reorderings, unlike with [naive solutions](http://programmers.stackexchange.com/questions/266451/maintain-ordered-collection-by-updating-as-few-order-fields-as-possible).
+
+Remember to declare on the server which collections you want to be reorderable from the client.
+Otherwise, the library will error because the client would be able to modify numerical fields in
+any collection, which represents a security risk.
 
 
 ## Passing options to the Sortable library
