@@ -26,7 +26,8 @@
 
 	angular.module('ng-sortable', [])
 		.constant('version', '0.3.7')
-		.directive('ngSortable', ['$parse', function ($parse) {
+		.constant('ngSortableConfig', {})
+		.directive('ngSortable', ['$parse', 'ngSortableConfig', function ($parse, ngSortableConfig) {
 			var removed,
 				nextSibling;
 
@@ -67,7 +68,7 @@
 				link: function (scope, $el, attrs) {
 					var el = $el[0],
 						ngSortable = attrs.ngSortable,
-						options = scope.$eval(ngSortable) || {},
+						options = angular.extend({}, ngSortableConfig, scope.$eval(ngSortable)),
 						source = getSource(el),
 						sortable
 					;
