@@ -134,6 +134,16 @@
 			this._sortableInstance = Sortable.create((this.refs[options.ref] || this).getDOMNode(), copyOptions);
 		},
 
+		componentWillReceiveProps: function (nextProps) {
+			var newState = {},
+				modelName = _getModelName(this),
+				items;
+
+			if (items = nextProps[modelName]) {
+				newState[modelName] = items;
+				this.setState(newState);
+			}
+		},
 
 		componentWillUnmount: function () {
 			this._sortableInstance.destroy();
