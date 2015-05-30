@@ -1,6 +1,6 @@
 /*
 Make a Sortable reactive by binding it to a Mongo.Collection.
-Calls `rubaxa:sortable/collection-update` on the server to update the sortField or affected records.
+Calls `rubaxa:sortable/collection-update` on the server to update the sortField of affected records.
 
 TODO:
   * supply consecutive values if the `order` field doesn't have any

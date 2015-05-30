@@ -35,7 +35,7 @@ run script:
 ### Differential
 
 Differential wrote [a blog post on reorderable lists with
-Meteor](differential.com/blog/sortable-lists-in-meteor-using-jquery-ui) and
+Meteor](http://differential.com/blog/sortable-lists-in-meteor-using-jquery-ui) and
 [jQuery UI Sortable](http://jqueryui.com/sortable/). It served as inspiration
 for integrating [rubaxa:sortable](rubaxa.github.io/Sortable/),
 which uses the HTML5 native drag&drop API (not without [its

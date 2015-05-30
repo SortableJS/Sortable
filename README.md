@@ -215,7 +215,7 @@ Sortable.create(el, {
 Sortable.create(list, {
 	filter: ".js-remove, .js-edit",
 	onFilter: function (evt) {
-		var item = el.item,
+		var item = evt.item,
 			ctrl = evt.target;
 
 		if (Sortable.utils.is(ctrl, ".js-remove")) {  // Click on remove button
