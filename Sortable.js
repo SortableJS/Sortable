@@ -45,6 +45,8 @@
 		tapEvt,
 		touchEvt,
 
+		moved,
+
 		/** @const */
 		RSPACE = /\s+/g,
 
@@ -427,6 +429,8 @@
 					dy = touch.clientY - tapEvt.clientY,
 					translate3d = evt.touches ? 'translate3d(' + dx + 'px,' + dy + 'px,0)' : 'translate(' + dx + 'px,' + dy + 'px)';
 
+				moved = true;
+
 				touchEvt = touch;
 
 				_css(ghostEl, 'webkitTransform', translate3d);
@@ -513,6 +517,8 @@
 				evt.preventDefault();
 				!options.dragoverBubble && evt.stopPropagation();
 			}
+
+			moved = true;
 
 			if (activeGroup && !options.disabled &&
 				(isOwner
@@ -666,8 +672,10 @@
 			this._offUpEvents();
 
 			if (evt) {
-				evt.preventDefault();
-				!options.dropBubble && evt.stopPropagation();
+				if (moved) {
+					evt.preventDefault();
+					!options.dropBubble && evt.stopPropagation();
+				}
 
 				ghostEl && ghostEl.parentNode.removeChild(ghostEl);
 
@@ -725,6 +733,8 @@
 
 				tapEvt =
 				touchEvt =
+
+				moved =
 
 				lastEl =
 				lastCSS =
