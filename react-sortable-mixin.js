@@ -139,7 +139,9 @@
 				modelName = _getModelName(this),
 				items;
 
-			if (items = nextProps[modelName]) {
+			items = nextProps[modelName];
+
+			if (items) {
 				newState[modelName] = items;
 				this.setState(newState);
 			}
