@@ -2,7 +2,9 @@
   "name": "Sortable",
   "main": [
   	"Sortable.js",
-  	"ng-sortable.js"
+  	"ng-sortable.js",
+  	"knockout-sortable.js",
+  	"react-sortable-mixin.js"
   ],
   "version": "1.2.0",
   "homepage": "http://rubaxa.github.io/Sortable/",
