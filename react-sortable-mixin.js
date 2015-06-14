@@ -45,7 +45,7 @@
 
 	function _getModelItems(component) {
 		var name = _getModelName(component),
-			items = component.state && component.state[name] || component.props[name];
+			items = component.state && component.state[name] || component.props[name] || [];
 
 		return items.slice();
 	}
