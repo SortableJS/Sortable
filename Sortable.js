@@ -885,7 +885,7 @@
 			selector = selector.split('.');
 
 			var tag = selector.shift().toUpperCase(),
-				re = new RegExp('\\s(' + selector.join('|') + ')\\s', 'g');
+				re = new RegExp('\\s(' + selector.join('|') + ')(?=\\s)', 'g');
 
 			do {
 				if (
