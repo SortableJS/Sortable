@@ -740,7 +740,7 @@
 					if (rootEl !== dragEl.parentNode) {
 						newIndex = _index(dragEl);
 
-						if(dragEl.parentNode.nodeName !== "TRASH"){
+						if (dragEl.parentNode.nodeName !== "TRASH") {
 							// drag from one list and drop into another
 							_dispatchEvent(null, dragEl.parentNode, 'sort', dragEl, rootEl, oldIndex, newIndex);
 							// Add event

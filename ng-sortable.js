@@ -129,9 +129,9 @@
 						var preItems;
 
 						// when target parentNode is trash node,it means the target is to drag out to remove
-						if(source && evt.item.parentNode && evt.item.parentNode.nodeName === "TRASH"){
+						if (source && evt.item.parentNode && evt.item.parentNode.nodeName === "TRASH") {
 							preItems = getSource(evt.from).items();
-							preItems.splice(evt.oldIndex ,1);
+							preItems.splice(evt.oldIndex, 1);
 
 							scope.$apply();
 						}
