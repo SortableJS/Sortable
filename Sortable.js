@@ -483,7 +483,7 @@
 		_onDragOut: function (container, dragEl) {
 			// remove from container when drag out
 			if (container.contains(dragEl)) {
-				// we can not remove dragEl from container directly because on an unSupportedDraggable api device if we remove dragEl,
+				// we can not remove dragEl from container directly because when we remove dragEl on a device which not support draggable api,
 				// the touchmove/mousemove event will lose the pointer
 				trashElement.appendChild(dragEl);
 			}
