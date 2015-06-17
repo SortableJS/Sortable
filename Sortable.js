@@ -659,8 +659,10 @@
 						}
 
 						if (after && !nextSibling) {
+							lastContainer = el;
 							el.appendChild(dragEl);
 						} else {
+							lastContainer = target.parentNode;
 							target.parentNode.insertBefore(dragEl, after ? nextSibling : target);
 						}
 
