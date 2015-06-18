@@ -86,7 +86,7 @@
 
 					vx,
 					vy
-					;
+                ;
 
 				// Delect scrollEl
 				if (scrollParentEl !== rootEl) {
@@ -144,7 +144,7 @@
 				}
 			}
 		}, 30)
-		;
+	;
 
 
 
@@ -423,7 +423,7 @@
 
 						target = parent; // store last element
 					}
-						/* jshint boss:true */
+					/* jshint boss:true */
 					while (parent = parent.parentNode);
 				}
 
@@ -569,8 +569,8 @@
 
 			if (activeGroup && !options.disabled &&
 				(isOwner
-						? canSort || (revert = !rootEl.contains(dragEl)) // Reverting item into the original list
-						: activeGroup.pull && groupPut && (
+					? canSort || (revert = !rootEl.contains(dragEl)) // Reverting item into the original list
+					: activeGroup.pull && groupPut && (
 						(activeGroup.name === group.name) || // by Name
 						(groupPut.indexOf && ~groupPut.indexOf(activeGroup.name)) // by Array
 					)
