@@ -86,7 +86,7 @@
 
 					vx,
 					vy
-                ;
+				;
 
 				// Delect scrollEl
 				if (scrollParentEl !== rootEl) {
@@ -641,7 +641,7 @@
 						nextSibling = target.nextElementSibling,
 						moveVector = _onMove(rootEl, el, dragEl, dragRect, target, targetRect),
 						after
-						;
+					;
 
 					if (moveVector !== false) {
 						_silent = true;
