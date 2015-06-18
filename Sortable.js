@@ -655,8 +655,7 @@
 
 			clearInterval(this._loopId);
 			clearInterval(autoScroll.pid);
-
-			clearTimeout(this.dragStartTimer);
+			clearTimeout(this._dragStartTimer);
 
 			// Unbind events
 			_off(document, 'drop', this);
