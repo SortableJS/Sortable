@@ -124,6 +124,18 @@
 						scope.$apply();
 					}
 
+					function _remove(evt) {
+
+						var preItems;
+
+						// when target parentNode is trash node,it means the target is to drag out to remove
+						if(source && evt.item.parentNode && evt.item.parentNode.nodeName === "TRASH"){
+							preItems = getSource(evt.from).items();
+							preItems.splice(evt.oldIndex ,1);
+
+							scope.$apply();
+						}
+					}
 
 					sortable = Sortable.create(el, Object.keys(options).reduce(function (opts, name) {
 						opts[name] = opts[name] || options[name];
@@ -148,6 +160,7 @@
 							_emitEvent(evt);
 						},
 						onRemove: function (/**Event*/evt) {
+							_remove(evt);
 							_emitEvent(evt, removed);
 						},
 						onSort: function (/**Event*/evt) {
