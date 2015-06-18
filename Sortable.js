@@ -35,7 +35,6 @@
 
 		lastEl,
 		lastCSS,
-		lastContainer,
 
 		oldIndex,
 		newIndex,
@@ -54,12 +53,6 @@
 		win = window,
 		document = win.document,
 		parseInt = win.parseInt,
-
-		trashElement = (function () {
-			var trashElement = document.createElement("TRASH");
-			trashElement.style.display = "none";
-			return document.body.appendChild(trashElement);
-		})(),
 
 		supportDraggable = !!('draggable' in document.createElement('div')),
 
@@ -86,7 +79,7 @@
 
 					vx,
 					vy
-				;
+					;
 
 				// Delect scrollEl
 				if (scrollParentEl !== rootEl) {
@@ -144,7 +137,7 @@
 				}
 			}
 		}, 30)
-	;
+		;
 
 
 
@@ -183,8 +176,7 @@
 			dropBubble: false,
 			dragoverBubble: false,
 			dataIdAttr: 'data-id',
-			delay: 0,
-			dragOutRemove: false
+			delay: 0
 		};
 
 
@@ -369,10 +361,6 @@
 			else {
 				_on(dragEl, 'dragend', this);
 				_on(rootEl, 'dragstart', this._onDragStart);
-
-				if (activeGroup.pull !== "clone" && this.options.dragOutRemove) {
-					_on(dragEl, 'drag', this._onDrag);
-				}
 			}
 
 			try {
@@ -423,7 +411,7 @@
 
 						target = parent; // store last element
 					}
-					/* jshint boss:true */
+						/* jshint boss:true */
 					while (parent = parent.parentNode);
 				}
 
@@ -446,46 +434,7 @@
 				_css(ghostEl, 'msTransform', translate3d);
 				_css(ghostEl, 'transform', translate3d);
 
-				if (activeGroup.pull != 'clone' && this.options.dragOutRemove) {
-					this._onDrag(touchEvt);
-				}
-
 				evt.preventDefault();
-			}
-		},
-
-		/**
-		 * @author Kuitos
-		 * @since 2015-06-15
-		 */
-		_onDrag: _throttle(function (evt) {
-
-			if (!lastContainer) {
-				return;
-			}
-
-			var rect = lastContainer.getBoundingClientRect(),
-				left = rect.left,
-				right = rect.right,
-				top = rect.top,
-				bottom = rect.bottom,
-
-				pointerX = evt.clientX,
-				pointerY = evt.clientY;
-
-			// when drag out from container
-			if (right < pointerX || pointerX < left || pointerY > bottom || pointerY < top) {
-				this._onDragOut(lastContainer, dragEl);
-			}
-
-		}, 120),
-
-		_onDragOut: function (container, dragEl) {
-			// remove from container when drag out
-			if (container.contains(dragEl)) {
-				// we can not remove dragEl from container directly because when we remove dragEl on a device which not support draggable api,
-				// the touchmove/mousemove event will lose the pointer
-				trashElement.appendChild(dragEl);
 			}
 		},
 
@@ -501,8 +450,6 @@
 				_css(cloneEl, 'display', 'none');
 				rootEl.insertBefore(cloneEl, dragEl);
 			}
-
-			lastContainer = rootEl;
 
 			if (useFallback) {
 				var rect = dragEl.getBoundingClientRect(),
@@ -569,8 +516,8 @@
 
 			if (activeGroup && !options.disabled &&
 				(isOwner
-					? canSort || (revert = !rootEl.contains(dragEl)) // Reverting item into the original list
-					: activeGroup.pull && groupPut && (
+						? canSort || (revert = !rootEl.contains(dragEl)) // Reverting item into the original list
+						: activeGroup.pull && groupPut && (
 						(activeGroup.name === group.name) || // by Name
 						(groupPut.indexOf && ~groupPut.indexOf(activeGroup.name)) // by Array
 					)
@@ -591,8 +538,6 @@
 				if (revert) {
 					_cloneHide(true);
 
-					lastContainer = rootEl;
-
 					if (cloneEl || nextEl) {
 						rootEl.insertBefore(dragEl, cloneEl || nextEl);
 					}
@@ -607,8 +552,6 @@
 				if ((el.children.length === 0) || (el.children[0] === ghostEl) ||
 					(el === evt.target) && (target = _ghostInBottom(el, evt))
 				) {
-					lastContainer = el;
-
 					if (target) {
 						if (target.animated) {
 							return;
@@ -641,7 +584,7 @@
 						nextSibling = target.nextElementSibling,
 						moveVector = _onMove(rootEl, el, dragEl, dragRect, target, targetRect),
 						after
-					;
+						;
 
 					if (moveVector !== false) {
 						_silent = true;
@@ -659,10 +602,8 @@
 						}
 
 						if (after && !nextSibling) {
-							lastContainer = el;
 							el.appendChild(dragEl);
 						} else {
-							lastContainer = target.parentNode;
 							target.parentNode.insertBefore(dragEl, after ? nextSibling : target);
 						}
 
@@ -715,7 +656,7 @@
 			clearInterval(this._loopId);
 			clearInterval(autoScroll.pid);
 
-			clearTimeout(this._dragStartTimer);
+			clearTimeout(this.dragStartTimer);
 
 			// Unbind events
 			_off(document, 'drop', this);
@@ -731,7 +672,6 @@
 				ghostEl && ghostEl.parentNode.removeChild(ghostEl);
 
 				if (dragEl) {
-					_off(dragEl, 'drag', this._onDrag);
 					_off(dragEl, 'dragend', this);
 
 					_disableDraggable(dragEl);
@@ -740,14 +680,12 @@
 					if (rootEl !== dragEl.parentNode) {
 						newIndex = _index(dragEl);
 
-						if (dragEl.parentNode.nodeName !== "TRASH") {
-							// drag from one list and drop into another
-							_dispatchEvent(null, dragEl.parentNode, 'sort', dragEl, rootEl, oldIndex, newIndex);
-							// Add event
-							_dispatchEvent(null, dragEl.parentNode, 'add', dragEl, rootEl, oldIndex, newIndex);
-						}
-
+						// drag from one list and drop into another
+						_dispatchEvent(null, dragEl.parentNode, 'sort', dragEl, rootEl, oldIndex, newIndex);
 						_dispatchEvent(this, rootEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
+
+						// Add event
+						_dispatchEvent(null, dragEl.parentNode, 'add', dragEl, rootEl, oldIndex, newIndex);
 
 						// Remove event
 						_dispatchEvent(this, rootEl, 'remove', dragEl, rootEl, oldIndex, newIndex);
@@ -777,25 +715,22 @@
 
 				// Nulling
 				rootEl =
-				dragEl =
-				ghostEl =
-				nextEl =
-				cloneEl =
+					dragEl =
+						ghostEl =
+							nextEl =
+								cloneEl =
 
-				scrollEl =
-				scrollParentEl =
+									scrollEl =
+										scrollParentEl =
 
-				tapEvt =
-				touchEvt =
+											tapEvt =
+												touchEvt =
 
-				lastEl =
-				lastCSS =
-				lastContainer =
+													lastEl =
+														lastCSS =
 
-				trashElement.innerHTML =
-
-				activeGroup =
-				Sortable.active = null;
+															activeGroup =
+																Sortable.active = null;
 			}
 		},
 
