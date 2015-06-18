@@ -79,7 +79,7 @@
 
 					vx,
 					vy
-				;
+					;
 
 				// Delect scrollEl
 				if (scrollParentEl !== rootEl) {
@@ -137,7 +137,7 @@
 				}
 			}
 		}, 30)
-	;
+		;
 
 
 
@@ -411,7 +411,7 @@
 
 						target = parent; // store last element
 					}
-					/* jshint boss:true */
+						/* jshint boss:true */
 					while (parent = parent.parentNode);
 				}
 
@@ -516,8 +516,8 @@
 
 			if (activeGroup && !options.disabled &&
 				(isOwner
-					? canSort || (revert = !rootEl.contains(dragEl)) // Reverting item into the original list
-					: activeGroup.pull && groupPut && (
+						? canSort || (revert = !rootEl.contains(dragEl)) // Reverting item into the original list
+						: activeGroup.pull && groupPut && (
 						(activeGroup.name === group.name) || // by Name
 						(groupPut.indexOf && ~groupPut.indexOf(activeGroup.name)) // by Array
 					)
@@ -584,7 +584,7 @@
 						nextSibling = target.nextElementSibling,
 						moveVector = _onMove(rootEl, el, dragEl, dragRect, target, targetRect),
 						after
-					;
+						;
 
 					if (moveVector !== false) {
 						_silent = true;
@@ -656,7 +656,7 @@
 			clearInterval(this._loopId);
 			clearInterval(autoScroll.pid);
 
-			clearTimeout(this.dragStartTimer);
+			clearTimeout(this._dragStartTimer);
 
 			// Unbind events
 			_off(document, 'drop', this);
@@ -715,22 +715,22 @@
 
 				// Nulling
 				rootEl =
-				dragEl =
-				ghostEl =
-				nextEl =
-				cloneEl =
+					dragEl =
+						ghostEl =
+							nextEl =
+								cloneEl =
 
-				scrollEl =
-				scrollParentEl =
+									scrollEl =
+										scrollParentEl =
 
-				tapEvt =
-				touchEvt =
+											tapEvt =
+												touchEvt =
 
-				lastEl =
-				lastCSS =
+													lastEl =
+														lastCSS =
 
-				activeGroup =
-				Sortable.active = null;
+															activeGroup =
+																Sortable.active = null;
 			}
 		},
 

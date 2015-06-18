@@ -35,9 +35,9 @@
 				var scope = angular.element(el).scope();
 				var ngRepeat = [].filter.call(el.childNodes, function (node) {
 					return (
-							(node.nodeType === 8) &&
-							(node.nodeValue.indexOf('ngRepeat:') !== -1)
-						);
+						(node.nodeType === 8) &&
+						(node.nodeValue.indexOf('ngRepeat:') !== -1)
+					);
 				})[0];
 
 				if (!ngRepeat) {
@@ -72,7 +72,7 @@
 						source = getSource(el),
 						watchers = [],
 						sortable
-					;
+						;
 
 
 					function _emitEvent(/**Event*/evt, /*Mixed*/item) {
