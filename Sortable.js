@@ -1021,17 +1021,19 @@
 			onMoveFn = sortable.options.onMove,
 			retVal;
 
+		evt = document.createEvent('Event');
+		evt.initEvent('move', true, true);
+
+		evt.to = toEl;
+		evt.from = fromEl;
+		evt.dragged = dragEl;
+		evt.draggedRect = dragRect;
+		evt.related = targetEl || toEl;
+		evt.relatedRect = targetRect || toEl.getBoundingClientRect();
+
+		fromEl.dispatchEvent(evt);
+
 		if (onMoveFn) {
-			evt = document.createEvent('Event');
-			evt.initEvent('move', true, true);
-
-			evt.to = toEl;
-			evt.from = fromEl;
-			evt.dragged = dragEl;
-			evt.draggedRect = dragRect;
-			evt.related = targetEl || toEl;
-			evt.relatedRect = targetRect || toEl.getBoundingClientRect();
-
 			retVal = onMoveFn.call(sortable, evt);
 		}
 
