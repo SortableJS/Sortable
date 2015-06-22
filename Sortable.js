@@ -176,7 +176,8 @@
 			dropBubble: false,
 			dragoverBubble: false,
 			dataIdAttr: 'data-id',
-			delay: 0
+			delay: 0,
+			forcePolyfill: false
 		};
 
 
@@ -323,8 +324,12 @@
 				_on(ownerDocument, 'touchcancel', _this._onDrop);
 
 				if (options.delay) {
-					// If the user moves the pointer before the delay has been reached:
+					// If the user moves the pointer or let go the click or touch
+					// before the delay has been reached:
 					// disable the delayed drag
+					_on(ownerDocument, 'mouseup', _this._disableDelayedDrag);
+					_on(ownerDocument, 'touchend', _this._disableDelayedDrag);
+					_on(ownerDocument, 'touchcancel', _this._disableDelayedDrag);
 					_on(ownerDocument, 'mousemove', _this._disableDelayedDrag);
 					_on(ownerDocument, 'touchmove', _this._disableDelayedDrag);
 
@@ -339,7 +344,9 @@
 			var ownerDocument = this.el.ownerDocument;
 
 			clearTimeout(this._dragStartTimer);
-
+			_off(ownerDocument, 'mouseup', this._disableDelayedDrag);
+			_off(ownerDocument, 'touchend', this._disableDelayedDrag);
+			_off(ownerDocument, 'touchcancel', this._disableDelayedDrag);
 			_off(ownerDocument, 'mousemove', this._disableDelayedDrag);
 			_off(ownerDocument, 'touchmove', this._disableDelayedDrag);
 		},
@@ -355,7 +362,7 @@
 
 				this._onDragStart(tapEvt, 'touch');
 			}
-			else if (!supportDraggable) {
+			else if (!supportDraggable || this.options.forcePolyfill) {
 				this._onDragStart(tapEvt, true);
 			}
 			else {
@@ -422,6 +429,12 @@
 
 		_onTouchMove: function (/**TouchEvent*/evt) {
 			if (tapEvt) {
+				// only set the status to dragging, when we are actually dragging
+				if(!Sortable.active) {
+					this._dragStarted();
+				}
+				// as well as creating the ghost element on the document body
+				this._appendGhost();
 				var touch = evt.touches ? evt.touches[0] : evt,
 					dx = touch.clientX - tapEvt.clientX,
 					dy = touch.clientY - tapEvt.clientY,
@@ -438,20 +451,8 @@
 			}
 		},
 
-
-		_onDragStart: function (/**Event*/evt, /**boolean*/useFallback) {
-			var dataTransfer = evt.dataTransfer,
-				options = this.options;
-
-			this._offUpEvents();
-
-			if (activeGroup.pull == 'clone') {
-				cloneEl = dragEl.cloneNode(true);
-				_css(cloneEl, 'display', 'none');
-				rootEl.insertBefore(cloneEl, dragEl);
-			}
-
-			if (useFallback) {
+		_appendGhost: function() {
+			if(!ghostEl) {
 				var rect = dragEl.getBoundingClientRect(),
 					css = _css(dragEl),
 					ghostRect;
@@ -466,12 +467,28 @@
 				_css(ghostEl, 'position', 'fixed');
 				_css(ghostEl, 'zIndex', '100000');
 
-				rootEl.appendChild(ghostEl);
+				document.body.appendChild(ghostEl);
 
 				// Fixing dimensions.
 				ghostRect = ghostEl.getBoundingClientRect();
 				_css(ghostEl, 'width', rect.width * 2 - ghostRect.width);
 				_css(ghostEl, 'height', rect.height * 2 - ghostRect.height);
+			}
+		},
+
+		_onDragStart: function (/**Event*/evt, /**boolean*/useFallback) {
+			var dataTransfer = evt.dataTransfer,
+				options = this.options;
+
+			this._offUpEvents();
+
+			if (activeGroup.pull == 'clone') {
+				cloneEl = dragEl.cloneNode(true);
+				_css(cloneEl, 'display', 'none');
+				rootEl.insertBefore(cloneEl, dragEl);
+			}
+
+			if (useFallback) {
 
 				if (useFallback === 'touch') {
 					// Bind touch events
@@ -493,9 +510,9 @@
 				}
 
 				_on(document, 'drop', this);
+				setTimeout(this._dragStarted, 0);
 			}
-
-			setTimeout(this._dragStarted, 0);
+			
 		},
 
 		_onDragOver: function (/**Event*/evt) {

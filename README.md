@@ -65,6 +65,13 @@ var sortable = new Sortable(el, {
 	ghostClass: "sortable-ghost",  // Class name for the drop placeholder
 	dataIdAttr: 'data-id',
 	
+	/*
+	 ignore the HTML5 DnD behaviour and force the fallback to kick in
+	 - provide a more reliable cross-browser solution
+	 - grants the ability to display a different "dragged" element
+	*/
+	forcePolyfill: false,
+	
 	scroll: true, // or HTMLElement
 	scrollSensitivity: 30, // px, how near the mouse must be to an edge to start scrolling.
 	scrollSpeed: 10, // px
@@ -248,6 +255,18 @@ Sortable.create(list, {
   ghostClass: "ghost"
 });
 ```
+
+
+---
+
+
+#### `forcePolyfill` option
+If set to `true`, the polyfill - or Fallback for non HTML5 Browser - will be used, even if we are using an HTML5 Browser.
+This gives us the possiblity to test the behaviour for older Browsers even in newer Browser, or make the Drag 'n Drop feel more consistent between Desktop , Mobile and old Browsers.
+
+On top of that, the polyfill always generates a copy of that DOM Element in the Document's Body. This behaviour can be exploited to give us more control over the look of this 'dragged' Element.
+
+Demo: http://jsbin.com/zejimolava/edit?html,css,js,output
 
 
 ---
