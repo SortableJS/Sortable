@@ -45,6 +45,8 @@
 		tapEvt,
 		touchEvt,
 
+		moved,
+
 		/** @const */
 		RSPACE = /\s+/g,
 
@@ -442,6 +444,8 @@
 
 				touchEvt = touch;
 
+				moved = true;
+
 				_css(ghostEl, 'webkitTransform', translate3d);
 				_css(ghostEl, 'mozTransform', translate3d);
 				_css(ghostEl, 'msTransform', translate3d);
@@ -682,9 +686,10 @@
 			this._offUpEvents();
 
 			if (evt) {
-				evt.preventDefault();
-				!options.dropBubble && evt.stopPropagation();
-
+				if(moved) {
+					evt.preventDefault();
+					!options.dropBubble && evt.stopPropagation();
+				}
 				ghostEl && ghostEl.parentNode.removeChild(ghostEl);
 
 				if (dragEl) {
@@ -741,6 +746,8 @@
 
 				tapEvt =
 				touchEvt =
+
+				moved =
 
 				lastEl =
 				lastCSS =
