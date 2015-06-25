@@ -206,7 +206,7 @@
 		// Bind all private methods
 		for (var fn in this) {
 			if (fn.charAt(0) === '_') {
-                this[fn] = this[fn].bind(this);
+				this[fn] = this[fn].bind(this);
 			}
 		}
 
