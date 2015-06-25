@@ -206,7 +206,7 @@
 		// Bind all private methods
 		for (var fn in this) {
 			if (fn.charAt(0) === '_') {
-				this[fn] = _bind(this, this[fn]);
+                this[fn] = this[fn].bind(this);
 			}
 		}
 
@@ -870,14 +870,6 @@
 	}
 
 
-	function _bind(ctx, fn) {
-		var args = slice.call(arguments, 2);
-		return	fn.bind ? fn.bind.apply(fn, [ctx].concat(args)) : function () {
-			return fn.apply(ctx, args.concat(slice.call(arguments)));
-		};
-	}
-
-
 	function _closest(/**HTMLElement*/el, /**String*/selector, /**HTMLElement*/ctx) {
 		if (el) {
 			ctx = ctx || document;
@@ -1115,7 +1107,6 @@
 		off: _off,
 		css: _css,
 		find: _find,
-		bind: _bind,
 		is: function (el, selector) {
 			return !!_closest(el, selector, el);
 		},
