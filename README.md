@@ -55,6 +55,7 @@ You can use any element for the list and its elements, not just `ul`/`li`. Here 
 var sortable = new Sortable(el, {
 	group: "name",  // or { name: "...", pull: [true, false, clone], put: [true, false, array] }
 	sort: true,  // sorting inside list
+	delay: 0, // time in milliseconds to define when the sorting should start
 	disabled: false, // Disables the sortable if set to true.
 	store: null,  // @see Store
 	animation: 150,  // ms, animation speed moving items when sorting, `0` — without animation
@@ -140,9 +141,18 @@ You can also define whether lists can give away, give and keep a copy (`clone`),
 
 
 #### `sort` option
-Sorting inside list
+Sorting inside list.
 
 Demo: http://jsbin.com/xizeh/2/edit?html,js,output
+
+
+---
+
+
+#### `delay` option
+Time in milliseconds to define when the sorting should start.
+
+Demo: http://jsbin.com/xizeh/4/edit?html,js,output
 
 
 ---
@@ -205,7 +215,7 @@ Sortable.create(el, {
 Sortable.create(list, {
 	filter: ".js-remove, .js-edit",
 	onFilter: function (evt) {
-		var item = el.item,
+		var item = evt.item,
 			ctrl = evt.target;
 
 		if (Sortable.utils.is(ctrl, ".js-remove")) {  // Click on remove button

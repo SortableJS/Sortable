@@ -1,7 +1,7 @@
 {
   "name": "sortablejs",
   "exportName": "Sortable",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "devDependencies": {
     "grunt": "*",
     "grunt-version": "*",
@@ -25,7 +25,7 @@
     "drag",
     "meteor",
     "angular",
-    "ng-srotable",
+    "ng-sortable",
     "react",
     "mixin"
   ],

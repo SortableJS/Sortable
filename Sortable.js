@@ -991,11 +991,11 @@
 		evt.oldIndex = startIndex;
 		evt.newIndex = newIndex;
 
+		rootEl.dispatchEvent(evt);
+
 		if (options[onName]) {
 			options[onName].call(sortable, evt);
 		}
-
-		rootEl.dispatchEvent(evt);
 	}
 
 
@@ -1035,7 +1035,9 @@
 
 	/** @returns {HTMLElement|false} */
 	function _ghostInBottom(el, evt) {
-		var lastEl = el.lastElementChild, rect = lastEl.getBoundingClientRect();
+		var lastEl = el.lastElementChild,
+			rect = lastEl.getBoundingClientRect();
+
 		return (evt.clientY - (rect.top + rect.height) > 5) && lastEl; // min delta
 	}
 
