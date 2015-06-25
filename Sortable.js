@@ -179,7 +179,9 @@
 			dragoverBubble: false,
 			dataIdAttr: 'data-id',
 			delay: 0,
-			forcePolyfill: false
+			forceFallback: false,
+			fallbackClass: 'sortable-fallback',
+			fallbackOnBody: false
 		};
 
 
@@ -364,7 +366,7 @@
 
 				this._onDragStart(tapEvt, 'touch');
 			}
-			else if (!supportDraggable || this.options.forcePolyfill) {
+			else if (!supportDraggable || this.options.forceFallback) {
 				this._onDragStart(tapEvt, true);
 			}
 			else {
@@ -463,6 +465,9 @@
 
 				ghostEl = dragEl.cloneNode(true);
 
+				_toggleClass(ghostEl, this.options.ghostClass, false);
+				_toggleClass(ghostEl, this.options.fallbackClass, true);
+
 				_css(ghostEl, 'top', rect.top - parseInt(css.marginTop, 10));
 				_css(ghostEl, 'left', rect.left - parseInt(css.marginLeft, 10));
 				_css(ghostEl, 'width', rect.width);
@@ -471,7 +476,7 @@
 				_css(ghostEl, 'position', 'fixed');
 				_css(ghostEl, 'zIndex', '100000');
 
-				document.body.appendChild(ghostEl);
+				this.options.fallbackOnBody && document.body.appendChild(ghostEl) || rootEl.appendChild(ghostEl);
 
 				// Fixing dimensions.
 				ghostRect = ghostEl.getBoundingClientRect();
