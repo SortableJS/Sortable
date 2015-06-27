@@ -45,6 +45,8 @@
 		tapEvt,
 		touchEvt,
 
+		moved,
+
 		/** @const */
 		RSPACE = /\s+/g,
 
@@ -175,7 +177,9 @@
 			dragoverBubble: false,
 			dataIdAttr: 'data-id',
 			delay: 0,
-			forceFallback : false
+			forceFallback: false,
+			fallbackClass: 'sortable-fallback',
+			fallbackOnBody: false
 		};
 
 
@@ -329,8 +333,12 @@
 				_on(ownerDocument, 'touchcancel', _this._onDrop);
 
 				if (options.delay) {
-					// If the user moves the pointer before the delay has been reached:
+					// If the user moves the pointer or let go the click or touch
+					// before the delay has been reached:
 					// disable the delayed drag
+					_on(ownerDocument, 'mouseup', _this._disableDelayedDrag);
+					_on(ownerDocument, 'touchend', _this._disableDelayedDrag);
+					_on(ownerDocument, 'touchcancel', _this._disableDelayedDrag);
 					_on(ownerDocument, 'mousemove', _this._disableDelayedDrag);
 					_on(ownerDocument, 'touchmove', _this._disableDelayedDrag);
 
@@ -345,7 +353,9 @@
 			var ownerDocument = this.el.ownerDocument;
 
 			clearTimeout(this._dragStartTimer);
-
+			_off(ownerDocument, 'mouseup', this._disableDelayedDrag);
+			_off(ownerDocument, 'touchend', this._disableDelayedDrag);
+			_off(ownerDocument, 'touchcancel', this._disableDelayedDrag);
 			_off(ownerDocument, 'mousemove', this._disableDelayedDrag);
 			_off(ownerDocument, 'touchmove', this._disableDelayedDrag);
 		},
@@ -428,12 +438,20 @@
 
 		_onTouchMove: function (/**TouchEvent*/evt) {
 			if (tapEvt) {
+				// only set the status to dragging, when we are actually dragging
+				if(!Sortable.active) {
+					this._dragStarted();
+				}
+				// as well as creating the ghost element on the document body
+				this._appendGhost();
 				var touch = evt.touches ? evt.touches[0] : evt,
 					dx = touch.clientX - tapEvt.clientX,
 					dy = touch.clientY - tapEvt.clientY,
 					translate3d = evt.touches ? 'translate3d(' + dx + 'px,' + dy + 'px,0)' : 'translate(' + dx + 'px,' + dy + 'px)';
 
 				touchEvt = touch;
+
+				moved = true;
 
 				_css(ghostEl, 'webkitTransform', translate3d);
 				_css(ghostEl, 'mozTransform', translate3d);
@@ -444,6 +462,33 @@
 			}
 		},
 
+		_appendGhost: function() {
+			if(!ghostEl) {
+				var rect = dragEl.getBoundingClientRect(),
+					css = _css(dragEl),
+					ghostRect;
+
+				ghostEl = dragEl.cloneNode(true);
+
+				_toggleClass(ghostEl, this.options.ghostClass, false);
+				_toggleClass(ghostEl, this.options.fallbackClass, true);
+
+				_css(ghostEl, 'top', rect.top - parseInt(css.marginTop, 10));
+				_css(ghostEl, 'left', rect.left - parseInt(css.marginLeft, 10));
+				_css(ghostEl, 'width', rect.width);
+				_css(ghostEl, 'height', rect.height);
+				_css(ghostEl, 'opacity', '0.8');
+				_css(ghostEl, 'position', 'fixed');
+				_css(ghostEl, 'zIndex', '100000');
+
+				this.options.fallbackOnBody && document.body.appendChild(ghostEl) || rootEl.appendChild(ghostEl);
+
+				// Fixing dimensions.
+				ghostRect = ghostEl.getBoundingClientRect();
+				_css(ghostEl, 'width', rect.width * 2 - ghostRect.width);
+				_css(ghostEl, 'height', rect.height * 2 - ghostRect.height);
+			}
+		},
 
 		_onDragStart: function (/**Event*/evt, /**boolean*/useFallback) {
 			var dataTransfer = evt.dataTransfer,
@@ -458,26 +503,6 @@
 			}
 
 			if (useFallback) {
-				var rect = dragEl.getBoundingClientRect(),
-					css = _css(dragEl),
-					ghostRect;
-
-				ghostEl = dragEl.cloneNode(true);
-
-				_css(ghostEl, 'top', rect.top - parseInt(css.marginTop, 10));
-				_css(ghostEl, 'left', rect.left - parseInt(css.marginLeft, 10));
-				_css(ghostEl, 'width', rect.width);
-				_css(ghostEl, 'height', rect.height);
-				_css(ghostEl, 'opacity', '0.8');
-				_css(ghostEl, 'position', 'fixed');
-				_css(ghostEl, 'zIndex', '100000');
-
-				rootEl.appendChild(ghostEl);
-
-				// Fixing dimensions.
-				ghostRect = ghostEl.getBoundingClientRect();
-				_css(ghostEl, 'width', rect.width * 2 - ghostRect.width);
-				_css(ghostEl, 'height', rect.height * 2 - ghostRect.height);
 
 				if (useFallback === 'touch') {
 					// Bind touch events
@@ -499,9 +524,9 @@
 				}
 
 				_on(document, 'drop', this);
+			setTimeout(this._dragStarted, 0);
 			}
 
-			setTimeout(this._dragStarted, 0);
 		},
 
 		_onDragOver: function (/**Event*/evt) {
@@ -674,9 +699,10 @@
 			this._offUpEvents();
 
 			if (evt) {
-				evt.preventDefault();
-				!options.dropBubble && evt.stopPropagation();
-
+				if(moved) {
+				    evt.preventDefault();
+				    !options.dropBubble && evt.stopPropagation();
+				}
 				ghostEl && ghostEl.parentNode.removeChild(ghostEl);
 
 				if (dragEl) {
@@ -735,6 +761,8 @@
 
 				tapEvt =
 				touchEvt =
+
+				moved =
 
 				lastEl =
 				lastCSS =
@@ -1009,7 +1037,6 @@
 			onMoveFn = sortable.options.onMove,
 			retVal;
 
-		if (onMoveFn) {
 			evt = document.createEvent('Event');
 			evt.initEvent('move', true, true);
 
@@ -1020,6 +1047,9 @@
 			evt.related = targetEl || toEl;
 			evt.relatedRect = targetRect || toEl.getBoundingClientRect();
 
+		fromEl.dispatchEvent(evt);
+
+		if (onMoveFn) {
 			retVal = onMoveFn.call(sortable, evt);
 		}
 
