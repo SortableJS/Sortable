@@ -65,6 +65,10 @@ var sortable = new Sortable(el, {
 	ghostClass: "sortable-ghost",  // Class name for the drop placeholder
 	dataIdAttr: 'data-id',
 	
+	forceFallback: false,  // ignore the HTML5 DnD behaviour and force the fallback to kick in
+	fallbackClass: "sortable-fallback"  // Class name for the cloned DOM Element when using forceFallback
+	fallbackOnBody: false  // Appends the cloned DOM Element into the Document's Body
+	
 	scroll: true, // or HTMLElement
 	scrollSensitivity: 30, // px, how near the mouse must be to an edge to start scrolling.
 	scrollSpeed: 10, // px
@@ -248,6 +252,18 @@ Sortable.create(list, {
   ghostClass: "ghost"
 });
 ```
+
+
+---
+
+
+#### `forceFallback` option
+If set to `true`, the Fallback for non HTML5 Browser will be used, even if we are using an HTML5 Browser.
+This gives us the possiblity to test the behaviour for older Browsers even in newer Browser, or make the Drag 'n Drop feel more consistent between Desktop , Mobile and old Browsers.
+
+On top of that, the Fallback always generates a copy of that DOM Element and appends the class `fallbackClass` definied in the options. This behaviour controls the look of this 'dragged' Element.
+
+Demo: http://jsbin.com/xinuyenabi/edit?html,css,js,output
 
 
 ---
