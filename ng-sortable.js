@@ -25,8 +25,9 @@
 
 
 	angular.module('ng-sortable', [])
-		.constant('version', '0.3.7')
-		.directive('ngSortable', ['$parse', function ($parse) {
+		.constant('ngSortableVersion', '0.3.7')
+		.constant('ngSortableConfig', {})
+		.directive('ngSortable', ['$parse', 'ngSortableConfig', function ($parse, ngSortableConfig) {
 			var removed,
 				nextSibling;
 
@@ -67,7 +68,7 @@
 				scope: { ngSortable: "=?" },
 				link: function (scope, $el, attrs) {
 					var el = $el[0],
-						options = scope.ngSortable || {},
+						options = angular.extend(scope.ngSortable || {}, ngSortableConfig),
 						source = getSource(el),
 						watchers = [],
 						sortable
@@ -165,7 +166,7 @@
 					});
 
 					angular.forEach([
-						'sort', 'disabled', 'draggable', 'handle', 'animation',
+						'sort', 'disabled', 'draggable', 'handle', 'animation', 'group', 'ghostClass', 'filter',
 						'onStart', 'onEnd', 'onAdd', 'onUpdate', 'onRemove', 'onSort'
 					], function (name) {
 						watchers.push(scope.$watch('ngSortable.' + name, function (value) {
