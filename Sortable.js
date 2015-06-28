@@ -181,7 +181,8 @@
 			delay: 0,
 			forceFallback: false,
 			fallbackClass: 'sortable-fallback',
-			fallbackOnBody: false
+			fallbackOnBody: false,
+			cursorAt : false
 		};
 
 
@@ -384,12 +385,23 @@
 			}
 		},
 
-		_dragStarted: function () {
+		_dragStarted: function (/**Event*/evt) {
 			if (rootEl && dragEl) {
 				// Apply effect
 				_toggleClass(dragEl, this.options.ghostClass, true);
 
 				Sortable.active = this;
+
+				// Fallback mode init
+				if (evt && !evt.dataTransfer) {// todo : or any property to detect current mode like this.nativeDragMode proposed in #457
+					this._appendGhost();
+
+					var rect = ghostEl.getBoundingClientRect();
+					this.touchOffsetX = evt.clientX-rect.left;
+					this.touchOffsetY = evt.clientY-rect.top;
+					this.cursorOffsetLeft = this.options.cursorAt && this.options.cursorAt.left ? (this.touchOffsetX - this.options.cursorAt.left) : 0;
+					this.cursorOffsetTop = this.options.cursorAt && this.options.cursorAt.top ? (this.touchOffsetY - this.options.cursorAt.top) : 0;
+				}
 
 				// Drag start event
 				_dispatchEvent(this, rootEl, 'start', dragEl, rootEl, oldIndex);
@@ -433,15 +445,15 @@
 
 		_onTouchMove: function (/**TouchEvent*/evt) {
 			if (tapEvt) {
+				var	touch = evt.touches ? evt.touches[0] : evt;
+
 				// only set the status to dragging, when we are actually dragging
 				if(!Sortable.active) {
-					this._dragStarted();
+					this._dragStarted(touch);
 				}
-				// as well as creating the ghost element on the document body
-				this._appendGhost();
-				var touch = evt.touches ? evt.touches[0] : evt,
-					dx = touch.clientX - tapEvt.clientX,
-					dy = touch.clientY - tapEvt.clientY,
+
+				var	dx = touch.clientX - tapEvt.clientX + this.cursorOffsetLeft,
+					dy = touch.clientY - tapEvt.clientY + this.cursorOffsetTop,
 					translate3d = evt.touches ? 'translate3d(' + dx + 'px,' + dy + 'px,0)' : 'translate(' + dx + 'px,' + dy + 'px)';
 
 				touchEvt = touch;
@@ -516,6 +528,9 @@
 				if (dataTransfer) {
 					dataTransfer.effectAllowed = 'move';
 					options.setData && options.setData.call(this, dataTransfer, dragEl);
+				}
+				if (this.options.cursorAt && evt.dataTransfer.setDragImage) {
+					evt.dataTransfer.setDragImage(dragEl, this.options.cursorAt.left, this.options.cursorAt.top);
 				}
 
 				_on(document, 'drop', this);
