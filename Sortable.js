@@ -385,23 +385,12 @@
 			}
 		},
 
-		_dragStarted: function (/**Event*/evt) {
+		_dragStarted: function () {
 			if (rootEl && dragEl) {
 				// Apply effect
 				_toggleClass(dragEl, this.options.ghostClass, true);
 
 				Sortable.active = this;
-
-				// Fallback mode init
-				if (evt && !evt.dataTransfer) {// todo : or any property to detect current mode like this.nativeDragMode proposed in #457
-					this._appendGhost();
-
-					var rect = ghostEl.getBoundingClientRect();
-					this.touchOffsetX = evt.clientX-rect.left;
-					this.touchOffsetY = evt.clientY-rect.top;
-					this.cursorOffsetLeft = this.options.cursorAt && this.options.cursorAt.left ? (this.touchOffsetX - this.options.cursorAt.left) : 0;
-					this.cursorOffsetTop = this.options.cursorAt && this.options.cursorAt.top ? (this.touchOffsetY - this.options.cursorAt.top) : 0;
-				}
 
 				// Drag start event
 				_dispatchEvent(this, rootEl, 'start', dragEl, rootEl, oldIndex);
@@ -449,7 +438,14 @@
 
 				// only set the status to dragging, when we are actually dragging
 				if(!Sortable.active) {
-					this._dragStarted(touch);
+					this._dragStarted();
+					this._appendGhost();
+
+					var rect = ghostEl.getBoundingClientRect();
+					this.touchOffsetX = touch.clientX-rect.left;
+					this.touchOffsetY = touch.clientY-rect.top;
+					this.cursorOffsetLeft = this.options.cursorAt && this.options.cursorAt.left ? (this.touchOffsetX - this.options.cursorAt.left) : 0;
+					this.cursorOffsetTop = this.options.cursorAt && this.options.cursorAt.top ? (this.touchOffsetY - this.options.cursorAt.top) : 0;
 				}
 
 				var	dx = touch.clientX - tapEvt.clientX + this.cursorOffsetLeft,
@@ -536,7 +532,7 @@
 				_on(document, 'drop', this);
 				setTimeout(this._dragStarted, 0);
 			}
-			
+
 		},
 
 		_onDragOver: function (/**Event*/evt) {
