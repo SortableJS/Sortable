@@ -25,6 +25,7 @@
 	"use strict";
 
 	var dragEl,
+		parentEl,
 		ghostEl,
 		cloneEl,
 		rootEl,
@@ -303,6 +304,7 @@
 
 				rootEl = el;
 				dragEl = target;
+				parentEl = target.parentNode;
 				nextEl = dragEl.nextSibling;
 				activeGroup = options.group;
 
@@ -434,7 +436,7 @@
 		_onTouchMove: function (/**TouchEvent*/evt) {
 			if (tapEvt) {
 				// only set the status to dragging, when we are actually dragging
-				if(!Sortable.active) {
+				if (!Sortable.active) {
 					this._dragStarted();
 				}
 				// as well as creating the ghost element on the document body
@@ -457,8 +459,8 @@
 			}
 		},
 
-		_appendGhost: function() {
-			if(!ghostEl) {
+		_appendGhost: function () {
+			if (!ghostEl) {
 				var rect = dragEl.getBoundingClientRect(),
 					css = _css(dragEl),
 					ghostRect;
@@ -691,7 +693,7 @@
 			this._offUpEvents();
 
 			if (evt) {
-				if(moved) {
+				if (moved) {
 					evt.preventDefault();
 					!options.dropBubble && evt.stopPropagation();
 				}
@@ -703,15 +705,15 @@
 					_disableDraggable(dragEl);
 					_toggleClass(dragEl, this.options.ghostClass, false);
 
-					if (rootEl !== dragEl.parentNode) {
+					if (rootEl !== parentEl) {
 						newIndex = _index(dragEl);
 
 						// drag from one list and drop into another
-						_dispatchEvent(null, dragEl.parentNode, 'sort', dragEl, rootEl, oldIndex, newIndex);
+						_dispatchEvent(null, parentEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
 						_dispatchEvent(this, rootEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
 
 						// Add event
-						_dispatchEvent(null, dragEl.parentNode, 'add', dragEl, rootEl, oldIndex, newIndex);
+						_dispatchEvent(null, parentEl, 'add', dragEl, rootEl, oldIndex, newIndex);
 
 						// Remove event
 						_dispatchEvent(this, rootEl, 'remove', dragEl, rootEl, oldIndex, newIndex);
@@ -742,6 +744,7 @@
 				// Nulling
 				rootEl =
 				dragEl =
+				parentEl =
 				ghostEl =
 				nextEl =
 				cloneEl =
@@ -1149,7 +1152,7 @@
 	};
 
 
-	Sortable.version = '1.2.1';
+	Sortable.version = '1.2.2';
 
 
 	/**
