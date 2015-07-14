@@ -100,7 +100,7 @@
 					else if (name === 'onAdd' || name === 'onUpdate') {
 						try {
 							evt.from.insertBefore(evt.item, _nextSibling);
-						}catch(ex){
+						} catch (ex) {
 							evt.from.appendChild(evt.item);
 						}
 
