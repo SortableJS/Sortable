@@ -30,8 +30,8 @@
 			var removed,
 				nextSibling;
 
-			function getSource(el) {
-				var scope = angular.element(el).scope();
+			function getSource(scope, el) {
+			
 				var ngRepeat = [].filter.call(el.childNodes, function (node) {
 					return (
 							(node.nodeType === 8) &&
@@ -68,7 +68,7 @@
 				link: function (scope, $el, attrs) {
 					var el = $el[0],
 						options = scope.ngSortable || {},
-						source = getSource(el),
+						source = getSource(scope, el),
 						watchers = [],
 						sortable
 					;
@@ -98,7 +98,7 @@
 							items = source.items();
 
 						if (el !== evt.from) {
-							var prevSource = getSource(evt.from),
+							var prevSource = getSource(scope, evt.from),
 								prevItems = prevSource.items();
 
 							oldIndex = prevItems.indexOf(prevSource.item(evt.item));
