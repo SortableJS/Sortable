@@ -57,8 +57,6 @@
 		document = win.document,
 		parseInt = win.parseInt,
 
-		supportDraggable = !!('draggable' in document.createElement('div')),
-
 		_silent = false,
 
 		abs = Math.abs,
@@ -191,6 +189,11 @@
 			!(name in options) && (options[name] = defaults[name]);
 		}
 
+		if (options.forceFallback) {
+			this.nativeDragMode = false;
+		} else {
+			this.nativeDragMode = !!('draggable' in document.createElement('div'));
+		}
 
 		var group = options.group;
 
@@ -221,8 +224,10 @@
 		_on(el, 'mousedown', this._onTapStart);
 		_on(el, 'touchstart', this._onTapStart);
 
-		_on(el, 'dragover', this);
-		_on(el, 'dragenter', this);
+		if (this.nativeDragMode) {
+			_on(el, 'dragover', this);
+			_on(el, 'dragenter', this);
+		}
 
 		touchDragOverListeners.push(this._onDragOver);
 
@@ -368,7 +373,7 @@
 
 				this._onDragStart(tapEvt, 'touch');
 			}
-			else if (!supportDraggable || this.options.forceFallback) {
+			else if (!this.nativeDragMode) {
 				this._onDragStart(tapEvt, true);
 			}
 			else {
@@ -532,7 +537,6 @@
 				_on(document, 'drop', this);
 				setTimeout(this._dragStarted, 0);
 			}
-			
 		},
 
 		_onDragOver: function (/**Event*/evt) {
@@ -695,9 +699,12 @@
 			clearTimeout(this._dragStartTimer);
 
 			// Unbind events
-			_off(document, 'drop', this);
 			_off(document, 'mousemove', this._onTouchMove);
-			_off(el, 'dragstart', this._onDragStart);
+
+			if (this.nativeDragMode) {
+				_off(document, 'drop', this);
+				_off(el, 'dragstart', this._onDragStart);
+			}
 
 			this._offUpEvents();
 
@@ -710,7 +717,9 @@
 				ghostEl && ghostEl.parentNode.removeChild(ghostEl);
 
 				if (dragEl) {
-					_off(dragEl, 'dragend', this);
+					if (this.nativeDragMode) {
+						_off(dragEl, 'dragend', this);
+					}
 
 					_disableDraggable(dragEl);
 					_toggleClass(dragEl, this.options.ghostClass, false);
@@ -888,8 +897,10 @@
 			_off(el, 'mousedown', this._onTapStart);
 			_off(el, 'touchstart', this._onTapStart);
 
-			_off(el, 'dragover', this);
-			_off(el, 'dragenter', this);
+			if (this.nativeDragMode) {
+				_off(el, 'dragover', this);
+				_off(el, 'dragenter', this);
+			}
 
 			// Remove draggable attributes
 			Array.prototype.forEach.call(el.querySelectorAll('[draggable]'), function (el) {
