@@ -139,12 +139,12 @@
 							scope.$apply();
 						},
 						onAdd: function (/**Event*/evt) {
-							_sync(evt);
+							(options.skipSync === true) || _sync(evt);
 							_emitEvent(evt, removed);
 							scope.$apply();
 						},
 						onUpdate: function (/**Event*/evt) {
-							_sync(evt);
+							(options.skipSync === true) || _sync(evt);
 							_emitEvent(evt);
 						},
 						onRemove: function (/**Event*/evt) {
