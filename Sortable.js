@@ -655,8 +655,7 @@
 
 			clearInterval(this._loopId);
 			clearInterval(autoScroll.pid);
-
-			clearTimeout(this.dragStartTimer);
+			clearTimeout(this._dragStartTimer);
 
 			// Unbind events
 			_off(document, 'drop', this);
@@ -885,7 +884,7 @@
 			selector = selector.split('.');
 
 			var tag = selector.shift().toUpperCase(),
-				re = new RegExp('\\s(' + selector.join('|') + ')\\s', 'g');
+				re = new RegExp('\\s(' + selector.join('|') + ')(?=\\s)', 'g');
 
 			do {
 				if (
@@ -1128,7 +1127,7 @@
 	};
 
 
-	Sortable.version = '1.2.0';
+	Sortable.version = '1.2.1';
 
 
 	/**
