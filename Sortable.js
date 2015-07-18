@@ -458,6 +458,8 @@
 					dy = touch.clientY - tapEvt.clientY,
 					translate3d = evt.touches ? 'translate3d(' + dx + 'px,' + dy + 'px,0)' : 'translate(' + dx + 'px,' + dy + 'px)';
 
+				moved = true;
+
 				touchEvt = touch;
 
 				moved = true;
@@ -552,6 +554,8 @@
 				evt.preventDefault();
 				!options.dragoverBubble && evt.stopPropagation();
 			}
+
+			moved = true;
 
 			if (activeGroup && !options.disabled &&
 				(isOwner
