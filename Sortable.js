@@ -400,6 +400,12 @@
 
 		_emulateDragOver: function () {
 			if (touchEvt) {
+				if (this._lastX===touchEvt.clientX && this._lastY===touchEvt.clientY ) {
+					return;
+				}
+				this._lastX=touchEvt.clientX;
+				this._lastY=touchEvt.clientY;
+
 				_css(ghostEl, 'display', 'none');
 
 				var target = document.elementFromPoint(touchEvt.clientX, touchEvt.clientY),
@@ -514,7 +520,7 @@
 					_on(document, 'mouseup', this._onDrop);
 				}
 
-				this._loopId = setInterval(this._emulateDragOver, 150);
+				this._loopId = setInterval(this._emulateDragOver, 50);
 			}
 			else {
 				if (dataTransfer) {
