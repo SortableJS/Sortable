@@ -400,11 +400,12 @@
 
 		_emulateDragOver: function () {
 			if (touchEvt) {
-				if (this._lastX===touchEvt.clientX && this._lastY===touchEvt.clientY ) {
+				if (this._lastX === touchEvt.clientX && this._lastY === touchEvt.clientY) {
 					return;
 				}
-				this._lastX=touchEvt.clientX;
-				this._lastY=touchEvt.clientY;
+
+				this._lastX = touchEvt.clientX;
+				this._lastY = touchEvt.clientY;
 
 				_css(ghostEl, 'display', 'none');
 
