@@ -57,6 +57,8 @@
 		document = win.document,
 		parseInt = win.parseInt,
 
+		supportDraggable = !!('draggable' in document.createElement('div')),
+
 		_silent = false,
 
 		abs = Math.abs,
@@ -189,12 +191,6 @@
 			!(name in options) && (options[name] = defaults[name]);
 		}
 
-		if (options.forceFallback) {
-			this.nativeDragMode = false;
-		} else {
-			this.nativeDragMode = !!('draggable' in document.createElement('div'));
-		}
-
 		var group = options.group;
 
 		if (!group || typeof group != 'object') {
@@ -219,12 +215,14 @@
 			}
 		}
 
+		// Setup drag mode
+		this.nativeDraggable = options.forceFallback ? false : supportDraggable;
 
 		// Bind events
 		_on(el, 'mousedown', this._onTapStart);
 		_on(el, 'touchstart', this._onTapStart);
 
-		if (this.nativeDragMode) {
+		if (this.nativeDraggable) {
 			_on(el, 'dragover', this);
 			_on(el, 'dragenter', this);
 		}
@@ -373,7 +371,7 @@
 
 				this._onDragStart(tapEvt, 'touch');
 			}
-			else if (!this.nativeDragMode) {
+			else if (!this.nativeDraggable) {
 				this._onDragStart(tapEvt, true);
 			}
 			else {
@@ -701,7 +699,7 @@
 			// Unbind events
 			_off(document, 'mousemove', this._onTouchMove);
 
-			if (this.nativeDragMode) {
+			if (this.nativeDraggable) {
 				_off(document, 'drop', this);
 				_off(el, 'dragstart', this._onDragStart);
 			}
@@ -717,7 +715,7 @@
 				ghostEl && ghostEl.parentNode.removeChild(ghostEl);
 
 				if (dragEl) {
-					if (this.nativeDragMode) {
+					if (this.nativeDraggable) {
 						_off(dragEl, 'dragend', this);
 					}
 
@@ -897,7 +895,7 @@
 			_off(el, 'mousedown', this._onTapStart);
 			_off(el, 'touchstart', this._onTapStart);
 
-			if (this.nativeDragMode) {
+			if (this.nativeDraggable) {
 				_off(el, 'dragover', this);
 				_off(el, 'dragenter', this);
 			}
