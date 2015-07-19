@@ -6,7 +6,6 @@
   	"knockout-sortable.js",
   	"react-sortable-mixin.js"
   ],
-  "version": "1.2.1",
   "homepage": "http://rubaxa.github.io/Sortable/",
   "authors": [
     "RubaXa <ibnRubaXa@gmail.com>"

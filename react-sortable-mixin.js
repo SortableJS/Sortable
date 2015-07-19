@@ -138,9 +138,7 @@
 		componentWillReceiveProps: function (nextProps) {
 			var newState = {},
 				modelName = _getModelName(this),
-				items;
-
-			items = nextProps[modelName];
+				items = nextProps[modelName];
 
 			if (items) {
 				newState[modelName] = items;

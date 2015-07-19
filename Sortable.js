@@ -25,6 +25,7 @@
 	"use strict";
 
 	var dragEl,
+		parentEl,
 		ghostEl,
 		cloneEl,
 		rootEl,
@@ -190,7 +191,6 @@
 			!(name in options) && (options[name] = defaults[name]);
 		}
 
-
 		var group = options.group;
 
 		if (!group || typeof group != 'object') {
@@ -215,13 +215,17 @@
 			}
 		}
 
+		// Setup drag mode
+		this.nativeDraggable = options.forceFallback ? false : supportDraggable;
 
 		// Bind events
 		_on(el, 'mousedown', this._onTapStart);
 		_on(el, 'touchstart', this._onTapStart);
 
-		_on(el, 'dragover', this);
-		_on(el, 'dragenter', this);
+		if (this.nativeDraggable) {
+			_on(el, 'dragover', this);
+			_on(el, 'dragenter', this);
+		}
 
 		touchDragOverListeners.push(this._onDragOver);
 
@@ -303,6 +307,7 @@
 
 				rootEl = el;
 				dragEl = target;
+				parentEl = target.parentNode;
 				nextEl = dragEl.nextSibling;
 				activeGroup = options.group;
 
@@ -366,7 +371,7 @@
 
 				this._onDragStart(tapEvt, 'touch');
 			}
-			else if (!supportDraggable || this.options.forceFallback) {
+			else if (!this.nativeDraggable) {
 				this._onDragStart(tapEvt, true);
 			}
 			else {
@@ -398,6 +403,13 @@
 
 		_emulateDragOver: function () {
 			if (touchEvt) {
+				if (this._lastX === touchEvt.clientX && this._lastY === touchEvt.clientY) {
+					return;
+				}
+
+				this._lastX = touchEvt.clientX;
+				this._lastY = touchEvt.clientY;
+
 				_css(ghostEl, 'display', 'none');
 
 				var target = document.elementFromPoint(touchEvt.clientX, touchEvt.clientY),
@@ -434,19 +446,20 @@
 		_onTouchMove: function (/**TouchEvent*/evt) {
 			if (tapEvt) {
 				// only set the status to dragging, when we are actually dragging
-				if(!Sortable.active) {
+				if (!Sortable.active) {
 					this._dragStarted();
 				}
+
 				// as well as creating the ghost element on the document body
 				this._appendGhost();
+
 				var touch = evt.touches ? evt.touches[0] : evt,
 					dx = touch.clientX - tapEvt.clientX,
 					dy = touch.clientY - tapEvt.clientY,
 					translate3d = evt.touches ? 'translate3d(' + dx + 'px,' + dy + 'px,0)' : 'translate(' + dx + 'px,' + dy + 'px)';
 
-				touchEvt = touch;
-
 				moved = true;
+				touchEvt = touch;
 
 				_css(ghostEl, 'webkitTransform', translate3d);
 				_css(ghostEl, 'mozTransform', translate3d);
@@ -457,8 +470,8 @@
 			}
 		},
 
-		_appendGhost: function() {
-			if(!ghostEl) {
+		_appendGhost: function () {
+			if (!ghostEl) {
 				var rect = dragEl.getBoundingClientRect(),
 					css = _css(dragEl),
 					ghostRect;
@@ -510,7 +523,7 @@
 					_on(document, 'mouseup', this._onDrop);
 				}
 
-				this._loopId = setInterval(this._emulateDragOver, 150);
+				this._loopId = setInterval(this._emulateDragOver, 50);
 			}
 			else {
 				if (dataTransfer) {
@@ -521,7 +534,6 @@
 				_on(document, 'drop', this);
 				setTimeout(this._dragStarted, 0);
 			}
-			
 		},
 
 		_onDragOver: function (/**Event*/evt) {
@@ -539,6 +551,8 @@
 				evt.preventDefault();
 				!options.dragoverBubble && evt.stopPropagation();
 			}
+
+			moved = true;
 
 			if (activeGroup && !options.disabled &&
 				(isOwner
@@ -684,37 +698,44 @@
 			clearTimeout(this._dragStartTimer);
 
 			// Unbind events
-			_off(document, 'drop', this);
 			_off(document, 'mousemove', this._onTouchMove);
-			_off(el, 'dragstart', this._onDragStart);
+
+			if (this.nativeDraggable) {
+				_off(document, 'drop', this);
+				_off(el, 'dragstart', this._onDragStart);
+			}
 
 			this._offUpEvents();
 
 			if (evt) {
-				if(moved) {
+				if (moved) {
 					evt.preventDefault();
 					!options.dropBubble && evt.stopPropagation();
 				}
+
 				ghostEl && ghostEl.parentNode.removeChild(ghostEl);
 
 				if (dragEl) {
-					_off(dragEl, 'dragend', this);
+					if (this.nativeDraggable) {
+						_off(dragEl, 'dragend', this);
+					}
 
 					_disableDraggable(dragEl);
 					_toggleClass(dragEl, this.options.ghostClass, false);
 
-					if (rootEl !== dragEl.parentNode) {
+					if (rootEl !== parentEl) {
 						newIndex = _index(dragEl);
+						if (newIndex != -1) {
+							// drag from one list and drop into another
+							_dispatchEvent(null, parentEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
+							_dispatchEvent(this, rootEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
 
-						// drag from one list and drop into another
-						_dispatchEvent(null, dragEl.parentNode, 'sort', dragEl, rootEl, oldIndex, newIndex);
-						_dispatchEvent(this, rootEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
+							// Add event
+							_dispatchEvent(null, parentEl, 'add', dragEl, rootEl, oldIndex, newIndex);
 
-						// Add event
-						_dispatchEvent(null, dragEl.parentNode, 'add', dragEl, rootEl, oldIndex, newIndex);
-
-						// Remove event
-						_dispatchEvent(this, rootEl, 'remove', dragEl, rootEl, oldIndex, newIndex);
+							// Remove event
+							_dispatchEvent(this, rootEl, 'remove', dragEl, rootEl, oldIndex, newIndex);
+						}
 					}
 					else {
 						// Remove clone
@@ -723,10 +744,11 @@
 						if (dragEl.nextSibling !== nextEl) {
 							// Get the index of the dragged element within its parent
 							newIndex = _index(dragEl);
-
-							// drag & drop within the same list
-							_dispatchEvent(this, rootEl, 'update', dragEl, rootEl, oldIndex, newIndex);
-							_dispatchEvent(this, rootEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
+							if (newIndex != -1) {
+								// drag & drop within the same list
+								_dispatchEvent(this, rootEl, 'update', dragEl, rootEl, oldIndex, newIndex);
+								_dispatchEvent(this, rootEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
+							}
 						}
 					}
 
@@ -738,10 +760,11 @@
 						this.save();
 					}
 				}
-
+				
 				// Nulling
 				rootEl =
 				dragEl =
+				parentEl =
 				ghostEl =
 				nextEl =
 				cloneEl =
@@ -873,8 +896,10 @@
 			_off(el, 'mousedown', this._onTapStart);
 			_off(el, 'touchstart', this._onTapStart);
 
-			_off(el, 'dragover', this);
-			_off(el, 'dragenter', this);
+			if (this.nativeDraggable) {
+				_off(el, 'dragover', this);
+				_off(el, 'dragenter', this);
+			}
 
 			// Remove draggable attributes
 			Array.prototype.forEach.call(el.querySelectorAll('[draggable]'), function (el) {
@@ -1089,6 +1114,9 @@
 	 * @private
 	 */
 	function _index(/**HTMLElement*/el) {
+		if (!el || !el.parentNode) {
+			return -1;
+		}
 		var index = 0;
 		while (el && (el = el.previousElementSibling)) {
 			if (el.nodeName.toUpperCase() !== 'TEMPLATE') {
@@ -1149,9 +1177,6 @@
 	};
 
 
-	Sortable.version = '1.2.1';
-
-
 	/**
 	 * Create sortable instance
 	 * @param {HTMLElement}  el
@@ -1160,7 +1185,9 @@
 	Sortable.create = function (el, options) {
 		return new Sortable(el, options);
 	};
+	
 
 	// Export
+	Sortable.version = '1.2.2';
 	return Sortable;
 });
