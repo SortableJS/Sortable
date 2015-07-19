@@ -16,7 +16,7 @@ Package.describe({
 Package.onUse(function (api) {
 	api.versionsFrom(['METEOR@0.9.0', 'METEOR@1.0']);
 	api.use('templating', 'client');
-	api.use('dburles:mongo-collection-instances@0.3.3');  // to watch collections getting created
+	api.use('dburles:mongo-collection-instances@0.3.4');  // to watch collections getting created
 	api.export('Sortable');  // exported on the server too, as a global to hold the array of sortable collections (for security)
 	api.addFiles([
 		'Sortable.js',
