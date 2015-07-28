@@ -573,7 +573,7 @@
 
 				target = _closest(evt.target, options.draggable, el);
 				dragRect = dragEl.getBoundingClientRect();
-
+				parentEl = target && target.parentNode; // actualization
 
 				if (revert) {
 					_cloneHide(true);
@@ -725,6 +725,7 @@
 
 					if (rootEl !== parentEl) {
 						newIndex = _index(dragEl);
+
 						if (newIndex != -1) {
 							// drag from one list and drop into another
 							_dispatchEvent(null, parentEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
@@ -760,7 +761,7 @@
 						this.save();
 					}
 				}
-				
+
 				// Nulling
 				rootEl =
 				dragEl =
@@ -1185,7 +1186,7 @@
 	Sortable.create = function (el, options) {
 		return new Sortable(el, options);
 	};
-	
+
 
 	// Export
 	Sortable.version = '1.2.2';
