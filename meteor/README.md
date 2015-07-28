@@ -81,6 +81,20 @@ Template.myTemplate.helpers({
 });
 ```
 
+#### meteor specific options
+
+* `selector` - you can specify collection selector if your list operates only on subset of collection. Example:
+
+```js
+Template.myTemplate.helpers({
+   playerOptions: function() {
+      return {
+         selector: { city: 'San Francisco' }
+      }
+   }
+});
+```
+
 
 ## Events
 
