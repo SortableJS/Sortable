@@ -780,6 +780,7 @@
 				touchEvt =
 
 				moved =
+				newIndex =
 
 				lastEl =
 				lastCSS =
