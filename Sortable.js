@@ -574,7 +574,7 @@
 
 				target = _closest(evt.target, options.draggable, el);
 				dragRect = dragEl.getBoundingClientRect();
-				parentEl = target && target.parentNode; // actualization
+				parentEl = target && target.parentNode || parentEl; // actualization
 
 				if (revert) {
 					_cloneHide(true);
