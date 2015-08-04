@@ -176,7 +176,8 @@
 			dropBubble: false,
 			dragoverBubble: false,
 			dataIdAttr: 'data-id',
-			delay: 0
+			delay: 0,
+			draggedClass: 'being-dragged'
 		};
 
 
@@ -308,6 +309,9 @@
 
 					// Make the element draggable
 					dragEl.draggable = true;
+					
+					// Add a class to the newly draggable item
+					dragEl.classList.add(draggedClass);
 
 					// Disable "draggable"
 					options.ignore.split(',').forEach(function (criteria) {
@@ -1024,6 +1028,7 @@
 
 	function _disableDraggable(el) {
 		el.draggable = false;
+		dragEl.classList.remove(draggedClass);
 	}
 
 
