@@ -250,7 +250,7 @@
 			}
 
 			// get the index of the dragged element within its parent
-			oldIndex = _index(target);
+			oldIndex = _index(target, options.draggable);
 
 			// Check filter
 			if (typeof filter === 'function') {
@@ -677,7 +677,7 @@
 					_toggleClass(dragEl, this.options.ghostClass, false);
 
 					if (rootEl !== dragEl.parentNode) {
-						newIndex = _index(dragEl);
+						newIndex = _index(dragEl, options.draggable);
 
 						// drag from one list and drop into another
 						_dispatchEvent(null, dragEl.parentNode, 'sort', dragEl, rootEl, oldIndex, newIndex);
@@ -695,7 +695,7 @@
 
 						if (dragEl.nextSibling !== nextEl) {
 							// Get the index of the dragged element within its parent
-							newIndex = _index(dragEl);
+							newIndex = _index(dragEl, options.draggable);
 
 							// drag & drop within the same list
 							_dispatchEvent(this, rootEl, 'update', dragEl, rootEl, oldIndex, newIndex);
@@ -1062,13 +1062,18 @@
 	/**
 	 * Returns the index of an element within its parent
 	 * @param el
+	 * @param selector
 	 * @returns {number}
 	 * @private
 	 */
-	function _index(/**HTMLElement*/el) {
+	function _index(/**HTMLElement*/el, /**String*/selector) {
 		var index = 0;
+		var className = typeof selector === 'undefined' || selector === '>*' ? ' ' : selector.replace('.', '');
 		while (el && (el = el.previousElementSibling)) {
 			if (el.nodeName.toUpperCase() !== 'TEMPLATE') {
+				if ((' ' + el.className + ' ').replace(/[\t\r\n\f]/g, ' ').indexOf(className) < 0) {
+					continue;
+				}
 				index++;
 			}
 		}
