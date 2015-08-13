@@ -30,9 +30,7 @@
 		.directive('ngSortable', ['$parse', 'ngSortableConfig', function ($parse, ngSortableConfig) {
 			var removed,
 				nextSibling;
-
-
-
+				
 			// Export
 			return {
 				restrict: 'AC',
@@ -59,9 +57,6 @@
 						var itemsExpr = $parse(ngRepeat[2]);
 		
 						return {
-							item: function (el) {
-								return itemExpr(angular.element(el).scope());
-							},
 							items: function () {
 								return itemsExpr(scope);
 							}
@@ -81,7 +76,7 @@
 
 						/* jshint expr:true */
 						options[name] && options[name]({
-							model: item || source && source.item(evt.item),
+							model: item || source && source.items()[evt.newIndex],
 							models: source && source.items(),
 							oldIndex: evt.oldIndex,
 							newIndex: evt.newIndex
