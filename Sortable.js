@@ -36,6 +36,7 @@
 
 		lastEl,
 		lastCSS,
+		lastParentCSS,
 
 		oldIndex,
 		newIndex,
@@ -573,7 +574,7 @@
 
 				target = _closest(evt.target, options.draggable, el);
 				dragRect = dragEl.getBoundingClientRect();
-
+				parentEl = target && target.parentNode || parentEl; // actualization
 
 				if (revert) {
 					_cloneHide(true);
@@ -590,7 +591,7 @@
 
 
 				if ((el.children.length === 0) || (el.children[0] === ghostEl) ||
-					(el === evt.target) && (target = _ghostInBottom(el, evt))
+					(el === evt.target) && (target = _ghostIsLast(el, evt))
 				) {
 					if (target) {
 						if (target.animated) {
@@ -611,13 +612,15 @@
 					if (lastEl !== target) {
 						lastEl = target;
 						lastCSS = _css(target);
+						lastParentCSS = _css(target.parentNode);
 					}
 
 
 					var targetRect = target.getBoundingClientRect(),
 						width = targetRect.right - targetRect.left,
 						height = targetRect.bottom - targetRect.top,
-						floating = /left|right|inline/.test(lastCSS.cssFloat + lastCSS.display),
+						floating = /left|right|inline/.test(lastCSS.cssFloat + lastCSS.display)
+							|| (lastParentCSS.display == 'flex' && lastParentCSS['flex-direction'].indexOf('row') === 0),
 						isWide = (target.offsetWidth > dragEl.offsetWidth),
 						isLong = (target.offsetHeight > dragEl.offsetHeight),
 						halfway = (floating ? (evt.clientX - targetRect.left) / width : (evt.clientY - targetRect.top) / height) > 0.5,
@@ -725,6 +728,7 @@
 
 					if (rootEl !== parentEl) {
 						newIndex = _index(dragEl);
+
 						if (newIndex != -1) {
 							// drag from one list and drop into another
 							_dispatchEvent(null, parentEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
@@ -760,7 +764,7 @@
 						this.save();
 					}
 				}
-				
+
 				// Nulling
 				rootEl =
 				dragEl =
@@ -776,6 +780,7 @@
 				touchEvt =
 
 				moved =
+				newIndex =
 
 				lastEl =
 				lastCSS =
@@ -950,7 +955,9 @@
 
 
 	function _globalDragOver(/**Event*/evt) {
-		evt.dataTransfer.dropEffect = 'move';
+		if (evt.dataTransfer) {
+			evt.dataTransfer.dropEffect = 'move';
+		}
 		evt.preventDefault();
 	}
 
@@ -1081,11 +1088,11 @@
 
 
 	/** @returns {HTMLElement|false} */
-	function _ghostInBottom(el, evt) {
+	function _ghostIsLast(el, evt) {
 		var lastEl = el.lastElementChild,
-			rect = lastEl.getBoundingClientRect();
+				rect = lastEl.getBoundingClientRect();
 
-		return (evt.clientY - (rect.top + rect.height) > 5) && lastEl; // min delta
+		return ((evt.clientY - (rect.top + rect.height) > 5) || (evt.clientX - (rect.right + rect.width) > 5)) && lastEl; // min delta
 	}
 
 
@@ -1185,7 +1192,7 @@
 	Sortable.create = function (el, options) {
 		return new Sortable(el, options);
 	};
-	
+
 
 	// Export
 	Sortable.version = '1.2.2';
