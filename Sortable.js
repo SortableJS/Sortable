@@ -639,7 +639,13 @@
 							after = (moveVector === 1);
 						}
 						else if (floating) {
-							after = (target.previousElementSibling === dragEl) && !isWide || halfway && isWide;
+							var elTop = dragEl.offsetTop,
+								tgTop = target.offsetTop;
+							if (elTop===tgTop) {
+								after = (target.previousElementSibling === dragEl) && !isWide || halfway && isWide;
+							} else {
+								after = tgTop > elTop;
+							}
 						} else {
 							after = (nextSibling !== dragEl) && !isLong || halfway && isLong;
 						}
