@@ -126,7 +126,7 @@ Template.sortable.rendered = function () {
 	var optionsOnUpdate = templateInstance.options.onUpdate;
 	templateInstance.options.onUpdate = function sortableUpdate(/**Event*/event) {
 		var itemEl = event.item;  // dragged HTMLElement
-		event.data = Blaze.getData(itemEl);
+		event.data = $.extend(true, {}, Blaze.getData(itemEl));
 		if (event.newIndex < event.oldIndex) {
 			// Element moved up in the list. The dropped element has a next sibling for sure.
 			var orderNextItem = Blaze.getData(itemEl.nextElementSibling)[orderField];
@@ -145,7 +145,7 @@ Template.sortable.rendered = function () {
 	var optionsOnAdd = templateInstance.options.onAdd;
 	templateInstance.options.onAdd = function sortableAdd(/**Event*/event) {
 		var itemEl = event.item;  // dragged HTMLElement
-		event.data = Blaze.getData(itemEl);
+		event.data = $.extend(true, {}, Blaze.getData(itemEl));
 		// let the user decorate the object with additional properties before insertion
 		if (optionsOnAdd) optionsOnAdd(event);
 
