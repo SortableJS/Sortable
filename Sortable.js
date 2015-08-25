@@ -40,6 +40,7 @@
 
 		oldIndex,
 		newIndex,
+		oldChangeIndex,
 
 		activeGroup,
 		autoScroll = {},
@@ -260,7 +261,7 @@
 			}
 
 			// get the index of the dragged element within its parent
-			oldIndex = _index(target);
+			oldIndex = oldChangeIndex = _index(target);
 
 			// Check filter
 			if (typeof filter === 'function') {
@@ -581,9 +582,19 @@
 
 					if (cloneEl || nextEl) {
 						rootEl.insertBefore(dragEl, cloneEl || nextEl);
+						newIndex = _index(dragEl);
+						if (oldChangeIndex !== newIndex) {
+							_dispatchEvent(rootEl, 'change', dragEl, rootEl, oldChangeIndex, newIndex);
+							oldChangeIndex = newIndex;
+						}
 					}
 					else if (!canSort) {
 						rootEl.appendChild(dragEl);
+						newIndex = _index(dragEl);
+						if (oldChangeIndex !== newIndex) {
+							_dispatchEvent(rootEl, 'change', dragEl, rootEl, oldChangeIndex, newIndex);
+							oldChangeIndex = newIndex;
+						}
 					}
 
 					return;
@@ -652,8 +663,18 @@
 
 						if (after && !nextSibling) {
 							el.appendChild(dragEl);
+							newIndex = _index(dragEl);
+							if (oldChangeIndex !== newIndex) {
+								_dispatchEvent(rootEl, 'change', dragEl, rootEl, oldChangeIndex, newIndex);
+								oldChangeIndex = newIndex;
+							}
 						} else {
 							target.parentNode.insertBefore(dragEl, after ? nextSibling : target);
+							newIndex = _index(dragEl);
+							if (oldChangeIndex !== newIndex) {
+								_dispatchEvent(rootEl, 'change', dragEl, rootEl, oldChangeIndex, newIndex);
+								oldChangeIndex = newIndex;
+							}
 						}
 
 						this._animate(dragRect, dragEl);
