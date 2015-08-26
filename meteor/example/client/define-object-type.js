@@ -32,7 +32,11 @@ Template.typeDefinition.helpers({
       delete event.data._id; // Generate a new id when inserting in the Attributes collection. Otherwise, if we add the same type twice, we'll get an error that the ids are not unique.
       delete event.data.icon;
       event.data.type = event.data.name;
-      event.data.name = 'Rename me (double click)'
+      event.data.name = 'Rename me (double click)';
+      // If you want to manage the collection item insert yourself, just use onAdd
+      // option and set event.stopDefaultMeteorPropagation to true:
+      //   event.stopDefaultMeteorPropagation = true;
+      // and do all you needs here, in onAdd function.
     },
     // event handler for reordering attributes
     onSort: function (event) {
