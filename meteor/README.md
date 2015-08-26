@@ -12,7 +12,7 @@ Demo: http://rubaxa-sortable.meteor.com
 If you're new to Meteor, here's what the excitement is all about -
 [watch the first two minutes](https://www.youtube.com/watch?v=fsi0aJ9yr2o); you'll be hooked by 1:28.
 That screencast is from 2012. In the meantime, Meteor has become a mature JavaScript-everywhere web
-development framework. Read more at [Why Meteor](http://www.meteorpedia.com/read/Why_Meteor).
+development framework. Read more at [Why Meteor](http://wiki.dandascalescu.com/essays/why_meteor).
 
 
 # Usage
@@ -81,9 +81,9 @@ Template.myTemplate.helpers({
 });
 ```
 
-#### meteor specific options
+#### Meteor-specific options
 
-* `selector` - you can specify collection selector if your list operates only on subset of collection. Example:
+* `selector` - you can specify a collection selector if your list operates only on a subset of the collection. Example:
 
 ```js
 Template.myTemplate.helpers({
