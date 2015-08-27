@@ -197,5 +197,5 @@ Template.sortable.rendered = function () {
 
 
 Template.sortable.destroyed = function () {
-	this.sortable.destroy();
+	if(this.sortable) this.sortable.destroy();
 };
