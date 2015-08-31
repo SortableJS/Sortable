@@ -137,6 +137,18 @@ onAdd: function (event) {
 },
 ```
 
+## Even more ?
+
+You can use the same trick with onRemove:
+
+```js
+onRemove: function (event) {
+  ...
+  event.stopDefaultMeteorPropagation = true;
+  ...
+},
+```
+
 
 # Issues
 

@@ -147,7 +147,7 @@ Template.sortable.rendered = function () {
 		var itemEl = event.item;  // dragged HTMLElement
 		event.data = $.extend(true, {}, Blaze.getData(itemEl));
 		// let the user decorate the object with additional properties before insertion
-		if (optionsOnAdd) optionsOnAdd(event);
+		if (optionsOnAdd) optionsOnAdd(event, templateInstance);
 
 		if (!event.stopDefaultMeteorPropagation) {
 		    // Insert the new element at the end of the list and move it where it was dropped.
@@ -165,7 +165,8 @@ Template.sortable.rendered = function () {
 		    }
 		}
 		// remove the dropped HTMLElement from the list because we have inserted it in the collection, which will update the template
-		itemEl.parentElement.removeChild(itemEl);
+        if (itemEl.parentElement)
+		  itemEl.parentElement.removeChild(itemEl);
 	};
 
 	// element was removed by dragging into another list
@@ -173,12 +174,17 @@ Template.sortable.rendered = function () {
 	templateInstance.options.onRemove = function sortableRemove(/**Event*/event) {
 		var itemEl = event.item;  // dragged HTMLElement
 		event.data = Blaze.getData(itemEl);
-		// don't remove from the collection if group.pull is clone or false
-		if (typeof templateInstance.options.group === 'undefined'
-				|| typeof templateInstance.options.group.pull === 'undefined'
-				|| templateInstance.options.group.pull === true
-		) templateInstance.collection.remove(event.data._id);
-		if (optionsOnRemove) optionsOnRemove(event);
+		// let the user decorate the object with additional properties before insertion
+		if (optionsOnRemove) optionsOnRemove(event, templateInstance);
+
+		if (!event.stopDefaultMeteorPropagation) {
+ 		    // don't remove from the collection if group.pull is clone or false
+ 		    if (typeof templateInstance.options.group === 'undefined'
+ 		            || typeof templateInstance.options.group.pull === 'undefined'
+ 		            || templateInstance.options.group.pull === true
+ 		    ) templateInstance.collection.remove(event.data._id);
+ 		    if (optionsOnRemove) optionsOnRemove(event);
+ 		}
 	};
 
 	// just compute the `data` context
