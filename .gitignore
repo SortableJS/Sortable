@@ -3,4 +3,3 @@ mock.png
 .*.sw*
 .build*
 jquery.fn.*
-package.js
