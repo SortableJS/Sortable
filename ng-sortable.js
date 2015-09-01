@@ -30,43 +30,39 @@
 		.directive('ngSortable', ['$parse', 'ngSortableConfig', function ($parse, ngSortableConfig) {
 			var removed,
 				nextSibling;
-
-			function getSource(el) {
-				var scope = angular.element(el).scope();
-				var ngRepeat = [].filter.call(el.childNodes, function (node) {
-					return (
-							(node.nodeType === 8) &&
-							(node.nodeValue.indexOf('ngRepeat:') !== -1)
-						);
-				})[0];
-
-				if (!ngRepeat) {
-					// Without ng-repeat
-					return null;
-				}
-
-				// tests: http://jsbin.com/kosubutilo/1/edit?js,output
-				ngRepeat = ngRepeat.nodeValue.match(/ngRepeat:\s*(?:\(.*?,\s*)?([^\s)]+)[\s)]+in\s+([^\s|]+)/);
-
-				var itemExpr = $parse(ngRepeat[1]);
-				var itemsExpr = $parse(ngRepeat[2]);
-
-				return {
-					item: function (el) {
-						return itemExpr(angular.element(el).scope());
-					},
-					items: function () {
-						return itemsExpr(scope);
-					}
-				};
-			}
-
-
+				
 			// Export
 			return {
 				restrict: 'AC',
 				scope: { ngSortable: "=?" },
 				link: function (scope, $el, attrs) {
+					
+					function getSource(el) {
+						var ngRepeat = [].filter.call(el.childNodes, function (node) {
+							return (
+									(node.nodeType === 8) &&
+									(node.nodeValue.indexOf('ngRepeat:') !== -1)
+								);
+						})[0];
+		
+						if (!ngRepeat) {
+							// Without ng-repeat
+							return null;
+						}
+		
+						// tests: http://jsbin.com/kosubutilo/1/edit?js,output
+						ngRepeat = ngRepeat.nodeValue.match(/ngRepeat:\s*(?:\(.*?,\s*)?([^\s)]+)[\s)]+in\s+([^\s|]+)/);
+		
+						var itemExpr = $parse(ngRepeat[1]);
+						var itemsExpr = $parse(ngRepeat[2]);
+		
+						return {
+							items: function () {
+								return itemsExpr(scope);
+							}
+						};
+					}
+
 					var el = $el[0],
 						options = angular.extend(scope.ngSortable || {}, ngSortableConfig),
 						source = getSource(el),
@@ -80,7 +76,7 @@
 
 						/* jshint expr:true */
 						options[name] && options[name]({
-							model: item || source && source.item(evt.item),
+							model: item || source && source.items()[evt.newIndex],
 							models: source && source.items(),
 							oldIndex: evt.oldIndex,
 							newIndex: evt.newIndex
