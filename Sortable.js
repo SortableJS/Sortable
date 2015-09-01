@@ -59,6 +59,7 @@
 		parseInt = win.parseInt,
 
 		supportDraggable = !!('draggable' in document.createElement('div')),
+		supportCssPointerEvents = navigator.userAgent.indexOf('MSIE') < 0,
 
 		_silent = false,
 
@@ -411,7 +412,9 @@
 				this._lastX = touchEvt.clientX;
 				this._lastY = touchEvt.clientY;
 
-				_css(ghostEl, 'display', 'none');
+				if (!supportCssPointerEvents) {
+					_css(ghostEl, 'display', 'none');
+				}
 
 				var target = document.elementFromPoint(touchEvt.clientX, touchEvt.clientY),
 					parent = target,
@@ -439,7 +442,9 @@
 					while (parent = parent.parentNode);
 				}
 
-				_css(ghostEl, 'display', '');
+				if (!supportCssPointerEvents) {
+					_css(ghostEl, 'display', '');
+				}
 			}
 		},
 
@@ -489,6 +494,10 @@
 				_css(ghostEl, 'opacity', '0.8');
 				_css(ghostEl, 'position', 'fixed');
 				_css(ghostEl, 'zIndex', '100000');
+
+				if (supportCssPointerEvents) {
+					_css(ghostEl, 'pointerEvents', 'none');
+				}
 
 				this.options.fallbackOnBody && document.body.appendChild(ghostEl) || rootEl.appendChild(ghostEl);
 
