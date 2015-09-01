@@ -24,52 +24,30 @@
 	 */
 
 
-	angular.module('ng-sortable', [])
+	return angular.module('ng-sortable', [])
 		.constant('ngSortableVersion', '0.3.7')
 		.constant('ngSortableConfig', {})
-		.directive('ngSortable', ['$parse', 'ngSortableConfig', function ($parse, ngSortableConfig) {
-			var removed,
-				nextSibling;
-
-			function getSource(el) {
-				var scope = angular.element(el).scope();
-				var ngRepeat = [].filter.call(el.childNodes, function (node) {
-					return (
-							(node.nodeType === 8) &&
-							(node.nodeValue.indexOf('ngRepeat:') !== -1)
-						);
-				})[0];
-
-				if (!ngRepeat) {
-					// Without ng-repeat
-					return null;
+		.factory('ngSortableStore', function () {
+			var models = [];
+			return {
+				get: function () {
+					return models;
+				},
+				set: function (items) {
+					models = items || [];
 				}
-
-				// tests: http://jsbin.com/kosubutilo/1/edit?js,output
-				ngRepeat = ngRepeat.nodeValue.match(/ngRepeat:\s*(?:\(.*?,\s*)?([^\s)]+)[\s)]+in\s+([^\s|]+)/);
-
-				var itemExpr = $parse(ngRepeat[1]);
-				var itemsExpr = $parse(ngRepeat[2]);
-
-				return {
-					item: function (el) {
-						return itemExpr(angular.element(el).scope());
-					},
-					items: function () {
-						return itemsExpr(scope);
-					}
-				};
-			}
-
+			};
+		})
+		.directive('ngSortable', ['$parse', 'ngSortableConfig', 'ngSortableStore', function ($parse, ngSortableConfig, ngSortableStore) {
 
 			// Export
 			return {
 				restrict: 'AC',
+				require: 'ngModel',
 				scope: { ngSortable: "=?" },
-				link: function (scope, $el, attrs) {
+				link: function (scope, $el, attrs, ngModel) {
 					var el = $el[0],
 						options = angular.extend(scope.ngSortable || {}, ngSortableConfig),
-						source = getSource(el),
 						watchers = [],
 						sortable
 					;
@@ -80,75 +58,70 @@
 
 						/* jshint expr:true */
 						options[name] && options[name]({
-							model: item || source && source.item(evt.item),
-							models: source && source.items(),
+							model: item,
+							models: ngModel.$modelValue,
 							oldIndex: evt.oldIndex,
 							newIndex: evt.newIndex
 						});
 					}
 
+					// added new item into list from another list
+					function _addItem(/**Event*/evt, /*Mixed*/item) {
+						var newIndex = evt.newIndex,
+							items = ngModel.$modelValue,
+							itemToAdd = angular.copy(item);
 
-					function _sync(/**Event*/evt) {
-						if (!source) {
-							// Without ng-repeat
-							return;
-						}
-
-						var oldIndex = evt.oldIndex,
-							newIndex = evt.newIndex,
-							items = source.items();
-
-						if (el !== evt.from) {
-							var prevSource = getSource(evt.from),
-								prevItems = prevSource.items();
-
-							oldIndex = prevItems.indexOf(prevSource.item(evt.item));
-							removed = prevItems[oldIndex];
-
-							if (evt.clone) {
-								evt.from.removeChild(evt.clone);
-								removed = angular.copy(removed);
-							}
-							else {
-								prevItems.splice(oldIndex, 1);
-							}
-
-							items.splice(newIndex, 0, removed);
-
-							evt.from.insertBefore(evt.item, nextSibling); // revert element
-						}
-						else {
-							items.splice(newIndex, 0, items.splice(oldIndex, 1)[0]);
-						}
-
-						scope.$apply();
+						items.splice(newIndex, 0, itemToAdd);
+						evt.item.remove(); // revert element
+						return itemToAdd;
 					}
 
+					// remove from one list when item moved into another
+					function _removeItem(/**Event*/evt) {
+						var oldIndex = evt.oldIndex,
+							items = ngModel.$modelValue;
+
+						if (!evt.clone) {
+							return items.splice(oldIndex, 1);
+						}
+					}
+
+					// invoked only after sort within the same container
+					// on update position within the same list
+					function _updateItemPosition(/**Event*/evt) {
+						var oldIndex = evt.oldIndex,
+							newIndex = evt.newIndex,
+							items = ngModel.$modelValue;
+
+						items.splice(newIndex, 0, items.splice(oldIndex, 1)[0]);
+						return items[newIndex];
+					}
 
 					sortable = Sortable.create(el, Object.keys(options).reduce(function (opts, name) {
 						opts[name] = opts[name] || options[name];
 						return opts;
 					}, {
 						onStart: function (/**Event*/evt) {
-							nextSibling = evt.item.nextSibling;
+							ngSortableStore.set(ngModel.$modelValue);
 							_emitEvent(evt);
-							scope.$apply();
-						},
-						onEnd: function (/**Event*/evt) {
-							_emitEvent(evt, removed);
-							scope.$apply();
 						},
 						onAdd: function (/**Event*/evt) {
-							_sync(evt);
-							_emitEvent(evt, removed);
-							scope.$apply();
-						},
-						onUpdate: function (/**Event*/evt) {
-							_sync(evt);
-							_emitEvent(evt);
+							var addedModel = _addItem(evt, ngSortableStore.get()[evt.oldIndex]);
+							_emitEvent(evt, addedModel);
 						},
 						onRemove: function (/**Event*/evt) {
-							_emitEvent(evt, removed);
+							var removedModel = _removeItem(evt);
+							_emitEvent(evt, removedModel);
+						},
+						onUpdate: function (/**Event*/evt) {
+							var movedModel = _updateItemPosition(evt);
+							_emitEvent(evt, movedModel);
+						},
+						onEnd: function (/**Event*/evt) {
+							ngSortableStore.set(null);
+
+							_emitEvent(evt);
+							scope.$apply();
 						},
 						onSort: function (/**Event*/evt) {
 							_emitEvent(evt);
@@ -162,7 +135,6 @@
 						sortable.destroy();
 						watchers = null;
 						sortable = null;
-						nextSibling = null;
 					});
 
 					angular.forEach([
@@ -181,5 +153,6 @@
 					});
 				}
 			};
-		}]);
+		}])
+		.name;
 });

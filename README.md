@@ -302,15 +302,15 @@ Demo: http://jsbin.com/naduvo/1/edit?html,js,output
 
 ```html
 <div ng-app="myApp" ng-controller="demo">
-	<ul ng-sortable>
+	<ul ng-sortable ng-model="items">
 		<li ng-repeat="item in items">{{item}}</li>
 	</ul>
 
-	<ul ng-sortable="{ group: 'foobar' }">
+	<ul ng-sortable="{ group: 'foobar' }" ng-model="foo">
 		<li ng-repeat="item in foo">{{item}}</li>
 	</ul>
 
-	<ul ng-sortable="barConfig">
+	<ul ng-sortable="barConfig" ng-model="bar">
 		<li ng-repeat="item in bar">{{item}}</li>
 	</ul>
 </div>
