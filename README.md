@@ -123,7 +123,7 @@ var sortable = new Sortable(el, {
 		evt.draggedRect; // TextRectangle {left, top, right и bottom}
 		evt.related; // HTMLElement on which have guided
 		evt.relatedRect; // TextRectangle
-		// retrun false; — for cancel
+		// return false; — for cancel
 	}
 });
 ```
