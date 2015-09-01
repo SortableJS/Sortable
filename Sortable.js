@@ -603,7 +603,9 @@
 					_cloneHide(isOwner);
 
 					if (_onMove(rootEl, el, dragEl, dragRect, target, targetRect) !== false) {
-						el.appendChild(dragEl);
+						if (!dragEl.contains(el)) {
+							el.appendChild(dragEl);
+						}
 						this._animate(dragRect, dragEl);
 						target && this._animate(targetRect, target);
 					}
@@ -650,10 +652,12 @@
 							after = (nextSibling !== dragEl) && !isLong || halfway && isLong;
 						}
 
-						if (after && !nextSibling) {
-							el.appendChild(dragEl);
-						} else {
-							target.parentNode.insertBefore(dragEl, after ? nextSibling : target);
+						if (!dragEl.contains(el)) {
+							if (after && !nextSibling) {
+								el.appendChild(dragEl);
+							} else {
+								target.parentNode.insertBefore(dragEl, after ? nextSibling : target);
+							}
 						}
 
 						this._animate(dragRect, dragEl);
