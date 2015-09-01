@@ -447,12 +447,10 @@
 
 			if (activeGroup.pull == 'clone') {
 				cloneEl = dragEl.cloneNode(true);
-				// < for Meteor compatibility
-				if (dragEl.$blaze_range) {
-				  cloneEl.$blaze_teardown_callbacks = dragEl.$blaze_teardown_callbacks;
-				  cloneEl.$blaze_range = dragEl.$blaze_range;
-				}
-				// > for Meteor compatibility
+                // clone node properties
+                Object.keys(dragEl).forEach(function (key) {
+                  cloneEl[key] = dragEl[key];
+                });
 				_css(cloneEl, 'display', 'none');
 				rootEl.insertBefore(cloneEl, dragEl);
 			}
