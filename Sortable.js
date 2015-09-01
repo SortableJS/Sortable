@@ -59,7 +59,11 @@
 		parseInt = win.parseInt,
 
 		supportDraggable = !!('draggable' in document.createElement('div')),
-		supportCssPointerEvents = navigator.userAgent.indexOf('MSIE') < 0,
+		supportCssPointerEvents = (function (el) {
+			el = document.createElement('x');
+			el.style.cssText = 'pointer-events:auto';
+			return el.style.pointerEvents === 'auto';
+		})(),
 
 		_silent = false,
 
@@ -494,10 +498,7 @@
 				_css(ghostEl, 'opacity', '0.8');
 				_css(ghostEl, 'position', 'fixed');
 				_css(ghostEl, 'zIndex', '100000');
-
-				if (supportCssPointerEvents) {
-					_css(ghostEl, 'pointerEvents', 'none');
-				}
+				_css(ghostEl, 'pointerEvents', 'none');
 
 				this.options.fallbackOnBody && document.body.appendChild(ghostEl) || rootEl.appendChild(ghostEl);
 
