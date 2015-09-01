@@ -126,7 +126,7 @@ Template.sortable.rendered = function () {
 	var optionsOnUpdate = templateInstance.options.onUpdate;
 	templateInstance.options.onUpdate = function sortableUpdate(/**Event*/event) {
 		var itemEl = event.item;  // dragged HTMLElement
-		event.data = Blaze.getData(itemEl);
+		event.data = $.extend(true, {}, Blaze.getData(itemEl));
 		if (event.newIndex < event.oldIndex) {
 			// Element moved up in the list. The dropped element has a next sibling for sure.
 			var orderNextItem = Blaze.getData(itemEl.nextElementSibling)[orderField];
@@ -145,25 +145,28 @@ Template.sortable.rendered = function () {
 	var optionsOnAdd = templateInstance.options.onAdd;
 	templateInstance.options.onAdd = function sortableAdd(/**Event*/event) {
 		var itemEl = event.item;  // dragged HTMLElement
-		event.data = Blaze.getData(itemEl);
+		event.data = $.extend(true, {}, Blaze.getData(itemEl));
 		// let the user decorate the object with additional properties before insertion
-		if (optionsOnAdd) optionsOnAdd(event);
+		if (optionsOnAdd) optionsOnAdd(event, templateInstance);
 
-		// Insert the new element at the end of the list and move it where it was dropped.
-		// We could insert it at the beginning, but that would lead to negative orders.
-		var sortSpecifier = {}; sortSpecifier[orderField] = -1;
-		event.data.order = templateInstance.collection.findOne({}, { sort: sortSpecifier, limit: 1 }).order + 1;
-		// TODO: this can obviously be optimized by setting the order directly as the arithmetic average, with the caveats described above
-		var newElementId = templateInstance.collection.insert(event.data);
-		event.data._id = newElementId;
-		if (itemEl.nextElementSibling) {
-			var orderNextItem = Blaze.getData(itemEl.nextElementSibling)[orderField];
-			templateInstance.adjustOrders(newElementId, null, orderNextItem);
-		} else {
-			// do nothing - inserted after the last element
+		if (!event.stopDefaultMeteorPropagation) {
+		    // Insert the new element at the end of the list and move it where it was dropped.
+		    // We could insert it at the beginning, but that would lead to negative orders.
+		    var sortSpecifier = {}; sortSpecifier[orderField] = -1;
+		    event.data.order = templateInstance.collection.findOne({}, { sort: sortSpecifier, limit: 1 }).order + 1;
+		    // TODO: this can obviously be optimized by setting the order directly as the arithmetic average, with the caveats described above
+		    var newElementId = templateInstance.collection.insert(event.data);
+		    event.data._id = newElementId;
+		    if (itemEl.nextElementSibling) {
+		        var orderNextItem = Blaze.getData(itemEl.nextElementSibling)[orderField];
+		        templateInstance.adjustOrders(newElementId, null, orderNextItem);
+		    } else {
+		        // do nothing - inserted after the last element
+		    }
 		}
 		// remove the dropped HTMLElement from the list because we have inserted it in the collection, which will update the template
-		itemEl.parentElement.removeChild(itemEl);
+        if (itemEl.parentElement)
+		  itemEl.parentElement.removeChild(itemEl);
 	};
 
 	// element was removed by dragging into another list
@@ -171,12 +174,17 @@ Template.sortable.rendered = function () {
 	templateInstance.options.onRemove = function sortableRemove(/**Event*/event) {
 		var itemEl = event.item;  // dragged HTMLElement
 		event.data = Blaze.getData(itemEl);
-		// don't remove from the collection if group.pull is clone or false
-		if (typeof templateInstance.options.group === 'undefined'
-				|| typeof templateInstance.options.group.pull === 'undefined'
-				|| templateInstance.options.group.pull === true
-		) templateInstance.collection.remove(event.data._id);
-		if (optionsOnRemove) optionsOnRemove(event);
+		// let the user decorate the object with additional properties before insertion
+		if (optionsOnRemove) optionsOnRemove(event, templateInstance);
+
+		if (!event.stopDefaultMeteorPropagation) {
+ 		    // don't remove from the collection if group.pull is clone or false
+ 		    if (typeof templateInstance.options.group === 'undefined'
+ 		            || typeof templateInstance.options.group.pull === 'undefined'
+ 		            || templateInstance.options.group.pull === true
+ 		    ) templateInstance.collection.remove(event.data._id);
+ 		    if (optionsOnRemove) optionsOnRemove(event);
+ 		}
 	};
 
 	// just compute the `data` context

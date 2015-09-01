@@ -447,6 +447,10 @@
 
 			if (activeGroup.pull == 'clone') {
 				cloneEl = dragEl.cloneNode(true);
+				// clone node properties
+				Object.keys(dragEl).forEach(function (key) {
+					cloneEl[key] = dragEl[key];
+				});
 				_css(cloneEl, 'display', 'none');
 				rootEl.insertBefore(cloneEl, dragEl);
 			}

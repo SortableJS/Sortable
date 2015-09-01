@@ -120,6 +120,36 @@ Template.myTemplate.helpers({
 ```
 
 
+## More control ?
+
+If you want to manage the collection item insert yourself, just use onAdd
+option and set event.stopDefaultMeteorPropagation to true.
+Do all you needs in onAdd function.
+
+You can create your server Meteor method and call it from onAdd.
+
+```js
+onAdd: function (event) {
+  ...
+  event.stopDefaultMeteorPropagation = true;
+  Meteor.call('your_function', ...);
+  ...
+},
+```
+
+## Even more ?
+
+You can use the same trick with onRemove:
+
+```js
+onRemove: function (event) {
+  ...
+  event.stopDefaultMeteorPropagation = true;
+  ...
+},
+```
+
+
 # Issues
 
 If you encounter an issue while using this package, please CC @dandv when you file it in this repo.
