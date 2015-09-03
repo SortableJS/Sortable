@@ -23,61 +23,60 @@
 	 * @property  {number}        newIndex   after sort
 	 */
 
+	var expando = 'Sortable:ng-sortable';
 
 	angular.module('ng-sortable', [])
-		.constant('ngSortableVersion', '0.3.7')
+		.constant('ngSortableVersion', '0.4.0')
 		.constant('ngSortableConfig', {})
 		.directive('ngSortable', ['$parse', 'ngSortableConfig', function ($parse, ngSortableConfig) {
 			var removed,
-				nextSibling;
-				
+				nextSibling,
+				getSourceFactory = function getSourceFactory(el, scope) {
+					var ngRepeat = [].filter.call(el.childNodes, function (node) {
+						return (
+								(node.nodeType === 8) &&
+								(node.nodeValue.indexOf('ngRepeat:') !== -1)
+							);
+					})[0];
+
+					if (!ngRepeat) {
+						// Without ng-repeat
+						return null;
+					}
+
+					// tests: http://jsbin.com/kosubutilo/1/edit?js,output
+					ngRepeat = ngRepeat.nodeValue.match(/ngRepeat:\s*(?:\(.*?,\s*)?([^\s)]+)[\s)]+in\s+([^\s|]+)/);
+
+					var itemsExpr = $parse(ngRepeat[2]);
+
+					return function () {
+						return itemsExpr(scope.$parent) || [];
+					};
+				};
+
+
 			// Export
 			return {
 				restrict: 'AC',
 				scope: { ngSortable: "=?" },
-				link: function (scope, $el, attrs) {
-					
-					function getSource(el) {
-						var ngRepeat = [].filter.call(el.childNodes, function (node) {
-							return (
-									(node.nodeType === 8) &&
-									(node.nodeValue.indexOf('ngRepeat:') !== -1)
-								);
-						})[0];
-		
-						if (!ngRepeat) {
-							// Without ng-repeat
-							return null;
-						}
-		
-						// tests: http://jsbin.com/kosubutilo/1/edit?js,output
-						ngRepeat = ngRepeat.nodeValue.match(/ngRepeat:\s*(?:\(.*?,\s*)?([^\s)]+)[\s)]+in\s+([^\s|]+)/);
-		
-						var itemExpr = $parse(ngRepeat[1]);
-						var itemsExpr = $parse(ngRepeat[2]);
-		
-						return {
-							items: function () {
-								return itemsExpr(scope);
-							}
-						};
-					}
-
+				link: function (scope, $el) {
 					var el = $el[0],
 						options = angular.extend(scope.ngSortable || {}, ngSortableConfig),
-						source = getSource(el),
 						watchers = [],
+						getSource = getSourceFactory(el, scope),
 						sortable
 					;
 
+					el[expando] = getSource;
 
 					function _emitEvent(/**Event*/evt, /*Mixed*/item) {
 						var name = 'on' + evt.type.charAt(0).toUpperCase() + evt.type.substr(1);
+						var source = getSource();
 
 						/* jshint expr:true */
 						options[name] && options[name]({
-							model: item || source && source.items()[evt.newIndex],
-							models: source && source.items(),
+							model: item || source[evt.newIndex],
+							models: source,
 							oldIndex: evt.oldIndex,
 							newIndex: evt.newIndex
 						});
@@ -85,25 +84,25 @@
 
 
 					function _sync(/**Event*/evt) {
-						if (!source) {
+						var items = getSource();
+
+						if (!items) {
 							// Without ng-repeat
 							return;
 						}
 
 						var oldIndex = evt.oldIndex,
-							newIndex = evt.newIndex,
-							items = source.items();
+							newIndex = evt.newIndex;
 
 						if (el !== evt.from) {
-							var prevSource = getSource(evt.from),
-								prevItems = prevSource.items();
+							var prevItems = evt.from[expando]();
 
-							oldIndex = prevItems.indexOf(prevSource.item(evt.item));
 							removed = prevItems[oldIndex];
 
 							if (evt.clone) {
-								evt.from.removeChild(evt.clone);
 								removed = angular.copy(removed);
+								prevItems.splice(Sortable.utils.index(evt.clone), 0, prevItems.splice(oldIndex, 1)[0]);
+								evt.from.removeChild(evt.clone);
 							}
 							else {
 								prevItems.splice(oldIndex, 1);
@@ -155,7 +154,11 @@
 						angular.forEach(watchers, function (/** Function */unwatch) {
 							unwatch();
 						});
+
 						sortable.destroy();
+
+						el[expando] = null;
+						el = null;
 						watchers = null;
 						sortable = null;
 						nextSibling = null;
