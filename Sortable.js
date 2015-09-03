@@ -585,7 +585,6 @@
 
 				target = _closest(evt.target, options.draggable, el);
 				dragRect = dragEl.getBoundingClientRect();
-				parentEl = target && target.parentNode || parentEl; // actualization
 
 				if (revert) {
 					_cloneHide(true);
@@ -604,7 +603,10 @@
 				if ((el.children.length === 0) || (el.children[0] === ghostEl) ||
 					(el === evt.target) && (target = _ghostIsLast(el, evt))
 				) {
+
 					if (target) {
+						parentEl = target.parentNode; // actualization
+						
 						if (target.animated) {
 							return;
 						}
@@ -622,6 +624,8 @@
 					}
 				}
 				else if (target && !target.animated && target !== dragEl && (target.parentNode[expando] !== void 0)) {
+					parentEl = target.parentNode; // actualization
+
 					if (lastEl !== target) {
 						lastEl = target;
 						lastCSS = _css(target);
