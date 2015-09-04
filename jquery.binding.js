@@ -49,6 +49,9 @@
 				else if (typeof sortable[options] === 'function') {
 					retVal = sortable[options].apply(sortable, [].slice.call(arguments, 1));
 				}
+				else if (options in sortable.options) {
+					retVal = sortable.option.apply(sortable, arguments);
+				}
 			}
 		});
 
