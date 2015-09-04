@@ -196,7 +196,7 @@
 			<div style="width: 30%; margin-top: -8px; margin-left: 10px; float: left;" class="block__list block__list_words">
 				<div ng-controller="TodoControllerNext">
 					<span style="padding-left: 20px">{{remaining()}} of {{todos.length}} remaining</span>
-					<ul ng-sortable="sortableConfig" class="unstyled">
+					<ul ng-sortable="sortableConfig" class="unstyled" style="min-height: 40px;">
 						<li ng-repeat="todo in todos">
 							<input type="checkbox" ng-model="todo.done">
 							<span class="done-{{todo.done}}">{{todo.text}}</span>
