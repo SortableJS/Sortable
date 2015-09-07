@@ -665,8 +665,10 @@
 			this._offUpEvents();
 
 			if (evt) {
-				evt.preventDefault();
-				!options.dropBubble && evt.stopPropagation();
+				if (Sortable.active) {
+					evt.preventDefault();
+					!options.dropBubble && evt.stopPropagation();
+				}
 
 				ghostEl && ghostEl.parentNode.removeChild(ghostEl);
 
