@@ -192,6 +192,7 @@
 			scrollSpeed: 10,
 			draggable: /[uo]l/i.test(el.nodeName) ? 'li' : '>*',
 			ghostClass: 'sortable-ghost',
+			chosenClass: 'sortable-chosen',
 			ignore: 'a, img',
 			filter: null,
 			animation: 0,
@@ -326,14 +327,17 @@
 					// Make the element draggable
 					dragEl.draggable = true;
 
-					// Disable "draggable"
-					options.ignore.split(',').forEach(function (criteria) {
-						_find(dragEl, criteria.trim(), _disableDraggable);
-					});
+					// Chosen item
+					_toggleClass(dragEl, _this.options.chosenClass, true);
 
 					// Bind the events: dragstart/dragend
 					_this._triggerDragStart(touch);
 				};
+
+				// Disable "draggable"
+				options.ignore.split(',').forEach(function (criteria) {
+					_find(dragEl, criteria.trim(), _disableDraggable);
+				});
 
 				_on(ownerDocument, 'mouseup', _this._onDrop);
 				_on(ownerDocument, 'touchend', _this._onDrop);
@@ -606,7 +610,7 @@
 
 					if (target) {
 						parentEl = target.parentNode; // actualization
-						
+
 						if (target.animated) {
 							return;
 						}
@@ -749,7 +753,10 @@
 					}
 
 					_disableDraggable(dragEl);
+
+					// Remove class's
 					_toggleClass(dragEl, this.options.ghostClass, false);
+					_toggleClass(dragEl, this.options.chosenClass, false);
 
 					if (rootEl !== parentEl) {
 						newIndex = _index(dragEl);

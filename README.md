@@ -63,6 +63,7 @@ var sortable = new Sortable(el, {
 	filter: ".ignore-elements",  // Selectors that do not lead to dragging (String or Function)
 	draggable: ".item",  // Specifies which items inside the element should be sortable
 	ghostClass: "sortable-ghost",  // Class name for the drop placeholder
+	chosenClass: "sortable-chosen",  // Class name for the chosen item
 	dataIdAttr: 'data-id',
 	
 	forceFallback: false,  // ignore the HTML5 DnD behaviour and force the fallback to kick in
@@ -237,7 +238,7 @@ Sortable.create(list, {
 
 
 #### `ghostClass` option
-Class name for the drop placeholder.
+Class name for the drop placeholder (default `sortable-ghost`).
 
 Demo: http://jsbin.com/hunifu/1/edit?css,js,output
 
@@ -250,6 +251,29 @@ Demo: http://jsbin.com/hunifu/1/edit?css,js,output
 ```js
 Sortable.create(list, {
   ghostClass: "ghost"
+});
+```
+
+
+---
+
+
+#### `chosenClass` option
+Class name for the chosen item  (default `sortable-chosen`).
+
+Demo: http://jsbin.com/hunifu/edit?html,css,js,output
+
+```css
+.chosen {
+  color: #fff;
+  background-color: #c00;
+}
+```
+
+```js
+Sortable.create(list, {
+  delay: 500,
+  chosenClass: "chosen"
 });
 ```
 
