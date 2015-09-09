@@ -315,7 +315,7 @@
 
 				rootEl = el;
 				dragEl = target;
-				parentEl = target.parentNode;
+				parentEl = dragEl.parentNode;
 				nextEl = dragEl.nextSibling;
 				activeGroup = options.group;
 
@@ -609,11 +609,10 @@
 				) {
 
 					if (target) {
-						parentEl = target.parentNode; // actualization
-
 						if (target.animated) {
 							return;
 						}
+
 						targetRect = target.getBoundingClientRect();
 					}
 
@@ -622,14 +621,14 @@
 					if (_onMove(rootEl, el, dragEl, dragRect, target, targetRect) !== false) {
 						if (!dragEl.contains(el)) {
 							el.appendChild(dragEl);
+							parentEl = el; // actualization
 						}
+
 						this._animate(dragRect, dragEl);
 						target && this._animate(targetRect, target);
 					}
 				}
 				else if (target && !target.animated && target !== dragEl && (target.parentNode[expando] !== void 0)) {
-					parentEl = target.parentNode; // actualization
-
 					if (lastEl !== target) {
 						lastEl = target;
 						lastCSS = _css(target);
@@ -678,6 +677,8 @@
 								target.parentNode.insertBefore(dragEl, after ? nextSibling : target);
 							}
 						}
+
+						parentEl = dragEl.parentNode; // actualization
 
 						this._animate(dragRect, dragEl);
 						this._animate(targetRect, target);
