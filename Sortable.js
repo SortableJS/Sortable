@@ -661,7 +661,8 @@
 						else if (floating) {
 							var elTop = dragEl.offsetTop,
 								tgTop = target.offsetTop;
-							if (elTop===tgTop) {
+
+							if (elTop === tgTop) {
 								after = (target.previousElementSibling === dragEl) && !isWide || halfway && isWide;
 							} else {
 								after = tgTop > elTop;
@@ -1232,6 +1233,6 @@
 
 
 	// Export
-	Sortable.version = '1.2.2';
+	Sortable.version = '1.3.0-rc1';
 	return Sortable;
 });
