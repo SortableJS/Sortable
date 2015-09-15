@@ -792,7 +792,7 @@
 					}
 
 					if (Sortable.active) {
-						if (newIndex == null || newIndex === -1) {
+						if (newIndex === null || newIndex === -1) {
 							newIndex = oldIndex;
 						}
 
@@ -1239,6 +1239,6 @@
 
 
 	// Export
-	Sortable.version = '1.3.0-rc1';
+	Sortable.version = '1.3.0-rc2';
 	return Sortable;
 });
