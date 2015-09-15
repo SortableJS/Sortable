@@ -179,7 +179,7 @@
 				<div ng-controller="TodoController">
 					<span style="padding-left: 20px">{{remaining()}} of {{todos.length}} remaining</span>
 					[ <a href="" ng-click="archive()">archive</a> ]
-					<ul ng-sortable="{ group: 'todo', animation: 150 }" class="unstyled">
+					<ul ng-sortable="{ group: 'todo', animation: 150 }" class="unstyled" style="min-height: 40px;">
 						<li ng-repeat="todo in todos">
 							<input type="checkbox" ng-model="todo.done">
 							<span class="done-{{todo.done}}">{{todo.text}}</span>
