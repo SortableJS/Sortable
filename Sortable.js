@@ -791,8 +791,11 @@
 						}
 					}
 
-					if (newIndex >= 0) {
-						// Only if we really move the item.
+					if (Sortable.active) {
+						if (newIndex == null || newIndex === -1) {
+							newIndex = oldIndex;
+						}
+
 						_dispatchEvent(this, rootEl, 'end', dragEl, rootEl, oldIndex, newIndex);
 
 						// Save sorting
