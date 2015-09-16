@@ -767,7 +767,7 @@
 					if (rootEl !== parentEl) {
 						newIndex = _index(dragEl);
 
-						if (newIndex != -1) {
+						if (newIndex >= 0) {
 							// drag from one list and drop into another
 							_dispatchEvent(null, parentEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
 							_dispatchEvent(this, rootEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
@@ -786,7 +786,8 @@
 						if (dragEl.nextSibling !== nextEl) {
 							// Get the index of the dragged element within its parent
 							newIndex = _index(dragEl);
-							if (newIndex != -1) {
+
+							if (newIndex >= 0) {
 								// drag & drop within the same list
 								_dispatchEvent(this, rootEl, 'update', dragEl, rootEl, oldIndex, newIndex);
 								_dispatchEvent(this, rootEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
@@ -795,7 +796,10 @@
 					}
 
 					if (Sortable.active) {
-						// Drag end event
+						if (newIndex === null || newIndex === -1) {
+							newIndex = oldIndex;
+						}
+
 						_dispatchEvent(this, rootEl, 'end', dragEl, rootEl, oldIndex, newIndex);
 
 						// Save sorting
@@ -1158,20 +1162,22 @@
 
 	/**
 	 * Returns the index of an element within its parent
-	 * @param el
-	 * @returns {number}
-	 * @private
+	 * @param  {HTMLElement} el
+	 * @return {number}
 	 */
-	function _index(/**HTMLElement*/el) {
+	function _index(el) {
+		var index = 0;
+
 		if (!el || !el.parentNode) {
 			return -1;
 		}
-		var index = 0;
+
 		while (el && (el = el.previousElementSibling)) {
 			if (el.nodeName.toUpperCase() !== 'TEMPLATE') {
 				index++;
 			}
 		}
+
 		return index;
 	}
 
@@ -1237,6 +1243,6 @@
 
 
 	// Export
-	Sortable.version = '1.3.0-rc1';
+	Sortable.version = '1.3.0-rc2';
 	return Sortable;
 });
