@@ -5,11 +5,16 @@
 (function (factory) {
 	'use strict';
 
-	if (window.angular && window.Sortable) {
-		factory(angular, Sortable);
-	}
-	else if (typeof define === 'function' && define.amd) {
+	if (typeof define === 'function' && define.amd) {
 		define(['angular', './Sortable'], factory);
+	}
+	else if (typeof require === 'function' && typeof exports === 'object' && typeof module === 'object') {
+		require('angular');
+		factory(angular, require('./Sortable'));
+		module.exports = 'ng-sortable';
+	}
+	else if (window.angular && window.Sortable) {
+		factory(angular, Sortable);
 	}
 })(function (angular, Sortable) {
 	'use strict';
