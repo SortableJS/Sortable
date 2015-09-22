@@ -1243,6 +1243,6 @@
 
 
 	// Export
-	Sortable.version = '1.3.0-rc2';
+	Sortable.version = '1.3.0';
 	return Sortable;
 });
