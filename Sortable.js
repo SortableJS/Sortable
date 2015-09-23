@@ -412,7 +412,12 @@
 				Sortable.active = this;
 
 				// Drag start event
-				_dispatchEvent(this, rootEl, 'start', dragEl, rootEl, oldIndex);
+				if (this.options.forceFallback) {
+					_dispatchEvent(this, rootEl, 'start', ghostEl, dragEl, oldIndex);
+				}
+				else {
+					_dispatchEvent(this, rootEl, 'start', dragEl, rootEl, oldIndex);
+				}
 			}
 		},
 
@@ -464,13 +469,16 @@
 
 		_onTouchMove: function (/**TouchEvent*/evt) {
 			if (tapEvt) {
+
+				// as well as creating the ghost element on the document body
+				// append this before start dragging so I have access to the ghost in case of forceFallback = true
+				this._appendGhost();
+
 				// only set the status to dragging, when we are actually dragging
 				if (!Sortable.active) {
 					this._dragStarted();
 				}
 
-				// as well as creating the ghost element on the document body
-				this._appendGhost();
 
 				var touch = evt.touches ? evt.touches[0] : evt,
 					dx = touch.clientX - tapEvt.clientX,
@@ -538,7 +546,7 @@
 					_on(document, 'touchend', this._onDrop);
 					_on(document, 'touchcancel', this._onDrop);
 				} else {
-					// Old brwoser
+					// Old browser
 					_on(document, 'mousemove', this._onTouchMove);
 					_on(document, 'mouseup', this._onDrop);
 				}
