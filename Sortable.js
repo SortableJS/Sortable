@@ -470,8 +470,8 @@
 		_onTouchMove: function (/**TouchEvent*/evt) {
 			if (tapEvt) {
 
+				// make the ghost available onStart in case of forceFallback = true
 				// as well as creating the ghost element on the document body
-				// append this before start dragging so I have access to the ghost in case of forceFallback = true
 				this._appendGhost();
 
 				// only set the status to dragging, when we are actually dragging
