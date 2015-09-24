@@ -46,7 +46,9 @@
 
 					if (!ngRepeat) {
 						// Without ng-repeat
-						return null;
+						return function () {
+							return null;
+						};
 					}
 
 					// tests: http://jsbin.com/kosubutilo/1/edit?js,output
