@@ -493,12 +493,13 @@
 			if (!ghostEl) {
 				var rect = dragEl.getBoundingClientRect(),
 					css = _css(dragEl),
+					options = this.options,
 					ghostRect;
 
 				ghostEl = dragEl.cloneNode(true);
 
-				_toggleClass(ghostEl, this.options.ghostClass, false);
-				_toggleClass(ghostEl, this.options.fallbackClass, true);
+				_toggleClass(ghostEl, options.ghostClass, false);
+				_toggleClass(ghostEl, options.fallbackClass, true);
 
 				_css(ghostEl, 'top', rect.top - parseInt(css.marginTop, 10));
 				_css(ghostEl, 'left', rect.left - parseInt(css.marginLeft, 10));
@@ -509,7 +510,7 @@
 				_css(ghostEl, 'zIndex', '100000');
 				_css(ghostEl, 'pointerEvents', 'none');
 
-				this.options.fallbackOnBody && document.body.appendChild(ghostEl) || rootEl.appendChild(ghostEl);
+				options.fallbackOnBody && document.body.appendChild(ghostEl) || rootEl.appendChild(ghostEl);
 
 				// Fixing dimensions.
 				ghostRect = ghostEl.getBoundingClientRect();
