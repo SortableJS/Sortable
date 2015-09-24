@@ -35,7 +35,11 @@
 		onRemove: 'handleRemove',
 		onSort: 'handleSort',
 		onFilter: 'handleFilter',
-		onMove: 'handleMove'
+		onMove: 'handleMove',
+		getContainer: function(component){
+			/** @namespace this.refs — http://facebook.github.io/react/docs/more-about-refs.html */
+			return (component.refs[options.ref] || component).getDOMNode()
+		}
 	};
 
 
@@ -132,7 +136,7 @@
 
 
 			/** @namespace this.refs — http://facebook.github.io/react/docs/more-about-refs.html */
-			this._sortableInstance = Sortable.create((this.refs[options.ref] || this).getDOMNode(), copyOptions);
+			this._sortableInstance = Sortable.create(copyOptions.getContainer(this), copyOptions);
 		},
 
 		componentWillReceiveProps: function (nextProps) {
