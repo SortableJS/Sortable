@@ -35,11 +35,7 @@
 		onRemove: 'handleRemove',
 		onSort: 'handleSort',
 		onFilter: 'handleFilter',
-		onMove: 'handleMove',
-		getContainer: function(component){
-			/** @namespace this.refs — http://facebook.github.io/react/docs/more-about-refs.html */
-			return (component.refs[options.ref] || component).getDOMNode()
-		}
+		onMove: 'handleMove'
 	};
 
 
@@ -85,7 +81,7 @@
 
 
 		componentDidMount: function () {
-			var options = _extend(_extend({}, _defaultOptions), this.sortableOptions || {}),
+			var DOMNode, options = _extend(_extend({}, _defaultOptions), this.sortableOptions || {}),
 				copyOptions = _extend({}, options),
 
 				emitEvent = function (/** string */type, /** Event */evt) {
@@ -134,9 +130,10 @@
 				}.bind(this);
 			}, this);
 
+			DOMNode = this.getDOMNode() ? (this.refs[options.ref] || this).getDOMNode() : this.refs[options.ref] || this;
 
 			/** @namespace this.refs — http://facebook.github.io/react/docs/more-about-refs.html */
-			this._sortableInstance = Sortable.create(copyOptions.getContainer(this), copyOptions);
+			this._sortableInstance = Sortable.create(DOMNode, copyOptions);
 		},
 
 		componentWillReceiveProps: function (nextProps) {

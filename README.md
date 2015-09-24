@@ -287,7 +287,7 @@ This gives us the possiblity to test the behaviour for older Browsers even in ne
 
 On top of that, the Fallback always generates a copy of that DOM Element and appends the class `fallbackClass` definied in the options. This behaviour controls the look of this 'dragged' Element.
 
-Demo: http://jsbin.com/xinuyenabi/edit?html,css,js,output
+Demo: http://jsbin.com/pucurizace/edit?html,css,js,output
 
 
 ---
@@ -410,7 +410,7 @@ var AllUsers = React.createClass({
 	render: function() {
 		return (
 			<h1>Users</h1>
-			<ul ref="users">{
+			<ul ref="user">{
 				this.state.users.map(function (text) {
 					return <li>{text}</li>
 				})
