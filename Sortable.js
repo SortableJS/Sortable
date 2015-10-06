@@ -470,16 +470,13 @@
 
 				var	touch = evt.touches ? evt.touches[0] : evt;
 
-				if (this.options.distance && this.options.distance > 0) {
-					// sorting will not start until mouse is dragged at a minimum distance
-					// this is used to prevent unwanted move during a simple click on a sortable element
-					if (!Sortable.active && !(Math.abs(touch.clientX - this._lastX) > this.options.distance || Math.abs(touch.clientY - this._lastY) > this.options.distance)) {
-						return;
-					}
-				}
-
 				// only set the status to dragging, when we are actually dragging
 				if (!Sortable.active) {
+					if (this.options.distance && this.options.distance > 0) { // #590
+						if (Math.abs(touch.clientX - this._lastX) < this.options.distance && Math.abs(touch.clientY - this._lastY) < this.options.distance) {
+							return;
+						}
+					}
 					this._dragStarted();
 				}
 
