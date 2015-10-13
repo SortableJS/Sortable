@@ -476,9 +476,9 @@ Other attributes are:
 ### Support Polymer
 ```html
 
-<link rel="import" href="bower_components/sortable-js/sortable-js.html">
+<link rel="import" href="bower_components/Sortable/Sortable-js.html">
 
-<sortable-js>
+<sortable-js handle=".handle">
   <template is="dom-repeat" items={{names}}>
     <div>{{item}}</div>
   </template>
