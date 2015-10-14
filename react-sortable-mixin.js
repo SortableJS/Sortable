@@ -70,7 +70,7 @@
 	 * @mixin
 	 */
 	var SortableMixin = {
-		sortableMixinVersion: '0.1.0',
+		sortableMixinVersion: '0.1.1',
 
 
 		/**
