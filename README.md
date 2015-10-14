@@ -69,6 +69,7 @@ var sortable = new Sortable(el, {
 	forceFallback: false,  // ignore the HTML5 DnD behaviour and force the fallback to kick in
 	fallbackClass: "sortable-fallback"  // Class name for the cloned DOM Element when using forceFallback
 	fallbackOnBody: false  // Appends the cloned DOM Element into the Document's Body
+	fallbackTolerance: 0 // Specify in pixels how far the mouse should move before it's considered as a drag.        
 	
 	scroll: true, // or HTMLElement
 	scrollSensitivity: 30, // px, how near the mouse must be to an edge to start scrolling.
@@ -288,6 +289,19 @@ This gives us the possiblity to test the behaviour for older Browsers even in ne
 On top of that, the Fallback always generates a copy of that DOM Element and appends the class `fallbackClass` definied in the options. This behaviour controls the look of this 'dragged' Element.
 
 Demo: http://jsbin.com/pucurizace/edit?html,css,js,output
+
+
+---
+
+
+#### `fallbackTolerance` option
+Emulates the native drag threshold. Specify in pixels how far the mouse should move before it's considered as a drag.
+Useful if the items are also clickable like in a list of links.
+
+When the user clicks inside a sortable element, it's not uncommon for your hand to move a little between the time you press and the time you release.  
+Dragging only starts if you move the pointer past a certain tolerance, so that you don't accidentally start dragging every time you click.
+
+3 to 5 are probably good values.
 
 
 ---

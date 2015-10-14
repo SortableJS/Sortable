@@ -209,7 +209,8 @@
 			delay: 0,
 			forceFallback: false,
 			fallbackClass: 'sortable-fallback',
-			fallbackOnBody: false
+			fallbackOnBody: false,
+			fallbackTolerance: 0
 		};
 
 
@@ -323,8 +324,8 @@
 				nextEl = dragEl.nextSibling;
 				activeGroup = options.group;
 
-				this._lastX = (touch||evt).clientX;
-				this._lastY = (touch||evt).clientY;
+				this._lastX = (touch || evt).clientX;
+				this._lastY = (touch || evt).clientY;
 
 				dragStartFn = function () {
 					// Delayed drag has been triggered
@@ -472,8 +473,8 @@
 
 				// only set the status to dragging, when we are actually dragging
 				if (!Sortable.active) {
-					if (this.options.distance && this.options.distance > 0) { // #590
-						if (Math.abs(touch.clientX - this._lastX) < this.options.distance && Math.abs(touch.clientY - this._lastY) < this.options.distance) {
+					if (this.options.fallbackTolerance) {
+						if (Math.min(Math.abs(touch.clientX - this._lastX), Math.abs(touch.clientY - this._lastY)) < this.options.fallbackTolerance) {
 							return;
 						}
 					}
