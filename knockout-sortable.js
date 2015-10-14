@@ -84,9 +84,11 @@
                     newIndex = e.newIndex;
 
                 if (e.item.previousElementSibling)
+                {
                     newIndex = fromArray.indexOf(ko.dataFor(e.item.previousElementSibling));
-                if (originalIndex > newIndex)
-                    newIndex = newIndex + 1;
+                    if (originalIndex > newIndex)
+                        newIndex = newIndex + 1;
+                }                
 
                 //Remove sortables "unbound" element
                 e.item.parentNode.removeChild(e.item);
