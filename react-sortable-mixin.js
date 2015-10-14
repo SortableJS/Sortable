@@ -120,7 +120,11 @@
 						}
 
 						newState[_getModelName(this)] = items;
-						this.setState(newState);
+						if (copyOptions["stateHandler"]) {
+							this[copyOptions["stateHandler"]](newState);
+						} else {
+							this.setState(newState);
+						}
 						(this !== _activeComponent) && _activeComponent.setState(remoteState);
 					}
 
