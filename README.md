@@ -78,12 +78,17 @@ var sortable = new Sortable(el, {
 		dataTransfer.setData('Text', dragEl.textContent);
 	},
 
-	// dragging started
+	// Element is chosen
+	onChoose: function (/**Event*/evt) {
+		evt.oldIndex;  // element index within parent
+	},
+
+	// Element dragging started
 	onStart: function (/**Event*/evt) {
 		evt.oldIndex;  // element index within parent
 	},
 	
-	// dragging ended
+	// Element dragging ended
 	onEnd: function (/**Event*/evt) {
 		evt.oldIndex;  // element's old index within parent
 		evt.newIndex;  // element's new index within parent
@@ -635,11 +640,11 @@ Link to the active instance.
 
 ```html
 <!-- CDNJS :: Sortable (https://cdnjs.com/) -->
-<script src="//cdnjs.cloudflare.com/ajax/libs/Sortable/1.3.0-rc1/Sortable.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/Sortable/1.4.0-rc1/Sortable.min.js"></script>
 
 
 <!-- jsDelivr :: Sortable (http://www.jsdelivr.com/) -->
-<script src="//cdn.jsdelivr.net/sortable/1.3.0-rc1/Sortable.min.js"></script>
+<script src="//cdn.jsdelivr.net/sortable/1.4.0-rc1/Sortable.min.js"></script>
 
 
 <!-- jsDelivr :: Sortable :: Latest (http://www.jsdelivr.com/) -->
