@@ -336,6 +336,9 @@
 
 					// Bind the events: dragstart/dragend
 					_this._triggerDragStart(touch);
+
+					// Drag start event
+					_dispatchEvent(this, rootEl, 'choose', dragEl, rootEl, oldIndex);
 				};
 
 				// Disable "draggable"
@@ -1244,6 +1247,6 @@
 
 
 	// Export
-	Sortable.version = '1.3.0';
+	Sortable.version = '1.4.0';
 	return Sortable;
 });
