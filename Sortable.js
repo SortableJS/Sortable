@@ -269,6 +269,10 @@
 			if (!target) {
 				return;
 			}
+			
+			if (options.handle && !_closest(originalTarget, options.handle, el)) {
+				return;
+			}
 
 			// get the index of the dragged element within its parent
 			oldIndex = _index(target);
@@ -296,12 +300,6 @@
 					return; // cancel dnd
 				}
 			}
-
-
-			if (options.handle && !_closest(originalTarget, options.handle, el)) {
-				return;
-			}
-
 
 			// Prepare `dragstart`
 			this._prepareDragStart(evt, touch, target);
