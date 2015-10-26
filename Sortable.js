@@ -172,6 +172,10 @@
 	 * @param  {Object}       [options]
 	 */
 	function Sortable(el, options) {
+		if (!(el && el.nodeType && el.nodeType === 1)) {
+			throw 'Sortable: `el` must be HTMLElement, and not ' + {}.toString.call(el);
+		}
+
 		this.el = el; // root element
 		this.options = options = _extend({}, options);
 
@@ -489,12 +493,13 @@
 			if (!ghostEl) {
 				var rect = dragEl.getBoundingClientRect(),
 					css = _css(dragEl),
+					options = this.options,
 					ghostRect;
 
 				ghostEl = dragEl.cloneNode(true);
 
-				_toggleClass(ghostEl, this.options.ghostClass, false);
-				_toggleClass(ghostEl, this.options.fallbackClass, true);
+				_toggleClass(ghostEl, options.ghostClass, false);
+				_toggleClass(ghostEl, options.fallbackClass, true);
 
 				_css(ghostEl, 'top', rect.top - parseInt(css.marginTop, 10));
 				_css(ghostEl, 'left', rect.left - parseInt(css.marginLeft, 10));
@@ -505,7 +510,7 @@
 				_css(ghostEl, 'zIndex', '100000');
 				_css(ghostEl, 'pointerEvents', 'none');
 
-				this.options.fallbackOnBody && document.body.appendChild(ghostEl) || rootEl.appendChild(ghostEl);
+				options.fallbackOnBody && document.body.appendChild(ghostEl) || rootEl.appendChild(ghostEl);
 
 				// Fixing dimensions.
 				ghostRect = ghostEl.getBoundingClientRect();
@@ -792,7 +797,7 @@
 					}
 
 					if (Sortable.active) {
-						if (newIndex == null || newIndex === -1) {
+						if (newIndex === null || newIndex === -1) {
 							newIndex = oldIndex;
 						}
 
@@ -1239,6 +1244,6 @@
 
 
 	// Export
-	Sortable.version = '1.3.0-rc1';
+	Sortable.version = '1.4.2';
 	return Sortable;
 });
