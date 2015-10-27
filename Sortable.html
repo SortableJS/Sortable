@@ -11,7 +11,7 @@
     is: "sortable-js",
 
     properties: {
-      group             : { type: String, value: () => Math.random(), observer: "groupChanged" },
+      group             : { type: String, value: function() { return Math.random(); }, observer: "groupChanged" },
       sort              : { type: Boolean, value: true, observer: "sortChanged" },
       disabled          : { type: Boolean, value: false, observer: "disabledChanged" },
       store             : { type: Object, value: null, observer: "storeChanged" },
@@ -59,19 +59,19 @@
       var template = templates[templates.length-1]
 
       var options = {}
-      Object.keys(this.properties).forEach(key => {
+      Object.keys(this.properties).forEach(function(key) {
         options[key] = this[key]
       })
 
       this.sortable = Sortable.create(this, Object.assign(options, {
-        onUpdate: e => {
+        onUpdate: function(e) {
           if (template) {
             template.splice("items", e.newIndex, 0, template.splice("items", e.oldIndex, 1)[0])
           }
           this.fire("update", e)
         },
 
-        onAdd: e => {
+        onAdd: function(e) {
           if (template) {
             var froms = e.from.querySelectorAll("template[is='dom-repeat']")
             var from = froms[froms.length-1]
@@ -81,30 +81,30 @@
           this.fire("add", e)
         },
 
-        onRemove: e => {
+        onRemove: function(e) {
           if (template) {
             template.splice("items", e.oldIndex, 1)[0]
           }
           this.fire("remove", e)
         },
 
-        onStart: e => {
+        onStart: function(e) {
           this.fire("start", e)
         },
 
-        onEnd: e => {
+        onEnd: function(e) {
           this.fire("end", e)
         },
 
-        onSort: e => {
+        onSort: function(e) {
           this.fire("sort", e)
         },
 
-        onFilter: e => {
+        onFilter: function(e) {
           this.fire("filter", e)
         },
 
-        onMove: e => {
+        onMove: function(e) {
           this.fire("move", e)
         }
       }))
