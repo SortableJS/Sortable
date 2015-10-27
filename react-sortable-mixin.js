@@ -3,20 +3,20 @@
  * @licence MIT
  */
 
-(function (factory) {
+(function (root, factory) {
 	'use strict';
 
 	if (typeof module != 'undefined' && typeof module.exports != 'undefined') {
-		module.exports = factory(require('./Sortable'));
+		module.exports = factory(require('./Sortable'), require('react'), require('react-dom'));
 	}
 	else if (typeof define === 'function' && define.amd) {
-		define(['./Sortable'], factory);
+		define(['./Sortable', 'react', 'react-dom'], factory);
 	}
 	else {
 		/* jshint sub:true */
-		window['SortableMixin'] = factory(Sortable);
+		root['SortableMixin'] = factory(root.Sortable, root.React, root.ReactDOM);
 	}
-})(function (/** Sortable */Sortable) {
+})(this, function (/** Sortable */Sortable, React, ReactDOM) {
 	'use strict';
 
 	var _nextSibling;
@@ -120,13 +120,13 @@
 						}
 
 						newState[_getModelName(this)] = items;
-						
+
 						if (copyOptions.stateHandler) {
 							this[copyOptions.stateHandler](newState);
 						} else {
 							this.setState(newState);
 						}
-						
+
 						(this !== _activeComponent) && _activeComponent.setState(remoteState);
 					}
 
@@ -136,7 +136,7 @@
 				}.bind(this);
 			}, this);
 
-			DOMNode = this.getDOMNode() ? (this.refs[options.ref] || this).getDOMNode() : this.refs[options.ref] || this;
+			DOMNode = ReactDOM.findDOMNode(this) ? ReactDOM.findDOMNode((this.refs[options.ref] || this)) : this.refs[options.ref] || this;
 
 			/** @namespace this.refs — http://facebook.github.io/react/docs/more-about-refs.html */
 			this._sortableInstance = Sortable.create(DOMNode, copyOptions);
