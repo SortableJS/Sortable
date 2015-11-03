@@ -393,7 +393,7 @@ var SortableList = React.createClass({
 	}
 });
 
-React.render(<SortableList />, document.body);
+ReactDOM.render(<SortableList />, document.body);
 
 
 //
@@ -442,7 +442,7 @@ var ApprovedUsers = React.createClass({
 	}
 });
 
-React.render(<div>
+ReactDOM.render(<div>
 	<AllUsers/>
 	<hr/>
 	<ApprovedUsers/>
