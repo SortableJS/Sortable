@@ -49,6 +49,7 @@
 	Sortable.create(byId('foo'), {
 		group: "words",
 		animation: 150,
+		forceFallback: true,
 		store: {
 			get: function (sortable) {
 				var order = localStorage.getItem(sortable.options.group);
@@ -62,7 +63,7 @@
 		onAdd: function (evt){ console.log('onAdd.foo:', [evt.item, evt.from]); },
 		onUpdate: function (evt){ console.log('onUpdate.foo:', [evt.item, evt.from]); },
 		onRemove: function (evt){ console.log('onRemove.foo:', [evt.item, evt.from]); },
-		onStart:function(evt){ console.log('onStart.foo:', [evt.item, evt.from]);},
+		onStart:function(evt){ console.log('onStart.foo:', [evt.item, evt.from]); },
 		onSort:function(evt){ console.log('onStart.foo:', [evt.item, evt.from]);},
 		onEnd: function(evt){ console.log('onEnd.foo:', [evt.item, evt.from]);}
 	});
