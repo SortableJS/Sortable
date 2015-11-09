@@ -2,7 +2,7 @@
     "use strict";
     if (typeof define === "function" && define.amd) {
         // AMD anonymous module
-        define(["knockout"], factory);
+        define(["knockout", "./Sortable"], factory);
     } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
         // CommonJS module
         var ko = require("knockout");
@@ -11,7 +11,7 @@
         // No module loader (plain <script> tag) - put directly in global namespace
         factory(window.ko);
     }
-})(function (ko) {
+})(function (ko, Sortable) {
     "use strict";
 
     var init = function (element, valueAccessor, allBindings, viewModel, bindingContext, sortableOptions) {
