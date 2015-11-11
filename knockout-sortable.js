@@ -2,16 +2,17 @@
     "use strict";
     if (typeof define === "function" && define.amd) {
         // AMD anonymous module
-        define(["knockout"], factory);
+        define(["knockout", "./Sortable"], factory);
     } else if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
         // CommonJS module
         var ko = require("knockout");
-        factory(ko);
+        var Sortable = require('./Sortable');
+        factory(ko, Sortable);
     } else {
         // No module loader (plain <script> tag) - put directly in global namespace
-        factory(window.ko);
+        factory(window.ko, window.Sortable);
     }
-})(function (ko) {
+})(function (ko, Sortable) {
     "use strict";
 
     var init = function (element, valueAccessor, allBindings, viewModel, bindingContext, sortableOptions) {
