@@ -85,8 +85,8 @@
 				copyOptions = _extend({}, options),
 
 				emitEvent = function (/** string */type, /** Event */evt) {
-					var method = this[options[type]];
-					method && method.call(this, evt, this._sortableInstance);
+					var method = options[type];
+					method && typeof method === "function" && method.call(this, evt, this._sortableInstance);
 				}.bind(this);
 
 
