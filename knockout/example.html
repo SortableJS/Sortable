@@ -17,36 +17,82 @@
 		.col-1_2 {
 			width: 50%;
 		}
+
+		.mirror {
+			color: #ccc;
+		}
 	</style>
 </head>
 <body>
 	<div class="grid">
 		<div class="col-1_2">
-			<h4>Sortable observable</h4>
-			<ul data-bind="sortable: {foreach: sortableObservableItems}">
-				<li data-bind="text: name"></li>
-			</ul>
+			<div class="grid">
+				<div class="col-1_2">
+					<h4>Sortable observable</h4>
+					<ul data-bind="sortable: {foreach: sortableObservableItems}">
+						<li data-bind="text: name"></li>
+					</ul>
+				</div>
+				<div class="col-1_2 mirror">
+					<h4>Sortable observable mirrored</h4>
+					<ul data-bind="foreach: sortableObservableItems">
+						<li data-bind="text: name"></li>
+					</ul>
+				</div>
+			</div>
 		</div>
+
 		<div class="col-1_2">
-			<h4>Sortable observable mirrored</h4>
-			<ul data-bind="sortable: {foreach: sortableObservableItems}">
-				<li data-bind="text: name"></li>
-			</ul>
+			<div class="grid">
+				<div class="col-1_2">
+					<h4>Sortable computed</h4>
+					<ul data-bind="sortable: {foreach: sortableComputedItems, collection: underlayingSortableComputedItems}">
+						<li data-bind="text: name"></li>
+					</ul>
+				</div>
+				<div class="col-1_2 mirror">
+					<h4>Sortable computed mirrored</h4>
+					<ul data-bind="foreach: sortableComputedItems">
+						<li data-bind="text: name"></li>
+					</ul>
+				</div>
+			</div>
 		</div>
 	</div>
 
 	<div class="grid">
 		<div class="col-1_2">
-			<h4>Sortable computed</h4>
-			<ul data-bind="sortable: {foreach: sortableComputedItems, collection: underlayingsortableComputedItems}">
-				<li data-bind="text: name"></li>
-			</ul>
+			<div class="grid">
+				<div class="col-1_2">
+					<h4>Draggable observable</h4>
+					<ul data-bind="draggable: {foreach: draggableObservableItems}">
+						<li data-bind="text: name"></li>
+					</ul>
+				</div>
+				<div class="col-1_2 mirror">
+					<h4>Draggable observable mirrored</h4>
+					<ul data-bind="foreach: draggableObservableItems">
+						<li data-bind="text: name"></li>
+					</ul>
+				</div>
+			</div>
 		</div>
+
 		<div class="col-1_2">
-			<h4>Sortable computed mirrored</h4>
-			<ul data-bind="foreach: sortableComputedItems">
-				<li data-bind="text: name"></li>
-			</ul>
+			<div class="grid">
+				<div class="col-1_2">
+					<h4>Draggable computed</h4>
+					<ul data-bind="draggable: {foreach: draggableComputedItems, collection: underlayingDraggableComputedItems}">
+						<li data-bind="text: name"></li>
+					</ul>
+				</div>
+				<div class="col-1_2 mirror">
+					<h4>Draggable computed mirrored</h4>
+					<ul data-bind="foreach: draggableComputedItems">
+						<li data-bind="text: name"></li>
+					</ul>
+				</div>
+			</div>
 		</div>
 	</div>
 
@@ -58,11 +104,17 @@
 		var sortableComputedItems = [{ name: 'Sortable computed 1' }, { name: 'Sortable computed 2' }, { name: 'Sortable computed 3' }];
 		var sortableObservableItems = [{ name: 'Sortable observable 1' }, { name: 'Sortable observable 2' }, { name: 'Sortable observable 3' }];
 
+		var draggableComputedItems = [{ name: 'Draggable computed 1' }, { name: 'Draggable computed 2' }, { name: 'Draggable computed 3' }];
+		var draggableObservableItems = [{ name: 'Draggable observable 1' }, { name: 'Draggable observable 2' }, { name: 'Draggable observable 3' }];
+
 		var vm = {
 			underlayingSortableComputedItems: ko.observableArray(sortableComputedItems),
-			sortableObservableItems: ko.observableArray(sortableObservableItems)
+			sortableObservableItems: ko.observableArray(sortableObservableItems),
+			underlayingDraggableComputedItems: ko.observableArray(draggableComputedItems),
+			draggableObservableItems: ko.observableArray(draggableObservableItems)
 		}
 		vm.sortableComputedItems = ko.computed(function () { return vm.underlayingSortableComputedItems(); });
+		vm.draggableComputedItems = ko.computed(function () { return vm.underlayingDraggableComputedItems(); });
 
 		ko.applyBindings(vm);
 	</script>
