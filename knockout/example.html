@@ -51,8 +51,8 @@
 					</ul>
 				</div>
 				<div class="col-1_2 mirror">
-					<h4>Sortable computed mirrored</h4>
-					<ul data-bind="foreach: sortableComputedItems">
+					<h4>Sortable underlaying computed</h4>
+					<ul data-bind="foreach: underlayingSortableComputedItems">
 						<li data-bind="text: name"></li>
 					</ul>
 				</div>
@@ -101,7 +101,7 @@
 	<script src="../knockout-sortable.js"></script>
 	<script>
 
-		var sortableComputedItems = [{ name: 'Sortable computed 1' }, { name: 'Sortable computed 2' }, { name: 'Sortable computed 3' }];
+		var sortableComputedItems = [{ name: 'Sortable computed 1' }, { name: 'Filtered computed 2' }, { name: 'Sortable computed 3' }, { name: 'Filtered computed 4' }, { name: 'Sortable computed 5' }, { name: 'Filtered computed 6' }];
 		var sortableObservableItems = [{ name: 'Sortable observable 1' }, { name: 'Sortable observable 2' }, { name: 'Sortable observable 3' }];
 
 		var draggableComputedItems = [{ name: 'Draggable computed 1' }, { name: 'Draggable computed 2' }, { name: 'Draggable computed 3' }];
@@ -113,7 +113,12 @@
 			underlayingDraggableComputedItems: ko.observableArray(draggableComputedItems),
 			draggableObservableItems: ko.observableArray(draggableObservableItems)
 		}
-		vm.sortableComputedItems = ko.computed(function () { return vm.underlayingSortableComputedItems(); });
+		vm.sortableComputedItems = ko.computed(function () {
+			return vm.underlayingSortableComputedItems()
+				.filter(function (item) {
+					return item.name.indexOf('Filtered') < 0;
+				});
+		});
 		vm.draggableComputedItems = ko.computed(function () { return vm.underlayingDraggableComputedItems(); });
 
 		ko.applyBindings(vm);
