@@ -1,0 +1,70 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+	<meta charset="utf-8" />
+
+	<style>
+		.grid {
+			font-size: 0;
+		}
+		.col-1_2 {
+			box-sizing:border-box;
+			display: inline-block;
+			padding: 0.5rem;
+			font-size: 1rem;
+		}
+		.col-1_2 {
+			width: 50%;
+		}
+	</style>
+</head>
+<body>
+	<div class="grid">
+		<div class="col-1_2">
+			<h4>Sortable observable</h4>
+			<ul data-bind="sortable: {foreach: sortableObservableItems}">
+				<li data-bind="text: name"></li>
+			</ul>
+		</div>
+		<div class="col-1_2">
+			<h4>Sortable observable mirrored</h4>
+			<ul data-bind="sortable: {foreach: sortableObservableItems}">
+				<li data-bind="text: name"></li>
+			</ul>
+		</div>
+	</div>
+
+	<div class="grid">
+		<div class="col-1_2">
+			<h4>Sortable computed</h4>
+			<ul data-bind="sortable: {foreach: sortableComputedItems, collection: underlayingsortableComputedItems}">
+				<li data-bind="text: name"></li>
+			</ul>
+		</div>
+		<div class="col-1_2">
+			<h4>Sortable computed mirrored</h4>
+			<ul data-bind="foreach: sortableComputedItems">
+				<li data-bind="text: name"></li>
+			</ul>
+		</div>
+	</div>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.3.0/knockout-min.js"></script>
+	<script src="../Sortable.js"></script>
+	<script src="../knockout-sortable.js"></script>
+	<script>
+
+		var sortableComputedItems = [{ name: 'Sortable computed 1' }, { name: 'Sortable computed 2' }, { name: 'Sortable computed 3' }];
+		var sortableObservableItems = [{ name: 'Sortable observable 1' }, { name: 'Sortable observable 2' }, { name: 'Sortable observable 3' }];
+
+		var vm = {
+			underlayingSortableComputedItems: ko.observableArray(sortableComputedItems),
+			sortableObservableItems: ko.observableArray(sortableObservableItems)
+		}
+		vm.sortableComputedItems = ko.computed(function () { return vm.underlayingSortableComputedItems(); });
+
+		ko.applyBindings(vm);
+	</script>
+</body>
+</html>
