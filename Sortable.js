@@ -95,7 +95,7 @@
 					scrollEl = options.scroll;
 					scrollParentEl = rootEl;
 
-					if (scrollEl === true) {
+					if (scrollEl =_onDragOver== true) {
 						scrollEl = rootEl;
 
 						do {
@@ -606,7 +606,8 @@
 					else if (!canSort) {
 						rootEl.appendChild(dragEl);
 					}
-
+					//fix bug when cancel drag
+					parentEl = dragEl.parentNode;
 					return;
 				}
 
