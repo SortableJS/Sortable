@@ -95,7 +95,7 @@
 					scrollEl = options.scroll;
 					scrollParentEl = rootEl;
 
-					if (scrollEl =_onDragOver== true) {
+					if (scrollEl === true) {
 						scrollEl = rootEl;
 
 						do {
