@@ -979,17 +979,11 @@
 	function _closest(/**HTMLElement*/el, /**String*/selector, /**HTMLElement*/ctx) {
 		if (el) {
 			ctx = ctx || document;
-			selector = selector.split('.');
-
-			var tag = selector.shift().toUpperCase(),
-				re = new RegExp('\\s(' + selector.join('|') + ')(?=\\s)', 'g');
 
 			do {
 				if (
-					(tag === '>*' && el.parentNode === ctx) || (
-						(tag === '' || el.nodeName.toUpperCase() == tag) &&
-						(!selector.length || ((' ' + el.className + ' ').match(re) || []).length == selector.length)
-					)
+					(selector === '>*' && el.parentNode === ctx)
+					|| _matches(el, selector)
 				) {
 					return el;
 				}
@@ -1186,20 +1180,19 @@
 	}
 
 	function _matches(/**HTMLElement*/el, /**String*/selector) {
-		var matches,
-			i = 0;
+		if (el) {
+			selector = selector.split('.');
 
-		if (el.matches) {
-			return el.matches(selector);
-		} else if (el.matchesSelector) {
-			return el.matchesSelector(selector);
-		} else {
-			matches = (el.document || el.ownerDocument).querySelectorAll(selector);
-			while (matches[i] && matches[i] !== el) {
-				i++;
-			}
-			return matches[i] ? true : false;
+			var tag = selector.shift().toUpperCase(),
+				re = new RegExp('\\s(' + selector.join('|') + ')(?=\\s)', 'g');
+
+			return (
+				(tag === '' || el.nodeName.toUpperCase() == tag) &&
+				(!selector.length || ((' ' + el.className + ' ').match(re) || []).length == selector.length)
+			);
 		}
+
+		return false;
 	}
 
 	function _throttle(callback, ms) {
