@@ -70,7 +70,7 @@
 	 * @mixin
 	 */
 	var SortableMixin = {
-		sortableMixinVersion: '0.1.0',
+		sortableMixinVersion: '0.1.1',
 
 
 		/**
@@ -120,7 +120,13 @@
 						}
 
 						newState[_getModelName(this)] = items;
-						this.setState(newState);
+						
+						if (copyOptions.stateHandler) {
+							this[copyOptions.stateHandler](newState);
+						} else {
+							this.setState(newState);
+						}
+						
 						(this !== _activeComponent) && _activeComponent.setState(remoteState);
 					}
 

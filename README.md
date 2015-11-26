@@ -496,7 +496,7 @@ Other attributes are:
 ### Support Polymer
 ```html
 
-<link rel="import" href="bower_components/Sortable/Sortable-js.html">
+<link rel="import" href="bower_components/Sortable/Sortable.html">
 
 <sortable-js handle=".handle">
   <template is="dom-repeat" items={{names}}>
@@ -655,11 +655,11 @@ Link to the active instance.
 
 ```html
 <!-- CDNJS :: Sortable (https://cdnjs.com/) -->
-<script src="//cdnjs.cloudflare.com/ajax/libs/Sortable/1.4.0-rc1/Sortable.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/Sortable/1.4.2/Sortable.min.js"></script>
 
 
 <!-- jsDelivr :: Sortable (http://www.jsdelivr.com/) -->
-<script src="//cdn.jsdelivr.net/sortable/1.4.0-rc1/Sortable.min.js"></script>
+<script src="//cdn.jsdelivr.net/sortable/1.4.2/Sortable.min.js"></script>
 
 
 <!-- jsDelivr :: Sortable :: Latest (http://www.jsdelivr.com/) -->
