@@ -12,7 +12,7 @@ Demo: http://rubaxa.github.io/Sortable/
  * Supports drag handles *and selectable text* (better than voidberg's html5sortable)
  * Smart auto-scrolling
  * Built using native HTML5 drag and drop API
- * Supports [Meteor](meteor/README.md), [AngularJS](#ng), [React](#react) and [Polymer](#polymer)
+ * Supports [Meteor](meteor/README.md), [AngularJS](#ng), [React](#react), [Polymer](#polymer) and [Vuejs](#vuejs)
  * Supports any CSS library, e.g. [Bootstrap](#bs)
  * Simple API
  * [CDN](#cdn)
@@ -65,15 +65,15 @@ var sortable = new Sortable(el, {
 	ghostClass: "sortable-ghost",  // Class name for the drop placeholder
 	chosenClass: "sortable-chosen",  // Class name for the chosen item
 	dataIdAttr: 'data-id',
-	
+
 	forceFallback: false,  // ignore the HTML5 DnD behaviour and force the fallback to kick in
 	fallbackClass: "sortable-fallback"  // Class name for the cloned DOM Element when using forceFallback
 	fallbackOnBody: false  // Appends the cloned DOM Element into the Document's Body
-	
+
 	scroll: true, // or HTMLElement
 	scrollSensitivity: 30, // px, how near the mouse must be to an edge to start scrolling.
 	scrollSpeed: 10, // px
-	
+
 	setData: function (dataTransfer, dragEl) {
 		dataTransfer.setData('Text', dragEl.textContent);
 	},
@@ -82,7 +82,7 @@ var sortable = new Sortable(el, {
 	onStart: function (/**Event*/evt) {
 		evt.oldIndex;  // element index within parent
 	},
-	
+
 	// dragging ended
 	onEnd: function (/**Event*/evt) {
 		evt.oldIndex;  // element's old index within parent
@@ -116,7 +116,7 @@ var sortable = new Sortable(el, {
 	onFilter: function (/**Event*/evt) {
 		var itemEl = evt.item;  // HTMLElement receiving the `mousedown|tapstart` event.
 	},
-	
+
 	// Event when you move an item in the list or between lists
 	onMove: function (/**Event*/evt) {
 		// Example: http://jsbin.com/tuyafe/1/edit?js,output
@@ -297,7 +297,7 @@ Demo: http://jsbin.com/pucurizace/edit?html,css,js,output
 If set to `true`, the page (or sortable-area) scrolls when coming to an edge.
 
 Demo:
- - `window`: http://jsbin.com/boqugumiqi/1/edit?html,js,output 
+ - `window`: http://jsbin.com/boqugumiqi/1/edit?html,js,output
  - `overflow: hidden`: http://jsbin.com/kohamakiwi/1/edit?html,js,output
 
 
@@ -485,6 +485,32 @@ Other attributes are:
 <sortable-js>
 ```
 
+---
+
+<a name="vuejs"></a>
+### Support Vuejs
+```html
+
+<ul
+    v-sortable
+    :options="{
+        chosenClass: 'customClassName',
+        dataIdAttr: 'custom-id',
+    }"
+    eventName="orderChanged"
+>
+    <li
+        v-for="item in collection"
+        custom-id="{{ item.id }}"
+    >
+        {{ item.name }}
+    </li>
+</ul>
+```
+An example use case can be found [here](http://christophegraniczny.com/snippets/v-sortable.html)
+
+---
+
 ### Method
 
 
@@ -665,13 +691,13 @@ Now you can use `jquery.fn.sortable.js`:<br/>
 
 ```js
   $("#list").sortable({ /* options */ }); // init
-  
+
   $("#list").sortable("widget"); // get Sortable instance
-  
+
   $("#list").sortable("destroy"); // destroy Sortable instance
-  
+
   $("#list").sortable("{method-name}"); // call an instance method
-  
+
   $("#list").sortable("{method-name}", "foo", "bar"); // call an instance method with parameters
 ```
 
@@ -682,7 +708,7 @@ And `grunt jquery:mySortableFunc` → `jquery.fn.mySortableFunc.js`
 
 ### Contributing (Issue/PR)
 
-Please, [read this](CONTRIBUTING.md). 
+Please, [read this](CONTRIBUTING.md).
 
 
 ---
