@@ -126,13 +126,26 @@
 						scope.$apply();
 					}
 
+					function findNextSibling(evt) {
+						if(evt.item.nextSibling) {
+							return evt.item.nextSibling;
+						}
+
+						// Sometimes evt.item has already been removed from the parent so we need the evt.clone.nextSibling instead of the evt.item.nextSibling.
+						if(evt.from !== evt.item.parentNode) {
+							return evt.clone.nextSibling;
+						}
+
+						// last element of the collection.
+						return null;
+					}
 
 					sortable = Sortable.create(el, Object.keys(options).reduce(function (opts, name) {
 						opts[name] = opts[name] || options[name];
 						return opts;
 					}, {
 						onStart: function (/**Event*/evt) {
-							nextSibling = evt.item.nextSibling;
+							nextSibling = findNextSibling(evt);
 							_emitEvent(evt);
 							scope.$apply();
 						},
