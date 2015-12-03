@@ -132,7 +132,7 @@
 						return opts;
 					}, {
 						onStart: function (/**Event*/evt) {
-							nextSibling = evt.item.nextSibling;
+							nextSibling = evt.from === evt.item.parentNode ? evt.item.nextSibling : evt.clone.nextSibling;
 							_emitEvent(evt);
 							scope.$apply();
 						},
