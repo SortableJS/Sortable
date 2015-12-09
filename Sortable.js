@@ -259,7 +259,7 @@
 				originalTarget = target,
 				filter = options.filter;
 			// don't trigger start event when an element is been dragged, otherwise the evt.oldindex always wrong when set option.group.
-			if(dragEl){
+			if (dragEl) {
 				return;
 			}
 			if (type === 'mousedown' && evt.button !== 0 || options.disabled) {
