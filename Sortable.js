@@ -260,10 +260,12 @@
 				target = (touch || evt).target,
 				originalTarget = target,
 				filter = options.filter;
-			// don't trigger start event when an element is been dragged, otherwise the evt.oldindex always wrong when set option.group.
+
+			// Don't trigger start event when an element is been dragged, otherwise the evt.oldindex always wrong when set option.group.
 			if (dragEl) {
 				return;
 			}
+
 			if (type === 'mousedown' && evt.button !== 0 || options.disabled) {
 				return; // only left button or enabled
 			}
@@ -278,7 +280,7 @@
 				return;
 			}
 
-			// get the index of the dragged element within its parent
+			// Get the index of the dragged element within its parent
 			oldIndex = _index(target, options.draggable);
 
 			// Check filter
@@ -613,6 +615,7 @@
 
 				if (revert) {
 					_cloneHide(true);
+					parentEl = rootEl; // actualization
 
 					if (cloneEl || nextEl) {
 						rootEl.insertBefore(dragEl, cloneEl || nextEl);
