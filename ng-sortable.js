@@ -173,7 +173,7 @@
 
 					angular.forEach([
 						'sort', 'disabled', 'draggable', 'handle', 'animation', 'group', 'ghostClass', 'filter',
-						'onStart', 'onEnd', 'onAdd', 'onUpdate', 'onRemove', 'onSort'
+						'onStart', 'onEnd', 'onAdd', 'onUpdate', 'onRemove', 'onSort', 'onMove', 'onClone'
 					], function (name) {
 						watchers.push(scope.$watch('ngSortable.' + name, function (value) {
 							if (value !== void 0) {

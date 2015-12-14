@@ -131,6 +131,12 @@ var sortable = new Sortable(el, {
 		evt.related; // HTMLElement on which have guided
 		evt.relatedRect; // TextRectangle
 		// return false; — for cancel
+	},
+	
+	// Called when creating a clone of element
+	onClone: function (/**Event*/evt) {
+		var origEl = evt.item;
+		var cloneEl = evt.clone;
 	}
 });
 ```

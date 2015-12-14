@@ -35,7 +35,8 @@
 		onRemove: 'handleRemove',
 		onSort: 'handleSort',
 		onFilter: 'handleFilter',
-		onMove: 'handleMove'
+		onMove: 'handleMove',
+		onClone: 'handleClone'
 	};
 
 
@@ -120,13 +121,13 @@
 						}
 
 						newState[_getModelName(this)] = items;
-						
+
 						if (copyOptions.stateHandler) {
 							this[copyOptions.stateHandler](newState);
 						} else {
 							this.setState(newState);
 						}
-						
+
 						(this !== _activeComponent) && _activeComponent.setState(remoteState);
 					}
 

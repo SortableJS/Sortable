@@ -1,4 +1,4 @@
-﻿(function (factory) {
+(function (factory) {
     "use strict";
     if (typeof define === "function" && define.amd) {
         // AMD anonymous module
@@ -21,7 +21,7 @@
 
         // It's seems that we cannot update the eventhandlers after we've created
         // the sortable, so define them in init instead of update
-        ['onStart', 'onEnd', 'onRemove', 'onAdd', 'onUpdate', 'onSort', 'onFilter'].forEach(function (e) {
+        ['onStart', 'onEnd', 'onRemove', 'onAdd', 'onUpdate', 'onSort', 'onFilter', 'onMove', 'onClone'].forEach(function (e) {
             if (options[e] || eventHandlers[e])
                 options[e] = function (eventType, parentVM, parentBindings, handler, e) {
                     var itemVM = ko.dataFor(e.item),
