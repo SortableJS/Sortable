@@ -126,7 +126,24 @@
 						scope.$apply();
 					}
 
+					function _destroy() {
+						scope.off('$destroy', _destroy);
 
+						angular.forEach(watchers, function (/** Function */unwatch) {
+							unwatch();
+						});
+
+						sortable.destroy();
+
+						el[expando] = null;
+						el = null;
+						watchers = null;
+						sortable = null;
+						nextSibling = null;
+					}
+
+
+					// Initialization
 					sortable = Sortable.create(el, Object.keys(options).reduce(function (opts, name) {
 						opts[name] = opts[name] || options[name];
 						return opts;
@@ -157,20 +174,7 @@
 						}
 					}));
 
-					$el.on('$destroy', function () {
-						angular.forEach(watchers, function (/** Function */unwatch) {
-							unwatch();
-						});
-
-						sortable.destroy();
-
-						el[expando] = null;
-						el = null;
-						watchers = null;
-						sortable = null;
-						nextSibling = null;
-					});
-
+					// Create watchers for `options`
 					angular.forEach([
 						'sort', 'disabled', 'draggable', 'handle', 'animation', 'group', 'ghostClass', 'filter',
 						'onStart', 'onEnd', 'onAdd', 'onUpdate', 'onRemove', 'onSort', 'onMove', 'onClone'
@@ -185,6 +189,8 @@
 							}
 						}));
 					});
+
+					scope.on('$destroy', _destroy);
 				}
 			};
 		}]);
