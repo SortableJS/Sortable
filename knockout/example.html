@@ -1,0 +1,127 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+	<meta charset="utf-8" />
+
+	<style>
+		.grid {
+			font-size: 0;
+		}
+		.col-1_2 {
+			box-sizing:border-box;
+			display: inline-block;
+			padding: 0.5rem;
+			font-size: 1rem;
+		}
+		.col-1_2 {
+			width: 50%;
+		}
+
+		.mirror {
+			color: #ccc;
+		}
+	</style>
+</head>
+<body>
+	<div class="grid">
+		<div class="col-1_2">
+			<div class="grid">
+				<div class="col-1_2">
+					<h4>Sortable observable</h4>
+					<ul data-bind="sortable: {foreach: sortableObservableItems}">
+						<li data-bind="text: name"></li>
+					</ul>
+				</div>
+				<div class="col-1_2 mirror">
+					<h4>Sortable observable mirrored</h4>
+					<ul data-bind="foreach: sortableObservableItems">
+						<li data-bind="text: name"></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-1_2">
+			<div class="grid">
+				<div class="col-1_2">
+					<h4>Sortable computed</h4>
+					<ul data-bind="sortable: {foreach: sortableComputedItems, collection: underlayingSortableComputedItems}">
+						<li data-bind="text: name"></li>
+					</ul>
+				</div>
+				<div class="col-1_2 mirror">
+					<h4>Sortable underlaying computed</h4>
+					<ul data-bind="foreach: underlayingSortableComputedItems">
+						<li data-bind="text: name"></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="grid">
+		<div class="col-1_2">
+			<div class="grid">
+				<div class="col-1_2">
+					<h4>Draggable observable</h4>
+					<ul data-bind="draggable: {foreach: draggableObservableItems}">
+						<li data-bind="text: name"></li>
+					</ul>
+				</div>
+				<div class="col-1_2 mirror">
+					<h4>Draggable observable mirrored</h4>
+					<ul data-bind="foreach: draggableObservableItems">
+						<li data-bind="text: name"></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-1_2">
+			<div class="grid">
+				<div class="col-1_2">
+					<h4>Draggable computed</h4>
+					<ul data-bind="draggable: {foreach: draggableComputedItems, collection: underlayingDraggableComputedItems}">
+						<li data-bind="text: name"></li>
+					</ul>
+				</div>
+				<div class="col-1_2 mirror">
+					<h4>Draggable computed mirrored</h4>
+					<ul data-bind="foreach: draggableComputedItems">
+						<li data-bind="text: name"></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.3.0/knockout-min.js"></script>
+	<script src="../Sortable.js"></script>
+	<script src="../knockout-sortable.js"></script>
+	<script>
+
+		var sortableComputedItems = [{ name: 'Sortable computed 1' }, { name: 'Filtered computed 2' }, { name: 'Sortable computed 3' }, { name: 'Filtered computed 4' }, { name: 'Sortable computed 5' }, { name: 'Filtered computed 6' }];
+		var sortableObservableItems = [{ name: 'Sortable observable 1' }, { name: 'Sortable observable 2' }, { name: 'Sortable observable 3' }];
+
+		var draggableComputedItems = [{ name: 'Draggable computed 1' }, { name: 'Draggable computed 2' }, { name: 'Draggable computed 3' }];
+		var draggableObservableItems = [{ name: 'Draggable observable 1' }, { name: 'Draggable observable 2' }, { name: 'Draggable observable 3' }];
+
+		var vm = {
+			underlayingSortableComputedItems: ko.observableArray(sortableComputedItems),
+			sortableObservableItems: ko.observableArray(sortableObservableItems),
+			underlayingDraggableComputedItems: ko.observableArray(draggableComputedItems),
+			draggableObservableItems: ko.observableArray(draggableObservableItems)
+		}
+		vm.sortableComputedItems = ko.computed(function () {
+			return vm.underlayingSortableComputedItems()
+				.filter(function (item) {
+					return item.name.indexOf('Filtered') < 0;
+				});
+		});
+		vm.draggableComputedItems = ko.computed(function () { return vm.underlayingDraggableComputedItems(); });
+
+		ko.applyBindings(vm);
+	</script>
+</body>
+</html>

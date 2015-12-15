@@ -78,7 +78,7 @@
                     moveItem(itemVM, removeOperation.collection, addOperation.collection, addOperation.event.clone, addOperation.event);
                 }
             },
-            // Moves an item from the "to" collection to the "from" collection, these
+            // Moves an item from the "from" collection to the "to" collection, these
             // can be references to the same collection which means it's a sort.
             // clone indicates if we should move or copy the item into the new collection
             moveItem = function (itemVM, from, to, clone, e) {
@@ -89,11 +89,12 @@
                     originalIndex = fromArray.indexOf(itemVM),
                     newIndex = e.newIndex;
 
-                if (e.item.previousElementSibling)
-                {
-                    newIndex = fromArray.indexOf(ko.dataFor(e.item.previousElementSibling));
-                    if (originalIndex > newIndex)
-                        newIndex = newIndex + 1;
+                // We have to find out the actual desired index of the to array, 
+                // as this might be a computed array. We could otherwise potentially
+                // drop an item above the 3rd visible item, but the 2nd visible item
+                // has an actual index of 5.
+                if (e.item.previousElementSibling) {
+                    newIndex = to().indexOf(ko.dataFor(e.item.previousElementSibling)) + 1;
                 }
 
                 // Remove sortables "unbound" element
