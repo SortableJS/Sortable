@@ -831,11 +831,11 @@
 				}
 
 			}
+
 			this._nulling();
 		},
 
-		_nulling: function() {
-			// Nulling
+		_nulling: function () {
 			rootEl =
 			dragEl =
 			parentEl =
