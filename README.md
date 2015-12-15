@@ -502,7 +502,7 @@ Other attributes are:
 ### Support Polymer
 ```html
 
-<link rel="import" href="bower_components/Sortable/Sortable.html">
+<link rel="import" href="bower_components/Sortable/Sortable-js.html">
 
 <sortable-js handle=".handle">
   <template is="dom-repeat" items={{names}}>
