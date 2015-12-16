@@ -259,7 +259,8 @@
 				touch = evt.touches && evt.touches[0],
 				target = (touch || evt).target,
 				originalTarget = target,
-				filter = options.filter;
+				filter = options.filter,
+				startIndex;
 
 			// Don't trigger start event when an element is been dragged, otherwise the evt.oldindex always wrong when set option.group.
 			if (dragEl) {
@@ -281,12 +282,12 @@
 			}
 
 			// Get the index of the dragged element within its parent
-			oldIndex = _index(target, options.draggable);
+			startIndex = _index(target, options.draggable);
 
 			// Check filter
 			if (typeof filter === 'function') {
 				if (filter.call(this, evt, target, this)) {
-					_dispatchEvent(_this, originalTarget, 'filter', target, el, oldIndex);
+					_dispatchEvent(_this, originalTarget, 'filter', target, el, startIndex);
 					evt.preventDefault();
 					return; // cancel dnd
 				}
@@ -296,7 +297,7 @@
 					criteria = _closest(originalTarget, criteria.trim(), el);
 
 					if (criteria) {
-						_dispatchEvent(_this, criteria, 'filter', target, el, oldIndex);
+						_dispatchEvent(_this, criteria, 'filter', target, el, startIndex);
 						return true;
 					}
 				});
@@ -308,10 +309,10 @@
 			}
 
 			// Prepare `dragstart`
-			this._prepareDragStart(evt, touch, target);
+			this._prepareDragStart(evt, touch, target, startIndex);
 		},
 
-		_prepareDragStart: function (/** Event */evt, /** Touch */touch, /** HTMLElement */target) {
+		_prepareDragStart: function (/** Event */evt, /** Touch */touch, /** HTMLElement */target, /** Number */startIndex) {
 			var _this = this,
 				el = _this.el,
 				options = _this.options,
@@ -326,6 +327,7 @@
 				parentEl = dragEl.parentNode;
 				nextEl = dragEl.nextSibling;
 				activeGroup = options.group;
+				oldIndex = startIndex;
 
 				this._lastX = (touch || evt).clientX;
 				this._lastY = (touch || evt).clientY;
@@ -1006,10 +1008,7 @@
 			ctx = ctx || document;
 
 			do {
-				if (
-					(selector === '>*' && el.parentNode === ctx)
-					|| _matches(el, selector)
-				) {
+				if ((selector === '>*' && el.parentNode === ctx) || _matches(el, selector)) {
 					return el;
 				}
 			}
@@ -1195,8 +1194,7 @@
 		}
 
 		while (el && (el = el.previousElementSibling)) {
-			if (el.nodeName.toUpperCase() !== 'TEMPLATE'
-					&& _matches(el, selector)) {
+			if ((el.nodeName.toUpperCase() !== 'TEMPLATE') && (selector === '>*' || _matches(el, selector))) {
 				index++;
 			}
 		}
