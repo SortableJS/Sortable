@@ -58,6 +58,9 @@
 		document = win.document,
 		parseInt = win.parseInt,
 
+		$ = win.jQuery || win.Zepto;
+		Polymer = win.Polymer,
+
 		supportDraggable = !!('draggable' in document.createElement('div')),
 		supportCssPointerEvents = (function (el) {
 			el = document.createElement('x');
@@ -546,7 +549,7 @@
 			this._offUpEvents();
 
 			if (activeGroup.pull == 'clone') {
-				cloneEl = dragEl.cloneNode(true);
+				cloneEl = _clone(dragEl);
 				_css(cloneEl, 'display', 'none');
 				rootEl.insertBefore(cloneEl, dragEl);
 				_dispatchEvent(this, rootEl, 'clone', dragEl);
@@ -1251,6 +1254,15 @@
 		return dst;
 	}
 
+	function _clone(el) {
+		return $
+			? $(el).clone(true)[0]
+			: (Polymer && Polymer.dom
+				? Polymer.dom(el).cloneNode(true)
+				: el.cloneNode(true)
+			);
+	}
+
 
 	// Export utils
 	Sortable.utils = {
@@ -1265,6 +1277,7 @@
 		throttle: _throttle,
 		closest: _closest,
 		toggleClass: _toggleClass,
+		clone: _clone,
 		index: _index
 	};
 
