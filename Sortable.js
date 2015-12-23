@@ -58,7 +58,7 @@
 		document = win.document,
 		parseInt = win.parseInt,
 
-		$ = win.jQuery || win.Zepto;
+		$ = win.jQuery || win.Zepto,
 		Polymer = win.Polymer,
 
 		supportDraggable = !!('draggable' in document.createElement('div')),

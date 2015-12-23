@@ -343,6 +343,28 @@ The speed at which the window should scroll once the mouse pointer gets within t
 ---
 
 
+### Event object
+
+ - to:`HTMLElement` — list, in which moved element.
+ - from:`HTMLElement` — previous list
+ - item:`HTMLElement` — dragged element
+ - clone:`HTMLElement`
+ - oldIndex:`Number|undefined` — old index within parent
+ - newIndex:`Number|undefined` — new index within parent
+
+
+#### `move` event object
+ - to:`HTMLElement`
+ - from:`HTMLElement`
+ - dragged:`HTMLElement`
+ - draggedRect:` TextRectangle`
+ - related:`HTMLElement` — element on which have guided
+ - relatedRect:` TextRectangle`
+
+
+---
+
+
 <a name="ng"></a>
 ### Support AngularJS
 Include [ng-sortable.js](ng-sortable.js)
