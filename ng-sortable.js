@@ -127,7 +127,7 @@
 					}
 
 					function _destroy() {
-						scope.off('$destroy', _destroy);
+						scope.$off('$destroy', _destroy);
 
 						angular.forEach(watchers, function (/** Function */unwatch) {
 							unwatch();
@@ -190,7 +190,7 @@
 						}));
 					});
 
-					scope.on('$destroy', _destroy);
+					scope.$on('$destroy', _destroy);
 				}
 			};
 		}]);
