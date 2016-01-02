@@ -150,8 +150,12 @@ To drag elements from one list into another, both lists must have the same `grou
 You can also define whether lists can give away, give and keep a copy (`clone`), and receive elements.
 
  * name: `String` — group name
- * pull: `true|false|'clone'` — ability to move from the list. `clone` — copy the item, rather than move.
- * put: `true|false|["foo", "bar"]` — whether elements can be added from other lists, or an array of group names from which elements can be taken. Demo: http://jsbin.com/naduvo/2/edit?html,js,output
+ * pull: `true|false|'clone'|function` — ability to move from the list. `clone` — copy the item, rather than move.
+ * put: `true|false|["foo", "bar"]|function` — whether elements can be added from other lists, or an array of group names from which elements can be taken.
+
+Demo:
+ - http://jsbin.com/naduvo/edit?js,output
+ - http://jsbin.com/tisequvute/edit?js,output — use of complex logic in the `pull` and` put`
 
 
 ---

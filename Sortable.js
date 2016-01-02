@@ -42,6 +42,8 @@
 		newIndex,
 
 		activeGroup,
+		putSortable,
+
 		autoScroll = {},
 
 		tapEvt,
@@ -152,19 +154,35 @@
 		}, 30),
 
 		_prepareGroup = function (options) {
+			function toFn(value, pull) {
+				if (value === void 0) {
+					value = true;
+				}
+
+				if (typeof value === 'function') {
+					return value;
+				} else {
+					return function (to, from) {
+						var fromGroup = from.options.group.name;
+
+						return pull
+							? value
+							: value && (value.join
+								? value.indexOf(fromGroup) > -1
+								: (fromGroup == value)
+							);
+					};
+				}
+			}
+
 			var group = options.group;
 
 			if (!group || typeof group != 'object') {
 				group = options.group = {name: group};
 			}
 
-			['pull', 'put'].forEach(function (key) {
-				if (!(key in group)) {
-					group[key] = true;
-				}
-			});
-
-			options.groups = ' ' + group.name + (group.put.join ? ' ' + group.put.join(' ') : '') + ' ';
+			group.checkPull = toFn(group.pull, true);
+			group.checkPut = toFn(group.put);
 		}
 	;
 
@@ -451,7 +469,7 @@
 
 				if (parent) {
 					do {
-						if (parent[expando] && parent[expando].options.groups.indexOf(groupName) > -1) {
+						if (parent[expando]) {
 							while (i--) {
 								touchDragOverListeners[i]({
 									clientX: touchEvt.clientX,
@@ -548,7 +566,7 @@
 
 			this._offUpEvents();
 
-			if (activeGroup.pull == 'clone') {
+			if (activeGroup.checkPull(this, this, dragEl, evt) == 'clone') {
 				cloneEl = _clone(dragEl);
 				_css(cloneEl, 'display', 'none');
 				rootEl.insertBefore(cloneEl, dragEl);
@@ -587,7 +605,7 @@
 				revert,
 				options = this.options,
 				group = options.group,
-				groupPut = group.put,
+				activeSortable = Sortable.active,
 				isOwner = (activeGroup === group),
 				canSort = options.sort;
 
@@ -601,9 +619,9 @@
 			if (activeGroup && !options.disabled &&
 				(isOwner
 					? canSort || (revert = !rootEl.contains(dragEl)) // Reverting item into the original list
-					: activeGroup.pull && groupPut && (
-						(activeGroup.name === group.name) || // by Name
-						(groupPut.indexOf && ~groupPut.indexOf(activeGroup.name)) // by Array
+					: (
+						putSortable === this ||
+						activeGroup.checkPull(this, activeSortable, dragEl, evt) && group.checkPut(this, activeSortable, dragEl, evt)
 					)
 				) &&
 				(evt.rootEl === void 0 || evt.rootEl === this.el) // touch fallback
@@ -617,6 +635,7 @@
 
 				target = _closest(evt.target, options.draggable, el);
 				dragRect = dragEl.getBoundingClientRect();
+				putSortable = this;
 
 				if (revert) {
 					_cloneHide(true);
@@ -860,7 +879,9 @@
 			lastEl =
 			lastCSS =
 
+			putSortable =
 			activeGroup =
+
 			Sortable.active = null;
 		},
 
