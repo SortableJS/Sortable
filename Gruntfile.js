@@ -87,6 +87,14 @@ module.exports = function (grunt) {
 		}
 	});
 
+	grunt.registerTask('polymerize', function () {
+		var fs = require('fs'),
+		filename = 'Sortable-polymer.js';
+
+		fs.writeFileSync(filename,
+			(fs.readFileSync('Sortable.js') + '')
+			.replace(/([a-zA-Z\.]+)\.(appendChild|insertBefore|removeChild|childNodes|children|parentNode|firstChild|lastChild|firstElementChild|lastElementChild|previousSibling|nextSibling|textContent|innerHTML|querySelectorAll|querySelector|getDistributedNodes|getDestinationInsertionPoints|setAttribute|removeAttribute|classList|cloneNode)/g, 'Polymer.dom($1).$2'));
+	});
 
 	grunt.loadNpmTasks('grunt-version');
 	grunt.loadNpmTasks('grunt-contrib-jshint');

@@ -1,147 +1,130 @@
 <link rel="import" href="../polymer/polymer.html">
-<script src="./Sortable.js"></script>
+<script src="./Sortable-polymer.js"></script>
 
 <dom-module id="sortable-js">
   <template>
     <content></content>
   </template>
+  <script>
+    Polymer({
+      is: "sortable-js",
+
+      properties: {
+        group             : { type: Object, value: function() { return Math.random() }, notify: true },
+        sort              : { type: Object, value: true, notify: true},
+        delay             : { type: Number, value: 0, notify: true },
+        disabled          : { type: Boolean, value: false, notify: true},
+        store             : { type: Object, value: null, notify: true },
+        animation         : { type: Number, value: 0, notify: true },
+        handle            : { type: String, value: null, notify: true },
+        filter            : { type: Object, value: null, notify: true },
+        draggable         : { type: String, value: ">*", notify: true },
+        ghostClass        : { type: String, value: "sortable-ghost", notify: true },
+        chosenClass       : { type: String, value: "sortable-chosen", notify: true },
+        ignore            : { type: String, value: "a, img", notify: true },
+        dropBubble        : { type: Boolean, value: false, notify: true },
+        dragoverBubble    : { type: Boolean, value: false, notify: true },
+        dataIdAttr        : { type: String, value: "data-id", notify: true },
+
+        forceFallback     : { type: Boolean, value: false, notify: true },
+        fallbackClass     : { type: String, value: "sortable-fallback", notify: true },
+        fallbackOnBody    : { type: Boolean, value: false, notify: true },
+        fallbackTolerance : { type: Number, value: 0, notify: true },
+
+        scroll            : { type: Object, value: true, notify: true },
+        scrollSensitivity : { type: Number, value: 30, notify: true },
+        scrollSpeed       : { type: Number, value: 10, notify: true },
+
+      },
+      created: function() {
+        /* watch all properties with notify = true */
+        Object.keys(this.properties).forEach(function(key) {
+          this.addEventListener(key+'-changed', function(e){
+            this.sortable && this.sortable.option(key, e.detail.value);
+          });
+        });
+      },
+      attached: function() {
+        // Given
+        //   <sortable-js>
+        //     <template is="dom-repeat" items={{data}}>
+        //       <div>
+        //         <template is="dom-if" if="true">
+        //           <span>hello</span></template></div>
+        // After render, it becomes
+        //   <sortable-js>
+        //     <div>
+        //       <span>hello</span>
+        //       <template is="dom-if">
+        //     <template is="dom-repeat">
+
+        var templates = this.querySelectorAll("template[is='dom-repeat']")
+        var template = templates[templates.length-1]
+        var options = {}, _this = this;
+
+        Object.keys(this.properties).forEach(function(key) {
+          options[key] = _this[key]
+        });
+
+        this.sortable = Sortable.create(this, Object.assign(options, {
+          onUpdate: function (e) {
+            if (template) {
+              template.splice("items", e.newIndex, 0, template.splice("items", e.oldIndex, 1)[0])
+            }
+            _this.fire("update", e)
+          },
+
+          onAdd: function(e) {
+            if (template) {
+              var froms = e.from.querySelectorAll("template[is='dom-repeat']")
+              var from = froms[froms.length-1]
+              var item = from.items[e.oldIndex]
+              template.splice("items", e.newIndex, 0, item)
+            }
+            _this.fire("add", e)
+          },
+
+          onRemove: function(e) {
+            if (template) {
+              template.splice("items", e.oldIndex, 1)[0]
+            }
+            _this.fire("remove", e)
+          },
+
+          onChoose: function(e) {
+            _this.fire("choose", e)
+          },
+
+          onStart: function(e) {
+            _this.fire("start", e)
+          },
+
+          onEnd: function(e) {
+            _this.fire("end", e)
+          },
+
+          onSort: function(e) {
+            _this.fire("sort", e)
+          },
+
+          onFilter: function(e) {
+            _this.fire("filter", e)
+          },
+
+          onMove: function(e) {
+            _this.fire("move", e)
+          },
+
+          onClone: function(e) {
+            _this.fire("clone", e)
+          }
+        }));
+      },
+
+      detached: function() {
+        this.sortable.destroy();
+      }
+
+    })
+  </script>
 </dom-module>
-<script>
-  Polymer({
-    is: "sortable-js",
-
-    properties: {
-      group             : { type: String, value: function() { return Math.random() }, observer: "groupChanged" },
-      sort              : { type: Boolean, value: true, observer: "sortChanged" },
-      disabled          : { type: Boolean, value: false, observer: "disabledChanged" },
-      store             : { type: Object, value: null, observer: "storeChanged" },
-      handle            : { type: String, value: null, observer: "handleChanged" },
-      scrollSensitivity : { type: Number, value: 30, observer: "scrollSensitivityChanged" },
-      scrollSpeed       : { type: Number, value: 10, observer: "scrollSpeedChanged" },
-      ghostClass        : { type: String, value: "sortable-ghost", observer: "ghostClassChanged" },
-      chosenClass       : { type: String, value: "sortable-chosen", observer: "chosenClassChanged" },
-      ignore            : { type: String, value: "a, img", observer: "ignoreChanged" },
-      filter            : { type: Object, value: null, observer: "filterChanged" },
-      animation         : { type: Number, value: 0, observer: "animationChanged" },
-      dropBubble        : { type: Boolean, value: false, observer: "dropBubbleChanged" },
-      dragoverBubble    : { type: Boolean, value: false, observer: "dragoverBubbleChanged" },
-      dataIdAttr        : { type: String, value: "data-id", observer: "dataIdAttrChanged" },
-      delay             : { type: Number, value: 0, observer: "delayChanged" },
-      forceFallback     : { type: Boolean, value: false, observer: "forceFallbackChanged" },
-      fallbackClass     : { type: String, value: "sortable-fallback", observer: "fallbackClassChanged" },
-      fallbackOnBody    : { type: Boolean, value: false, observer: "fallbackOnBodyChanged" },
-      draggable         : {},
-      scroll            : {}
-    },
-
-    created() {
-      // override default DOM property behavior
-      Object.defineProperties(this, {
-        draggable: { get() { return this._draggable || this.getAttribute("draggable") || ">*"}, set(value) { this._draggable = value; this.draggableChanged(value)} },
-        scroll: { get() { return this._scroll || JSON.parse(this.getAttribute("scroll") || "true") }, set(value) { this._scroll = value; this.scrollChanged(value)} }
-      })
-    },
-
-    attached: function() {
-      // Given
-      //   <sortable-js>
-      //     <template is="dom-repeat" items={{data}}>
-      //       <div>
-      //         <template is="dom-if" if="true">
-      //           <span>hello</span></template></div>
-      // After render, it becomes
-      //   <sortable-js>
-      //     <div>
-      //       <span>hello</span>
-      //       <template is="dom-if">
-      //     <tempalte is="dom-repeat">
-      var templates = this.querySelectorAll("template[is='dom-repeat']")
-      var template = templates[templates.length-1]
-
-      var options = {}
-      Object.keys(this.properties).forEach(function(key) {
-        options[key] = this[key]
-      })
-
-      this.sortable = Sortable.create(this, Object.assign(options, {
-        onUpdate: function (e) {
-          if (template) {
-            template.splice("items", e.newIndex, 0, template.splice("items", e.oldIndex, 1)[0])
-          }
-          this.fire("update", e)
-        },
-
-        onAdd: function(e) {
-          if (template) {
-            var froms = e.from.querySelectorAll("template[is='dom-repeat']")
-            var from = froms[froms.length-1]
-            var item = from.items[e.oldIndex]
-            template.splice("items", e.newIndex, 0, item)
-          }
-          this.fire("add", e)
-        },
-
-        onRemove: function(e) {
-          if (template) {
-            template.splice("items", e.oldIndex, 1)[0]
-          }
-          this.fire("remove", e)
-        },
-
-        onChoose: function(e) {
-          this.fire("choose", e)
-        },
-
-        onStart: function(e) {
-          this.fire("start", e)
-        },
-
-        onEnd: function(e) {
-          this.fire("end", e)
-        },
-
-        onSort: function(e) {
-          this.fire("sort", e)
-        },
-
-        onFilter: function(e) {
-          this.fire("filter", e)
-        },
-
-        onMove: function(e) {
-          this.fire("move", e)
-        },
-
-        onClone: function(e) {
-          this.fire("clone", e)
-        }
-      }))
-    },
-
-    detached: function() {
-      this.sortable.destroy()
-    },
-
-    groupChanged             : function(value) { this.sortable && this.sortable.option("group", value) },
-    sortChanged              : function(value) { this.sortable && this.sortable.option("sort", value) },
-    disabledChanged          : function(value) { this.sortable && this.sortable.option("disabled", value) },
-    storeChanged             : function(value) { this.sortable && this.sortable.option("store", value) },
-    handleChanged            : function(value) { this.sortable && this.sortable.option("handle", value) },
-    scrollChanged           : function(value) { this.sortable && this.sortable.option("scroll", value) },
-    scrollSensitivityChanged : function(value) { this.sortable && this.sortable.option("scrollSensitivity", value) },
-    scrollSpeedChanged       : function(value) { this.sortable && this.sortable.option("scrollSpeed", value) },
-    draggableChanged        : function(value) { this.sortable && this.sortable.option("draggable", value) },
-    ghostClassChanged        : function(value) { this.sortable && this.sortable.option("ghostClass", value) },
-    chosenClassChanged       : function(value) { this.sortable && this.sortable.option("chosenClass", value) },
-    ignoreChanged            : function(value) { this.sortable && this.sortable.option("ignore", value) },
-    filterChanged            : function(value) { this.sortable && this.sortable.option("filter", value) },
-    animationChanged         : function(value) { this.sortable && this.sortable.option("animation", value) },
-    dropBubbleChanged        : function(value) { this.sortable && this.sortable.option("dropBubble", value) },
-    dragoverBubbleChanged    : function(value) { this.sortable && this.sortable.option("dragoverBubble", value) },
-    dataIdAttrChanged        : function(value) { this.sortable && this.sortable.option("dataIdAttr", value) },
-    delayChanged             : function(value) { this.sortable && this.sortable.option("delay", value) },
-    forceFallbackChanged     : function(value) { this.sortable && this.sortable.option("forceFallback", value) },
-    fallbackClassChanged     : function(value) { this.sortable && this.sortable.option("fallbackClass", value) },
-    fallbackOnBodyChanged    : function(value) { this.sortable && this.sortable.option("fallbackOnBody", value) }
-  })
-</script>
