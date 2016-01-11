@@ -86,7 +86,8 @@
 							model: item || source[evt.newIndex],
 							models: source,
 							oldIndex: evt.oldIndex,
-							newIndex: evt.newIndex
+							newIndex: evt.newIndex,
+							originalEvent: evt
 						});
 					}
 
