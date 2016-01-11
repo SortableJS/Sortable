@@ -71,6 +71,7 @@
 						options = angular.extend(scope.ngSortable || {}, ngSortableConfig),
 						watchers = [],
 						getSource = getSourceFactory(el, scope),
+						offDestroy,
 						sortable
 					;
 
@@ -127,7 +128,7 @@
 					}
 
 					function _destroy() {
-						scope.$off('$destroy', _destroy);
+						offDestroy();
 
 						angular.forEach(watchers, function (/** Function */unwatch) {
 							unwatch();
@@ -190,7 +191,7 @@
 						}));
 					});
 
-					scope.$on('$destroy', _destroy);
+					offDestroy = scope.$on('$destroy', _destroy);
 				}
 			};
 		}]);
