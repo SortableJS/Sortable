@@ -81,8 +81,7 @@
 							model: item,
 							models: source && source.items(),
 							oldIndex: evt.oldIndex,
-							newIndex: evt.newIndex,
-							event: evt
+							newIndex: evt.newIndex
 						});
 					}
 
