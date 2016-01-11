@@ -155,7 +155,7 @@ You can also define whether lists can give away, give and keep a copy (`clone`),
 
 Demo:
  - http://jsbin.com/naduvo/edit?js,output
- - http://jsbin.com/tisequvute/edit?js,output — use of complex logic in the `pull` and` put`
+ - http://jsbin.com/rusuvot/edit?js,output — use of complex logic in the `pull` and` put`
 
 
 ---
@@ -347,7 +347,7 @@ The speed at which the window should scroll once the mouse pointer gets within t
 ---
 
 
-### Event object
+### Event object ([demo](http://jsbin.com/xedusu/edit?js,output))
 
  - to:`HTMLElement` — list, in which moved element.
  - from:`HTMLElement` — previous list

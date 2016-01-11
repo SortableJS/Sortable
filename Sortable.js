@@ -156,7 +156,7 @@
 		_prepareGroup = function (options) {
 			function toFn(value, pull) {
 				if (value === void 0) {
-					value = true;
+					value = group.name;
 				}
 
 				if (typeof value === 'function') {
@@ -1118,8 +1118,10 @@
 
 
 	function _dispatchEvent(sortable, rootEl, name, targetEl, fromEl, startIndex, newIndex) {
+		sortable = (sortable || rootEl[expando]);
+
 		var evt = document.createEvent('Event'),
-			options = (sortable || rootEl[expando]).options,
+			options = sortable.options,
 			onName = 'on' + name.charAt(0).toUpperCase() + name.substr(1);
 
 		evt.initEvent(name, true, true);
