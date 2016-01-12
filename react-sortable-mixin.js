@@ -87,6 +87,9 @@
 
 				emitEvent = function (/** string */type, /** Event */evt) {
 					var method = options[type];
+					if (method && typeof method === "string") {
+						method = this[method];
+					}
 					method && typeof method === "function" && method.call(this, evt, this._sortableInstance);
 				}.bind(this);
 
