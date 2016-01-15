@@ -175,14 +175,18 @@
 				}
 			}
 
-			var group = options.group;
+			var group = {};
+			var originalGroup = options.group;
 
-			if (!group || typeof group != 'object') {
-				group = options.group = {name: group};
+			if (!originalGroup || typeof originalGroup != 'object') {
+				originalGroup = {name: originalGroup};
 			}
 
-			group.checkPull = toFn(group.pull, true);
-			group.checkPut = toFn(group.put);
+			group.name = originalGroup.name;
+			group.checkPull = toFn(originalGroup.pull, true);
+			group.checkPut = toFn(originalGroup.put);
+
+			options.group = group;
 		}
 	;
 
