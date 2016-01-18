@@ -659,7 +659,6 @@
 				if ((el.children.length === 0) || (el.children[0] === ghostEl) ||
 					(el === evt.target) && (target = _ghostIsLast(el, evt))
 				) {
-
 					if (target) {
 						if (target.animated) {
 							return;
@@ -1185,9 +1184,13 @@
 	/** @returns {HTMLElement|false} */
 	function _ghostIsLast(el, evt) {
 		var lastEl = el.lastElementChild,
-				rect = lastEl.getBoundingClientRect();
+			rect = lastEl.getBoundingClientRect();
 
-		return ((evt.clientY - (rect.top + rect.height) > 5) || (evt.clientX - (rect.right + rect.width) > 5)) && lastEl; // min delta
+		// 5 — min delta
+		return (
+			(abs(evt.clientY - (rect.top + rect.height)) > 5) ||
+			(abs(evt.clientX - (rect.right + rect.width)) > 5)
+		) && lastEl;
 	}
 
 
