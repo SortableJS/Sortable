@@ -824,15 +824,15 @@
 						newIndex = _index(dragEl, options.draggable);
 
 						if (newIndex >= 0) {
-							// drag from one list and drop into another
-							_dispatchEvent(null, parentEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
-							_dispatchEvent(this, rootEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
 
 							// Add event
 							_dispatchEvent(null, parentEl, 'add', dragEl, rootEl, oldIndex, newIndex);
 
 							// Remove event
 							_dispatchEvent(this, rootEl, 'remove', dragEl, rootEl, oldIndex, newIndex);
+							// drag from one list and drop into another
+							_dispatchEvent(null, parentEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
+							_dispatchEvent(this, rootEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
 						}
 					}
 					else {
