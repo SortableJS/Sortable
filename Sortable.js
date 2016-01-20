@@ -24,6 +24,12 @@
 })(function () {
 	"use strict";
 
+	if (typeof window == "undefined" || typeof window.document == "undefined") {
+		return function() {
+			throw new Error( "Sortable.js requires a window with a document" );
+		}
+	}
+
 	var dragEl,
 		parentEl,
 		ghostEl,
@@ -363,7 +369,7 @@
 					_this._disableDelayedDrag();
 
 					// Make the element draggable
-					dragEl.draggable = true;
+					dragEl.draggable = _this.nativeDraggable;
 
 					// Chosen item
 					_toggleClass(dragEl, _this.options.chosenClass, true);
