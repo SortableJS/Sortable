@@ -23,11 +23,11 @@
 	}
 })(function () {
 	"use strict";
-	
+
 	if (typeof window == "undefined" || typeof window.document == "undefined") {
-		return function() {
-			throw new Error( "Sortable.js requires a window with a document" );
-		}
+		return function () {
+			throw new Error("Sortable.js requires a window with a document");
+		};
 	}
 
 	var dragEl,
@@ -334,8 +334,11 @@
 					// we can re-enable the events: touchmove/mousemove
 					_this._disableDelayedDrag();
 
-					// Make the element draggable
-					dragEl.draggable = true;
+					// fix bug for https://github.com/RubaXa/Sortable/issues/628
+					if (_this.nativeDraggable) {
+						// Make the element draggable
+						dragEl.draggable = true;
+					}
 
 					// Chosen item
 					_toggleClass(dragEl, _this.options.chosenClass, true);
@@ -818,7 +821,7 @@
 			this._nulling();
 		},
 
-		_nulling: function() {
+		_nulling: function () {
 			// Nulling
 			rootEl =
 			dragEl =
