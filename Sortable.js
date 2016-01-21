@@ -830,6 +830,7 @@
 
 							// Remove event
 							_dispatchEvent(this, rootEl, 'remove', dragEl, rootEl, oldIndex, newIndex);
+
 							// drag from one list and drop into another
 							_dispatchEvent(null, parentEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
 							_dispatchEvent(this, rootEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
