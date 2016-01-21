@@ -255,7 +255,7 @@
 
 		// Bind all private methods
 		for (var fn in this) {
-			if (fn.charAt(0) === '_' && typeof(this[fn].bind) === 'function') {
+			if (fn.charAt(0) === '_' && typeof(this[fn]) === 'function') {
 				this[fn] = this[fn].bind(this);
 			}
 		}
