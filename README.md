@@ -689,7 +689,7 @@ Please, [read this](CONTRIBUTING.md).
 
 
 ## MIT LICENSE
-Copyright 2013-2015 Lebedev Konstantin <ibnRubaXa@gmail.com>
+Copyright 2013-2016 Lebedev Konstantin <ibnRubaXa@gmail.com>
 http://rubaxa.github.io/Sortable/
 
 Permission is hereby granted, free of charge, to any person obtaining
