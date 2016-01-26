@@ -35,7 +35,8 @@
 		onRemove: 'handleRemove',
 		onSort: 'handleSort',
 		onFilter: 'handleFilter',
-		onMove: 'handleMove'
+		onMove: 'handleMove',
+		onClone: 'handleClone'
 	};
 
 
@@ -70,7 +71,7 @@
 	 * @mixin
 	 */
 	var SortableMixin = {
-		sortableMixinVersion: '0.1.0',
+		sortableMixinVersion: '0.1.1',
 
 
 		/**
@@ -85,8 +86,11 @@
 				copyOptions = _extend({}, options),
 
 				emitEvent = function (/** string */type, /** Event */evt) {
-					var method = this[options[type]];
-					method && method.call(this, evt, this._sortableInstance);
+					var method = options[type];
+					if (method && typeof method === "string") {
+						method = this[method];
+					}
+					method && typeof method === "function" && method.call(this, evt, this._sortableInstance);
 				}.bind(this);
 
 
@@ -120,7 +124,13 @@
 						}
 
 						newState[_getModelName(this)] = items;
-						this.setState(newState);
+
+						if (copyOptions.stateHandler) {
+							this[copyOptions.stateHandler](newState);
+						} else {
+							this.setState(newState);
+						}
+
 						(this !== _activeComponent) && _activeComponent.setState(remoteState);
 					}
 

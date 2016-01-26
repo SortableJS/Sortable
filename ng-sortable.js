@@ -71,6 +71,7 @@
 						options = angular.extend(scope.ngSortable || {}, ngSortableConfig),
 						watchers = [],
 						getSource = getSourceFactory(el, scope),
+						offDestroy,
 						sortable
 					;
 
@@ -85,7 +86,8 @@
 							model: item || source[evt.newIndex],
 							models: source,
 							oldIndex: evt.oldIndex,
-							newIndex: evt.newIndex
+							newIndex: evt.newIndex,
+							originalEvent: evt
 						});
 					}
 
@@ -121,18 +123,40 @@
 						}
 						else {
 							items.splice(newIndex, 0, items.splice(oldIndex, 1)[0]);
+
+							// move ng-repeat comment node to right position
+							if (nextSibling.nodeType === Node.COMMENT_NODE) {
+								evt.from.insertBefore(nextSibling, evt.item.nextSibling);
+							}
 						}
 
 						scope.$apply();
 					}
 
+					function _destroy() {
+						offDestroy();
 
+						angular.forEach(watchers, function (/** Function */unwatch) {
+							unwatch();
+						});
+
+						sortable.destroy();
+
+						el[expando] = null;
+						el = null;
+						watchers = null;
+						sortable = null;
+						nextSibling = null;
+					}
+
+
+					// Initialization
 					sortable = Sortable.create(el, Object.keys(options).reduce(function (opts, name) {
 						opts[name] = opts[name] || options[name];
 						return opts;
 					}, {
 						onStart: function (/**Event*/evt) {
-							nextSibling = evt.item.nextSibling;
+							nextSibling = evt.from === evt.item.parentNode ? evt.item.nextSibling : evt.clone.nextSibling;
 							_emitEvent(evt);
 							scope.$apply();
 						},
@@ -157,23 +181,10 @@
 						}
 					}));
 
-					$el.on('$destroy', function () {
-						angular.forEach(watchers, function (/** Function */unwatch) {
-							unwatch();
-						});
-
-						sortable.destroy();
-
-						el[expando] = null;
-						el = null;
-						watchers = null;
-						sortable = null;
-						nextSibling = null;
-					});
-
+					// Create watchers for `options`
 					angular.forEach([
 						'sort', 'disabled', 'draggable', 'handle', 'animation', 'group', 'ghostClass', 'filter',
-						'onStart', 'onEnd', 'onAdd', 'onUpdate', 'onRemove', 'onSort'
+						'onStart', 'onEnd', 'onAdd', 'onUpdate', 'onRemove', 'onSort', 'onMove', 'onClone'
 					], function (name) {
 						watchers.push(scope.$watch('ngSortable.' + name, function (value) {
 							if (value !== void 0) {
@@ -185,6 +196,8 @@
 							}
 						}));
 					});
+
+					offDestroy = scope.$on('$destroy', _destroy);
 				}
 			};
 		}]);
