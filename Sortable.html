@@ -61,9 +61,9 @@
       var options = {}
       Object.keys(this.properties).forEach(function(key) {
         options[key] = this[key]
-      })
+      });
 
-      this.sortable = Sortable.create(this, Object.assign(options, {
+      var eventCallbacks = {
         onUpdate: function (e) {
           if (template) {
             template.splice("items", e.newIndex, 0, template.splice("items", e.oldIndex, 1)[0])
@@ -115,7 +115,13 @@
         onClone: function(e) {
           this.fire("clone", e)
         }
-      }))
+      };
+
+      Object.keys(eventCallbacks).forEach(function(name){
+        options[name] = eventCallbacks[name];
+      });
+      
+      this.sortable = Sortable.create(this, options);
     },
 
     detached: function() {
