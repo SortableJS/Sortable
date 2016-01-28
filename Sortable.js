@@ -1180,7 +1180,7 @@
 
 		while (el && (el = el.previousElementSibling)) {
 			if (el.nodeName.toUpperCase() !== 'TEMPLATE'
-					&& _matches(el, selector)) {
+					&& (_matches(el, selector) || selector === '>*')) {
 				index++;
 			}
 		}
