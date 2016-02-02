@@ -215,7 +215,8 @@
 			delay: 0,
 			forceFallback: false,
 			fallbackClass: 'sortable-fallback',
-			fallbackOnBody: false
+			fallbackOnBody: false,
+			dropOnParent: true
 		};
 
 
@@ -616,7 +617,7 @@
 
 
 				if ((el.children.length === 0) || (el.children[0] === ghostEl) ||
-					(el === evt.target) && (target = _ghostIsLast(el, evt))
+					((el === evt.target) && (options.dropOnParent)) && (target = _ghostIsLast(el, evt))
 				) {
 
 					if (target) {
