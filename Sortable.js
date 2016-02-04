@@ -14,6 +14,7 @@
 		module.exports = factory();
 	}
 	else if (typeof Package !== "undefined") {
+		//noinspection JSUnresolvedVariable
 		Sortable = factory();  // export for Meteor.js
 	}
 	else {
@@ -228,6 +229,7 @@
 			draggable: /[uo]l/i.test(el.nodeName) ? 'li' : '>*',
 			ghostClass: 'sortable-ghost',
 			chosenClass: 'sortable-chosen',
+			dragClass: 'sortable-drag',
 			ignore: 'a, img',
 			filter: null,
 			animation: 0,
@@ -371,7 +373,7 @@
 					dragEl.draggable = _this.nativeDraggable;
 
 					// Chosen item
-					_toggleClass(dragEl, _this.options.chosenClass, true);
+					_toggleClass(dragEl, options.chosenClass, true);
 
 					// Bind the events: dragstart/dragend
 					_this._triggerDragStart(touch);
@@ -448,8 +450,11 @@
 
 		_dragStarted: function () {
 			if (rootEl && dragEl) {
+				var options = this.options;
+
 				// Apply effect
-				_toggleClass(dragEl, this.options.ghostClass, true);
+				_toggleClass(dragEl, options.ghostClass, true);
+				_toggleClass(dragEl, options.dragClass, false);
 
 				Sortable.active = this;
 
@@ -473,7 +478,6 @@
 
 				var target = document.elementFromPoint(touchEvt.clientX, touchEvt.clientY),
 					parent = target,
-					groupName = ' ' + this.options.group.name + '',
 					i = touchDragOverListeners.length;
 
 				if (parent) {
@@ -550,6 +554,7 @@
 
 				_toggleClass(ghostEl, options.ghostClass, false);
 				_toggleClass(ghostEl, options.fallbackClass, true);
+				_toggleClass(ghostEl, options.dragClass, true);
 
 				_css(ghostEl, 'top', rect.top - parseInt(css.marginTop, 10));
 				_css(ghostEl, 'left', rect.left - parseInt(css.marginLeft, 10));
@@ -581,6 +586,8 @@
 				rootEl.insertBefore(cloneEl, dragEl);
 				_dispatchEvent(this, rootEl, 'clone', dragEl);
 			}
+
+			_toggleClass(dragEl, options.dragClass, true);
 
 			if (useFallback) {
 				if (useFallback === 'touch') {
@@ -1193,9 +1200,10 @@
 			rect = lastEl.getBoundingClientRect();
 
 		// 5 — min delta
+		// abs — нельзя добавлять, а то глюки при наведении сверху
 		return (
-			(abs(evt.clientY - (rect.top + rect.height)) > 5) ||
-			(abs(evt.clientX - (rect.right + rect.width)) > 5)
+			(evt.clientY - (rect.top + rect.height) > 5) ||
+			(evt.clientX - (rect.right + rect.width) > 5)
 		) && lastEl;
 	}
 

@@ -64,6 +64,7 @@ var sortable = new Sortable(el, {
 	draggable: ".item",  // Specifies which items inside the element should be sortable
 	ghostClass: "sortable-ghost",  // Class name for the drop placeholder
 	chosenClass: "sortable-chosen",  // Class name for the chosen item
+	dragClass: "sortable-drag",  // Class name for the dragging item
 	dataIdAttr: 'data-id',
 	
 	forceFallback: false,  // ignore the HTML5 DnD behaviour and force the fallback to kick in
