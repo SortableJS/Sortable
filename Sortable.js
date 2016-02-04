@@ -4,7 +4,6 @@
  * @license MIT
  */
 
-
 (function (factory) {
 	"use strict";
 
@@ -24,10 +23,10 @@
 })(function () {
 	"use strict";
 
-	if (typeof window == "undefined" || typeof window.document == "undefined") {
-		return function() {
-			throw new Error( "Sortable.js requires a window with a document" );
-		}
+	if (typeof window == "undefined" || !window.document) {
+		return function SortableError() {
+			throw new Error("Sortable.js requires a window with a document");
+		};
 	}
 
 	var dragEl,
