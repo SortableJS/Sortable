@@ -12,7 +12,7 @@ Demo: http://rubaxa.github.io/Sortable/
  * Supports drag handles *and selectable text* (better than voidberg's html5sortable)
  * Smart auto-scrolling
  * Built using native HTML5 drag and drop API
- * Supports [Meteor](https://github.com/SortableJS/sortablejs-meteor), [AngularJS](#ng), [React](#react) and [Polymer](#polymer)
+ * Supports [Meteor](https://github.com/SortableJS/meteor), [AngularJS](#ng), [React](#react) and [Polymer](#polymer)
  * Supports any CSS library, e.g. [Bootstrap](#bs)
  * Simple API
  * [CDN](#cdn)
