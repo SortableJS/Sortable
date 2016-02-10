@@ -583,8 +583,8 @@
 
 			if (activeGroup && !options.disabled &&
 				(isOwner
-					? canSort || (revert = !rootEl.contains(dragEl)) // Reverting item into the original list
-					: activeGroup.pull && groupPut && (
+						? canSort || (revert = !rootEl.contains(dragEl)) // Reverting item into the original list
+						: activeGroup.pull && groupPut && (
 						(activeGroup.name === group.name) || // by Name
 						(groupPut.indexOf && ~groupPut.indexOf(activeGroup.name)) // by Array
 					)
@@ -658,7 +658,7 @@
 						nextSibling = target.nextElementSibling,
 						moveVector = _onMove(rootEl, el, dragEl, dragRect, target, targetRect),
 						after
-					;
+						;
 
 					if (moveVector !== false) {
 						_silent = true;
@@ -690,12 +690,14 @@
 							}
 						}
 
-						parentEl = dragEl.parentNode; // actualization
-
 						this._animate(dragRect, dragEl);
 						this._animate(targetRect, target);
 					}
 				}
+			}
+
+			if (dragEl) {
+				parentEl = dragEl.parentNode; // actualization
 			}
 		},
 
