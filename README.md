@@ -283,9 +283,9 @@ Sortable.create(list, {
 
 #### `forceFallback` option
 If set to `true`, the Fallback for non HTML5 Browser will be used, even if we are using an HTML5 Browser.
-This gives us the possiblity to test the behaviour for older Browsers even in newer Browser, or make the Drag 'n Drop feel more consistent between Desktop , Mobile and old Browsers.
+This gives us the possibility to test the behaviour for older Browsers even in newer Browser, or make the Drag 'n Drop feel more consistent between Desktop , Mobile and old Browsers.
 
-On top of that, the Fallback always generates a copy of that DOM Element and appends the class `fallbackClass` definied in the options. This behaviour controls the look of this 'dragged' Element.
+On top of that, the Fallback always generates a copy of that DOM Element and appends the class `fallbackClass` defined in the options. This behaviour controls the look of this 'dragged' Element.
 
 Demo: http://jsbin.com/pucurizace/edit?html,css,js,output
 
