@@ -110,7 +110,7 @@
 
 							if (evt.clone) {
 								removed = angular.copy(removed);
-								prevItems.splice(Sortable.utils.index(evt.clone), 0, prevItems.splice(oldIndex, 1)[0]);
+								prevItems.splice(Sortable.utils.index(evt.clone, sortable.options.draggable), 0, prevItems.splice(oldIndex, 1)[0]);
 								evt.from.removeChild(evt.clone);
 							}
 							else {
