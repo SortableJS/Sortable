@@ -8,7 +8,6 @@
 	<title>Sortable :: Tests</title>
 </head>
 <body>
-
 	<div id="canvas">
 		<ul id="simple">
 			<li>item 1</li>
@@ -17,11 +16,24 @@
 		</ul>
 	</div>
 
+	<div id="qunit"></div>
+	<div id="qunit-fixture"></div>
+
+	<link rel="stylesheet" href="//code.jquery.com/qunit/qunit-1.21.0.css"/>
+	<script src="//code.jquery.com/qunit/qunit-1.21.0.js"></script>
+
 	<script src="./src/raf.js"></script>
 	<script src="./src/simulate.js"></script>
+	<script src="./src/qunit.ext.js"></script>
 
 
 	<script src="../Sortable.js"></script>
+
+	<script>
+		Sortable.create(simple);
+	</script>
+
+
 	<script src="./sortable.tests.js"></script>
 </body>
 </html>

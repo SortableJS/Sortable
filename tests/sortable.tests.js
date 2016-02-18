@@ -1,8 +1,8 @@
 'use strict';
 
-Sortable.create(simple);
+QUnit.module('Sortable');
 
-simulateDrag({
+QUnit.sortableTest('simple', {
 	from: {
 		el: '#simple',
 		index: 0
@@ -12,6 +12,7 @@ simulateDrag({
 		el: '#simple',
 		index: 'last'
 	}
-}, function () {
-
+}, function (assert, scope) {
+	assert.ok(scope.toList.contains(scope.target), 'container');
+	assert.equal(scope.target, scope.toList.lastElementChild, 'position');
 });

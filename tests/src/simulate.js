@@ -108,6 +108,12 @@
 				callback();
 			}
 		});
+
+		return {
+			target: fromEl,
+			fromList: fromEl.parentNode,
+			toList: toEl.parentNode
+		};
 	}
 
 
