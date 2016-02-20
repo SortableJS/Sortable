@@ -42,7 +42,9 @@
 	}
 
 	function getTraget(target) {
-		var children = document.getElementById(target.el.substr(1)).children;
+		var el = typeof target.el === 'string' ? document.getElementById(target.el.substr(1)) : target.el;
+		var children = el.children;
+
 		return (
 			children[target.index] ||
 			children[target.index === 'first' ? 0 : -1] ||
@@ -58,16 +60,18 @@
 		return {
 			x: rect.left,
 			y: rect.top,
-			cx: rect.left + width/2,
-			cy: rect.top + height/2,
+			cx: rect.left + width / 2,
+			cy: rect.top + height / 2,
 			w: width,
 			h: height,
-			hw: width/2,
-			wh: height/2
-		}
+			hw: width / 2,
+			wh: height / 2
+		};
 	}
 
 	function simulateDrag(options, callback) {
+		options.to.el = options.to.el || options.from.el;
+
 		var fromEl = getTraget(options.from);
 		var toEl = getTraget(options.to);
 
@@ -83,10 +87,16 @@
 		var duration = options.duration || 1000;
 
 		simulateEvent(fromEl, 'mousedown', {button: 0});
+		options.ontap && options.ontap();
+
 		simulateEvent(toEl, 'dragstart');
 
+		requestAnimationFrame(function () {
+			options.ondragstart && options.ondragstart();
+		});
+
 		requestAnimationFrame(function loop() {
-			var progress = (new Date().getTime() - startTime)/duration;
+			var progress = (new Date().getTime() - startTime) / duration;
 			var x = fromRect.cx + (toRect.cx - fromRect.cx) * progress;
 			var y = fromRect.cy + (toRect.cy - fromRect.cy) * progress;
 			var overEl = fromEl.ownerDocument.elementFromPoint(x, y);
@@ -95,6 +105,7 @@
 			dotEl.style.left = x + 'px';
 			dotEl.style.top = y + 'px';
 
+			//console.log(overEl.parentNode.parentNode.parentNode.id, overEl.className, x, y);
 			overEl && simulateEvent(overEl, 'dragover', {
 				clientX: x,
 				clientY: y
@@ -104,6 +115,7 @@
 				dotEl.style.display = '';
 				requestAnimationFrame(loop);
 			} else {
+				options.ondragend && options.ondragend();
 				simulateEvent(toEl, 'drop');
 				callback();
 			}

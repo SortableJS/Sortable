@@ -18,7 +18,11 @@ module.exports = function (grunt) {
 		},
 
 		jshint: {
-			all: ['*.js', '!*.min.js'],
+			all: [
+				'*.js',
+				'!*.min.js',
+				'tests/**/*.js'
+			],
 
 			options: {
 				jshintrc: true
@@ -48,7 +52,25 @@ module.exports = function (grunt) {
 			}
 		},
 
-		jquery: {}
+		jquery: {},
+
+		qunit: {
+			all: ['tests/index.html'],
+			options: {
+				'--web-security': 'no',
+				coverage: {
+					src: ['Sortable.js'],
+					instrumentedFiles: 'temp/',
+					htmlReport: 'report/coverage/',
+					coberturaReport: 'report/',
+					baseUrl: "./coverage",
+					linesThresholdPct: 99,
+					functionsThresholdPct: 100,
+					branchesThresholdPct: 90,
+					statementsThresholdPct: 90
+				}
+			}
+		}
 	});
 
 
@@ -91,6 +113,7 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-version');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
+	grunt.loadNpmTasks('grunt-qunit-istanbul');
 	grunt.loadNpmTasks('grunt-exec');
 
 	// Meteor tasks
@@ -98,6 +121,6 @@ module.exports = function (grunt) {
 	grunt.registerTask('meteor-publish', 'exec:meteor-publish');
 	grunt.registerTask('meteor', ['meteor-test', 'meteor-publish']);
 
-	grunt.registerTask('tests', ['jshint']);
+	grunt.registerTask('tests', ['jshint', 'qunit']);
 	grunt.registerTask('default', ['tests', 'version', 'uglify:dist']);
 };
