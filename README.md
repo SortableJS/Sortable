@@ -482,7 +482,7 @@ Other attributes are:
   <template is="dom-repeat" items={{names}}>
     <div>{{item}}</div>
   </template>
-<sortable-js>
+</sortable-js>
 ```
 
 ### Method
