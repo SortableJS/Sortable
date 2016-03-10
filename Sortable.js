@@ -14,7 +14,7 @@
 	else if (typeof module != "undefined" && typeof module.exports != "undefined") {
 		module.exports = factory();
 	}
-	else if (typeof Package !== "undefined") {
+	else if (typeof Package['rubaxa:sortable'] !== "undefined") {
 		Sortable = factory();  // export for Meteor.js
 	}
 	else {
