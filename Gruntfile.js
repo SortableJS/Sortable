@@ -30,9 +30,13 @@ module.exports = function (grunt) {
 				banner: '/*! <%= pkg.exportName %> <%= pkg.version %> - <%= pkg.license %> | <%= pkg.repository.url %> */\n'
 			},
 			dist: {
-				files: {
-					'<%= pkg.exportName %>.min.js': ['<%= pkg.exportName %>.js']
-				}
+				files: (function (bowerFiles) {
+					var files = {};
+					bowerFiles.forEach(function (main) {
+						files[main.slice(0, -3) + '.min.js'] = [main];
+					});
+					return files;
+				})(grunt.file.readJSON('bower.json').main)
 			},
 			jquery: {
 				files: {}
