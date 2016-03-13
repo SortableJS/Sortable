@@ -55,6 +55,18 @@
       //       <span>hello</span>
       //       <template is="dom-if">
       //     <tempalte is="dom-repeat">
+
+      this.initialize();
+
+    },
+
+    detached: function() {
+      this.destroy()
+    },
+
+
+    initialize: function() {
+
       var templates = this.querySelectorAll("template[is='dom-repeat']")
       var template = templates[templates.length-1]
 
@@ -108,10 +120,13 @@
           this.fire("move", e)
         }
       }))
+
     },
 
-    detached: function() {
-      this.sortable.destroy()
+    destroy: function() {
+      if(this.sortable) {
+        this.sortable.destroy()
+      }
     },
 
     groupChanged             : function(value) { this.sortable && this.sortable.option("group", value) },
