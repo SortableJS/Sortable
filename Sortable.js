@@ -236,6 +236,7 @@
 			setData: function (dataTransfer, dragEl) {
 				dataTransfer.setData('Text', dragEl.textContent);
 			},
+			skipGhostIsLastCheck: false,
 			dropBubble: false,
 			dragoverBubble: false,
 			dataIdAttr: 'data-id',
@@ -669,9 +670,10 @@
 
 
 				if ((el.children.length === 0) || (el.children[0] === ghostEl) ||
-					(el === evt.target) && (target = _ghostIsLast(el, evt))
+					(el === evt.target) &&
+					(target = _ghostIsLast(el, evt, options))
 				) {
-					if (target) {
+					if (target && !options.skipGhostIsLastCheck) {
 						if (target.animated) {
 							return;
 						}
@@ -1195,7 +1197,11 @@
 
 
 	/** @returns {HTMLElement|false} */
-	function _ghostIsLast(el, evt) {
+	function _ghostIsLast(el, evt, options) {
+		if (options.skipGhostIsLastCheck) {
+			return true;
+		}
+
 		var lastEl = el.lastElementChild,
 			rect = lastEl.getBoundingClientRect();
 
@@ -1340,3 +1346,5 @@
 	Sortable.version = '1.4.2';
 	return Sortable;
 });
+
+
