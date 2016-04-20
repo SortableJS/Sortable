@@ -232,6 +232,7 @@
 			dragClass: 'sortable-drag',
 			ignore: 'a, img',
 			filter: null,
+			preventOnFilter: true,
 			animation: 0,
 			setData: function (dataTransfer, dragEl) {
 				dataTransfer.setData('Text', dragEl.textContent);
@@ -292,6 +293,7 @@
 				target = (touch || evt).target,
 				originalTarget = target,
 				filter = options.filter,
+				preventOnFilter = options.preventOnFilter,
 				startIndex;
 
 			// Don't trigger start event when an element is been dragged, otherwise the evt.oldindex always wrong when set option.group.
@@ -320,7 +322,7 @@
 			if (typeof filter === 'function') {
 				if (filter.call(this, evt, target, this)) {
 					_dispatchEvent(_this, originalTarget, 'filter', target, el, startIndex);
-					evt.preventDefault();
+					if (preventOnFilter) evt.preventDefault();
 					return; // cancel dnd
 				}
 			}
@@ -335,7 +337,7 @@
 				});
 
 				if (filter) {
-					evt.preventDefault();
+					if (preventOnFilter) evt.preventDefault();
 					return; // cancel dnd
 				}
 			}
