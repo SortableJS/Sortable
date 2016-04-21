@@ -71,6 +71,7 @@ var sortable = new Sortable(el, {
 	fallbackOnBody: false,  // Appends the cloned DOM Element into the Document's Body
 
 	scroll: true, // or HTMLElement
+	scrollFn: function(offsetX, offsetY, originalEvent) { ... }, // if you have custom scrollbar scrollFn may be used for autoscrolling
 	scrollSensitivity: 30, // px, how near the mouse must be to an edge to start scrolling.
 	scrollSpeed: 10, // px
 
@@ -299,6 +300,14 @@ If set to `true`, the page (or sortable-area) scrolls when coming to an edge.
 Demo:
  - `window`: http://jsbin.com/boqugumiqi/1/edit?html,js,output
  - `overflow: hidden`: http://jsbin.com/kohamakiwi/1/edit?html,js,output
+
+
+---
+
+
+#### `scrollFn` option
+Defines function that will be used for autoscrolling. el.scrollTop/el.scrollLeft is used by default.
+Useful when you have custom scrollbar with dedicated scroll function.
 
 
 ---
