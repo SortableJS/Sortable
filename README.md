@@ -126,12 +126,13 @@ var sortable = new Sortable(el, {
 	},
 	
 	// Event when you move an item in the list or between lists
-	onMove: function (/**Event*/evt) {
+	onMove: function (/**Event*/evt, /**Event*/originalEvent) {
 		// Example: http://jsbin.com/tuyafe/1/edit?js,output
 		evt.dragged; // dragged HTMLElement
 		evt.draggedRect; // TextRectangle {left, top, right и bottom}
 		evt.related; // HTMLElement on which have guided
 		evt.relatedRect; // TextRectangle
+		originalEvent.clientY; // mouse position
 		// return false; — for cancel
 	},
 	
