@@ -744,8 +744,9 @@
 								target.parentNode.insertBefore(dragEl, after ? nextSibling : target);
 							}
 						}
-
-						parentEl = dragEl.parentNode; // actualization
+						if (dragEl) {
+							parentEl = dragEl.parentNode; // actualization
+						}
 
 						this._animate(dragRect, dragEl);
 						this._animate(targetRect, target);
