@@ -23,7 +23,7 @@
 	}
 })(function () {
 	"use strict";
-	
+
 	if (typeof window == "undefined" || typeof window.document == "undefined") {
 		return function() {
 			throw new Error( "Sortable.js requires a window with a document" );
@@ -249,6 +249,11 @@
 
 		// Restore sorting
 		options.store && this.sort(options.store.get(this));
+
+		//fixing rendering in Chrome
+		for (var i = 0; i < el.children.length; i++) {
+			el.children[i].style.willChange = 'transform';
+		}
 	}
 
 
