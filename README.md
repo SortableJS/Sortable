@@ -67,7 +67,7 @@ var sortable = new Sortable(el, {
 	dataIdAttr: 'data-id',
 	
 	forceFallback: false,  // ignore the HTML5 DnD behaviour and force the fallback to kick in
-	fallbackClass: "sortable-fallback"  // Class name for the cloned DOM Element when using forceFallback
+	fallbackClass: "sortable-fallback",  // Class name for the cloned DOM Element when using forceFallback
 	fallbackOnBody: false,  // Appends the cloned DOM Element into the Document's Body
 	
 	scroll: true, // or HTMLElement
