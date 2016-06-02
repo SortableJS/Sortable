@@ -467,7 +467,7 @@ export class SortableExampleEsnext extends React.Component {
     // check if backing instance not null
     if (componentBackingInstance) {
       let options = {
-        draggable: "div" // Specifies which items inside the element should be sortable
+        draggable: "div", // Specifies which items inside the element should be sortable
         group: "shared"
       };
       Sortable.create(componentBackingInstance, options);
