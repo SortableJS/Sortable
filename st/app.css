@@ -51,6 +51,10 @@ ul {
 	opacity: .2;
 }
 
+#foo .sortable-drag {
+	background: #daf4ff;
+}
+
 
 img {
 	border: 0;

@@ -12,7 +12,7 @@ Demo: http://rubaxa.github.io/Sortable/
  * Supports drag handles *and selectable text* (better than voidberg's html5sortable)
  * Smart auto-scrolling
  * Built using native HTML5 drag and drop API
- * Supports [Meteor](meteor/README.md), [AngularJS](#ng), [React](#react) and [Polymer](#polymer)
+ * Supports [Meteor](https://github.com/SortableJS/meteor), [AngularJS](#ng), [React](#react) and [Polymer](#polymer)
  * Supports any CSS library, e.g. [Bootstrap](#bs)
  * Simple API
  * [CDN](#cdn)
@@ -23,6 +23,7 @@ Demo: http://rubaxa.github.io/Sortable/
 
 
 ### Articles
+
  * [Sortable v1.0 — New capabilities](https://github.com/RubaXa/Sortable/wiki/Sortable-v1.0-—-New-capabilities/) (December 22, 2014)
  * [Sorting with the help of HTML5 Drag'n'Drop API](https://github.com/RubaXa/Sortable/wiki/Sorting-with-the-help-of-HTML5-Drag'n'Drop-API/) (December 23, 2013)
 
@@ -64,11 +65,13 @@ var sortable = new Sortable(el, {
 	draggable: ".item",  // Specifies which items inside the element should be sortable
 	ghostClass: "sortable-ghost",  // Class name for the drop placeholder
 	chosenClass: "sortable-chosen",  // Class name for the chosen item
+	dragClass: "sortable-drag",  // Class name for the dragging item
 	dataIdAttr: 'data-id',
 	
 	forceFallback: false,  // ignore the HTML5 DnD behaviour and force the fallback to kick in
 	fallbackClass: "sortable-fallback"  // Class name for the cloned DOM Element when using forceFallback
 	fallbackOnBody: false  // Appends the cloned DOM Element into the Document's Body
+	fallbackTolerance: 0 // Specify in pixels how far the mouse should move before it's considered as a drag.        
 	
 	scroll: true, // or HTMLElement
 	scrollSensitivity: 30, // px, how near the mouse must be to an edge to start scrolling.
@@ -78,12 +81,17 @@ var sortable = new Sortable(el, {
 		dataTransfer.setData('Text', dragEl.textContent);
 	},
 
-	// dragging started
+	// Element is chosen
+	onChoose: function (/**Event*/evt) {
+		evt.oldIndex;  // element index within parent
+	},
+
+	// Element dragging started
 	onStart: function (/**Event*/evt) {
 		evt.oldIndex;  // element index within parent
 	},
 	
-	// dragging ended
+	// Element dragging ended
 	onEnd: function (/**Event*/evt) {
 		evt.oldIndex;  // element's old index within parent
 		evt.newIndex;  // element's new index within parent
@@ -125,6 +133,12 @@ var sortable = new Sortable(el, {
 		evt.related; // HTMLElement on which have guided
 		evt.relatedRect; // TextRectangle
 		// return false; — for cancel
+	},
+	
+	// Called when creating a clone of element
+	onClone: function (/**Event*/evt) {
+		var origEl = evt.item;
+		var cloneEl = evt.clone;
 	}
 });
 ```
@@ -138,8 +152,12 @@ To drag elements from one list into another, both lists must have the same `grou
 You can also define whether lists can give away, give and keep a copy (`clone`), and receive elements.
 
  * name: `String` — group name
- * pull: `true|false|'clone'` — ability to move from the list. `clone` — copy the item, rather than move.
- * put: `true|false|["foo", "bar"]` — whether elements can be added from other lists, or an array of group names from which elements can be taken. Demo: http://jsbin.com/naduvo/2/edit?html,js,output
+ * pull: `true|false|'clone'|function` — ability to move from the list. `clone` — copy the item, rather than move.
+ * put: `true|false|["foo", "bar"]|function` — whether elements can be added from other lists, or an array of group names from which elements can be taken.
+
+Demo:
+ - http://jsbin.com/naduvo/edit?js,output
+ - http://jsbin.com/rusuvot/edit?js,output — use of complex logic in the `pull` and` put`
 
 
 ---
@@ -293,6 +311,19 @@ Demo: http://jsbin.com/pucurizace/edit?html,css,js,output
 ---
 
 
+#### `fallbackTolerance` option
+Emulates the native drag threshold. Specify in pixels how far the mouse should move before it's considered as a drag.
+Useful if the items are also clickable like in a list of links.
+
+When the user clicks inside a sortable element, it's not uncommon for your hand to move a little between the time you press and the time you release.  
+Dragging only starts if you move the pointer past a certain tolerance, so that you don't accidentally start dragging every time you click.
+
+3 to 5 are probably good values.
+
+
+---
+
+
 #### `scroll` option
 If set to `true`, the page (or sortable-area) scrolls when coming to an edge.
 
@@ -313,6 +344,28 @@ Defines how near the mouse must be to an edge to start scrolling.
 
 #### `scrollSpeed` option
 The speed at which the window should scroll once the mouse pointer gets within the `scrollSensitivity` distance.
+
+
+---
+
+
+### Event object ([demo](http://jsbin.com/xedusu/edit?js,output))
+
+ - to:`HTMLElement` — list, in which moved element.
+ - from:`HTMLElement` — previous list
+ - item:`HTMLElement` — dragged element
+ - clone:`HTMLElement`
+ - oldIndex:`Number|undefined` — old index within parent
+ - newIndex:`Number|undefined` — new index within parent
+
+
+#### `move` event object
+ - to:`HTMLElement`
+ - from:`HTMLElement`
+ - dragged:`HTMLElement`
+ - draggedRect:` TextRectangle`
+ - related:`HTMLElement` — element on which have guided
+ - relatedRect:` TextRectangle`
 
 
 ---
@@ -381,14 +434,14 @@ var SortableList = React.createClass({
 
 	render: function() {
 		return <ul>{
-			this.state.items.map(function (text) {
-				return <li>{text}</li>
+			this.state.items.map(function (text, i) {
+				return <li ref={i}>{text}</li>
 			})
 		}</ul>
 	}
 });
 
-React.render(<SortableList />, document.body);
+ReactDOM.render(<SortableList />, document.body);
 
 
 //
@@ -404,17 +457,18 @@ var AllUsers = React.createClass({
 	},
 
 	getInitialState: function() {
-		return { users: ['Abbi', 'Adela', 'Bud', 'Cate', 'Davis', 'Eric']; };
+		return { users: ['Abbi', 'Adela', 'Bud', 'Cate', 'Davis', 'Eric'] };
 	},
 
 	render: function() {
-		return (
-			<h1>Users</h1>
-			<ul ref="user">{
-				this.state.users.map(function (text) {
-					return <li>{text}</li>
-				})
-			}</ul>
+		return (<div>
+				<h1>Users</h1>
+				<ul ref="user">{
+					this.state.users.map(function (text, i) {
+						return <li ref={i}>{text}</li>
+					})
+				}</ul>
+			</div>
 		);
 	}
 });
@@ -424,19 +478,19 @@ var ApprovedUsers = React.createClass({
 	sortableOptions: { group: "shared" },
 
 	getInitialState: function() {
-		return { items: ['Hal', 'Judy']; };
+		return { items: ['Hal', 'Judy'] };
 	},
 
 	render: function() {
 		return <ul>{
-			this.state.items.map(function (text) {
-				return <li>{text}</li>
+			this.state.items.map(function (text, i) {
+				return <li ref={i}>{text}</li>
 			})
 		}</ul>
 	}
 });
 
-React.render(<div>
+ReactDOM.render(<div>
 	<AllUsers/>
 	<hr/>
 	<ApprovedUsers/>
@@ -534,7 +588,7 @@ Other attributes are:
 ### Support Polymer
 ```html
 
-<link rel="import" href="bower_components/Sortable/Sortable.html">
+<link rel="import" href="bower_components/Sortable/Sortable-js.html">
 
 <sortable-js handle=".handle">
   <template is="dom-repeat" items={{names}}>
@@ -682,6 +736,7 @@ Link to the active instance.
 * bind(ctx`:Mixed`, fn`:Function`)`:Function` — Takes a function and returns a new one that will always have a particular context
 * is(el`:HTMLElement`, selector`:String`)`:Boolean` — check the current matched set of elements against a selector
 * closest(el`:HTMLElement`, selector`:String`[, ctx`:HTMLElement`])`:HTMLElement|Null` — for each element in the set, get the first element that matches the selector by testing the element itself and traversing up through its ancestors in the DOM tree
+* clone(el`:HTMLElement`)`:HTMLElement` — create a deep copy of the set of matched elements
 * toggleClass(el`:HTMLElement`, name`:String`, state`:Boolean`) — add or remove one classes from each element
 
 

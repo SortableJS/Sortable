@@ -35,7 +35,8 @@
 		onRemove: 'handleRemove',
 		onSort: 'handleSort',
 		onFilter: 'handleFilter',
-		onMove: 'handleMove'
+		onMove: 'handleMove',
+		onClone: 'handleClone'
 	};
 
 
@@ -85,8 +86,11 @@
 				copyOptions = _extend({}, options),
 
 				emitEvent = function (/** string */type, /** Event */evt) {
-					var method = this[options[type]];
-					method && method.call(this, evt, this._sortableInstance);
+					var method = options[type];
+					if (method && typeof method === "string") {
+						method = this[method];
+					}
+					method && typeof method === "function" && method.call(this, evt, this._sortableInstance);
 				}.bind(this);
 
 
@@ -120,13 +124,13 @@
 						}
 
 						newState[_getModelName(this)] = items;
-						
+
 						if (copyOptions.stateHandler) {
 							this[copyOptions.stateHandler](newState);
 						} else {
 							this.setState(newState);
 						}
-						
+
 						(this !== _activeComponent) && _activeComponent.setState(remoteState);
 					}
 
@@ -136,7 +140,7 @@
 				}.bind(this);
 			}, this);
 
-			DOMNode = this.getDOMNode() ? (this.refs[options.ref] || this).getDOMNode() : this.refs[options.ref] || this;
+			DOMNode = typeof this.getDOMNode === 'function' ? (this.refs[options.ref] || this).getDOMNode() : this.refs[options.ref] || this;
 
 			/** @namespace this.refs — http://facebook.github.io/react/docs/more-about-refs.html */
 			this._sortableInstance = Sortable.create(DOMNode, copyOptions);
