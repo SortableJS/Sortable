@@ -301,9 +301,9 @@ Sortable.create(list, {
 
 #### `forceFallback` option
 If set to `true`, the Fallback for non HTML5 Browser will be used, even if we are using an HTML5 Browser.
-This gives us the possiblity to test the behaviour for older Browsers even in newer Browser, or make the Drag 'n Drop feel more consistent between Desktop , Mobile and old Browsers.
+This gives us the possibility to test the behaviour for older Browsers even in newer Browser, or make the Drag 'n Drop feel more consistent between Desktop , Mobile and old Browsers.
 
-On top of that, the Fallback always generates a copy of that DOM Element and appends the class `fallbackClass` definied in the options. This behaviour controls the look of this 'dragged' Element.
+On top of that, the Fallback always generates a copy of that DOM Element and appends the class `fallbackClass` defined in the options. This behaviour controls the look of this 'dragged' Element.
 
 Demo: http://jsbin.com/pucurizace/edit?html,css,js,output
 
@@ -497,6 +497,64 @@ ReactDOM.render(<div>
 </div>, document.body);
 ```
 
+### Support React ES2015 / TypeScript syntax
+As mixins are not supported in ES2015 / TypeScript syntax here is example of ES2015 ref based implementation.
+Using refs is the preferred (by facebook) "escape hatch" to underlaying DOM nodes: [React: The ref Callback Attribute](https://facebook.github.io/react/docs/more-about-refs.html#the-ref-callback-attribute)
+
+```js
+import * as React from "react";
+import Sortable from 'sortablejs';
+
+export class SortableExampleEsnext extends React.Component {
+
+  sortableContainersDecorator = (componentBackingInstance) => {
+    // check if backing instance not null
+    if (componentBackingInstance) {
+      let options = {
+        handle: ".group-title" // Restricts sort start click/touch to the specified element
+      };
+      Sortable.create(componentBackingInstance, options);
+    }
+  };
+
+  sortableGroupDecorator = (componentBackingInstance) => {
+    // check if backing instance not null
+    if (componentBackingInstance) {
+      let options = {
+        draggable: "div" // Specifies which items inside the element should be sortable
+        group: "shared"
+      };
+      Sortable.create(componentBackingInstance, options);
+    }
+  };
+
+  render() {
+    return (
+      <div className="container" ref={this.sortableContainersDecorator}>
+        <div className="group">
+          <h2 className="group-title">Group 1</h2>
+          <div className="group-list" ref={this.sortableGroupDecorator}>
+            <div>Swap them around</div>
+            <div>Swap us around</div>
+            <div>Swap things around</div>
+            <div>Swap everything around</div>
+          </div>
+        </div>
+        <div className="group">
+          <h2 className="group-title">Group 2</h2>
+          <div className="group-list" ref={this.sortableGroupDecorator}>
+            <div>Swap them around</div>
+            <div>Swap us around</div>
+            <div>Swap things around</div>
+            <div>Swap everything around</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+```
+
 
 ---
 
@@ -536,7 +594,7 @@ Other attributes are:
   <template is="dom-repeat" items={{names}}>
     <div>{{item}}</div>
   </template>
-<sortable-js>
+</sortable-js>
 ```
 
 ### Method
@@ -744,7 +802,7 @@ Please, [read this](CONTRIBUTING.md).
 
 
 ## MIT LICENSE
-Copyright 2013-2015 Lebedev Konstantin <ibnRubaXa@gmail.com>
+Copyright 2013-2016 Lebedev Konstantin <ibnRubaXa@gmail.com>
 http://rubaxa.github.io/Sortable/
 
 Permission is hereby granted, free of charge, to any person obtaining
