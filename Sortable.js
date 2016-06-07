@@ -23,7 +23,7 @@
 	}
 })(function () {
 	"use strict";
-	
+
 	if (typeof window == "undefined" || typeof window.document == "undefined") {
 		return function() {
 			throw new Error( "Sortable.js requires a window with a document" );
@@ -239,6 +239,7 @@
 		// Bind events
 		_on(el, 'mousedown', this._onTapStart);
 		_on(el, 'touchstart', this._onTapStart);
+		_on(el, 'pointerdown', this._onTapStart);
 
 		if (this.nativeDraggable) {
 			_on(el, 'dragover', this);
@@ -341,7 +342,7 @@
 					_toggleClass(dragEl, _this.options.chosenClass, true);
 
 					// Bind the events: dragstart/dragend
-					_this._triggerDragStart(touch);
+					_this._triggerDragStart(evt,  touch);
 				};
 
 				// Disable "draggable"
@@ -352,6 +353,7 @@
 				_on(ownerDocument, 'mouseup', _this._onDrop);
 				_on(ownerDocument, 'touchend', _this._onDrop);
 				_on(ownerDocument, 'touchcancel', _this._onDrop);
+				_on(ownerDocument, 'pointercancel', _this._onDrop);
 
 				if (options.delay) {
 					// If the user moves the pointer or let go the click or touch
@@ -362,6 +364,7 @@
 					_on(ownerDocument, 'touchcancel', _this._disableDelayedDrag);
 					_on(ownerDocument, 'mousemove', _this._disableDelayedDrag);
 					_on(ownerDocument, 'touchmove', _this._disableDelayedDrag);
+					_on(ownerDocument, 'pointermove', _this._disableDelayedDrag);
 
 					_this._dragStartTimer = setTimeout(dragStartFn, options.delay);
 				} else {
@@ -379,9 +382,11 @@
 			_off(ownerDocument, 'touchcancel', this._disableDelayedDrag);
 			_off(ownerDocument, 'mousemove', this._disableDelayedDrag);
 			_off(ownerDocument, 'touchmove', this._disableDelayedDrag);
+			_off(ownerDocument, 'pointermove', this._disableDelayedDrag);
 		},
 
-		_triggerDragStart: function (/** Touch */touch) {
+		_triggerDragStart: function (/** Event */evt, /** Touch */touch) {
+			touch = touch || (evt.pointerType == 'touch' ? evt : null);
 			if (touch) {
 				// Touch device support
 				tapEvt = {
@@ -544,6 +549,8 @@
 					_on(document, 'touchmove', this._onTouchMove);
 					_on(document, 'touchend', this._onDrop);
 					_on(document, 'touchcancel', this._onDrop);
+					_on(document, 'pointermove', this._onTouchMove);
+					_on(document, 'pointerup', this._onDrop);
 				} else {
 					// Old brwoser
 					_on(document, 'mousemove', this._onTouchMove);
@@ -729,8 +736,10 @@
 			var ownerDocument = this.el.ownerDocument;
 
 			_off(document, 'touchmove', this._onTouchMove);
+			_off(document, 'pointermove', this._onTouchMove);
 			_off(ownerDocument, 'mouseup', this._onDrop);
 			_off(ownerDocument, 'touchend', this._onDrop);
+			_off(ownerDocument, 'pointerup', this._onDrop);
 			_off(ownerDocument, 'touchcancel', this._onDrop);
 		},
 
@@ -956,6 +965,7 @@
 
 			_off(el, 'mousedown', this._onTapStart);
 			_off(el, 'touchstart', this._onTapStart);
+			_off(el, 'pointerdown', this._onTapStart);
 
 			if (this.nativeDraggable) {
 				_off(el, 'dragover', this);
