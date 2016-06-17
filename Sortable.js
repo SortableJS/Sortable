@@ -215,7 +215,9 @@
 			delay: 0,
 			forceFallback: false,
 			fallbackClass: 'sortable-fallback',
-			fallbackOnBody: false
+			fallbackOnBody: false,
+			xOffset: 0,
+			yOffset: 0
 		};
 
 
@@ -479,8 +481,8 @@
 				this._appendGhost();
 
 				var touch = evt.touches ? evt.touches[0] : evt,
-					dx = touch.clientX - tapEvt.clientX,
-					dy = touch.clientY - tapEvt.clientY,
+					dx = (touch.clientX - tapEvt.clientX) + this.options.xOffset,
+					dy = (touch.clientY - tapEvt.clientY) + this.options.yOffset,
 					translate3d = evt.touches ? 'translate3d(' + dx + 'px,' + dy + 'px,0)' : 'translate(' + dx + 'px,' + dy + 'px)';
 
 				moved = true;
