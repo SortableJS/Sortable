@@ -601,7 +601,7 @@ Sortable.create(el, {
 		 * @returns {Array}
 		 */
 		get: function (sortable) {
-			var order = localStorage.getItem(sortable.options.group);
+			var order = localStorage.getItem(sortable.options.group.name);
 			return order ? order.split('|') : [];
 		},
 
@@ -611,7 +611,7 @@ Sortable.create(el, {
 		 */
 		set: function (sortable) {
 			var order = sortable.toArray();
-			localStorage.setItem(sortable.options.group, order.join('|'));
+			localStorage.setItem(sortable.options.group.name, order.join('|'));
 		}
 	}
 })
