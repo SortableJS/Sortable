@@ -11,27 +11,28 @@
     is: "sortable-js",
 
     properties: {
-      group             : { type: String, value: () => Math.random(), observer: "groupChanged" },
-      sort              : { type: Boolean, value: true, observer: "sortChanged" },
-      disabled          : { type: Boolean, value: false, observer: "disabledChanged" },
-      store             : { type: Object, value: null, observer: "storeChanged" },
-      handle            : { type: String, value: null, observer: "handleChanged" },
-      scrollSensitivity : { type: Number, value: 30, observer: "scrollSensitivityChanged" },
-      scrollSpeed       : { type: Number, value: 10, observer: "scrollSpeedChanged" },
-      ghostClass        : { type: String, value: "sortable-ghost", observer: "ghostClassChanged" },
-      chosenClass       : { type: String, value: "sortable-chosen", observer: "chosenClassChanged" },
-      ignore            : { type: String, value: "a, img", observer: "ignoreChanged" },
-      filter            : { type: Object, value: null, observer: "filterChanged" },
-      animation         : { type: Number, value: 0, observer: "animationChanged" },
-      dropBubble        : { type: Boolean, value: false, observer: "dropBubbleChanged" },
-      dragoverBubble    : { type: Boolean, value: false, observer: "dragoverBubbleChanged" },
-      dataIdAttr        : { type: String, value: "data-id", observer: "dataIdAttrChanged" },
-      delay             : { type: Number, value: 0, observer: "delayChanged" },
-      forceFallback     : { type: Boolean, value: false, observer: "forceFallbackChanged" },
-      fallbackClass     : { type: String, value: "sortable-fallback", observer: "fallbackClassChanged" },
-      fallbackOnBody    : { type: Boolean, value: false, observer: "fallbackOnBodyChanged" },
-      draggable         : {},
-      scroll            : {}
+      group                       : { type: String, value: () => Math.random(), observer: "groupChanged" },
+      sort                        : { type: Boolean, value: true, observer: "sortChanged" },
+      disabled                    : { type: Boolean, value: false, observer: "disabledChanged" },
+      store                       : { type: Object, value: null, observer: "storeChanged" },
+      handle                      : { type: String, value: null, observer: "handleChanged" },
+      scrollSensitivity           : { type: Number, value: 30, observer: "scrollSensitivityChanged" },
+      scrollSpeed                 : { type: Number, value: 10, observer: "scrollSpeedChanged" },
+      ghostClass                  : { type: String, value: "sortable-ghost", observer: "ghostClassChanged" },
+      chosenClass                 : { type: String, value: "sortable-chosen", observer: "chosenClassChanged" },
+      ignore                      : { type: String, value: "a, img", observer: "ignoreChanged" },
+      filter                      : { type: Object, value: null, observer: "filterChanged" },
+      animation                   : { type: Number, value: 0, observer: "animationChanged" },
+      dropBubble                  : { type: Boolean, value: false, observer: "dropBubbleChanged" },
+      dragoverBubble              : { type: Boolean, value: false, observer: "dragoverBubbleChanged" },
+      dataIdAttr                  : { type: String, value: "data-id", observer: "dataIdAttrChanged" },
+      delay                       : { type: Number, value: 0, observer: "delayChanged" },
+      forceFallback               : { type: Boolean, value: false, observer: "forceFallbackChanged" },
+      fallbackClass               : { type: String, value: "sortable-fallback", observer: "fallbackClassChanged" },
+      fallbackOnBody              : { type: Boolean, value: false, observer: "fallbackOnBodyChanged" },
+      manuallyHandleUpdateEvents  : { type: Boolean, value: false },
+      draggable                   : {},
+      scroll                      : {}
     },
 
     created() {
@@ -78,7 +79,11 @@
       this.sortable = Sortable.create(this, Object.assign(options, {
         onUpdate: e => {
           if (template) {
-            template.items.splice(e.newIndex, 0, template.items.splice(e.oldIndex, 1)[0]);
+            if(manuallyHandleUpdateEvents) {
+              template.items.splice(e.newIndex, 0, template.items.splice(e.oldIndex, 1)[0]);
+            } else {
+              template.splice("items", e.newIndex, 0, template.splice("items", e.oldIndex, 1)[0])
+            }
           }
           this.fire("update", e)
         },
