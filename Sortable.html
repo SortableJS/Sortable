@@ -79,7 +79,6 @@
         onUpdate: e => {
           if (template) {
             template.items.splice(e.newIndex, 0, template.items.splice(e.oldIndex, 1)[0]);
-            //template.splice("items", e.newIndex, 0, template.splice("items", e.oldIndex, 1)[0])
           }
           this.fire("update", e)
         },
