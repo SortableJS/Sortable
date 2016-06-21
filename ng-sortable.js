@@ -184,7 +184,7 @@
 					// Create watchers for `options`
 					angular.forEach([
 						'sort', 'disabled', 'draggable', 'handle', 'animation', 'group', 'ghostClass', 'filter',
-						'onStart', 'onEnd', 'onAdd', 'onUpdate', 'onRemove', 'onSort', 'onMove', 'onClone'
+						'onStart', 'onEnd', 'onAdd', 'onUpdate', 'onRemove', 'onSort', 'onMove', 'onClone', 'setData'
 					], function (name) {
 						watchers.push(scope.$watch('ngSortable.' + name, function (value) {
 							if (value !== void 0) {
