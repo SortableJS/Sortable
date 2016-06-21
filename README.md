@@ -65,15 +65,15 @@ var sortable = new Sortable(el, {
 	ghostClass: "sortable-ghost",  // Class name for the drop placeholder
 	chosenClass: "sortable-chosen",  // Class name for the chosen item
 	dataIdAttr: 'data-id',
-	
+
 	forceFallback: false,  // ignore the HTML5 DnD behaviour and force the fallback to kick in
 	fallbackClass: "sortable-fallback",  // Class name for the cloned DOM Element when using forceFallback
 	fallbackOnBody: false,  // Appends the cloned DOM Element into the Document's Body
-	
+
 	scroll: true, // or HTMLElement
 	scrollSensitivity: 30, // px, how near the mouse must be to an edge to start scrolling.
 	scrollSpeed: 10, // px
-	
+
 	setData: function (dataTransfer, dragEl) {
 		dataTransfer.setData('Text', dragEl.textContent);
 	},
@@ -82,7 +82,7 @@ var sortable = new Sortable(el, {
 	onStart: function (/**Event*/evt) {
 		evt.oldIndex;  // element index within parent
 	},
-	
+
 	// dragging ended
 	onEnd: function (/**Event*/evt) {
 		evt.oldIndex;  // element's old index within parent
@@ -116,7 +116,7 @@ var sortable = new Sortable(el, {
 	onFilter: function (/**Event*/evt) {
 		var itemEl = evt.item;  // HTMLElement receiving the `mousedown|tapstart` event.
 	},
-	
+
 	// Event when you move an item in the list or between lists
 	onMove: function (/**Event*/evt) {
 		// Example: http://jsbin.com/tuyafe/1/edit?js,output
@@ -297,7 +297,7 @@ Demo: http://jsbin.com/pucurizace/edit?html,css,js,output
 If set to `true`, the page (or sortable-area) scrolls when coming to an edge.
 
 Demo:
- - `window`: http://jsbin.com/boqugumiqi/1/edit?html,js,output 
+ - `window`: http://jsbin.com/boqugumiqi/1/edit?html,js,output
  - `overflow: hidden`: http://jsbin.com/kohamakiwi/1/edit?html,js,output
 
 
@@ -526,7 +526,7 @@ The sortable/draggable bindingHandlers supports the same syntax as Knockouts bui
 Other attributes are:
 *	options: an object that contains settings for the underlaying sortable, ie `group`,`handle`, events etc.
 *	collection: if your `foreach` array is a computed then you would supply the underlaying observableArray that you would like to sort here.
-
+*   manuallyHandleUpdateEvents: a boolean to turn off the change events on update that other polymer elements listen to.
 
 ---
 
@@ -723,13 +723,13 @@ Now you can use `jquery.fn.sortable.js`:<br/>
 
 ```js
   $("#list").sortable({ /* options */ }); // init
-  
+
   $("#list").sortable("widget"); // get Sortable instance
-  
+
   $("#list").sortable("destroy"); // destroy Sortable instance
-  
+
   $("#list").sortable("{method-name}"); // call an instance method
-  
+
   $("#list").sortable("{method-name}", "foo", "bar"); // call an instance method with parameters
 ```
 
@@ -740,7 +740,7 @@ And `grunt jquery:mySortableFunc` → `jquery.fn.mySortableFunc.js`
 
 ### Contributing (Issue/PR)
 
-Please, [read this](CONTRIBUTING.md). 
+Please, [read this](CONTRIBUTING.md).
 
 
 ---
