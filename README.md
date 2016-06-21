@@ -625,6 +625,7 @@ Link to the active instance.
 * is(el`:HTMLElement`, selector`:String`)`:Boolean` — check the current matched set of elements against a selector
 * closest(el`:HTMLElement`, selector`:String`[, ctx`:HTMLElement`])`:HTMLElement|Null` — for each element in the set, get the first element that matches the selector by testing the element itself and traversing up through its ancestors in the DOM tree
 * toggleClass(el`:HTMLElement`, name`:String`, state`:Boolean`) — add or remove one classes from each element
+* setImmediate(callback`:Function`) — https://developer.mozilla.org/ru/docs/Web/API/Window/setImmediate
 
 
 ---

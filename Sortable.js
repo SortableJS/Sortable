@@ -64,6 +64,9 @@
 		document = win.document,
 		parseInt = win.parseInt,
 
+		setTimeout = win.setTimeout,
+		setImmediate = win.setImmediate,
+
 		supportDraggable = !!('draggable' in document.createElement('div')),
 		supportCssPointerEvents = (function (el) {
 			el = document.createElement('x');
@@ -559,7 +562,7 @@
 				}
 
 				_on(document, 'drop', this);
-				setTimeout(this._dragStarted, 0);
+				setImmediate(this._dragStarted);
 			}
 		},
 
@@ -1237,6 +1240,44 @@
 		return dst;
 	}
 
+	// setImmediate polyfill
+	// Based on https://github.com/YuzuJS/setImmediate/blob/master/setImmediate.js
+	if (setImmediate === void 0) {
+		setImmediate = setTimeout;
+
+		if (win.postMessage && !win.importScripts) {
+            var postMessageIsAsynchronous = true;
+            var oldOnMessage = win.onmessage;
+
+            win.onmessage = function () { postMessageIsAsynchronous = false; };
+            win.postMessage('', '*');
+            win.onmessage = oldOnMessage;
+
+            if (postMessageIsAsynchronous) {
+            	var postMessageQueue = [];
+				var postMessageEventName = 'sortableSetImmediate:' + expando;
+				var onGlobalMessage = function (event) {
+					if (
+						(event.source === win) &&
+						(typeof event.data === 'string') &&
+						(event.data.indexOf(postMessageEventName) === 0)
+					) {
+						while (postMessageQueue.length) {
+							postMessageQueue.shift()(); // call
+						}
+					}
+				};
+
+				_on(win, 'message', onGlobalMessage, false);
+
+				setImmediate = function (callback) {
+					postMessageQueue.push(callback);
+					win.postMessage(postMessageEventName, '*');
+					return handle;
+				};
+            }
+        }
+	}
 
 	// Export utils
 	Sortable.utils = {
@@ -1247,11 +1288,12 @@
 		is: function (el, selector) {
 			return !!_closest(el, selector, el);
 		},
+		setImmediate: setImmediate,
 		extend: _extend,
 		throttle: _throttle,
 		closest: _closest,
 		toggleClass: _toggleClass,
-		index: _index
+		index: _index,
 	};
 
 
