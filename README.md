@@ -74,6 +74,7 @@ var sortable = new Sortable(el, {
 	fallbackTolerance: 0 // Specify in pixels how far the mouse should move before it's considered as a drag.        
 	
 	scroll: true, // or HTMLElement
+	scrollFn: function(offsetX, offsetY, originalEvent) { ... }, // if you have custom scrollbar scrollFn may be used for autoscrolling
 	scrollSensitivity: 30, // px, how near the mouse must be to an edge to start scrolling.
 	scrollSpeed: 10, // px
 	
@@ -126,12 +127,13 @@ var sortable = new Sortable(el, {
 	},
 	
 	// Event when you move an item in the list or between lists
-	onMove: function (/**Event*/evt) {
+	onMove: function (/**Event*/evt, /**Event*/originalEvent) {
 		// Example: http://jsbin.com/tuyafe/1/edit?js,output
 		evt.dragged; // dragged HTMLElement
 		evt.draggedRect; // TextRectangle {left, top, right и bottom}
 		evt.related; // HTMLElement on which have guided
 		evt.relatedRect; // TextRectangle
+		originalEvent.clientY; // mouse position
 		// return false; — for cancel
 	},
 	
@@ -330,6 +332,14 @@ If set to `true`, the page (or sortable-area) scrolls when coming to an edge.
 Demo:
  - `window`: http://jsbin.com/boqugumiqi/1/edit?html,js,output 
  - `overflow: hidden`: http://jsbin.com/kohamakiwi/1/edit?html,js,output
+
+
+---
+
+
+#### `scrollFn` option
+Defines function that will be used for autoscrolling. el.scrollTop/el.scrollLeft is used by default.
+Useful when you have custom scrollbar with dedicated scroll function.
 
 
 ---

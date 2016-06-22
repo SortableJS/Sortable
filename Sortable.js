@@ -39,6 +39,7 @@
 
 		scrollEl,
 		scrollParentEl,
+		scrollCustomFn,
 
 		lastEl,
 		lastCSS,
@@ -99,13 +100,17 @@
 					winHeight = window.innerHeight,
 
 					vx,
-					vy
+					vy,
+
+					scrollOffsetX,
+					scrollOffsetY
 				;
 
 				// Delect scrollEl
 				if (scrollParentEl !== rootEl) {
 					scrollEl = options.scroll;
 					scrollParentEl = rootEl;
+					scrollCustomFn = options.scrollFn;
 
 					if (scrollEl === true) {
 						scrollEl = rootEl;
@@ -147,11 +152,18 @@
 
 					if (el) {
 						autoScroll.pid = setInterval(function () {
+							scrollOffsetY = vy ? vy * speed : 0;
+							scrollOffsetX = vx ? vx * speed : 0;
+
+							if ('function' === typeof(scrollCustomFn)) {
+								return scrollCustomFn.call(_this, scrollOffsetX, scrollOffsetY, evt);
+							}
+
 							if (el === win) {
-								win.scrollTo(win.pageXOffset + vx * speed, win.pageYOffset + vy * speed);
+								win.scrollTo(win.pageXOffset + scrollOffsetX, win.pageYOffset + scrollOffsetY);
 							} else {
-								vy && (el.scrollTop += vy * speed);
-								vx && (el.scrollLeft += vx * speed);
+								el.scrollTop += scrollOffsetY;
+								el.scrollLeft += scrollOffsetX;
 							}
 						}, 24);
 					}
@@ -681,7 +693,7 @@
 
 					_cloneHide(isOwner);
 
-					if (_onMove(rootEl, el, dragEl, dragRect, target, targetRect) !== false) {
+					if (_onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt) !== false) {
 						if (!dragEl.contains(el)) {
 							el.appendChild(dragEl);
 							parentEl = el; // actualization
@@ -708,7 +720,7 @@
 						isLong = (target.offsetHeight > dragEl.offsetHeight),
 						halfway = (floating ? (evt.clientX - targetRect.left) / width : (evt.clientY - targetRect.top) / height) > 0.5,
 						nextSibling = target.nextElementSibling,
-						moveVector = _onMove(rootEl, el, dragEl, dragRect, target, targetRect),
+						moveVector = _onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt),
 						after
 					;
 
@@ -1158,7 +1170,7 @@
 	}
 
 
-	function _onMove(fromEl, toEl, dragEl, dragRect, targetEl, targetRect) {
+	function _onMove(fromEl, toEl, dragEl, dragRect, targetEl, targetRect, originalEvt) {
 		var evt,
 			sortable = fromEl[expando],
 			onMoveFn = sortable.options.onMove,
@@ -1177,7 +1189,7 @@
 		fromEl.dispatchEvent(evt);
 
 		if (onMoveFn) {
-			retVal = onMoveFn.call(sortable, evt);
+			retVal = onMoveFn.call(sortable, evt, originalEvt);
 		}
 
 		return retVal;
