@@ -803,7 +803,7 @@
 					}
 
 					if (Sortable.active) {
-						if (newIndex === null || newIndex === -1) {
+						if (newIndex == null || newIndex === -1) {
 							newIndex = oldIndex;
 						}
 
