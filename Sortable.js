@@ -39,6 +39,7 @@
 
 		scrollEl,
 		scrollParentEl,
+		scrollCustomFn,
 
 		lastEl,
 		lastCSS,
@@ -99,13 +100,17 @@
 					winHeight = window.innerHeight,
 
 					vx,
-					vy
+					vy,
+
+					scrollOffsetX,
+					scrollOffsetY
 				;
 
 				// Delect scrollEl
 				if (scrollParentEl !== rootEl) {
 					scrollEl = options.scroll;
 					scrollParentEl = rootEl;
+					scrollCustomFn = options.scrollFn;
 
 					if (scrollEl === true) {
 						scrollEl = rootEl;
@@ -147,11 +152,18 @@
 
 					if (el) {
 						autoScroll.pid = setInterval(function () {
+							scrollOffsetY = vy ? vy * speed : 0;
+							scrollOffsetX = vx ? vx * speed : 0;
+
+							if ('function' === typeof(scrollCustomFn)) {
+								return scrollCustomFn.call(_this, scrollOffsetX, scrollOffsetY, evt);
+							}
+
 							if (el === win) {
-								win.scrollTo(win.pageXOffset + vx * speed, win.pageYOffset + vy * speed);
+								win.scrollTo(win.pageXOffset + scrollOffsetX, win.pageYOffset + scrollOffsetY);
 							} else {
-								vy && (el.scrollTop += vy * speed);
-								vx && (el.scrollLeft += vx * speed);
+								el.scrollTop += scrollOffsetY;
+								el.scrollLeft += scrollOffsetX;
 							}
 						}, 24);
 					}
