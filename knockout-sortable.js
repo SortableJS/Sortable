@@ -1,55 +1,61 @@
-﻿(function (factory) {
-    "use strict";
-    //get ko ref via global or require
-    var koRef;
-    if (typeof ko !== 'undefined') {
-      //global ref already defined
-      koRef = ko;
-    }
-    else if (typeof require === 'function' && typeof exports === 'object' && typeof module === 'object') {
-      //commonjs / node.js
-      koRef = require('knockout');
-    }
-    //get sortable ref via global or require
-    var sortableRef;
-    if (typeof Sortable !== 'undefined') {
-      //global ref already defined
-      sortableRef = Sortable;
-    }
-    else if (typeof require === 'function' && typeof exports === 'object' && typeof module === 'object') {
-      //commonjs / node.js
-      sortableRef = require('sortablejs');
-    }
-    //use references if we found them
-    if (koRef !== undefined && sortableRef !== undefined) {
-      factory(koRef, sortableRef);
-    }
-    //if both references aren't found yet, get via AMD if available
-    else if (typeof define === 'function' && define.amd){
-      //we may have a reference to only 1, or none
-      if (koRef !== undefined && sortableRef === undefined) {
-        define(['./Sortable'], function(amdSortableRef){ factory(koRef, amdSortableRef); });
-      }
-      else if (koRef === undefined && sortableRef !== undefined) {
-        define(['knockout'], function(amdKnockout){ factory(amdKnockout, sortableRef); });
-      }
-      else if (koRef === undefined && sortableRef === undefined) {
-        define(['knockout', './Sortable'], factory);
-      }
-    }
-    //no more routes to get references
-    else {
-      //report specific error
-      if (koRef !== undefined && sortableRef === undefined) {
-        throw new Error('knockout-sortable could not get reference to Sortable');
-      }
-      else if (koRef === undefined && sortableRef !== undefined) {
-        throw new Error('knockout-sortable could not get reference to Knockout');
-      }
-      else if (koRef === undefined && sortableRef === undefined) {
-        throw new Error('knockout-sortable could not get reference to Knockout or Sortable');
-      }
-    }
+/*global ko*/
+
+(function (factory) {
+	"use strict";
+	//get ko ref via global or require
+	var koRef;
+	if (typeof ko !== 'undefined') {
+		//global ref already defined
+		koRef = ko;
+	}
+	else if (typeof require === 'function' && typeof exports === 'object' && typeof module === 'object') {
+		//commonjs / node.js
+		koRef = require('knockout');
+	}
+	//get sortable ref via global or require
+	var sortableRef;
+	if (typeof Sortable !== 'undefined') {
+		//global ref already defined
+		sortableRef = Sortable;
+	}
+	else if (typeof require === 'function' && typeof exports === 'object' && typeof module === 'object') {
+		//commonjs / node.js
+		sortableRef = require('sortablejs');
+	}
+	//use references if we found them
+	if (koRef !== undefined && sortableRef !== undefined) {
+		factory(koRef, sortableRef);
+	}
+	//if both references aren't found yet, get via AMD if available
+	else if (typeof define === 'function' && define.amd) {
+		//we may have a reference to only 1, or none
+		if (koRef !== undefined && sortableRef === undefined) {
+			define(['./Sortable'], function (amdSortableRef) {
+				factory(koRef, amdSortableRef);
+			});
+		}
+		else if (koRef === undefined && sortableRef !== undefined) {
+			define(['knockout'], function (amdKnockout) {
+				factory(amdKnockout, sortableRef);
+			});
+		}
+		else if (koRef === undefined && sortableRef === undefined) {
+			define(['knockout', './Sortable'], factory);
+		}
+	}
+	//no more routes to get references
+	else {
+		//report specific error
+		if (koRef !== undefined && sortableRef === undefined) {
+			throw new Error('knockout-sortable could not get reference to Sortable');
+		}
+		else if (koRef === undefined && sortableRef !== undefined) {
+			throw new Error('knockout-sortable could not get reference to Knockout');
+		}
+		else if (koRef === undefined && sortableRef === undefined) {
+			throw new Error('knockout-sortable could not get reference to Knockout or Sortable');
+		}
+	}
 })(function (ko, Sortable) {
     "use strict";
 
@@ -59,7 +65,7 @@
 
         // It's seems that we cannot update the eventhandlers after we've created
         // the sortable, so define them in init instead of update
-        ['onStart', 'onEnd', 'onRemove', 'onAdd', 'onUpdate', 'onSort', 'onFilter'].forEach(function (e) {
+        ['onStart', 'onEnd', 'onRemove', 'onAdd', 'onUpdate', 'onSort', 'onFilter', 'onMove', 'onClone'].forEach(function (e) {
             if (options[e] || eventHandlers[e])
                 options[e] = function (eventType, parentVM, parentBindings, handler, e) {
                     var itemVM = ko.dataFor(e.item),
@@ -116,7 +122,7 @@
                     moveItem(itemVM, removeOperation.collection, addOperation.collection, addOperation.event.clone, addOperation.event);
                 }
             },
-            // Moves an item from the "to" collection to the "from" collection, these
+            // Moves an item from the "from" collection to the "to" collection, these
             // can be references to the same collection which means it's a sort.
             // clone indicates if we should move or copy the item into the new collection
             moveItem = function (itemVM, from, to, clone, e) {
@@ -127,11 +133,12 @@
                     originalIndex = fromArray.indexOf(itemVM),
                     newIndex = e.newIndex;
 
-                if (e.item.previousElementSibling)
-                {
-                    newIndex = fromArray.indexOf(ko.dataFor(e.item.previousElementSibling));
-                    if (originalIndex > newIndex)
-                        newIndex = newIndex + 1;
+                // We have to find out the actual desired index of the to array,
+                // as this might be a computed array. We could otherwise potentially
+                // drop an item above the 3rd visible item, but the 2nd visible item
+                // has an actual index of 5.
+                if (e.item.previousElementSibling) {
+                    newIndex = to().indexOf(ko.dataFor(e.item.previousElementSibling)) + 1;
                 }
 
                 // Remove sortables "unbound" element
@@ -150,6 +157,8 @@
                     // Force knockout to update
                     from.valueHasMutated();
                 }
+                // Force deferred tasks to run now, registering the removal
+                ko.tasks.runEarly();
                 // Insert the item on its new position
                 to().splice(newIndex, 0, itemVM);
                 // Make sure to tell knockout that we've modified the actual array.
