@@ -1246,15 +1246,18 @@
 		setImmediate = setTimeout;
 
 		if (win.postMessage && !win.importScripts) {
-            var postMessageIsAsynchronous = true;
-            var oldOnMessage = win.onmessage;
+			var postMessageIsAsynchronous = true;
+			var oldOnMessage = win.onmessage;
 
-            win.onmessage = function () { postMessageIsAsynchronous = false; };
-            win.postMessage('', '*');
-            win.onmessage = oldOnMessage;
+			win.onmessage = function () {
+				postMessageIsAsynchronous = false;
+			};
 
-            if (postMessageIsAsynchronous) {
-            	var postMessageQueue = [];
+			win.postMessage('', '*');
+			win.onmessage = oldOnMessage;
+
+			if (postMessageIsAsynchronous) {
+				var postMessageQueue = [];
 				var postMessageEventName = 'sortableSetImmediate:' + expando;
 				var onGlobalMessage = function (event) {
 					if (
@@ -1273,10 +1276,9 @@
 				setImmediate = function (callback) {
 					postMessageQueue.push(callback);
 					win.postMessage(postMessageEventName, '*');
-					return handle;
 				};
-            }
-        }
+			}
+		}
 	}
 
 	// Export utils
