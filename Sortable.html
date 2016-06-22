@@ -64,13 +64,13 @@
         options[key] = this[key];
       }.bind(this));
 
-      var self = this;
+      var _this = this;
       var eventCallbacks = {
         onUpdate: function (e) {
           if (template) {
             template.splice("items", e.newIndex, 0, template.splice("items", e.oldIndex, 1)[0]);
           }
-          self.fire("update", e);
+          _this.fire("update", e);
         },
 
         onAdd: function(e) {
@@ -80,42 +80,42 @@
             var item = from.items[e.oldIndex];
             template.splice("items", e.newIndex, 0, item);
           }
-          self.fire("add", e);
+          _this.fire("add", e);
         },
 
         onRemove: function(e) {
           if (template) {
             template.splice("items", e.oldIndex, 1)[0];
           }
-          self.fire("remove", e);
+          _this.fire("remove", e);
         },
 
         onChoose: function(e) {
-          self.fire("choose", e);
+          _this.fire("choose", e);
         },
 
         onStart: function(e) {
-          self.fire("start", e);
+          _this.fire("start", e);
         },
 
         onEnd: function(e) {
-          self.fire("end", e);
+          _this.fire("end", e);
         },
 
         onSort: function(e) {
-          self.fire("sort", e);
+          _this.fire("sort", e);
         },
 
         onFilter: function(e) {
-          self.fire("filter", e);
+          _this.fire("filter", e);
         },
 
         onMove: function(e) {
-          self.fire("move", e);
+          _this.fire("move", e);
         },
 
         onClone: function(e) {
-          self.fire("clone", e);
+          _this.fire("clone", e);
         }
       };
 
