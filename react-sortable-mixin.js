@@ -7,16 +7,16 @@
 	'use strict';
 
 	if (typeof module != 'undefined' && typeof module.exports != 'undefined') {
-		module.exports = factory(require('./Sortable'));
+		module.exports = factory(require('./Sortable'), require('react-dom'));
 	}
 	else if (typeof define === 'function' && define.amd) {
-		define(['./Sortable'], factory);
+		define(['./Sortable', 'react-dom'], factory);
 	}
 	else {
 		/* jshint sub:true */
-		window['SortableMixin'] = factory(Sortable);
+		window['SortableMixin'] = factory(Sortable, ReactDOM);
 	}
-})(function (/** Sortable */Sortable) {
+})(function (/** Sortable */Sortable, /** ReactDOM */ReactDOM) {
 	'use strict';
 
 	var _nextSibling;
@@ -139,8 +139,16 @@
 					}, 0);
 				}.bind(this);
 			}, this);
-
-			DOMNode = typeof this.getDOMNode === 'function' ? (this.refs[options.ref] || this).getDOMNode() : this.refs[options.ref] || this;
+			
+			if(typeof(ReactDOM) !== 'undefined')
+			{
+				DOMNode = ReactDOM.findDOMNode(this.refs[options.ref] || this);
+			}
+			else
+			{
+				DOMNode = typeof this.getDOMNode === 'function' ? (this.refs[options.ref] || this).getDOMNode() : this.refs[options.ref] || this;
+			}
+			
 
 			/** @namespace this.refs — http://facebook.github.io/react/docs/more-about-refs.html */
 			this._sortableInstance = Sortable.create(DOMNode, copyOptions);
