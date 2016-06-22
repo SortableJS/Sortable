@@ -61,19 +61,19 @@ var sortable = new Sortable(el, {
 	animation: 150,  // ms, animation speed moving items when sorting, `0` — without animation
 	handle: ".my-handle",  // Drag handle selector within list items
 	filter: ".ignore-elements",  // Selectors that do not lead to dragging (String or Function)
-	draggable: ".item",  // Specifies which items inside the element should be sortable
+	draggable: ".item",  // Specifies which items inside the element should be draggable
 	ghostClass: "sortable-ghost",  // Class name for the drop placeholder
 	chosenClass: "sortable-chosen",  // Class name for the chosen item
 	dataIdAttr: 'data-id',
-	
+
 	forceFallback: false,  // ignore the HTML5 DnD behaviour and force the fallback to kick in
-	fallbackClass: "sortable-fallback"  // Class name for the cloned DOM Element when using forceFallback
-	fallbackOnBody: false  // Appends the cloned DOM Element into the Document's Body
-	
+	fallbackClass: "sortable-fallback",  // Class name for the cloned DOM Element when using forceFallback
+	fallbackOnBody: false,  // Appends the cloned DOM Element into the Document's Body
+
 	scroll: true, // or HTMLElement
 	scrollSensitivity: 30, // px, how near the mouse must be to an edge to start scrolling.
 	scrollSpeed: 10, // px
-	
+
 	setData: function (dataTransfer, dragEl) {
 		dataTransfer.setData('Text', dragEl.textContent);
 	},
@@ -82,7 +82,7 @@ var sortable = new Sortable(el, {
 	onStart: function (/**Event*/evt) {
 		evt.oldIndex;  // element index within parent
 	},
-	
+
 	// dragging ended
 	onEnd: function (/**Event*/evt) {
 		evt.oldIndex;  // element's old index within parent
@@ -116,7 +116,7 @@ var sortable = new Sortable(el, {
 	onFilter: function (/**Event*/evt) {
 		var itemEl = evt.item;  // HTMLElement receiving the `mousedown|tapstart` event.
 	},
-	
+
 	// Event when you move an item in the list or between lists
 	onMove: function (/**Event*/evt) {
 		// Example: http://jsbin.com/tuyafe/1/edit?js,output
@@ -297,7 +297,7 @@ Demo: http://jsbin.com/pucurizace/edit?html,css,js,output
 If set to `true`, the page (or sortable-area) scrolls when coming to an edge.
 
 Demo:
- - `window`: http://jsbin.com/boqugumiqi/1/edit?html,js,output 
+ - `window`: http://jsbin.com/boqugumiqi/1/edit?html,js,output
  - `overflow: hidden`: http://jsbin.com/kohamakiwi/1/edit?html,js,output
 
 
@@ -443,6 +443,64 @@ React.render(<div>
 </div>, document.body);
 ```
 
+### Support React ES2015 / TypeScript syntax
+As mixins are not supported in ES2015 / TypeScript syntax here is example of ES2015 ref based implementation.
+Using refs is the preferred (by facebook) "escape hatch" to underlaying DOM nodes: [React: The ref Callback Attribute](https://facebook.github.io/react/docs/more-about-refs.html#the-ref-callback-attribute)
+
+```js
+import * as React from "react";
+import Sortable from 'sortablejs';
+
+export class SortableExampleEsnext extends React.Component {
+
+  sortableContainersDecorator = (componentBackingInstance) => {
+    // check if backing instance not null
+    if (componentBackingInstance) {
+      let options = {
+        handle: ".group-title" // Restricts sort start click/touch to the specified element
+      };
+      Sortable.create(componentBackingInstance, options);
+    }
+  };
+
+  sortableGroupDecorator = (componentBackingInstance) => {
+    // check if backing instance not null
+    if (componentBackingInstance) {
+      let options = {
+        draggable: "div", // Specifies which items inside the element should be sortable
+        group: "shared"
+      };
+      Sortable.create(componentBackingInstance, options);
+    }
+  };
+
+  render() {
+    return (
+      <div className="container" ref={this.sortableContainersDecorator}>
+        <div className="group">
+          <h2 className="group-title">Group 1</h2>
+          <div className="group-list" ref={this.sortableGroupDecorator}>
+            <div>Swap them around</div>
+            <div>Swap us around</div>
+            <div>Swap things around</div>
+            <div>Swap everything around</div>
+          </div>
+        </div>
+        <div className="group">
+          <h2 className="group-title">Group 2</h2>
+          <div className="group-list" ref={this.sortableGroupDecorator}>
+            <div>Swap them around</div>
+            <div>Swap us around</div>
+            <div>Swap things around</div>
+            <div>Swap everything around</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+```
+
 
 ---
 
@@ -468,7 +526,7 @@ The sortable/draggable bindingHandlers supports the same syntax as Knockouts bui
 Other attributes are:
 *	options: an object that contains settings for the underlaying sortable, ie `group`,`handle`, events etc.
 *	collection: if your `foreach` array is a computed then you would supply the underlaying observableArray that you would like to sort here.
-
+*   manuallyHandleUpdateEvents: a boolean to turn off the change events on update that other polymer elements listen to.
 
 ---
 
@@ -482,7 +540,7 @@ Other attributes are:
   <template is="dom-repeat" items={{names}}>
     <div>{{item}}</div>
   </template>
-<sortable-js>
+</sortable-js>
 ```
 
 ### Method
@@ -543,7 +601,7 @@ Sortable.create(el, {
 		 * @returns {Array}
 		 */
 		get: function (sortable) {
-			var order = localStorage.getItem(sortable.options.group);
+			var order = localStorage.getItem(sortable.options.group.name);
 			return order ? order.split('|') : [];
 		},
 
@@ -553,7 +611,7 @@ Sortable.create(el, {
 		 */
 		set: function (sortable) {
 			var order = sortable.toArray();
-			localStorage.setItem(sortable.options.group, order.join('|'));
+			localStorage.setItem(sortable.options.group.name, order.join('|'));
 		}
 	}
 })
@@ -665,13 +723,13 @@ Now you can use `jquery.fn.sortable.js`:<br/>
 
 ```js
   $("#list").sortable({ /* options */ }); // init
-  
+
   $("#list").sortable("widget"); // get Sortable instance
-  
+
   $("#list").sortable("destroy"); // destroy Sortable instance
-  
+
   $("#list").sortable("{method-name}"); // call an instance method
-  
+
   $("#list").sortable("{method-name}", "foo", "bar"); // call an instance method with parameters
 ```
 
@@ -682,7 +740,7 @@ And `grunt jquery:mySortableFunc` → `jquery.fn.mySortableFunc.js`
 
 ### Contributing (Issue/PR)
 
-Please, [read this](CONTRIBUTING.md). 
+Please, [read this](CONTRIBUTING.md).
 
 
 ---
