@@ -329,6 +329,8 @@
 				nextEl = dragEl.nextSibling;
 				activeGroup = options.group;
 
+				dragEl.style['will-change'] = 'transform';
+
 				dragStartFn = function () {
 					// Delayed drag has been triggered
 					// we can re-enable the events: touchmove/mousemove
@@ -336,7 +338,6 @@
 
 					// Make the element draggable
 					dragEl.draggable = true;
-					dragEl.style.willСhange = 'transform';
 
 					// Chosen item
 					_toggleClass(dragEl, _this.options.chosenClass, true);
@@ -767,7 +768,7 @@
 					}
 
 					_disableDraggable(dragEl);
-					dragEl.style.willChange = '';
+					dragEl.style['will-change'] = '';
 
 					// Remove class's
 					_toggleClass(dragEl, this.options.ghostClass, false);
