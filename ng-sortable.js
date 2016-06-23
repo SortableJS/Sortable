@@ -46,16 +46,16 @@
 
 					var ngRepeat = [].filter.call($element[0].childNodes, function (node) {
 						return (
-								(node.nodeType === 1) &&
-								(node.attributes['ng-repeat'])
-							);
+							node.nodeType === Node.ELEMENT_NODE &&
+							angular.element(node).data('ngRepeat')
+						);
 					})[0];
 
 					if (!ngRepeat) {
 						return;
 					}
 
-					var expression = ngRepeat.attributes['ng-repeat'].nodeValue;
+					var expression = angular.element(ngRepeat).data('ngRepeat');
 					var match = expression.match(/^\s*([\s\S]+?)\s+in\s+([\s\S]+?)(?:\s+as\s+([\s\S]+?))?(?:\s+track\s+by\s+([\s\S]+?))?\s*$/);
 
 					if (!match) {
