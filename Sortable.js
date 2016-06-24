@@ -815,32 +815,34 @@
 				}
 
 			}
+
 			this._nulling();
 		},
 
 		_nulling: function() {
-			// Nulling
-			rootEl =
-			dragEl =
-			parentEl =
-			ghostEl =
-			nextEl =
-			cloneEl =
+			if (Sortable.active === this) {
+				rootEl =
+				dragEl =
+				parentEl =
+				ghostEl =
+				nextEl =
+				cloneEl =
 
-			scrollEl =
-			scrollParentEl =
+				scrollEl =
+				scrollParentEl =
 
-			tapEvt =
-			touchEvt =
+				tapEvt =
+				touchEvt =
 
-			moved =
-			newIndex =
+				moved =
+				newIndex =
 
-			lastEl =
-			lastCSS =
+				lastEl =
+				lastCSS =
 
-			activeGroup =
-			Sortable.active = null;
+				activeGroup =
+				Sortable.active = null;
+			}
 		},
 
 		handleEvent: function (/**Event*/evt) {
