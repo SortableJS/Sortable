@@ -813,9 +813,8 @@
 						this.save();
 					}
 				}
-
+				this._nulling();
 			}
-			this._nulling();
 		},
 
 		_nulling: function() {
