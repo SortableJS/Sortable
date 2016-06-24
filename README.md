@@ -12,7 +12,12 @@ Demo: http://rubaxa.github.io/Sortable/
  * Supports drag handles *and selectable text* (better than voidberg's html5sortable)
  * Smart auto-scrolling
  * Built using native HTML5 drag and drop API
- * Supports [Meteor](https://github.com/SortableJS/meteor), [AngularJS](#ng), [React](#react), [Knockout](https://github.com/SortableJS/knockout-sortablejs) and [Polymer](#polymer)
+ * Supports
+  * [Meteor](https://github.com/SortableJS/meteor)
+  * [AngularJS](#ng)
+  * [React](#react)
+  * [Knockout](https://github.com/SortableJS/knockout-sortablejs)
+  * [Polymer](https://github.com/SortableJS/polymer-sortablejs)
  * Supports any CSS library, e.g. [Bootstrap](#bs)
  * Simple API
  * [CDN](#cdn)
@@ -568,18 +573,6 @@ export class SortableExampleEsnext extends React.Component {
 
 ---
 
-<a name="polymer"></a>
-### Support Polymer
-```html
-
-<link rel="import" href="bower_components/Sortable/Sortable-js.html">
-
-<sortable-js handle=".handle">
-  <template is="dom-repeat" items={{names}}>
-    <div>{{item}}</div>
-  </template>
-</sortable-js>
-```
 
 ### Method
 
