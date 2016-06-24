@@ -37,6 +37,10 @@
 			var removed,
 				nextSibling;
 
+			function getNgRepeatExpression(node) {
+				return node.getAttribute('ng-repeat') || node.getAttribute('data-ng-repeat') || node.getAttribute('x-ng-repeat');
+			}
+
 			// Export
 			return {
 				restrict: 'AC',
@@ -45,18 +49,15 @@
 				compile: function ($element, $attr) {
 
 					var ngRepeat = [].filter.call($element[0].childNodes, function (node) {
-						return (
-								(node.nodeType === 1) &&
-								(node.attributes['ng-repeat'])
-							);
+						return node.nodeType === Node.ELEMENT_NODE && getNgRepeatExpression(node);
 					})[0];
 
 					if (!ngRepeat) {
 						return;
 					}
 
-					var expression = ngRepeat.attributes['ng-repeat'].nodeValue;
-					var match = expression.match(/^\s*([\s\S]+?)\s+in\s+([\s\S]+?)(?:\s+as\s+([\s\S]+?))?(?:\s+track\s+by\s+([\s\S]+?))?\s*$/);
+					var match = getNgRepeatExpression(ngRepeat)
+						.match(/^\s*([\s\S]+?)\s+in\s+([\s\S]+?)(?:\s+as\s+([\s\S]+?))?(?:\s+track\s+by\s+([\s\S]+?))?\s*$/);
 
 					if (!match) {
 						return;
