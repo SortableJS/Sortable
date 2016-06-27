@@ -140,7 +140,7 @@
 				}.bind(this);
 			}, this);
 
-			DOMNode = typeof this.getDOMNode === 'function' ? (this.refs[options.ref] || this).getDOMNode() : this.refs[options.ref] || this;
+			DOMNode = this.refs[options.ref] || this;
 
 			/** @namespace this.refs — http://facebook.github.io/react/docs/more-about-refs.html */
 			this._sortableInstance = Sortable.create(DOMNode, copyOptions);

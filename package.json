@@ -1,6 +1,9 @@
 {
   "name": "sortablejs",
   "exportName": "Sortable",
+  "peerDependencies": {
+    "react": "^0.14.0"
+  },
   "version": "1.4.2",
   "devDependencies": {
     "grunt": "*",
