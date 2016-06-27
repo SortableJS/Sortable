@@ -513,9 +513,10 @@
 			if (tapEvt) {
 				var	options = this.options,
 					fallbackTolerance = options.fallbackTolerance,
+					fallbackOffset = options.fallbackOffset,
 					touch = evt.touches ? evt.touches[0] : evt,
-					dx = (touch.clientX - tapEvt.clientX) + this.options.fallbackOffset.x,
-					dy = (touch.clientY - tapEvt.clientY) + this.options.fallbackOffset.y,
+					dx = (touch.clientX - tapEvt.clientX) + fallbackOffset.x,
+					dy = (touch.clientY - tapEvt.clientY) + fallbackOffset.y,
 					translate3d = evt.touches ? 'translate3d(' + dx + 'px,' + dy + 'px,0)' : 'translate(' + dx + 'px,' + dy + 'px)';
 
 				// only set the status to dragging, when we are actually dragging
