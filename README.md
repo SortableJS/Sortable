@@ -14,7 +14,9 @@ Demo: http://rubaxa.github.io/Sortable/
  * Built using native HTML5 drag and drop API
  * Supports
   * [Meteor](https://github.com/SortableJS/meteor-sortablejs)
-  * [AngularJS](#ng)
+  * [AngularJS]
+    * [2+](https://github.com/SortableJS/angular-sortablejs)
+    * [1.*](https://github.com/SortableJS/angular-legacy-sortablejs)
   * React
     * [ES2015+](https://github.com/SortableJS/react-sortablejs)
     * [Mixin](https://github.com/SortableJS/react-mixin-sortablejs)
@@ -320,49 +322,6 @@ Defines how near the mouse must be to an edge to start scrolling.
 
 #### `scrollSpeed` option
 The speed at which the window should scroll once the mouse pointer gets within the `scrollSensitivity` distance.
-
-
----
-
-
-<a name="ng"></a>
-### Support AngularJS
-Include [ng-sortable.js](ng-sortable.js)
-
-Demo: http://jsbin.com/naduvo/1/edit?html,js,output
-
-```html
-<div ng-app="myApp" ng-controller="demo">
-	<ul ng-sortable>
-		<li ng-repeat="item in items">{{item}}</li>
-	</ul>
-
-	<ul ng-sortable="{ group: 'foobar' }">
-		<li ng-repeat="item in foo">{{item}}</li>
-	</ul>
-
-	<ul ng-sortable="barConfig">
-		<li ng-repeat="item in bar">{{item}}</li>
-	</ul>
-</div>
-```
-
-
-```js
-angular.module('myApp', ['ng-sortable'])
-	.controller('demo', ['$scope', function ($scope) {
-		$scope.items = ['item 1', 'item 2'];
-		$scope.foo = ['foo 1', '..'];
-		$scope.bar = ['bar 1', '..'];
-		$scope.barConfig = {
-			group: 'foobar',
-			animation: 150,
-			onSort: function (/** ngSortEvent */evt){
-				// @see https://github.com/RubaXa/Sortable/blob/master/ng-sortable.js#L18-L24
-			}
-		};
-	}]);
-```
 
 
 ---

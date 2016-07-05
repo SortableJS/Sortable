@@ -1,8 +1,7 @@
 {
   "name": "Sortable",
   "main": [
-    "Sortable.js",
-    "ng-sortable.js"
+    "Sortable.js"
   ],
   "homepage": "http://rubaxa.github.io/Sortable/",
   "authors": [
