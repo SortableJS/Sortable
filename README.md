@@ -13,7 +13,7 @@ Demo: http://rubaxa.github.io/Sortable/
  * Smart auto-scrolling
  * Built using native HTML5 drag and drop API
  * Supports
-  * [Meteor](https://github.com/SortableJS/meteor)
+  * [Meteor](https://github.com/SortableJS/meteor-sortablejs)
   * [AngularJS](#ng)
   * React
     * [ES2015+](https://github.com/SortableJS/react-sortablejs)
