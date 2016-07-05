@@ -11,7 +11,7 @@
     is: "sortable-js",
 
     properties: {
-      group                       : { type: String, value: () => Math.random(), observer: "groupChanged" },
+      group                       : { type: String, value: function () { return Math.random();}, observer: "groupChanged" },
       sort                        : { type: Boolean, value: true, observer: "sortChanged" },
       disabled                    : { type: Boolean, value: false, observer: "disabledChanged" },
       store                       : { type: Object, value: null, observer: "storeChanged" },
@@ -72,12 +72,12 @@
       var template = templates[templates.length-1]
 
       var options = {}
-      Object.keys(this.properties).forEach(key => {
+      Object.keys(this.properties).forEach(function(key)  {
         options[key] = this[key]
-      })
+      }.bind(this));
 
       this.sortable = Sortable.create(this, Object.assign(options, {
-        onUpdate: e => {
+        onUpdate: function (e) {
           if (template) {
             if(manuallyHandleUpdateEvents) {
               template.items.splice(e.newIndex, 0, template.items.splice(e.oldIndex, 1)[0]);
@@ -86,9 +86,9 @@
             }
           }
           this.fire("update", e)
-        },
+        }.bind(this),
 
-        onAdd: e => {
+        onAdd: function (e) {
           if (template) {
             var froms = e.from.querySelectorAll("template[is='dom-repeat']")
             var from = froms[froms.length-1]
@@ -96,34 +96,34 @@
             template.splice("items", e.newIndex, 0, item)
           }
           this.fire("add", e)
-        },
+        }.bind(this),
 
-        onRemove: e => {
+        onRemove: function (e) {
           if (template) {
             template.splice("items", e.oldIndex, 1)[0]
           }
           this.fire("remove", e)
-        },
+        }.bind(this),
 
-        onStart: e => {
+        onStart: function (e) {
           this.fire("start", e)
-        },
+        }.bind(this),
 
-        onEnd: e => {
+        onEnd: function (e) {
           this.fire("end", e)
-        },
+        }.bind(this),
 
-        onSort: e => {
+        onSort: function (e) {
           this.fire("sort", e)
-        },
+        }.bind(this),
 
-        onFilter: e => {
+        onFilter: function (e) {
           this.fire("filter", e)
-        },
+        }.bind(this),
 
-        onMove: e => {
+        onMove: function (e) {
           this.fire("move", e)
-        }
+        }.bind(this)
       }))
 
     },
@@ -139,10 +139,10 @@
     disabledChanged          : function(value) { this.sortable && this.sortable.option("disabled", value) },
     storeChanged             : function(value) { this.sortable && this.sortable.option("store", value) },
     handleChanged            : function(value) { this.sortable && this.sortable.option("handle", value) },
-    scrollChanged           : function(value) { this.sortable && this.sortable.option("scroll", value) },
+    scrollChanged            : function(value) { this.sortable && this.sortable.option("scroll", value) },
     scrollSensitivityChanged : function(value) { this.sortable && this.sortable.option("scrollSensitivity", value) },
     scrollSpeedChanged       : function(value) { this.sortable && this.sortable.option("scrollSpeed", value) },
-    draggableChanged        : function(value) { this.sortable && this.sortable.option("draggable", value) },
+    draggableChanged         : function(value) { this.sortable && this.sortable.option("draggable", value) },
     ghostClassChanged        : function(value) { this.sortable && this.sortable.option("ghostClass", value) },
     chosenClassChanged       : function(value) { this.sortable && this.sortable.option("chosenClass", value) },
     ignoreChanged            : function(value) { this.sortable && this.sortable.option("ignore", value) },
