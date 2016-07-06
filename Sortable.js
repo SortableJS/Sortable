@@ -377,6 +377,8 @@
 				this._lastX = (touch || evt).clientX;
 				this._lastY = (touch || evt).clientY;
 
+				dragEl.style['will-change'] = 'transform';
+
 				dragStartFn = function () {
 					// Delayed drag has been triggered
 					// we can re-enable the events: touchmove/mousemove
@@ -835,6 +837,7 @@
 					}
 
 					_disableDraggable(dragEl);
+					dragEl.style['will-change'] = '';
 
 					// Remove class's
 					_toggleClass(dragEl, this.options.ghostClass, false);
