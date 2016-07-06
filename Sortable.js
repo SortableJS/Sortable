@@ -891,30 +891,28 @@
 
 
 		_nulling: function() {
-			if (Sortable.active === this) {
-				rootEl =
-				dragEl =
-				parentEl =
-				ghostEl =
-				nextEl =
-				cloneEl =
+			rootEl =
+			dragEl =
+			parentEl =
+			ghostEl =
+			nextEl =
+			cloneEl =
 
-				scrollEl =
-				scrollParentEl =
+			scrollEl =
+			scrollParentEl =
 
-				tapEvt =
-				touchEvt =
+			tapEvt =
+			touchEvt =
 
-				moved =
-				newIndex =
+			moved =
+			newIndex =
 
-				lastEl =
-				lastCSS =
+			lastEl =
+			lastCSS =
 
-				putSortable =
-				activeGroup =
-				Sortable.active = null;
-			}
+			putSortable =
+			activeGroup =
+			Sortable.active = null;
 		},
 
 		handleEvent: function (/**Event*/evt) {
