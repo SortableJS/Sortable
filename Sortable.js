@@ -4,7 +4,7 @@
  * @license MIT
  */
 
-(function (factory) {
+(function sortableModule(factory) {
 	"use strict";
 
 	if (typeof define === "function" && define.amd) {
@@ -21,11 +21,11 @@
 		/* jshint sub:true */
 		window["Sortable"] = factory();
 	}
-})(function () {
+})(function sortableFactory() {
 	"use strict";
 
 	if (typeof window == "undefined" || !window.document) {
-		return function SortableError() {
+		return function sortableError() {
 			throw new Error("Sortable.js requires a window with a document");
 		};
 	}
@@ -454,8 +454,11 @@
 			}
 
 			try {
-				if (document.selection) {
-					document.selection.empty();
+				if (document.selection) {					
+					// Timeout neccessary for IE9					
+					setTimeout(function () {
+						document.selection.empty();
+					});					
 				} else {
 					window.getSelection().removeAllRanges();
 				}
@@ -876,6 +879,7 @@
 					}
 
 					if (Sortable.active) {
+						/* jshint eqnull:true */
 						if (newIndex == null || newIndex === -1) {
 							newIndex = oldIndex;
 						}
@@ -891,7 +895,6 @@
 
 			this._nulling();
 		},
-
 
 		_nulling: function() {
 			rootEl =
