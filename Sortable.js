@@ -173,7 +173,7 @@
 
 		_prepareGroup = function (options) {
 			function toFn(value, pull) {
-				if (value === void 0) {
+				if (value === void 0 || value === true) {
 					value = group.name;
 				}
 
