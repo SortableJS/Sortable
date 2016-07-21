@@ -256,7 +256,8 @@
 			fallbackClass: 'sortable-fallback',
 			fallbackOnBody: false,
 			fallbackTolerance: 0,
-			fallbackOffset: {x: 0, y: 0}
+			fallbackOffset: {x: 0, y: 0},
+			unique: false
 		};
 
 
@@ -454,11 +455,11 @@
 			}
 
 			try {
-				if (document.selection) {					
-					// Timeout neccessary for IE9					
+				if (document.selection) {
+					// Timeout neccessary for IE9
 					setTimeout(function () {
 						document.selection.empty();
-					});					
+					});
 				} else {
 					window.getSelection().removeAllRanges();
 				}
@@ -672,6 +673,28 @@
 				dragRect = dragEl.getBoundingClientRect();
 				putSortable = this;
 
+				// Check For PreExisting Element
+				if (options.unique) {
+					if (el !== null) {
+						for (var i = 0; i < el.children.length; i++) {
+
+							if (dragEl !== null) {
+
+								// Look For Second Item
+								if (el.children[i].innerHTML === dragEl.innerHTML) {
+
+									if (!(new RegExp('(\\s|^)' + options.ghostClass + '(\\s|$)').test(el.children[i].className))) {
+										el.children[i].style.display = "none";
+									}
+
+								}
+
+							}
+
+						}
+					}
+				}
+
 				if (revert) {
 					_cloneHide(true);
 					parentEl = rootEl; // actualization
@@ -815,6 +838,28 @@
 			clearInterval(this._loopId);
 			clearInterval(autoScroll.pid);
 			clearTimeout(this._dragStartTimer);
+
+			// Check For PreExisting Element
+			if (options.unique) {
+				if (parentEl !== null) {
+					for (var i = 0; i < parentEl.children.length; i++) {
+
+						if (dragEl !== null) {
+
+							// Look For Second Item
+							if (parentEl.children[i].innerHTML === dragEl.innerHTML) {
+
+								if (parentEl.children[i].style.display === "none") {
+									parentEl.removeChild(parentEl.children[i]);
+								}
+
+							}
+
+						}
+
+					}
+				}
+			}
 
 			// Unbind events
 			_off(document, 'mousemove', this._onTouchMove);
