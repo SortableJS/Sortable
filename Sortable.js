@@ -23,7 +23,7 @@
 	}
 })(function () {
 	"use strict";
-	
+
 	if (typeof window == "undefined" || typeof window.document == "undefined") {
 		return function () {
 			throw new Error("Sortable.js requires a window with a document");
@@ -215,7 +215,8 @@
 			delay: 0,
 			forceFallback: false,
 			fallbackClass: 'sortable-fallback',
-			fallbackOnBody: false
+			fallbackOnBody: false,
+			unique: false
 		};
 
 
@@ -401,11 +402,11 @@
 			}
 
 			try {
-				if (document.selection) {					
-					// Timeout neccessary for IE9					
+				if (document.selection) {
+					// Timeout neccessary for IE9
 					setTimeout(function () {
 						document.selection.empty();
-					});					
+					});
 				} else {
 					window.getSelection().removeAllRanges();
 				}
@@ -594,6 +595,7 @@
 				) &&
 				(evt.rootEl === void 0 || evt.rootEl === this.el) // touch fallback
 			) {
+
 				// Smart auto-scrolling
 				_autoScroll(evt, options, this.el);
 
@@ -603,6 +605,26 @@
 
 				target = _closest(evt.target, options.draggable, el);
 				dragRect = dragEl.getBoundingClientRect();
+
+				// Check For PreExisting Element
+				if (options.unique) {
+					for (var i = 0; i < el.children.length; i++) {
+
+						if (dragEl !== null) {
+
+							// Look For Second Item
+							if (el.children[i].innerHTML === dragEl.innerHTML) {
+
+								if (!(new RegExp('(\\s|^)' + options.ghostClass + '(\\s|$)').test(el.children[i].className))) {
+									el.children[i].style.display = "none";
+								}
+
+							}
+
+						}
+
+					}
+				}
 
 				if (revert) {
 					_cloneHide(true);
@@ -616,7 +638,6 @@
 
 					return;
 				}
-
 
 				if ((el.children.length === 0) || (el.children[0] === ghostEl) ||
 					(el === evt.target) && (target = _ghostIsLast(el, evt))
@@ -648,7 +669,6 @@
 						lastCSS = _css(target);
 						lastParentCSS = _css(target.parentNode);
 					}
-
 
 					var targetRect = target.getBoundingClientRect(),
 						width = targetRect.right - targetRect.left,
@@ -697,6 +717,7 @@
 
 						this._animate(dragRect, dragEl);
 						this._animate(targetRect, target);
+
 					}
 				}
 			}
@@ -744,6 +765,26 @@
 			clearInterval(this._loopId);
 			clearInterval(autoScroll.pid);
 			clearTimeout(this._dragStartTimer);
+
+			// Check For PreExisting Element
+			if (options.unique) {
+				for (var i = 0; i < parentEl.children.length; i++) {
+
+					if (dragEl !== null) {
+
+						// Look For Second Item
+						if (parentEl.children[i].innerHTML === dragEl.innerHTML) {
+
+							if (parentEl.children[i].style.display === "none") {
+								parentEl.removeChild(parentEl.children[i]);
+							}
+
+						}
+
+					}
+
+				}
+			}
 
 			// Unbind events
 			_off(document, 'mousemove', this._onTouchMove);
