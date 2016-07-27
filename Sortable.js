@@ -213,6 +213,7 @@
 			dragoverBubble: false,
 			dataIdAttr: 'data-id',
 			delay: 0,
+			disabledPointerEvents: false,
 			forceFallback: false,
 			fallbackClass: 'sortable-fallback',
 			fallbackOnBody: false
@@ -434,7 +435,9 @@
 				this._lastX = touchEvt.clientX;
 				this._lastY = touchEvt.clientY;
 
-				if (!supportCssPointerEvents) {
+				var disabledPointerEvents = !supportCssPointerEvents || this.options.disabledPointerEvents;
+
+				if (disabledPointerEvents) {
 					_css(ghostEl, 'display', 'none');
 				}
 
@@ -464,7 +467,7 @@
 					while (parent = parent.parentNode);
 				}
 
-				if (!supportCssPointerEvents) {
+				if (disabledPointerEvents) {
 					_css(ghostEl, 'display', '');
 				}
 			}
