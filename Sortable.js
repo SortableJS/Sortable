@@ -824,7 +824,7 @@
 		},
 
 		_nulling: function () {
-			if (Sortable.active === this) {
+			if (Sortable.active === this || !Sortable.active) {
 				rootEl =
 				dragEl =
 				parentEl =
