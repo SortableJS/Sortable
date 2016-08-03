@@ -102,6 +102,7 @@
           if (template && this.group && !(this.group.pull ==='clone' || this.group.pull === false)) {
             template.splice("items", e.oldIndex, 1)[0]
           }
+          this.toggleClass(this.chosenClass, false, e.clone);
           this.fire("remove", e)
         },
 
