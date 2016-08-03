@@ -11,7 +11,7 @@
     is: "sortable-js",
 
     properties: {
-      group                       : { type: String, value: () => Math.random(), observer: "groupChanged" },
+      group                       : { type: Object, value: () => {return {name: Math.random()};}, observer: "groupChanged" },
       sort                        : { type: Boolean, value: true, observer: "sortChanged" },
       disabled                    : { type: Boolean, value: false, observer: "disabledChanged" },
       store                       : { type: Object, value: null, observer: "storeChanged" },
@@ -134,7 +134,7 @@
       }
     },
 
-    groupChanged             : function(value) { this.sortable && this.sortable.option("group", value) },
+    groupChanged             : function(value) { this.sortable && this.sortable.option("group", typeof (value) === 'string' ? {name: value} : value )},
     sortChanged              : function(value) { this.sortable && this.sortable.option("sort", value) },
     disabledChanged          : function(value) { this.sortable && this.sortable.option("disabled", value) },
     storeChanged             : function(value) { this.sortable && this.sortable.option("store", value) },
