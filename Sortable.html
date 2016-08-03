@@ -11,7 +11,7 @@
     is: "sortable-js",
 
     properties: {
-      group                       : { type: String, value: () => Math.random(), observer: "groupChanged" },
+      group                       : { type: Object, value: () => {return {name: Math.random()};}, observer: "groupChanged" },
       sort                        : { type: Boolean, value: true, observer: "sortChanged" },
       disabled                    : { type: Boolean, value: false, observer: "disabledChanged" },
       store                       : { type: Object, value: null, observer: "storeChanged" },
@@ -79,7 +79,7 @@
       this.sortable = Sortable.create(this, Object.assign(options, {
         onUpdate: e => {
           if (template) {
-            if(manuallyHandleUpdateEvents) {
+            if(this.manuallyHandleUpdateEvents) {
               template.items.splice(e.newIndex, 0, template.items.splice(e.oldIndex, 1)[0]);
             } else {
               template.splice("items", e.newIndex, 0, template.splice("items", e.oldIndex, 1)[0])
@@ -89,7 +89,7 @@
         },
 
         onAdd: e => {
-          if (template) {
+          if (template && this.group && (this.group.put !== false)) {
             var froms = e.from.querySelectorAll("template[is='dom-repeat']")
             var from = froms[froms.length-1]
             var item = from.items[e.oldIndex]
@@ -99,9 +99,10 @@
         },
 
         onRemove: e => {
-          if (template) {
+          if (template && this.group && !(this.group.pull ==='clone' || this.group.pull === false)) {
             template.splice("items", e.oldIndex, 1)[0]
           }
+          this.toggleClass(this.chosenClass, false, e.clone);
           this.fire("remove", e)
         },
 
@@ -134,7 +135,7 @@
       }
     },
 
-    groupChanged             : function(value) { this.sortable && this.sortable.option("group", value) },
+    groupChanged             : function(value) { this.sortable && this.sortable.option("group", typeof (value) === 'string' ? {name: value} : value )},
     sortChanged              : function(value) { this.sortable && this.sortable.option("sort", value) },
     disabledChanged          : function(value) { this.sortable && this.sortable.option("disabled", value) },
     storeChanged             : function(value) { this.sortable && this.sortable.option("store", value) },
