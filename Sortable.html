@@ -89,7 +89,7 @@
         },
 
         onAdd: e => {
-          if (template) {
+          if (template && this.group && (this.group.put !== false)) {
             var froms = e.from.querySelectorAll("template[is='dom-repeat']")
             var from = froms[froms.length-1]
             var item = from.items[e.oldIndex]
@@ -99,7 +99,7 @@
         },
 
         onRemove: e => {
-          if (template) {
+          if (template && this.group && !(this.group.pull ==='clone' || this.group.pull === false)) {
             template.splice("items", e.oldIndex, 1)[0]
           }
           this.fire("remove", e)
