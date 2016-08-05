@@ -265,6 +265,10 @@
 				originalTarget = target,
 				filter = options.filter;
 
+			if (options.handle && !_closest(originalTarget, options.handle, el)) {
+				return;
+			}
+
 
 			if (type === 'mousedown' && evt.button !== 0 || options.disabled) {
 				return; // only left button or enabled
@@ -301,11 +305,6 @@
 					evt.preventDefault();
 					return; // cancel dnd
 				}
-			}
-
-
-			if (options.handle && !_closest(originalTarget, options.handle, el)) {
-				return;
 			}
 
 
