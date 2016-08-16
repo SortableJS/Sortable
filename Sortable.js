@@ -262,9 +262,17 @@
 				type = evt.type,
 				touch = evt.touches && evt.touches[0],
 				target = (touch || evt).target,
-				originalTarget = target,
 				filter = options.filter;
 
+			var originalTarget;
+			if (evt.target.shadowRoot !== null)
+			{
+				originalTarget = path[0];
+			}
+			else
+			{
+				originalTarget = target;
+			}
 
 			if (type === 'mousedown' && evt.button !== 0 || options.disabled) {
 				return; // only left button or enabled
@@ -1002,12 +1010,23 @@
 				) {
 					return el;
 				}
+
+				if ('host' in el)
+				{
+					el = el.host;
+				}
+				else
+				{
+					el = el.parentNode;
+				}
 			}
-			while (el !== ctx && (el = el.parentNode));
+			while (el !== ctx && el);
 		}
 
 		return null;
 	}
+
+
 
 
 	function _globalDragOver(/**Event*/evt) {
