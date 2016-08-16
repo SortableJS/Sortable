@@ -267,7 +267,7 @@
 			var originalTarget;
 			if (evt.target.shadowRoot !== null)
 			{
-				originalTarget = path[0];
+				originalTarget = evt.path[0];
 			}
 			else
 			{
