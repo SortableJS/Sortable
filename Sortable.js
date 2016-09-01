@@ -518,7 +518,7 @@
 				_css(ghostEl, 'zIndex', '100000');
 				_css(ghostEl, 'pointerEvents', 'none');
 
-				options.fallbackOnBody && document.body.appendChild(ghostEl) || rootEl.appendChild(ghostEl);
+				options.fallbackOnBody && _insertChild(document.body, ghostEl) || _insertChild(rootEl, ghostEl);
 
 				// Fixing dimensions.
 				ghostRect = ghostEl.getBoundingClientRect();
@@ -536,7 +536,7 @@
 			if (activeGroup.pull == 'clone') {
 				cloneEl = dragEl.cloneNode(true);
 				_css(cloneEl, 'display', 'none');
-				rootEl.insertBefore(cloneEl, dragEl);
+				_insertChild(rootEl, cloneEl, dragEl);
 			}
 
 			if (useFallback) {
@@ -607,10 +607,10 @@
 					_cloneHide(true);
 
 					if (cloneEl || nextEl) {
-						rootEl.insertBefore(dragEl, cloneEl || nextEl);
+						_tryInsertOrAppendChild(rootEl, dragEl, cloneEl || nextEl);
 					}
 					else if (!canSort) {
-						rootEl.appendChild(dragEl);
+						_insertChild(rootEl, dragEl);
 					}
 
 					return;
@@ -633,7 +633,7 @@
 
 					if (_onMove(rootEl, el, dragEl, dragRect, target, targetRect) !== false) {
 						if (!dragEl.contains(el)) {
-							el.appendChild(dragEl);
+							_insertChild(el, dragEl);
 							parentEl = el; // actualization
 						}
 
@@ -686,9 +686,13 @@
 
 						if (!dragEl.contains(el)) {
 							if (after && !nextSibling) {
-								el.appendChild(dragEl);
+								_insertChild(el, dragEl);
 							} else {
-								target.parentNode.insertBefore(dragEl, after ? nextSibling : target);
+								_tryInsertOrAppendChild(
+									target.parentNode,
+									dragEl,
+									after ? nextSibling : target
+								);
 							}
 						}
 
@@ -760,7 +764,7 @@
 					!options.dropBubble && evt.stopPropagation();
 				}
 
-				ghostEl && ghostEl.parentNode.removeChild(ghostEl);
+				ghostEl && _removeChild(ghostEl.parentNode, ghostEl);
 
 				if (dragEl) {
 					if (this.nativeDraggable) {
@@ -790,7 +794,7 @@
 					}
 					else {
 						// Remove clone
-						cloneEl && cloneEl.parentNode.removeChild(cloneEl);
+						cloneEl && _removeChild(cloneEl.parentNode, cloneEl);
 
 						if (dragEl.nextSibling !== nextEl) {
 							// Get the index of the dragged element within its parent
@@ -903,8 +907,8 @@
 
 			order.forEach(function (id) {
 				if (items[id]) {
-					rootEl.removeChild(items[id]);
-					rootEl.appendChild(items[id]);
+					_removeChild(rootEl, items[id]);
+					_insertChild(rootEl, items[id]);
 				}
 			});
 		},
@@ -984,7 +988,7 @@
 	function _cloneHide(state) {
 		if (cloneEl && (cloneEl.state !== state)) {
 			_css(cloneEl, 'display', state ? 'none' : '');
-			!state && cloneEl.state && rootEl.insertBefore(cloneEl, dragEl);
+			!state && cloneEl.state && _insertChild(rootEl, cloneEl, dragEl);
 			cloneEl.state = state;
 		}
 	}
@@ -1244,6 +1248,21 @@
 		return dst;
 	}
 
+	function _insertChild(parent, newNode, refNode) {
+		parent.insertBefore(newNode, refNode);
+	}
+
+	function _tryInsertOrAppendChild(parent, newNode, refNode) {
+		try {
+			parent.insertBefore(newNode, refNode);
+		} catch (err) {
+			_insertChild(parent, newNode);
+		}
+	}
+
+	function _removeChild(parent, node) {
+		parent.removeChild(parent, node);
+	}
 
 	// Export utils
 	Sortable.utils = {
@@ -1258,7 +1277,10 @@
 		throttle: _throttle,
 		closest: _closest,
 		toggleClass: _toggleClass,
-		index: _index
+		index: _index,
+		insertChild: _insertChild,
+		tryInsertOrAppendChild: _tryInsertOrAppendChild,
+		removeChild: _removeChild
 	};
 
 
