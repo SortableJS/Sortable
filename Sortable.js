@@ -262,9 +262,8 @@
 				type = evt.type,
 				touch = evt.touches && evt.touches[0],
 				target = (touch || evt).target,
-				originalTarget = target,
+				originalTarget = evt.target.shadowRoot && evt.path[0] || target,
 				filter = options.filter;
-
 
 			if (type === 'mousedown' && evt.button !== 0 || options.disabled) {
 				return; // only left button or enabled
@@ -1003,11 +1002,13 @@
 					return el;
 				}
 			}
-			while (el !== ctx && (el = el.parentNode));
+			while (el = ('host' in el) ? el.host : el.parentNode)
 		}
 
 		return null;
 	}
+
+
 
 
 	function _globalDragOver(/**Event*/evt) {
