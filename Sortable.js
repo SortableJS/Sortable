@@ -1149,7 +1149,7 @@
 		var lastEl = el.lastElementChild,
 				rect = lastEl.getBoundingClientRect();
 
-		return ((evt.clientY - (rect.top + rect.height) > 5) || (evt.clientX - (rect.right + rect.width) > 5)) && lastEl; // min delta
+		return ((evt.clientY - (rect.top + rect.height) > 5) || (evt.clientX - (rect.left + rect.width) > 5)) && lastEl; // min delta
 	}
 
 
