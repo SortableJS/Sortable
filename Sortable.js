@@ -1002,13 +1002,18 @@
 					return el;
 				}
 			}
-			while (el = ('host' in el) ? el.host : el.parentNode)
+			while (el = _getParentOrHost(el))
 		}
 
 		return null;
 	}
 
 
+	function _getParentOrHost(el) {
+		var parent = el.host;
+
+		return (parent && parent.nodeType) ? parent : el.parentNode;
+	}
 
 
 	function _globalDragOver(/**Event*/evt) {
