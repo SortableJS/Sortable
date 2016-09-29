@@ -39,6 +39,21 @@ Demo: http://rubaxa.github.io/Sortable/
 
 <br/>
 
+### Install
+
+Via npm
+
+```bash
+$ npm install sortablejs --save
+```
+
+Via bower:
+
+```bash
+$ bower install --save sortablejs
+```
+
+<br/>
 
 ### Usage
 ```html
