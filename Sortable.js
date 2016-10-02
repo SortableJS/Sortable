@@ -4,8 +4,7 @@
  * @license MIT
  */
 
-
-(function (factory) {
+(function sortableModule(factory) {
 	"use strict";
 
 	if (typeof define === "function" && define.amd) {
@@ -15,14 +14,21 @@
 		module.exports = factory();
 	}
 	else if (typeof Package !== "undefined") {
+		//noinspection JSUnresolvedVariable
 		Sortable = factory();  // export for Meteor.js
 	}
 	else {
 		/* jshint sub:true */
 		window["Sortable"] = factory();
 	}
-})(function () {
+})(function sortableFactory() {
 	"use strict";
+
+	if (typeof window == "undefined" || !window.document) {
+		return function sortableError() {
+			throw new Error("Sortable.js requires a window with a document");
+		};
+	}
 
 	var dragEl,
 		parentEl,
@@ -33,6 +39,7 @@
 
 		scrollEl,
 		scrollParentEl,
+		scrollCustomFn,
 
 		lastEl,
 		lastCSS,
@@ -42,6 +49,8 @@
 		newIndex,
 
 		activeGroup,
+		putSortable,
+
 		autoScroll = {},
 
 		tapEvt,
@@ -58,8 +67,15 @@
 		document = win.document,
 		parseInt = win.parseInt,
 
+		$ = win.jQuery || win.Zepto,
+		Polymer = win.Polymer,
+
 		supportDraggable = !!('draggable' in document.createElement('div')),
 		supportCssPointerEvents = (function (el) {
+			// false when IE11
+			if (!!navigator.userAgent.match(/Trident.*rv[ :]?11\./)) {
+				return false;
+			}
 			el = document.createElement('x');
 			el.style.cssText = 'pointer-events:auto';
 			return el.style.pointerEvents === 'auto';
@@ -68,6 +84,7 @@
 		_silent = false,
 
 		abs = Math.abs,
+		min = Math.min,
 		slice = [].slice,
 
 		touchDragOverListeners = [],
@@ -87,13 +104,17 @@
 					winHeight = window.innerHeight,
 
 					vx,
-					vy
+					vy,
+
+					scrollOffsetX,
+					scrollOffsetY
 				;
 
 				// Delect scrollEl
 				if (scrollParentEl !== rootEl) {
 					scrollEl = options.scroll;
 					scrollParentEl = rootEl;
+					scrollCustomFn = options.scrollFn;
 
 					if (scrollEl === true) {
 						scrollEl = rootEl;
@@ -135,11 +156,18 @@
 
 					if (el) {
 						autoScroll.pid = setInterval(function () {
+							scrollOffsetY = vy ? vy * speed : 0;
+							scrollOffsetX = vx ? vx * speed : 0;
+
+							if ('function' === typeof(scrollCustomFn)) {
+								return scrollCustomFn.call(_this, scrollOffsetX, scrollOffsetY, evt);
+							}
+
 							if (el === win) {
-								win.scrollTo(win.pageXOffset + vx * speed, win.pageYOffset + vy * speed);
+								win.scrollTo(win.pageXOffset + scrollOffsetX, win.pageYOffset + scrollOffsetY);
 							} else {
-								vy && (el.scrollTop += vy * speed);
-								vx && (el.scrollLeft += vx * speed);
+								el.scrollTop += scrollOffsetY;
+								el.scrollLeft += scrollOffsetX;
 							}
 						}, 24);
 					}
@@ -148,19 +176,39 @@
 		}, 30),
 
 		_prepareGroup = function (options) {
-			var group = options.group;
+			function toFn(value, pull) {
+				if (value === void 0 || value === true) {
+					value = group.name;
+				}
 
-			if (!group || typeof group != 'object') {
-				group = options.group = {name: group};
+				if (typeof value === 'function') {
+					return value;
+				} else {
+					return function (to, from) {
+						var fromGroup = from.options.group.name;
+
+						return pull
+							? value
+							: value && (value.join
+								? value.indexOf(fromGroup) > -1
+								: (fromGroup == value)
+							);
+					};
+				}
 			}
 
-			['pull', 'put'].forEach(function (key) {
-				if (!(key in group)) {
-					group[key] = true;
-				}
-			});
+			var group = {};
+			var originalGroup = options.group;
 
-			options.groups = ' ' + group.name + (group.put.join ? ' ' + group.put.join(' ') : '') + ' ';
+			if (!originalGroup || typeof originalGroup != 'object') {
+				originalGroup = {name: originalGroup};
+			}
+
+			group.name = originalGroup.name;
+			group.checkPull = toFn(originalGroup.pull, true);
+			group.checkPut = toFn(originalGroup.put);
+
+			options.group = group;
 		}
 	;
 
@@ -197,6 +245,7 @@
 			draggable: /[uo]l/i.test(el.nodeName) ? 'li' : '>*',
 			ghostClass: 'sortable-ghost',
 			chosenClass: 'sortable-chosen',
+			dragClass: 'sortable-drag',
 			ignore: 'a, img',
 			filter: null,
 			animation: 0,
@@ -209,7 +258,9 @@
 			delay: 0,
 			forceFallback: false,
 			fallbackClass: 'sortable-fallback',
-			fallbackOnBody: false
+			fallbackOnBody: false,
+			fallbackTolerance: 0,
+			fallbackOffset: {x: 0, y: 0}
 		};
 
 
@@ -222,7 +273,7 @@
 
 		// Bind all private methods
 		for (var fn in this) {
-			if (fn.charAt(0) === '_') {
+			if (fn.charAt(0) === '_' && typeof this[fn] === 'function') {
 				this[fn] = this[fn].bind(this);
 			}
 		}
@@ -256,12 +307,21 @@
 				type = evt.type,
 				touch = evt.touches && evt.touches[0],
 				target = (touch || evt).target,
-				originalTarget = target,
-				filter = options.filter;
+				originalTarget = evt.target.shadowRoot && evt.path[0] || target,
+				filter = options.filter,
+				startIndex;
 
+			// Don't trigger start event when an element is been dragged, otherwise the evt.oldindex always wrong when set option.group.
+			if (dragEl) {
+				return;
+			}
 
 			if (type === 'mousedown' && evt.button !== 0 || options.disabled) {
 				return; // only left button or enabled
+			}
+
+			if (options.handle && !_closest(originalTarget, options.handle, el)) {
+				return;
 			}
 
 			target = _closest(target, options.draggable, el);
@@ -270,13 +330,13 @@
 				return;
 			}
 
-			// get the index of the dragged element within its parent
-			oldIndex = _index(target);
+			// Get the index of the dragged element within its parent
+			startIndex = _index(target, options.draggable);
 
 			// Check filter
 			if (typeof filter === 'function') {
 				if (filter.call(this, evt, target, this)) {
-					_dispatchEvent(_this, originalTarget, 'filter', target, el, oldIndex);
+					_dispatchEvent(_this, originalTarget, 'filter', target, el, startIndex);
 					evt.preventDefault();
 					return; // cancel dnd
 				}
@@ -286,7 +346,7 @@
 					criteria = _closest(originalTarget, criteria.trim(), el);
 
 					if (criteria) {
-						_dispatchEvent(_this, criteria, 'filter', target, el, oldIndex);
+						_dispatchEvent(_this, criteria, 'filter', target, el, startIndex);
 						return true;
 					}
 				});
@@ -297,17 +357,11 @@
 				}
 			}
 
-
-			if (options.handle && !_closest(originalTarget, options.handle, el)) {
-				return;
-			}
-
-
 			// Prepare `dragstart`
-			this._prepareDragStart(evt, touch, target);
+			this._prepareDragStart(evt, touch, target, startIndex);
 		},
 
-		_prepareDragStart: function (/** Event */evt, /** Touch */touch, /** HTMLElement */target) {
+		_prepareDragStart: function (/** Event */evt, /** Touch */touch, /** HTMLElement */target, /** Number */startIndex) {
 			var _this = this,
 				el = _this.el,
 				options = _this.options,
@@ -322,6 +376,12 @@
 				parentEl = dragEl.parentNode;
 				nextEl = dragEl.nextSibling;
 				activeGroup = options.group;
+				oldIndex = startIndex;
+
+				this._lastX = (touch || evt).clientX;
+				this._lastY = (touch || evt).clientY;
+
+				dragEl.style['will-change'] = 'transform';
 
 				dragStartFn = function () {
 					// Delayed drag has been triggered
@@ -329,13 +389,16 @@
 					_this._disableDelayedDrag();
 
 					// Make the element draggable
-					dragEl.draggable = true;
+					dragEl.draggable = _this.nativeDraggable;
 
 					// Chosen item
-					_toggleClass(dragEl, _this.options.chosenClass, true);
+					_toggleClass(dragEl, options.chosenClass, true);
 
 					// Bind the events: dragstart/dragend
 					_this._triggerDragStart(touch);
+
+					// Drag start event
+					_dispatchEvent(_this, rootEl, 'choose', dragEl, rootEl, oldIndex);
 				};
 
 				// Disable "draggable"
@@ -395,8 +458,11 @@
 			}
 
 			try {
-				if (document.selection) {
-					document.selection.empty();
+				if (document.selection) {					
+					// Timeout neccessary for IE9					
+					setTimeout(function () {
+						document.selection.empty();
+					});					
 				} else {
 					window.getSelection().removeAllRanges();
 				}
@@ -406,8 +472,11 @@
 
 		_dragStarted: function () {
 			if (rootEl && dragEl) {
+				var options = this.options;
+
 				// Apply effect
-				_toggleClass(dragEl, this.options.ghostClass, true);
+				_toggleClass(dragEl, options.ghostClass, true);
+				_toggleClass(dragEl, options.dragClass, false);
 
 				Sortable.active = this;
 
@@ -431,12 +500,11 @@
 
 				var target = document.elementFromPoint(touchEvt.clientX, touchEvt.clientY),
 					parent = target,
-					groupName = ' ' + this.options.group.name + '',
 					i = touchDragOverListeners.length;
 
 				if (parent) {
 					do {
-						if (parent[expando] && parent[expando].options.groups.indexOf(groupName) > -1) {
+						if (parent[expando]) {
 							while (i--) {
 								touchDragOverListeners[i]({
 									clientX: touchEvt.clientX,
@@ -464,18 +532,27 @@
 
 		_onTouchMove: function (/**TouchEvent*/evt) {
 			if (tapEvt) {
+				var	options = this.options,
+					fallbackTolerance = options.fallbackTolerance,
+					fallbackOffset = options.fallbackOffset,
+					touch = evt.touches ? evt.touches[0] : evt,
+					dx = (touch.clientX - tapEvt.clientX) + fallbackOffset.x,
+					dy = (touch.clientY - tapEvt.clientY) + fallbackOffset.y,
+					translate3d = evt.touches ? 'translate3d(' + dx + 'px,' + dy + 'px,0)' : 'translate(' + dx + 'px,' + dy + 'px)';
+
 				// only set the status to dragging, when we are actually dragging
 				if (!Sortable.active) {
+					if (fallbackTolerance &&
+						min(abs(touch.clientX - this._lastX), abs(touch.clientY - this._lastY)) < fallbackTolerance
+					) {
+						return;
+					}
+
 					this._dragStarted();
 				}
 
 				// as well as creating the ghost element on the document body
 				this._appendGhost();
-
-				var touch = evt.touches ? evt.touches[0] : evt,
-					dx = touch.clientX - tapEvt.clientX,
-					dy = touch.clientY - tapEvt.clientY,
-					translate3d = evt.touches ? 'translate3d(' + dx + 'px,' + dy + 'px,0)' : 'translate(' + dx + 'px,' + dy + 'px)';
 
 				moved = true;
 				touchEvt = touch;
@@ -500,6 +577,7 @@
 
 				_toggleClass(ghostEl, options.ghostClass, false);
 				_toggleClass(ghostEl, options.fallbackClass, true);
+				_toggleClass(ghostEl, options.dragClass, true);
 
 				_css(ghostEl, 'top', rect.top - parseInt(css.marginTop, 10));
 				_css(ghostEl, 'left', rect.left - parseInt(css.marginLeft, 10));
@@ -525,14 +603,16 @@
 
 			this._offUpEvents();
 
-			if (activeGroup.pull == 'clone') {
-				cloneEl = dragEl.cloneNode(true);
+			if (activeGroup.checkPull(this, this, dragEl, evt) == 'clone') {
+				cloneEl = _clone(dragEl);
 				_css(cloneEl, 'display', 'none');
 				rootEl.insertBefore(cloneEl, dragEl);
+				_dispatchEvent(this, rootEl, 'clone', dragEl);
 			}
 
-			if (useFallback) {
+			_toggleClass(dragEl, options.dragClass, true);
 
+			if (useFallback) {
 				if (useFallback === 'touch') {
 					// Bind touch events
 					_on(document, 'touchmove', this._onTouchMove);
@@ -561,10 +641,11 @@
 			var el = this.el,
 				target,
 				dragRect,
+				targetRect,
 				revert,
 				options = this.options,
 				group = options.group,
-				groupPut = group.put,
+				activeSortable = Sortable.active,
 				isOwner = (activeGroup === group),
 				canSort = options.sort;
 
@@ -578,9 +659,9 @@
 			if (activeGroup && !options.disabled &&
 				(isOwner
 					? canSort || (revert = !rootEl.contains(dragEl)) // Reverting item into the original list
-					: activeGroup.pull && groupPut && (
-						(activeGroup.name === group.name) || // by Name
-						(groupPut.indexOf && ~groupPut.indexOf(activeGroup.name)) // by Array
+					: (
+						putSortable === this ||
+						activeGroup.checkPull(this, activeSortable, dragEl, evt) && group.checkPut(this, activeSortable, dragEl, evt)
 					)
 				) &&
 				(evt.rootEl === void 0 || evt.rootEl === this.el) // touch fallback
@@ -594,9 +675,11 @@
 
 				target = _closest(evt.target, options.draggable, el);
 				dragRect = dragEl.getBoundingClientRect();
+				putSortable = this;
 
 				if (revert) {
 					_cloneHide(true);
+					parentEl = rootEl; // actualization
 
 					if (cloneEl || nextEl) {
 						rootEl.insertBefore(dragEl, cloneEl || nextEl);
@@ -612,7 +695,6 @@
 				if ((el.children.length === 0) || (el.children[0] === ghostEl) ||
 					(el === evt.target) && (target = _ghostIsLast(el, evt))
 				) {
-
 					if (target) {
 						if (target.animated) {
 							return;
@@ -623,7 +705,7 @@
 
 					_cloneHide(isOwner);
 
-					if (_onMove(rootEl, el, dragEl, dragRect, target, targetRect) !== false) {
+					if (_onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt) !== false) {
 						if (!dragEl.contains(el)) {
 							el.appendChild(dragEl);
 							parentEl = el; // actualization
@@ -640,9 +722,9 @@
 						lastParentCSS = _css(target.parentNode);
 					}
 
+					targetRect = target.getBoundingClientRect();
 
-					var targetRect = target.getBoundingClientRect(),
-						width = targetRect.right - targetRect.left,
+					var width = targetRect.right - targetRect.left,
 						height = targetRect.bottom - targetRect.top,
 						floating = /left|right|inline/.test(lastCSS.cssFloat + lastCSS.display)
 							|| (lastParentCSS.display == 'flex' && lastParentCSS['flex-direction'].indexOf('row') === 0),
@@ -650,7 +732,7 @@
 						isLong = (target.offsetHeight > dragEl.offsetHeight),
 						halfway = (floating ? (evt.clientX - targetRect.left) / width : (evt.clientY - targetRect.top) / height) > 0.5,
 						nextSibling = target.nextElementSibling,
-						moveVector = _onMove(rootEl, el, dragEl, dragRect, target, targetRect),
+						moveVector = _onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt),
 						after
 					;
 
@@ -669,6 +751,9 @@
 
 							if (elTop === tgTop) {
 								after = (target.previousElementSibling === dragEl) && !isWide || halfway && isWide;
+							}
+							else if (target.previousElementSibling === dragEl || dragEl.previousElementSibling === target) {
+								after = (evt.clientY - targetRect.top) / height > 0.5;
 							} else {
 								after = tgTop > elTop;
 							}
@@ -760,24 +845,26 @@
 					}
 
 					_disableDraggable(dragEl);
+					dragEl.style['will-change'] = '';
 
 					// Remove class's
 					_toggleClass(dragEl, this.options.ghostClass, false);
 					_toggleClass(dragEl, this.options.chosenClass, false);
 
 					if (rootEl !== parentEl) {
-						newIndex = _index(dragEl);
+						newIndex = _index(dragEl, options.draggable);
 
 						if (newIndex >= 0) {
-							// drag from one list and drop into another
-							_dispatchEvent(null, parentEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
-							_dispatchEvent(this, rootEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
 
 							// Add event
 							_dispatchEvent(null, parentEl, 'add', dragEl, rootEl, oldIndex, newIndex);
 
 							// Remove event
 							_dispatchEvent(this, rootEl, 'remove', dragEl, rootEl, oldIndex, newIndex);
+
+							// drag from one list and drop into another
+							_dispatchEvent(null, parentEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
+							_dispatchEvent(this, rootEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
 						}
 					}
 					else {
@@ -786,7 +873,7 @@
 
 						if (dragEl.nextSibling !== nextEl) {
 							// Get the index of the dragged element within its parent
-							newIndex = _index(dragEl);
+							newIndex = _index(dragEl, options.draggable);
 
 							if (newIndex >= 0) {
 								// drag & drop within the same list
@@ -797,7 +884,8 @@
 					}
 
 					if (Sortable.active) {
-						if (newIndex === null || newIndex === -1) {
+						/* jshint eqnull:true */
+						if (newIndex == null || newIndex === -1) {
 							newIndex = oldIndex;
 						}
 
@@ -808,31 +896,35 @@
 					}
 				}
 
-				// Nulling
-				rootEl =
-				dragEl =
-				parentEl =
-				ghostEl =
-				nextEl =
-				cloneEl =
-
-				scrollEl =
-				scrollParentEl =
-
-				tapEvt =
-				touchEvt =
-
-				moved =
-				newIndex =
-
-				lastEl =
-				lastCSS =
-
-				activeGroup =
-				Sortable.active = null;
 			}
+
+			this._nulling();
 		},
 
+		_nulling: function() {
+			rootEl =
+			dragEl =
+			parentEl =
+			ghostEl =
+			nextEl =
+			cloneEl =
+
+			scrollEl =
+			scrollParentEl =
+
+			tapEvt =
+			touchEvt =
+
+			moved =
+			newIndex =
+
+			lastEl =
+			lastCSS =
+
+			putSortable =
+			activeGroup =
+			Sortable.active = null;
+		},
 
 		handleEvent: function (/**Event*/evt) {
 			var type = evt.type;
@@ -979,25 +1071,23 @@
 	function _closest(/**HTMLElement*/el, /**String*/selector, /**HTMLElement*/ctx) {
 		if (el) {
 			ctx = ctx || document;
-			selector = selector.split('.');
-
-			var tag = selector.shift().toUpperCase(),
-				re = new RegExp('\\s(' + selector.join('|') + ')(?=\\s)', 'g');
 
 			do {
-				if (
-					(tag === '>*' && el.parentNode === ctx) || (
-						(tag === '' || el.nodeName.toUpperCase() == tag) &&
-						(!selector.length || ((' ' + el.className + ' ').match(re) || []).length == selector.length)
-					)
-				) {
+				if ((selector === '>*' && el.parentNode === ctx) || _matches(el, selector)) {
 					return el;
 				}
-			}
-			while (el !== ctx && (el = el.parentNode));
+				/* jshint boss:true */
+			} while (el = _getParentOrHost(el));
 		}
 
 		return null;
+	}
+
+
+	function _getParentOrHost(el) {
+		var parent = el.host;
+
+		return (parent && parent.nodeType) ? parent : el.parentNode;
 	}
 
 
@@ -1076,8 +1166,10 @@
 
 
 	function _dispatchEvent(sortable, rootEl, name, targetEl, fromEl, startIndex, newIndex) {
+		sortable = (sortable || rootEl[expando]);
+
 		var evt = document.createEvent('Event'),
-			options = (sortable || rootEl[expando]).options,
+			options = sortable.options,
 			onName = 'on' + name.charAt(0).toUpperCase() + name.substr(1);
 
 		evt.initEvent(name, true, true);
@@ -1098,7 +1190,7 @@
 	}
 
 
-	function _onMove(fromEl, toEl, dragEl, dragRect, targetEl, targetRect) {
+	function _onMove(fromEl, toEl, dragEl, dragRect, targetEl, targetRect, originalEvt) {
 		var evt,
 			sortable = fromEl[expando],
 			onMoveFn = sortable.options.onMove,
@@ -1117,7 +1209,7 @@
 		fromEl.dispatchEvent(evt);
 
 		if (onMoveFn) {
-			retVal = onMoveFn.call(sortable, evt);
+			retVal = onMoveFn.call(sortable, evt, originalEvt);
 		}
 
 		return retVal;
@@ -1137,9 +1229,14 @@
 	/** @returns {HTMLElement|false} */
 	function _ghostIsLast(el, evt) {
 		var lastEl = el.lastElementChild,
-				rect = lastEl.getBoundingClientRect();
+			rect = lastEl.getBoundingClientRect();
 
-		return ((evt.clientY - (rect.top + rect.height) > 5) || (evt.clientX - (rect.right + rect.width) > 5)) && lastEl; // min delta
+		// 5 — min delta
+		// abs — нельзя добавлять, а то глюки при наведении сверху
+		return (
+			(evt.clientY - (rect.top + rect.height) > 5) ||
+			(evt.clientX - (rect.right + rect.width) > 5)
+		) && lastEl;
 	}
 
 
@@ -1162,11 +1259,13 @@
 	}
 
 	/**
-	 * Returns the index of an element within its parent
+	 * Returns the index of an element within its parent for a selected set of
+	 * elements
 	 * @param  {HTMLElement} el
+	 * @param  {selector} selector
 	 * @return {number}
 	 */
-	function _index(el) {
+	function _index(el, selector) {
 		var index = 0;
 
 		if (!el || !el.parentNode) {
@@ -1174,12 +1273,28 @@
 		}
 
 		while (el && (el = el.previousElementSibling)) {
-			if (el.nodeName.toUpperCase() !== 'TEMPLATE') {
+			if ((el.nodeName.toUpperCase() !== 'TEMPLATE') && (selector === '>*' || _matches(el, selector))) {
 				index++;
 			}
 		}
 
 		return index;
+	}
+
+	function _matches(/**HTMLElement*/el, /**String*/selector) {
+		if (el) {
+			selector = selector.split('.');
+
+			var tag = selector.shift().toUpperCase(),
+				re = new RegExp('\\s(' + selector.join('|') + ')(?=\\s)', 'g');
+
+			return (
+				(tag === '' || el.nodeName.toUpperCase() == tag) &&
+				(!selector.length || ((' ' + el.className + ' ').match(re) || []).length == selector.length)
+			);
+		}
+
+		return false;
 	}
 
 	function _throttle(callback, ms) {
@@ -1215,6 +1330,15 @@
 		return dst;
 	}
 
+	function _clone(el) {
+		return $
+			? $(el).clone(true)[0]
+			: (Polymer && Polymer.dom
+				? Polymer.dom(el).cloneNode(true)
+				: el.cloneNode(true)
+			);
+	}
+
 
 	// Export utils
 	Sortable.utils = {
@@ -1229,6 +1353,7 @@
 		throttle: _throttle,
 		closest: _closest,
 		toggleClass: _toggleClass,
+		clone: _clone,
 		index: _index
 	};
 
