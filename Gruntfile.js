@@ -39,15 +39,6 @@ module.exports = function (grunt) {
 			}
 		},
 
-		exec: {
-			'meteor-test': {
-				command: 'meteor/runtests.sh'
-			},
-			'meteor-publish': {
-				command: 'meteor/publish.sh'
-			}
-		},
-
 		jquery: {}
 	});
 
@@ -92,11 +83,6 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-exec');
-
-	// Meteor tasks
-	grunt.registerTask('meteor-test', 'exec:meteor-test');
-	grunt.registerTask('meteor-publish', 'exec:meteor-publish');
-	grunt.registerTask('meteor', ['meteor-test', 'meteor-publish']);
 
 	grunt.registerTask('tests', ['jshint']);
 	grunt.registerTask('default', ['tests', 'version', 'uglify:dist']);

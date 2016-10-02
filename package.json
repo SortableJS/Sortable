@@ -5,10 +5,8 @@
   "devDependencies": {
     "grunt": "*",
     "grunt-version": "*",
-    "grunt-exec": "*",
-    "grunt-contrib-jshint": "0.9.2",
-    "grunt-contrib-uglify": "*",
-    "spacejam": "*"
+    "grunt-contrib-jshint": "*",
+    "grunt-contrib-uglify": "*"
   },
   "description": "Minimalist JavaScript library for reorderable drag-and-drop lists on modern browsers and touch devices. No jQuery. Supports AngularJS and any CSS library, e.g. Bootstrap.",
   "main": "Sortable.js",

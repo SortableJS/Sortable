@@ -103,8 +103,8 @@ var sortable = new Sortable(el, {
 	scrollSensitivity: 30, // px, how near the mouse must be to an edge to start scrolling.
 	scrollSpeed: 10, // px
 
-	setData: function (dataTransfer, dragEl) {
-		dataTransfer.setData('Text', dragEl.textContent);
+	setData: function (/** DataTransfer */dataTransfer, /** HTMLElement*/dragEl) {
+		dataTransfer.setData('Text', dragEl.textContent); // `dataTransfer` object of HTML5 DragEvent
 	},
 
 	// Element is chosen

@@ -307,7 +307,7 @@
 				type = evt.type,
 				touch = evt.touches && evt.touches[0],
 				target = (touch || evt).target,
-				originalTarget = target,
+				originalTarget = evt.target.shadowRoot && evt.path[0] || target,
 				filter = options.filter,
 				startIndex;
 
@@ -320,13 +320,13 @@
 				return; // only left button or enabled
 			}
 
-			target = _closest(target, options.draggable, el);
-
-			if (!target) {
+			if (options.handle && !_closest(originalTarget, options.handle, el)) {
 				return;
 			}
 
-			if (options.handle && !_closest(originalTarget, options.handle, el)) {
+			target = _closest(target, options.draggable, el);
+
+			if (!target) {
 				return;
 			}
 
@@ -641,6 +641,7 @@
 			var el = this.el,
 				target,
 				dragRect,
+				targetRect,
 				revert,
 				options = this.options,
 				group = options.group,
@@ -721,9 +722,9 @@
 						lastParentCSS = _css(target.parentNode);
 					}
 
+					targetRect = target.getBoundingClientRect();
 
-					var targetRect = target.getBoundingClientRect(),
-						width = targetRect.right - targetRect.left,
+					var width = targetRect.right - targetRect.left,
 						height = targetRect.bottom - targetRect.top,
 						floating = /left|right|inline/.test(lastCSS.cssFloat + lastCSS.display)
 							|| (lastParentCSS.display == 'flex' && lastParentCSS['flex-direction'].indexOf('row') === 0),
@@ -1075,11 +1076,18 @@
 				if ((selector === '>*' && el.parentNode === ctx) || _matches(el, selector)) {
 					return el;
 				}
-			}
-			while (el !== ctx && (el = el.parentNode));
+				/* jshint boss:true */
+			} while (el = _getParentOrHost(el));
 		}
 
 		return null;
+	}
+
+
+	function _getParentOrHost(el) {
+		var parent = el.host;
+
+		return (parent && parent.nodeType) ? parent : el.parentNode;
 	}
 
 
