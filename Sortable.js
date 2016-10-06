@@ -110,7 +110,7 @@
 					scrollOffsetY
 				;
 
-				// Delect scrollEl
+				// Detect scrollEl
 				if (scrollParentEl !== rootEl) {
 					scrollEl = options.scroll;
 					scrollParentEl = rootEl;
@@ -282,6 +282,10 @@
 		this.nativeDraggable = options.forceFallback ? false : supportDraggable;
 
 		// Bind events
+		_on(el, 'destroy', function() {
+			el[expando].destroy();
+		});
+
 		_on(el, 'mousedown', this._onTapStart);
 		_on(el, 'touchstart', this._onTapStart);
 
@@ -458,11 +462,11 @@
 			}
 
 			try {
-				if (document.selection) {					
-					// Timeout neccessary for IE9					
+				if (document.selection) {
+					// Timeout neccessary for IE9
 					setTimeout(function () {
 						document.selection.empty();
-					});					
+					});
 				} else {
 					window.getSelection().removeAllRanges();
 				}
@@ -1367,6 +1371,19 @@
 		return new Sortable(el, options);
 	};
 
+
+	/**
+	 * Destroy sortable instance
+	 * @param {HTMLElement}  el
+	 */
+	Sortable.destroy = function(el) {
+		var evt;
+
+		evt = document.createEvent('Event');
+		evt.initEvent('destroy', false, false);
+
+		el.dispatchEvent(evt);
+	};
 
 	// Export
 	Sortable.version = '1.4.2';
