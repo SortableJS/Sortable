@@ -458,11 +458,11 @@
 			}
 
 			try {
-				if (document.selection) {					
-					// Timeout neccessary for IE9					
+				if (document.selection) {
+					// Timeout neccessary for IE9
 					setTimeout(function () {
 						document.selection.empty();
-					});					
+					});
 				} else {
 					window.getSelection().removeAllRanges();
 				}
@@ -568,8 +568,18 @@
 
 		_appendGhost: function () {
 			if (!ghostEl) {
-				var rect = dragEl.getBoundingClientRect(),
-					css = _css(dragEl),
+				if (options.fallbackOnBody){
+					var rect = dragEl.getBoundingClientRect();
+				} else {
+					var rect = {
+						top: parseInt(dragEl.offsetTop, 10),
+						left: parseInt(dragEl.offsetLeft, 10),
+						width: parseInt(dragEl.offsetWidth, 10),
+						height: parseInt(dragEl.offsetHieght, 10)
+					};
+				}
+
+				var css = _css(dragEl),
 					options = this.options,
 					ghostRect;
 
