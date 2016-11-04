@@ -247,6 +247,7 @@
 			chosenClass: 'sortable-chosen',
 			dragClass: 'sortable-drag',
 			ignore: 'a, img',
+            ignoreDragStartInClass: null,
 			filter: null,
 			animation: 0,
 			setData: function (dataTransfer, dragEl) {
@@ -315,6 +316,12 @@
 			if (dragEl) {
 				return;
 			}
+			
+			var sender = (evt && evt.target) || (window.event && window.event.srcElement);
+            if (options.ignoreDragStartInClass !== null &&
+                    sender.className.indexOf(options.ignoreDragStartInClass) >= 0) {
+                return;
+            }
 
 			if (type === 'mousedown' && evt.button !== 0 || options.disabled) {
 				return; // only left button or enabled
