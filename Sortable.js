@@ -318,7 +318,7 @@
 			}
 
 			var sender = (evt && evt.target) || (window.event && window.event.srcElement);
-            if (options.ignoreDragStartInClass !== null &&
+			if (options.ignoreDragStartInClass !== null &&
 						sender.className.indexOf(options.ignoreDragStartInClass) >= 0) {
 				return;
 			}
