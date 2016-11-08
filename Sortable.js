@@ -247,6 +247,7 @@
 			chosenClass: 'sortable-chosen',
 			dragClass: 'sortable-drag',
 			ignore: 'a, img',
+			ignoreDragStartInClass: null,
 			filter: null,
 			animation: 0,
 			setData: function (dataTransfer, dragEl) {
@@ -313,6 +314,12 @@
 
 			// Don't trigger start event when an element is been dragged, otherwise the evt.oldindex always wrong when set option.group.
 			if (dragEl) {
+				return;
+			}
+
+			var sender = (evt && evt.target) || (window.event && window.event.srcElement);
+			if (options.ignoreDragStartInClass !== null &&
+						sender.className.indexOf(options.ignoreDragStartInClass) >= 0) {
 				return;
 			}
 
