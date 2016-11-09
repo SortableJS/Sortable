@@ -246,6 +246,8 @@
 			ghostClass: 'sortable-ghost',
 			chosenClass: 'sortable-chosen',
 			dragClass: 'sortable-drag',
+			validGroupClass: 'sortable-valid',
+			invalidGroupClass: 'sortable-invalid',
 			ignore: 'a, img',
 			filter: null,
 			animation: 0,
@@ -288,9 +290,10 @@
 		if (this.nativeDraggable) {
 			_on(el, 'dragover', this);
 			_on(el, 'dragenter', this);
+			_on(el, 'dragleave', this);
 		}
 
-		touchDragOverListeners.push(this._onDragOver);
+		touchDragOverListeners.push(this._onDragOver, this._onDragLeave);
 
 		// Restore sorting
 		options.store && this.sort(options.store.get(this));
@@ -666,6 +669,9 @@
 				) &&
 				(evt.rootEl === void 0 || evt.rootEl === this.el) // touch fallback
 			) {
+				_toggleClass(el, options.invalidGroupClass, false);
+				_toggleClass(el, options.validGroupClass, true);
+
 				// Smart auto-scrolling
 				_autoScroll(evt, options, this.el);
 
@@ -776,6 +782,20 @@
 					}
 				}
 			}
+			else {
+				_toggleClass(el, options.validGroupClass, false);
+				_toggleClass(el, options.invalidGroupClass, true);
+			}
+		},
+
+		_onDragLeave: function () {
+			var el = this.el,
+				options = this.options;
+
+			_toggleClass(el, options.invalidGroupClass, false);
+			_toggleClass(el, options.validGroupClass, false);
+
+			el = null;
 		},
 
 		_animate: function (prevRect, target) {
@@ -816,6 +836,8 @@
 		_onDrop: function (/**Event*/evt) {
 			var el = this.el,
 				options = this.options;
+
+			this._onDragLeave();
 
 			clearInterval(this._loopId);
 			clearInterval(autoScroll.pid);
@@ -929,14 +951,23 @@
 		handleEvent: function (/**Event*/evt) {
 			var type = evt.type;
 
-			if (type === 'dragover' || type === 'dragenter') {
-				if (dragEl) {
-					this._onDragOver(evt);
-					_globalDragOver(evt);
-				}
-			}
-			else if (type === 'drop' || type === 'dragend') {
-				this._onDrop(evt);
+			switch (type) {
+				case 'dragover':
+				case 'dragenter':
+					if (dragEl) {
+						this._onDragOver(evt);
+						_globalDragOver(evt);
+					}
+					break;
+
+				case 'dragleave':
+					this._onDragLeave(evt);
+					break;
+
+				case 'drop':
+				case 'dragend':
+					this._onDrop(evt);
+					break;
 			}
 		},
 
@@ -1051,6 +1082,7 @@
 			});
 
 			touchDragOverListeners.splice(touchDragOverListeners.indexOf(this._onDragOver), 1);
+			touchDragOverListeners.splice(touchDragOverListeners.indexOf(this._onDragLeave), 1);
 
 			this._onDrop();
 
