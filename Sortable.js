@@ -911,7 +911,7 @@
 							newIndex = oldIndex;
 						}
 
-						_dispatchEvent(this, rootEl, 'end', dragEl, rootEl, oldIndex, newIndex);
+						_dispatchEvent(this, parentEl, 'end', dragEl, rootEl, oldIndex, newIndex);
 
 						// Save sorting
 						this.save();
