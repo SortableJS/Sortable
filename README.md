@@ -96,7 +96,7 @@ var sortable = new Sortable(el, {
 
 	fallbackClass: "sortable-fallback",  // Class name for the cloned DOM Element when using forceFallback
 	fallbackOnBody: false,  // Appends the cloned DOM Element into the Document's Body
-	fallbackTolerance: 0 // Specify in pixels how far the mouse should move before it's considered as a drag.        
+	fallbackTolerance: 0, // Specify in pixels how far the mouse should move before it's considered as a drag.        
 	
 	scroll: true, // or HTMLElement
 	scrollFn: function(offsetX, offsetY, originalEvent) { ... }, // if you have custom scrollbar scrollFn may be used for autoscrolling
