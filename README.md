@@ -22,8 +22,7 @@ Demo: http://rubaxa.github.io/Sortable/
     * [Mixin](https://github.com/SortableJS/react-mixin-sortablejs)
   * [Knockout](https://github.com/SortableJS/knockout-sortablejs)
   * [Polymer](https://github.com/SortableJS/polymer-sortablejs)
-  * Vue
-    * [1+](https://github.com/SortableJS/Vue.Draggable)
+  * [Vue](https://github.com/SortableJS/Vue.Draggable)
  * Supports any CSS library, e.g. [Bootstrap](#bs)
  * Simple API
  * [CDN](#cdn)
