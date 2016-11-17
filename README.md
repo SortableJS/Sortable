@@ -20,6 +20,8 @@ Demo: http://rubaxa.github.io/Sortable/
   * React
     * [ES2015+](https://github.com/SortableJS/react-sortablejs)
     * [Mixin](https://github.com/SortableJS/react-mixin-sortablejs)
+  * Vuejs
+    * [1.0+](https://github.com/sagalbot/vue-sortable)
   * [Knockout](https://github.com/SortableJS/knockout-sortablejs)
   * [Polymer](https://github.com/SortableJS/polymer-sortablejs)
  * Supports any CSS library, e.g. [Bootstrap](#bs)
