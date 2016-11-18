@@ -457,12 +457,16 @@
 				_on(rootEl, 'dragstart', this._onDragStart);
 			}
 
+			this._emptySelection();
+		},
+
+		_emptySelection: function () {
 			try {
-				if (document.selection) {					
-					// Timeout neccessary for IE9					
+				if (document.selection) {
+					// Timeout neccessary for IE9
 					setTimeout(function () {
 						document.selection.empty();
-					});					
+					});
 				} else {
 					window.getSelection().removeAllRanges();
 				}
@@ -563,6 +567,8 @@
 				_css(ghostEl, 'transform', translate3d);
 
 				evt.preventDefault();
+
+				this._emptySelection();
 			}
 		},
 
