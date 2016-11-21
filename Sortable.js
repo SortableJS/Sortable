@@ -952,7 +952,6 @@
 			var type = evt.type;
 
 			switch (type) {
-				case 'dragover':
 				case 'dragenter':
 					if (dragEl) {
 						this._onDragOver(evt);
@@ -961,7 +960,13 @@
 					break;
 
 				case 'dragleave':
-					this._onDragLeave(evt);
+					if (evt.target.tagName.toLowerCase() === this.options.draggable) {
+						evt.preventDefault();
+						evt.stopPropagation();
+					}
+					else {
+						this._onDragLeave(evt);
+					}
 					break;
 
 				case 'drop':

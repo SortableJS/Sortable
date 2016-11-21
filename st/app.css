@@ -51,6 +51,10 @@ ul {
 	opacity: .2;
 }
 
+.sortable-invalid > * {
+	pointer-events: none;
+}
+
 #foo .sortable-drag {
 	background: #daf4ff;
 }
