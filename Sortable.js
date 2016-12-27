@@ -92,7 +92,8 @@
 		_autoScroll = _throttle(function (/**Event*/evt, /**Object*/options, /**HTMLElement*/rootEl) {
 			// Bug: https://bugzilla.mozilla.org/show_bug.cgi?id=505521
 			if (rootEl && options.scroll) {
-				var el,
+				var _this = rootEl[expando],
+					el,
 					rect,
 					sens = options.scrollSensitivity,
 					speed = options.scrollSpeed,
