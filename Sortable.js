@@ -111,7 +111,7 @@
 					scrollOffsetY
 				;
 
-				// Delect scrollEl
+				// Detect scrollEl
 				if (scrollParentEl !== rootEl) {
 					scrollEl = options.scroll;
 					scrollParentEl = rootEl;
@@ -292,6 +292,10 @@
 			_on(el, 'dragenter', this);
 		}
 
+		_on(el, 'destroy', function() {
+			el[expando].destroy();
+		});
+
 		touchDragOverListeners.push(this._onDragOver);
 
 		// Restore sorting
@@ -464,11 +468,11 @@
 			}
 
 			try {
-				if (document.selection) {					
-					// Timeout neccessary for IE9					
+				if (document.selection) {
+					// Timeout neccessary for IE9
 					setTimeout(function () {
 						document.selection.empty();
-					});					
+					});
 				} else {
 					window.getSelection().removeAllRanges();
 				}
@@ -1376,6 +1380,20 @@
 	 */
 	Sortable.create = function (el, options) {
 		return new Sortable(el, options);
+	};
+
+
+	/**
+	 * Destroy sortable instance
+	 * @param {HTMLElement}  el
+	 */
+	Sortable.destroy = function(el) {
+		var evt;
+
+		evt = document.createEvent('Event');
+		evt.initEvent('destroy', false, false);
+
+		el.dispatchEvent(evt);
 	};
 
 
