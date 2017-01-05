@@ -226,6 +226,8 @@
 		}
 
 		this.el = el; // root element
+		this.el.className += ' sortable';
+
 		this.options = options = _extend({}, options);
 
 

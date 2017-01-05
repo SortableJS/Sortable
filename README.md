@@ -25,7 +25,6 @@ Demo: http://rubaxa.github.io/Sortable/
   * [Vue](https://github.com/SortableJS/Vue.Draggable)
  * Supports any CSS library, e.g. [Bootstrap](#bs)
  * Simple API
- * [CDN](#cdn)
  * No jQuery (but there is [support](#jq))
 
 
@@ -548,26 +547,6 @@ Link to the active instance.
 * closest(el`:HTMLElement`, selector`:String`[, ctx`:HTMLElement`])`:HTMLElement|Null` — for each element in the set, get the first element that matches the selector by testing the element itself and traversing up through its ancestors in the DOM tree
 * clone(el`:HTMLElement`)`:HTMLElement` — create a deep copy of the set of matched elements
 * toggleClass(el`:HTMLElement`, name`:String`, state`:Boolean`) — add or remove one classes from each element
-
-
----
-
-
-<a name="cdn"></a>
-### CDN
-
-```html
-<!-- CDNJS :: Sortable (https://cdnjs.com/) -->
-<script src="//cdnjs.cloudflare.com/ajax/libs/Sortable/1.5.0-rc1/Sortable.min.js"></script>
-
-
-<!-- jsDelivr :: Sortable (http://www.jsdelivr.com/) -->
-<script src="//cdn.jsdelivr.net/sortable/1.5.0-rc1/Sortable.min.js"></script>
-
-
-<!-- jsDelivr :: Sortable :: Latest (http://www.jsdelivr.com/) -->
-<script src="//cdn.jsdelivr.net/sortable/latest/Sortable.min.js"></script>
-```
 
 
 ---
