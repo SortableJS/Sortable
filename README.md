@@ -1,4 +1,6 @@
 # Sortable
+
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/RubaXa/Sortable?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 Sortable is a minimalist JavaScript library for reorderable drag-and-drop lists.
 
 Demo: http://rubaxa.github.io/Sortable/
