@@ -226,7 +226,10 @@
 		}
 
 		this.el = el; // root element
-		this.el.className += ' sortable';
+
+		if ( this.el.className.indexOf('sortable') === -1 ) {
+			this.el.className += ' sortable';
+		}
 
 		this.options = options = _extend({}, options);
 
