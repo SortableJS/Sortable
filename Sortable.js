@@ -318,6 +318,12 @@
 				return;
 			}
 
+			// Don't trigger start event when clicking on an input field
+			var sender = (evt && evt.target) || (window.event && window.event.srcElement);
+			if (sender.nodeName == "INPUT") {
+				return;
+			}
+
 			if (type === 'mousedown' && evt.button !== 0 || options.disabled) {
 				return; // only left button or enabled
 			}
