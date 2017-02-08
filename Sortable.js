@@ -464,11 +464,11 @@
 			}
 
 			try {
-				if (document.selection) {					
-					// Timeout neccessary for IE9					
+				if (document.selection) {
+					// Timeout neccessary for IE9
 					setTimeout(function () {
 						document.selection.empty();
-					});					
+					});
 				} else {
 					window.getSelection().removeAllRanges();
 				}
@@ -1111,7 +1111,7 @@
 
 
 	function _on(el, event, fn) {
-		el.addEventListener(event, fn, false);
+		el.addEventListener(event, fn, { passive: false });
 	}
 
 
