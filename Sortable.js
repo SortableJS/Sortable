@@ -621,14 +621,14 @@
 			if (useFallback) {
 				if (useFallback === 'touch') {
 					// Bind touch events
-					_on(document, 'touchmove', this._onTouchMove);
+					_on(document, 'touchmove', this._onTouchMove, {passive: false});
 					_on(document, 'touchend', this._onDrop);
 					_on(document, 'touchcancel', this._onDrop);
-					_on(document, 'pointermove', this._onTouchMove);
+					_on(document, 'pointermove', this._onTouchMove), {passive: false};
 					_on(document, 'pointerup', this._onDrop);
 				} else {
 					// Old brwoser
-					_on(document, 'mousemove', this._onTouchMove);
+					_on(document, 'mousemove', this._onTouchMove), {passive: false};
 					_on(document, 'mouseup', this._onDrop);
 				}
 
@@ -1111,7 +1111,10 @@
 
 
 	function _on(el, event, fn) {
-		el.addEventListener(event, fn, false);
+		if (typeof(options)==='undefined'){
+			options = false
+		}
+		el.addEventListener(event, fn, options);
 	}
 
 
