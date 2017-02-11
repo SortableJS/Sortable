@@ -851,6 +851,9 @@
 					_toggleClass(dragEl, this.options.ghostClass, false);
 					_toggleClass(dragEl, this.options.chosenClass, false);
 
+					// Drag stop event
+					_dispatchEvent(this, rootEl, 'unchoose', dragEl, rootEl, oldIndex);
+
 					if (rootEl !== parentEl) {
 						newIndex = _index(dragEl, options.draggable);
 
@@ -1369,6 +1372,6 @@
 
 
 	// Export
-	Sortable.version = '1.4.2';
+	Sortable.version = '1.5.2';
 	return Sortable;
 });
