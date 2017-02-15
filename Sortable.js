@@ -428,6 +428,10 @@
 				} else {
 					dragStartFn();
 				}
+
+				if (options.forceFallback) {
+					evt.preventDefault();
+				}
 			}
 		},
 
