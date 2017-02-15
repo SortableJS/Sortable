@@ -36,6 +36,7 @@
 		cloneEl,
 		rootEl,
 		nextEl,
+		lastDownEl,
 
 		scrollEl,
 		scrollParentEl,
@@ -334,6 +335,11 @@
 				return;
 			}
 
+			if (lastDownEl === target) {
+				// Ignoring duplicate `down`
+				return;
+			}
+
 			// Get the index of the dragged element within its parent
 			startIndex = _index(target, options.draggable);
 
@@ -379,6 +385,7 @@
 				dragEl = target;
 				parentEl = dragEl.parentNode;
 				nextEl = dragEl.nextSibling;
+				lastDownEl = target
 				activeGroup = options.group;
 				oldIndex = startIndex;
 
@@ -926,6 +933,7 @@
 			ghostEl =
 			nextEl =
 			cloneEl =
+			lastDownEl =
 
 			scrollEl =
 			scrollParentEl =
