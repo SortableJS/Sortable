@@ -283,9 +283,12 @@
 		this.nativeDraggable = options.forceFallback ? false : supportDraggable;
 
 		// Bind events
-		_on(el, 'mousedown', this._onTapStart);
+		if (window.PointerEvent) {
+			_on(el, 'pointerdown', this._onTapStart);			
+		} else {
+			_on(el, 'mousedown', this._onTapStart);			
+		}
 		_on(el, 'touchstart', this._onTapStart);
-		_on(el, 'pointerdown', this._onTapStart);
 
 		if (this.nativeDraggable) {
 			_on(el, 'dragover', this);
@@ -339,7 +342,6 @@
 			if (typeof filter === 'function') {
 				if (filter.call(this, evt, target, this)) {
 					_dispatchEvent(_this, originalTarget, 'filter', target, el, startIndex);
-					evt.preventDefault();
 					return; // cancel dnd
 				}
 			}
@@ -354,7 +356,6 @@
 				});
 
 				if (filter) {
-					evt.preventDefault();
 					return; // cancel dnd
 				}
 			}
