@@ -183,10 +183,13 @@ You can also define whether lists can give away, give and keep a copy (`clone`),
  * name: `String` — group name
  * pull: `true|false|'clone'|function` — ability to move from the list. `clone` — copy the item, rather than move.
  * put: `true|false|["foo", "bar"]|function` — whether elements can be added from other lists, or an array of group names from which elements can be taken.
+ * revertClone: `boolean` — revert cloned element to initial position after moving to a another list.
+
 
 Demo:
  - http://jsbin.com/naduvo/edit?js,output
  - http://jsbin.com/rusuvot/edit?js,output — use of complex logic in the `pull` and` put`
+ - http://jsbin.com/magogub/edit?js,output — use `revertClone: true`
 
 
 ---
