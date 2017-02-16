@@ -207,6 +207,7 @@
 			group.name = originalGroup.name;
 			group.checkPull = toFn(originalGroup.pull, true);
 			group.checkPut = toFn(originalGroup.put);
+			group.revertClone = originalGroup.revertClone;
 
 			options.group = group;
 		}
@@ -678,7 +679,7 @@
 				putSortable = this;
 
 				if (revert) {
-					_cloneHide(true);
+					_cloneHide(activeSortable, true);
 					parentEl = rootEl; // actualization
 
 					if (cloneEl || nextEl) {
@@ -703,7 +704,7 @@
 						targetRect = target.getBoundingClientRect();
 					}
 
-					_cloneHide(isOwner);
+					_cloneHide(activeSortable, isOwner);
 
 					if (_onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt) !== false) {
 						if (!dragEl.contains(el)) {
@@ -740,7 +741,7 @@
 						_silent = true;
 						setTimeout(_unsilent, 30);
 
-						_cloneHide(isOwner);
+						_cloneHide(activeSortable, isOwner);
 
 						if (moveVector === 1 || moveVector === -1) {
 							after = (moveVector === 1);
@@ -783,6 +784,10 @@
 
 			if (ms) {
 				var currentRect = target.getBoundingClientRect();
+
+				if (prevRect.nodeType === 1) {
+					prevRect = prevRect.getBoundingClientRect();
+				}
 
 				_css(target, 'transition', 'none');
 				_css(target, 'transform', 'translate3d('
@@ -1059,10 +1064,21 @@
 	};
 
 
-	function _cloneHide(state) {
+	function _cloneHide(sortable, state) {
 		if (cloneEl && (cloneEl.state !== state)) {
 			_css(cloneEl, 'display', state ? 'none' : '');
-			!state && cloneEl.state && rootEl.insertBefore(cloneEl, dragEl);
+
+			if (!state) {
+				if (cloneEl.state) {
+					if (sortable.options.group.revertClone) {
+						rootEl.insertBefore(cloneEl, nextEl);
+						sortable._animate(dragEl, cloneEl);
+					} else {
+						rootEl.insertBefore(cloneEl, dragEl);
+					}
+				}
+			}
+
 			cloneEl.state = state;
 		}
 	}
@@ -1338,7 +1354,6 @@
 				: el.cloneNode(true)
 			);
 	}
-
 
 	// Export utils
 	Sortable.utils = {
