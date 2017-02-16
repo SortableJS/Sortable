@@ -70,7 +70,7 @@ var el = document.getElementById('items');
 var sortable = Sortable.create(el);
 ```
 
-You can use any element for the list and its elements, not just `ul`/`li`. Here is an [example with `div`s](http://jsbin.com/luxero/2/edit?html,js,output).
+You can use any element for the list and its elements, not just `ul`/`li`. Here is an [example with `div`s](http://jsbin.com/qumuwe/edit?html,js,output).
 
 
 ---
@@ -195,7 +195,7 @@ Demo:
 #### `sort` option
 Sorting inside list.
 
-Demo: http://jsbin.com/xizeh/2/edit?html,js,output
+Demo: http://jsbin.com/videzob/edit?html,js,output
 
 
 ---
@@ -204,7 +204,7 @@ Demo: http://jsbin.com/xizeh/2/edit?html,js,output
 #### `delay` option
 Time in milliseconds to define when the sorting should start.
 
-Demo: http://jsbin.com/xizeh/4/edit?html,js,output
+Demo: http://jsbin.com/xizeh/edit?html,js,output
 
 
 ---
@@ -213,7 +213,7 @@ Demo: http://jsbin.com/xizeh/4/edit?html,js,output
 #### `disabled` options
 Disables the sortable if set to `true`.
 
-Demo: http://jsbin.com/xiloqu/1/edit?html,js,output
+Demo: http://jsbin.com/xiloqu/edit?html,js,output
 
 ```js
 var sortable = Sortable.create(list);
@@ -234,7 +234,7 @@ To make list items draggable, Sortable disables text selection by the user.
 That's not always desirable. To allow text selection, define a drag handler,
 which is an area of every list element that allows it to be dragged around.
 
-Demo: http://jsbin.com/newize/1/edit?html,js,output
+Demo: http://jsbin.com/newize/edit?html,js,output
 
 ```js
 Sortable.create(el, {
@@ -287,7 +287,7 @@ Sortable.create(list, {
 #### `ghostClass` option
 Class name for the drop placeholder (default `sortable-ghost`).
 
-Demo: http://jsbin.com/hunifu/1/edit?css,js,output
+Demo: http://jsbin.com/hunifu/4/edit?css,js,output
 
 ```css
 .ghost {
@@ -308,7 +308,7 @@ Sortable.create(list, {
 #### `chosenClass` option
 Class name for the chosen item  (default `sortable-chosen`).
 
-Demo: http://jsbin.com/hunifu/edit?html,css,js,output
+Demo: http://jsbin.com/hunifu/3/edit?html,css,js,output
 
 ```css
 .chosen {
@@ -334,7 +334,7 @@ This gives us the possibility to test the behaviour for older Browsers even in n
 
 On top of that, the Fallback always generates a copy of that DOM Element and appends the class `fallbackClass` defined in the options. This behaviour controls the look of this 'dragged' Element.
 
-Demo: http://jsbin.com/pucurizace/edit?html,css,js,output
+Demo: http://jsbin.com/yacuqib/edit?html,css,js,output
 
 
 ---
@@ -357,8 +357,8 @@ Dragging only starts if you move the pointer past a certain tolerance, so that y
 If set to `true`, the page (or sortable-area) scrolls when coming to an edge.
 
 Demo:
- - `window`: http://jsbin.com/boqugumiqi/1/edit?html,js,output
- - `overflow: hidden`: http://jsbin.com/kohamakiwi/1/edit?html,js,output
+ - `window`: http://jsbin.com/tutuzeh/edit?html,js,output
+ - `overflow: hidden`: http://jsbin.com/kolisu/edit?html,js,output
 
 
 ---
@@ -488,7 +488,7 @@ Sortable.create(el, {
 
 <a name="bs"></a>
 ### Bootstrap
-Demo: http://jsbin.com/luxero/2/edit?html,js,output
+Demo: http://jsbin.com/qumuwe/edit?html,js,output
 
 ```html
 <!-- Latest compiled and minified CSS -->
