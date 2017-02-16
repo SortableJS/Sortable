@@ -623,7 +623,7 @@
 
 			this._offUpEvents();
 
-			if (activeGroup.checkPull(this, this, dragEl, evt) == 'clone') {
+			if (activeGroup.checkPull(this, this, dragEl, evt)) {
 				cloneEl = _clone(dragEl);
 
 				cloneEl.draggable = false;
@@ -689,7 +689,10 @@
 					? canSort || (revert = !rootEl.contains(dragEl)) // Reverting item into the original list
 					: (
 						putSortable === this ||
-						activeGroup.checkPull(this, activeSortable, dragEl, evt) && group.checkPut(this, activeSortable, dragEl, evt)
+						(
+							(activeSortable.lastPullMode = activeGroup.checkPull(this, activeSortable, dragEl, evt)) &&
+							group.checkPut(this, activeSortable, dragEl, evt)
+						)
 					)
 				) &&
 				(evt.rootEl === void 0 || evt.rootEl === this.el) // touch fallback
@@ -1096,6 +1099,10 @@
 
 
 	function _cloneHide(sortable, state) {
+		if (sortable.lastPullMode !== 'clone') {
+			state = true;
+		}
+
 		if (cloneEl && (cloneEl.state !== state)) {
 			_css(cloneEl, 'display', state ? 'none' : '');
 
