@@ -308,7 +308,7 @@
 			var _this = this,
 				el = this.el,
 				options = this.options,
-				preventOnFilter = preventOnFilter.options,
+				preventOnFilter = options.preventOnFilter,
 				type = evt.type,
 				touch = evt.touches && evt.touches[0],
 				target = (touch || evt).target,
@@ -325,9 +325,6 @@
 				return; // only left button or enabled
 			}
 
-			if (options.handle && !_closest(originalTarget, options.handle, el)) {
-				return;
-			}
 
 			target = _closest(target, options.draggable, el);
 
@@ -365,6 +362,10 @@
 					preventOnFilter && evt.preventDefault();
 					return; // cancel dnd
 				}
+			}
+
+			if (options.handle && !_closest(originalTarget, options.handle, el)) {
+				return;
 			}
 
 			// Prepare `dragstart`
