@@ -628,7 +628,13 @@
 
 			if (activeGroup.checkPull(this, this, dragEl, evt) == 'clone') {
 				cloneEl = _clone(dragEl);
+
+				cloneEl.draggable = false;
+				cloneEl.style['will-change'] = '';
+				
 				_css(cloneEl, 'display', 'none');
+				_toggleClass(dragEl, this.options.chosenClass, false);
+
 				rootEl.insertBefore(cloneEl, dragEl);
 				_dispatchEvent(this, rootEl, 'clone', dragEl);
 			}
