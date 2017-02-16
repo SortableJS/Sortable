@@ -112,6 +112,11 @@ var sortable = new Sortable(el, {
 		evt.oldIndex;  // element index within parent
 	},
 
+	// Element is unchosen
+	onUnchoose: function (/**Event*/evt) {
+		evt.oldIndex;  // element index within parent
+	},
+
 	// Element dragging started
 	onStart: function (/**Event*/evt) {
 		evt.oldIndex;  // element index within parent
@@ -557,11 +562,11 @@ Link to the active instance.
 
 ```html
 <!-- CDNJS :: Sortable (https://cdnjs.com/) -->
-<script src="//cdnjs.cloudflare.com/ajax/libs/Sortable/1.4.2/Sortable.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/Sortable/1.5.2/Sortable.min.js"></script>
 
 
 <!-- jsDelivr :: Sortable (http://www.jsdelivr.com/) -->
-<script src="//cdn.jsdelivr.net/sortable/1.4.2/Sortable.min.js"></script>
+<script src="//cdn.jsdelivr.net/sortable/1.5.2/Sortable.min.js"></script>
 
 
 <!-- jsDelivr :: Sortable :: Latest (http://www.jsdelivr.com/) -->
