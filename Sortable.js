@@ -13,10 +13,6 @@
 	else if (typeof module != "undefined" && typeof module.exports != "undefined") {
 		module.exports = factory();
 	}
-	else if (typeof Package !== "undefined") {
-		//noinspection JSUnresolvedVariable
-		Sortable = factory();  // export for Meteor.js
-	}
 	else {
 		/* jshint sub:true */
 		window["Sortable"] = factory();
@@ -36,6 +32,7 @@
 		cloneEl,
 		rootEl,
 		nextEl,
+		lastDownEl,
 
 		scrollEl,
 		scrollParentEl,
@@ -70,6 +67,8 @@
 		$ = win.jQuery || win.Zepto,
 		Polymer = win.Polymer,
 
+		captureMode = {capture: false, passive: false},
+
 		supportDraggable = !!('draggable' in document.createElement('div')),
 		supportCssPointerEvents = (function (el) {
 			// false when IE11
@@ -85,14 +84,14 @@
 
 		abs = Math.abs,
 		min = Math.min,
-		slice = [].slice,
 
 		touchDragOverListeners = [],
 
 		_autoScroll = _throttle(function (/**Event*/evt, /**Object*/options, /**HTMLElement*/rootEl) {
 			// Bug: https://bugzilla.mozilla.org/show_bug.cgi?id=505521
 			if (rootEl && options.scroll) {
-				var el,
+				var _this = rootEl[expando],
+					el,
 					rect,
 					sens = options.scrollSensitivity,
 					speed = options.scrollSpeed,
@@ -249,6 +248,7 @@
 			dragClass: 'sortable-drag',
 			ignore: 'a, img',
 			filter: null,
+			preventOnFilter: true,
 			animation: 0,
 			setData: function (dataTransfer, dragEl) {
 				dataTransfer.setData('Text', dragEl.textContent);
@@ -285,6 +285,7 @@
 		// Bind events
 		_on(el, 'mousedown', this._onTapStart);
 		_on(el, 'touchstart', this._onTapStart);
+		_on(el, 'pointerdown', this._onTapStart);
 
 		if (this.nativeDraggable) {
 			_on(el, 'dragover', this);
@@ -305,6 +306,7 @@
 			var _this = this,
 				el = this.el,
 				options = this.options,
+				preventOnFilter = options.preventOnFilter,
 				type = evt.type,
 				touch = evt.touches && evt.touches[0],
 				target = (touch || evt).target,
@@ -321,13 +323,15 @@
 				return; // only left button or enabled
 			}
 
-			if (options.handle && !_closest(originalTarget, options.handle, el)) {
-				return;
-			}
 
 			target = _closest(target, options.draggable, el);
 
 			if (!target) {
+				return;
+			}
+
+			if (lastDownEl === target) {
+				// Ignoring duplicate `down`
 				return;
 			}
 
@@ -338,7 +342,7 @@
 			if (typeof filter === 'function') {
 				if (filter.call(this, evt, target, this)) {
 					_dispatchEvent(_this, originalTarget, 'filter', target, el, startIndex);
-					evt.preventDefault();
+					preventOnFilter && evt.preventDefault();
 					return; // cancel dnd
 				}
 			}
@@ -353,9 +357,13 @@
 				});
 
 				if (filter) {
-					evt.preventDefault();
+					preventOnFilter && evt.preventDefault();
 					return; // cancel dnd
 				}
+			}
+
+			if (options.handle && !_closest(originalTarget, options.handle, el)) {
+				return;
 			}
 
 			// Prepare `dragstart`
@@ -376,6 +384,7 @@
 				dragEl = target;
 				parentEl = dragEl.parentNode;
 				nextEl = dragEl.nextSibling;
+				lastDownEl = target
 				activeGroup = options.group;
 				oldIndex = startIndex;
 
@@ -396,7 +405,7 @@
 					_toggleClass(dragEl, options.chosenClass, true);
 
 					// Bind the events: dragstart/dragend
-					_this._triggerDragStart(touch);
+					_this._triggerDragStart(evt, touch);
 
 					// Drag start event
 					_dispatchEvent(_this, rootEl, 'choose', dragEl, rootEl, oldIndex);
@@ -410,6 +419,7 @@
 				_on(ownerDocument, 'mouseup', _this._onDrop);
 				_on(ownerDocument, 'touchend', _this._onDrop);
 				_on(ownerDocument, 'touchcancel', _this._onDrop);
+				_on(ownerDocument, 'pointercancel', _this._onDrop);
 
 				if (options.delay) {
 					// If the user moves the pointer or let go the click or touch
@@ -420,10 +430,15 @@
 					_on(ownerDocument, 'touchcancel', _this._disableDelayedDrag);
 					_on(ownerDocument, 'mousemove', _this._disableDelayedDrag);
 					_on(ownerDocument, 'touchmove', _this._disableDelayedDrag);
+					_on(ownerDocument, 'pointermove', _this._disableDelayedDrag);
 
 					_this._dragStartTimer = setTimeout(dragStartFn, options.delay);
 				} else {
 					dragStartFn();
+				}
+
+				if (options.forceFallback) {
+					evt.preventDefault();
 				}
 			}
 		},
@@ -437,9 +452,11 @@
 			_off(ownerDocument, 'touchcancel', this._disableDelayedDrag);
 			_off(ownerDocument, 'mousemove', this._disableDelayedDrag);
 			_off(ownerDocument, 'touchmove', this._disableDelayedDrag);
+			_off(ownerDocument, 'pointermove', this._disableDelayedDrag);
 		},
 
-		_triggerDragStart: function (/** Touch */touch) {
+		_triggerDragStart: function (/** Event */evt, /** Touch */touch) {
+			touch = touch || (evt.pointerType == 'touch' ? evt : null);
 			if (touch) {
 				// Touch device support
 				tapEvt = {
@@ -483,6 +500,8 @@
 
 				// Drag start event
 				_dispatchEvent(this, rootEl, 'start', dragEl, rootEl, oldIndex);
+			} else {
+				this._nulling();
 			}
 		},
 
@@ -604,9 +623,15 @@
 
 			this._offUpEvents();
 
-			if (activeGroup.checkPull(this, this, dragEl, evt) == 'clone') {
+			if (activeGroup.checkPull(this, this, dragEl, evt)) {
 				cloneEl = _clone(dragEl);
+
+				cloneEl.draggable = false;
+				cloneEl.style['will-change'] = '';
+
 				_css(cloneEl, 'display', 'none');
+				_toggleClass(cloneEl, this.options.chosenClass, false);
+
 				rootEl.insertBefore(cloneEl, dragEl);
 				_dispatchEvent(this, rootEl, 'clone', dragEl);
 			}
@@ -619,6 +644,8 @@
 					_on(document, 'touchmove', this._onTouchMove);
 					_on(document, 'touchend', this._onDrop);
 					_on(document, 'touchcancel', this._onDrop);
+					_on(document, 'pointermove', this._onTouchMove);
+					_on(document, 'pointerup', this._onDrop);
 				} else {
 					// Old brwoser
 					_on(document, 'mousemove', this._onTouchMove);
@@ -657,12 +684,15 @@
 
 			moved = true;
 
-			if (activeGroup && !options.disabled &&
+			if (activeSortable && !options.disabled &&
 				(isOwner
 					? canSort || (revert = !rootEl.contains(dragEl)) // Reverting item into the original list
 					: (
 						putSortable === this ||
-						activeGroup.checkPull(this, activeSortable, dragEl, evt) && group.checkPut(this, activeSortable, dragEl, evt)
+						(
+							(activeSortable.lastPullMode = activeGroup.checkPull(this, activeSortable, dragEl, evt)) &&
+							group.checkPut(this, activeSortable, dragEl, evt)
+						)
 					)
 				) &&
 				(evt.rootEl === void 0 || evt.rootEl === this.el) // touch fallback
@@ -813,8 +843,10 @@
 			var ownerDocument = this.el.ownerDocument;
 
 			_off(document, 'touchmove', this._onTouchMove);
+			_off(document, 'pointermove', this._onTouchMove);
 			_off(ownerDocument, 'mouseup', this._onDrop);
 			_off(ownerDocument, 'touchend', this._onDrop);
+			_off(ownerDocument, 'pointerup', this._onDrop);
 			_off(ownerDocument, 'touchcancel', this._onDrop);
 		},
 
@@ -916,6 +948,7 @@
 			ghostEl =
 			nextEl =
 			cloneEl =
+			lastDownEl =
 
 			scrollEl =
 			scrollParentEl =
@@ -1047,6 +1080,7 @@
 
 			_off(el, 'mousedown', this._onTapStart);
 			_off(el, 'touchstart', this._onTapStart);
+			_off(el, 'pointerdown', this._onTapStart);
 
 			if (this.nativeDraggable) {
 				_off(el, 'dragover', this);
@@ -1068,6 +1102,10 @@
 
 
 	function _cloneHide(sortable, state) {
+		if (sortable.lastPullMode !== 'clone') {
+			state = true;
+		}
+
 		if (cloneEl && (cloneEl.state !== state)) {
 			_css(cloneEl, 'display', state ? 'none' : '');
 
@@ -1119,12 +1157,12 @@
 
 
 	function _on(el, event, fn) {
-		el.addEventListener(event, fn, false);
+		el.addEventListener(event, fn, captureMode);
 	}
 
 
 	function _off(el, event, fn) {
-		el.removeEventListener(event, fn, false);
+		el.removeEventListener(event, fn, captureMode);
 	}
 
 
@@ -1387,6 +1425,6 @@
 
 
 	// Export
-	Sortable.version = '1.5.2';
+	Sortable.version = '1.5.0-rc1';
 	return Sortable;
 });

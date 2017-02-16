@@ -1,7 +1,7 @@
 {
   "name": "sortablejs",
   "exportName": "Sortable",
-  "version": "1.5.2",
+  "version": "1.5.0-rc1",
   "devDependencies": {
     "grunt": "*",
     "grunt-version": "*",
@@ -17,6 +17,10 @@
     "type": "git",
     "url": "git://github.com/rubaxa/Sortable.git"
   },
+  "files": [
+    "Sortable.js",
+    "Sortable.min.js"
+  ],
   "keywords": [
     "sortable",
     "reorder",
