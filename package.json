@@ -17,6 +17,10 @@
     "type": "git",
     "url": "git://github.com/rubaxa/Sortable.git"
   },
+  "files": [
+    "Sortable.js",
+    "Sortable.min.js"
+  ],
   "keywords": [
     "sortable",
     "reorder",
