@@ -71,6 +71,8 @@
 		$ = win.jQuery || win.Zepto,
 		Polymer = win.Polymer,
 
+		captureMode = {capture: false, passive: false},
+
 		supportDraggable = !!('draggable' in document.createElement('div')),
 		supportCssPointerEvents = (function (el) {
 			// false when IE11
@@ -86,7 +88,6 @@
 
 		abs = Math.abs,
 		min = Math.min,
-		slice = [].slice,
 
 		touchDragOverListeners = [],
 
@@ -1128,12 +1129,12 @@
 
 
 	function _on(el, event, fn) {
-		el.addEventListener(event, fn, false);
+		el.addEventListener(event, fn, captureMode);
 	}
 
 
 	function _off(el, event, fn) {
-		el.removeEventListener(event, fn, false);
+		el.removeEventListener(event, fn, captureMode);
 	}
 
 
