@@ -631,9 +631,9 @@
 
 				cloneEl.draggable = false;
 				cloneEl.style['will-change'] = '';
-				
+
 				_css(cloneEl, 'display', 'none');
-				_toggleClass(dragEl, this.options.chosenClass, false);
+				_toggleClass(cloneEl, this.options.chosenClass, false);
 
 				rootEl.insertBefore(cloneEl, dragEl);
 				_dispatchEvent(this, rootEl, 'clone', dragEl);
