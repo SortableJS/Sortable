@@ -248,6 +248,7 @@
 			chosenClass: 'sortable-chosen',
 			dragClass: 'sortable-drag',
 			ignore: 'a, img',
+			sendAllMove: false,
 			filter: null,
 			animation: 0,
 			setData: function (dataTransfer, dragEl) {
@@ -723,7 +724,7 @@
 						target && this._animate(targetRect, target);
 					}
 				}
-				else if (target && !target.animated && target !== dragEl && (target.parentNode[expando] !== void 0)) {
+				else if (target && !target.animated && (options.sendAllMove || target !== dragEl) && (target.parentNode[expando] !== void 0)) {
 					if (lastEl !== target) {
 						lastEl = target;
 						lastCSS = _css(target);
@@ -887,8 +888,9 @@
 
 							if (newIndex >= 0) {
 								// drag & drop within the same list
-								_dispatchEvent(this, rootEl, 'update', dragEl, rootEl, oldIndex, newIndex);
-								_dispatchEvent(this, rootEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
+								console.log("DND");
+								//_dispatchEvent(this, rootEl, 'update', dragEl, rootEl, oldIndex, newIndex);
+								//_dispatchEvent(this, rootEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
 							}
 						}
 					}
