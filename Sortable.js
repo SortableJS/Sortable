@@ -686,132 +686,137 @@
 
 			// Check base state
 			if (
+				!activeSortable ||
 				options.disabled ||
-				(evt.rootEl != null && evt.rootEl !== this.el) || // touch fallback
-				!activeSortable
+				!(evt.rootEl === void 0 || evt.rootEl === this.el)  // touch fallback
 			) {
+				return; // exit
+			}
+
+			// Check access
+			if (isOwner) {
+				if (!canSort) {
+					// Reverting item into the original list
+					if (rootEl.contains(dragEl)) {
+						return; // exit
+					}
+
+					revert = true;
+				}
+			} else if (putSortable !== this) {
+				activeSortable.lastPullMode = activeGroup.checkPull(this, activeSortable, dragEl, evt);
+
+				if (!(activeSortable.lastPullMode || group.checkPut(this, activeSortable, dragEl, evt))) {
+					return; // exit;
+				}
+			}
+
+			// Smart auto-scrolling
+			_autoScroll(evt, options, this.el);
+
+			if (_silent) {
 				return;
 			}
 
-			if ((isOwner
-					? canSort || (revert = !rootEl.contains(dragEl)) // Reverting item into the original list
-					: (
-						putSortable === this ||
-						(
-							(activeSortable.lastPullMode = activeGroup.checkPull(this, activeSortable, dragEl, evt)) &&
-							group.checkPut(this, activeSortable, dragEl, evt)
-						)
-					)
-				)
+			target = _closest(evt.target, options.draggable, el);
+			dragRect = dragEl.getBoundingClientRect();
+			putSortable = this;
+
+			if (revert) {
+				_cloneHide(activeSortable, true);
+				parentEl = rootEl; // actualization
+
+				if (cloneEl || nextEl) {
+					rootEl.insertBefore(dragEl, cloneEl || nextEl);
+				}
+				else if (!canSort) {
+					rootEl.appendChild(dragEl);
+				}
+
+				return;
+			}
+
+			if ((el.children.length === 0) || (el.children[0] === ghostEl) ||
+				(el === evt.target) && (target = _ghostIsLast(el, evt))
 			) {
-				// Smart auto-scrolling
-				_autoScroll(evt, options, this.el);
-
-				if (_silent) {
-					return;
-				}
-
-				target = _closest(evt.target, options.draggable, el);
-				dragRect = dragEl.getBoundingClientRect();
-				putSortable = this;
-
-				if (revert) {
-					_cloneHide(activeSortable, true);
-					parentEl = rootEl; // actualization
-
-					if (cloneEl || nextEl) {
-						rootEl.insertBefore(dragEl, cloneEl || nextEl);
-					}
-					else if (!canSort) {
-						rootEl.appendChild(dragEl);
-					}
-
-					return;
-				}
-
-
-				if ((el.children.length === 0) || (el.children[0] === ghostEl) ||
-					(el === evt.target) && (target = _ghostIsLast(el, evt))
-				) {
-					if (target) {
-						if (target.animated) {
-							return;
-						}
-
-						targetRect = target.getBoundingClientRect();
-					}
-
-					_cloneHide(activeSortable, isOwner);
-
-					if (_onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt) !== false) {
-						if (!dragEl.contains(el)) {
-							el.appendChild(dragEl);
-							parentEl = el; // actualization
-						}
-
-						this._animate(dragRect, dragEl);
-						target && this._animate(targetRect, target);
-					}
-				}
-				else if (target && !target.animated && target !== dragEl && (target.parentNode[expando] !== void 0)) {
-					if (lastEl !== target) {
-						lastEl = target;
-						lastCSS = _css(target);
-						lastParentCSS = _css(target.parentNode);
+				if (target) {
+					if (target.animated) {
+						return;
 					}
 
 					targetRect = target.getBoundingClientRect();
+				}
 
-					var width = targetRect.right - targetRect.left,
-						height = targetRect.bottom - targetRect.top,
-						floating = /left|right|inline/.test(lastCSS.cssFloat + lastCSS.display)
-							|| (lastParentCSS.display == 'flex' && lastParentCSS['flex-direction'].indexOf('row') === 0),
-						isWide = (target.offsetWidth > dragEl.offsetWidth),
-						isLong = (target.offsetHeight > dragEl.offsetHeight),
-						halfway = (floating ? (evt.clientX - targetRect.left) / width : (evt.clientY - targetRect.top) / height) > 0.5,
-						nextSibling = target.nextElementSibling,
-						moveVector = _onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt),
-						after
-					;
+				_cloneHide(activeSortable, isOwner);
 
-					if (moveVector !== false) {
-						_silent = true;
-						setTimeout(_unsilent, 30);
-
-						_cloneHide(activeSortable, isOwner);
-
-						if (moveVector === 1 || moveVector === -1) {
-							after = (moveVector === 1);
-						}
-						else if (floating) {
-							var elTop = dragEl.offsetTop,
-								tgTop = target.offsetTop;
-
-							if (elTop === tgTop) {
-								after = (target.previousElementSibling === dragEl) && !isWide || halfway && isWide;
-							}
-							else if (target.previousElementSibling === dragEl || dragEl.previousElementSibling === target) {
-								after = (evt.clientY - targetRect.top) / height > 0.5;
-							} else {
-								after = tgTop > elTop;
-							}
-						} else {
-							after = (nextSibling !== dragEl) && !isLong || halfway && isLong;
-						}
-
-						if (!dragEl.contains(el)) {
-							if (after && !nextSibling) {
-								el.appendChild(dragEl);
-							} else {
-								target.parentNode.insertBefore(dragEl, after ? nextSibling : target);
-							}
-						}
-
-						parentEl = dragEl.parentNode; // actualization
-
-						this._animate(dragRect, dragEl);
-						this._animate(targetRect, target);
+				if (_onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt) !== false) {
+					if (!dragEl.contains(el)) {
+						el.appendChild(dragEl);
+						parentEl = el; // actualization
 					}
+
+					this._animate(dragRect, dragEl);
+					target && this._animate(targetRect, target);
+				}
+			}
+			else if (target && !target.animated && target !== dragEl && (target.parentNode[expando] !== void 0)) {
+				if (lastEl !== target) {
+					lastEl = target;
+					lastCSS = _css(target);
+					lastParentCSS = _css(target.parentNode);
+				}
+
+				targetRect = target.getBoundingClientRect();
+
+				var width = targetRect.right - targetRect.left,
+					height = targetRect.bottom - targetRect.top,
+					floating = /left|right|inline/.test(lastCSS.cssFloat + lastCSS.display)
+						|| (lastParentCSS.display == 'flex' && lastParentCSS['flex-direction'].indexOf('row') === 0),
+					isWide = (target.offsetWidth > dragEl.offsetWidth),
+					isLong = (target.offsetHeight > dragEl.offsetHeight),
+					halfway = (floating ? (evt.clientX - targetRect.left) / width : (evt.clientY - targetRect.top) / height) > 0.5,
+					nextSibling = target.nextElementSibling,
+					moveVector = _onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt),
+					after
+				;
+
+				if (moveVector !== false) {
+					_silent = true;
+					setTimeout(_unsilent, 30);
+
+					_cloneHide(activeSortable, isOwner);
+
+					if (moveVector === 1 || moveVector === -1) {
+						after = (moveVector === 1);
+					}
+					else if (floating) {
+						var elTop = dragEl.offsetTop,
+							tgTop = target.offsetTop;
+
+						if (elTop === tgTop) {
+							after = (target.previousElementSibling === dragEl) && !isWide || halfway && isWide;
+						}
+						else if (target.previousElementSibling === dragEl || dragEl.previousElementSibling === target) {
+							after = (evt.clientY - targetRect.top) / height > 0.5;
+						} else {
+							after = tgTop > elTop;
+						}
+					} else {
+						after = (nextSibling !== dragEl) && !isLong || halfway && isLong;
+					}
+
+					if (!dragEl.contains(el)) {
+						if (after && !nextSibling) {
+							el.appendChild(dragEl);
+						} else {
+							target.parentNode.insertBefore(dragEl, after ? nextSibling : target);
+						}
+					}
+
+					parentEl = dragEl.parentNode; // actualization
+
+					this._animate(dragRect, dragEl);
+					this._animate(targetRect, target);
 				}
 			}
 		},
