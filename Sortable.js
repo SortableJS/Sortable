@@ -684,8 +684,16 @@
 
 			moved = true;
 
-			if (activeSortable && !options.disabled &&
-				(isOwner
+			// Check base state
+			if (
+				options.disabled ||
+				(evt.rootEl != null && evt.rootEl !== this.el) || // touch fallback
+				!activeSortable
+			) {
+				return;
+			}
+
+			if ((isOwner
 					? canSort || (revert = !rootEl.contains(dragEl)) // Reverting item into the original list
 					: (
 						putSortable === this ||
@@ -694,8 +702,7 @@
 							group.checkPut(this, activeSortable, dragEl, evt)
 						)
 					)
-				) &&
-				(evt.rootEl === void 0 || evt.rootEl === this.el) // touch fallback
+				)
 			) {
 				// Smart auto-scrolling
 				_autoScroll(evt, options, this.el);
