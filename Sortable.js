@@ -67,7 +67,7 @@
 		$ = win.jQuery || win.Zepto,
 		Polymer = win.Polymer,
 
-		captureMode = {capture: false, passive: false},
+		captureMode = false,
 
 		supportDraggable = !!('draggable' in document.createElement('div')),
 		supportCssPointerEvents = (function (el) {
@@ -230,7 +230,7 @@
 
 		// Export instance
 		el[expando] = this;
-
+		el.style['touch-action'] = 'none'; // #1022
 
 		// Default options
 		var defaults = {
