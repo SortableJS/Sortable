@@ -291,6 +291,7 @@
 		if (this.nativeDraggable) {
 			_on(el, 'dragover', this);
 			_on(el, 'dragenter', this);
+			_on(el, 'dragleave', this);
 		}
 
 		touchDragOverListeners.push(this._onDragOver);
@@ -505,7 +506,7 @@
 
 				// Drag start event
 				_dispatchEvent(this, rootEl, 'start', dragEl, rootEl, oldIndex);
-				_dispatchEvent(this, rootEl, 'enter', dragEl, rootEl, oldIndex);
+				_dispatchEvent(this, rootEl, 'enter', dragEl);
 			} else {
 				this._nulling();
 			}
@@ -696,8 +697,7 @@
 			moved = true;
 
 			if (lastOver !== this) {
-				_dispatchEvent(lastOver, lastOver.el, 'leave', dragEl);
-				_dispatchEvent(this, el, 'enter', dragEl, lastOver.el);
+				_dispatchEvent(this, el, 'enter', dragEl, activeSortable.el);
 				lastOver = this;
 			}
 
@@ -953,8 +953,9 @@
 						// Save sorting
 						this.save();
 					}
-				}
 
+					_dispatchEvent(this, el, 'leave', dragEl, lastOver.el);
+				}
 			}
 
 			this._nulling();
@@ -1001,9 +1002,26 @@
 
 				case 'dragover':
 				case 'dragenter':
+					this.hasDragleave = false;
+
 					if (dragEl) {
 						this._onDragOver(evt);
 						_globalDragOver(evt);
+					}
+					break;
+
+				case 'dragleave':
+					this.hasDragleave = true;
+
+					if (lastOver && !lastOver.dragleaveId) {
+						lastOver.dragleaveId = setTimeout(function () {
+							lastOver.dragleaveId = null;
+
+							if (lastOver.hasDragleave) {
+								_dispatchEvent(lastOver, lastOver.el, 'leave', dragEl);
+								lastOver = null;
+							}
+						}, 10);
 					}
 					break;
 
@@ -1113,11 +1131,9 @@
 			_off(el, 'mousedown', this._onTapStart);
 			_off(el, 'touchstart', this._onTapStart);
 			_off(el, 'pointerdown', this._onTapStart);
-
-			if (this.nativeDraggable) {
-				_off(el, 'dragover', this);
-				_off(el, 'dragenter', this);
-			}
+			_off(el, 'dragover', this);
+			_off(el, 'dragenter', this);
+			_off(el, 'dragleave', this);
 
 			// Remove draggable attributes
 			Array.prototype.forEach.call(el.querySelectorAll('[draggable]'), function (el) {
