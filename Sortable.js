@@ -25,6 +25,16 @@
 			throw new Error("Sortable.js requires a window with a document");
 		};
 	}
+	
+	var supportsPassive = false;
+	try {
+		var opts = Object.defineProperty({}, 'passive', {
+			get: function() {
+			supportsPassive = true;
+			}
+		});
+		window.addEventListener("test", null, opts);
+	} catch (e) {}
 
 	var dragEl,
 		parentEl,
@@ -67,7 +77,7 @@
 		$ = win.jQuery || win.Zepto,
 		Polymer = win.Polymer,
 
-		captureMode = false,
+		captureMode = supportsPassive ? {capture: false, passive: false} : false,
 
 		supportDraggable = !!('draggable' in document.createElement('div')),
 		supportCssPointerEvents = (function (el) {
@@ -230,7 +240,6 @@
 
 		// Export instance
 		el[expando] = this;
-		el.style['touch-action'] = 'none'; // #1022
 
 		// Default options
 		var defaults = {
