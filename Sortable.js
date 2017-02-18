@@ -57,7 +57,8 @@
 		moved,
 
 		/** @const */
-		RSPACE = /\s+/g,
+		R_SPACE = /\s+/g,
+		R_FLOAT = /left|right|inline/,
 
 		expando = 'Sortable' + (new Date).getTime(),
 
@@ -86,6 +87,7 @@
 		abs = Math.abs,
 		min = Math.min,
 
+		savedInputChecked = [],
 		touchDragOverListeners = [],
 
 		_autoScroll = _throttle(function (/**Event*/evt, /**Object*/options, /**HTMLElement*/rootEl) {
@@ -214,7 +216,6 @@
 	;
 
 
-
 	/**
 	 * @class  Sortable
 	 * @param  {HTMLElement}  el
@@ -313,6 +314,9 @@
 				originalTarget = evt.target.shadowRoot && evt.path[0] || target,
 				filter = options.filter,
 				startIndex;
+
+			_saveInputCheckedState(el);
+
 
 			// Don't trigger start event when an element is been dragged, otherwise the evt.oldindex always wrong when set option.group.
 			if (dragEl) {
@@ -420,6 +424,7 @@
 				_on(ownerDocument, 'touchend', _this._onDrop);
 				_on(ownerDocument, 'touchcancel', _this._onDrop);
 				_on(ownerDocument, 'pointercancel', _this._onDrop);
+				_on(ownerDocument, 'selectstart', _this);
 
 				if (options.delay) {
 					// If the user moves the pointer or let go the click or touch
@@ -437,9 +442,7 @@
 					dragStartFn();
 				}
 
-				if (options.forceFallback) {
-					evt.preventDefault();
-				}
+
 			}
 		},
 
@@ -678,11 +681,16 @@
 				group = options.group,
 				activeSortable = Sortable.active,
 				isOwner = (activeGroup === group),
+				isMovingBetweenSortable = false,
 				canSort = options.sort;
 
 			if (evt.preventDefault !== void 0) {
 				evt.preventDefault();
 				!options.dragoverBubble && evt.stopPropagation();
+			}
+
+			if (dragEl.animated) {
+				return;
 			}
 
 			moved = true;
@@ -715,7 +723,11 @@
 
 				target = _closest(evt.target, options.draggable, el);
 				dragRect = dragEl.getBoundingClientRect();
-				putSortable = this;
+
+				if (putSortable !== this) {
+					putSortable = this;
+					isMovingBetweenSortable = true;
+				}
 
 				if (revert) {
 					_cloneHide(activeSortable, true);
@@ -766,14 +778,14 @@
 
 					var width = targetRect.right - targetRect.left,
 						height = targetRect.bottom - targetRect.top,
-						floating = /left|right|inline/.test(lastCSS.cssFloat + lastCSS.display)
+						floating = R_FLOAT.test(lastCSS.cssFloat + lastCSS.display)
 							|| (lastParentCSS.display == 'flex' && lastParentCSS['flex-direction'].indexOf('row') === 0),
 						isWide = (target.offsetWidth > dragEl.offsetWidth),
 						isLong = (target.offsetHeight > dragEl.offsetHeight),
 						halfway = (floating ? (evt.clientX - targetRect.left) / width : (evt.clientY - targetRect.top) / height) > 0.5,
 						nextSibling = target.nextElementSibling,
 						moveVector = _onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt),
-						after
+						after = false
 					;
 
 					if (moveVector !== false) {
@@ -797,7 +809,7 @@
 							} else {
 								after = tgTop > elTop;
 							}
-						} else {
+						} else if (!isMovingBetweenSortable) {
 							after = (nextSibling !== dragEl) && !isLong || halfway && isLong;
 						}
 
@@ -857,6 +869,7 @@
 			_off(ownerDocument, 'touchend', this._onDrop);
 			_off(ownerDocument, 'pointerup', this._onDrop);
 			_off(ownerDocument, 'touchcancel', this._onDrop);
+			_off(ownerDocument, 'selectstart', this);
 		},
 
 		_onDrop: function (/**Event*/evt) {
@@ -972,19 +985,31 @@
 			putSortable =
 			activeGroup =
 			Sortable.active = null;
+
+			savedInputChecked.forEach(function (el) {
+				el.checked = true;
+			});
+			savedInputChecked.length = 0;
 		},
 
 		handleEvent: function (/**Event*/evt) {
-			var type = evt.type;
+			switch (evt.type) {
+				case 'drop':
+				case 'dragend':
+					this._onDrop(evt);
+					break;
 
-			if (type === 'dragover' || type === 'dragenter') {
-				if (dragEl) {
-					this._onDragOver(evt);
-					_globalDragOver(evt);
-				}
-			}
-			else if (type === 'drop' || type === 'dragend') {
-				this._onDrop(evt);
+				case 'dragover':
+				case 'dragenter':
+					if (dragEl) {
+						this._onDragOver(evt);
+						_globalDragOver(evt);
+					}
+					break;
+
+				case 'selectstart':
+					evt.preventDefault();
+					break;
 			}
 		},
 
@@ -1179,8 +1204,8 @@
 				el.classList[state ? 'add' : 'remove'](name);
 			}
 			else {
-				var className = (' ' + el.className + ' ').replace(RSPACE, ' ').replace(' ' + name + ' ', ' ');
-				el.className = (className + (state ? ' ' + name : '')).replace(RSPACE, ' ');
+				var className = (' ' + el.className + ' ').replace(R_SPACE, ' ').replace(' ' + name + ' ', ' ');
+				el.className = (className + (state ? ' ' + name : '')).replace(R_SPACE, ' ');
 			}
 		}
 	}
@@ -1401,6 +1426,16 @@
 				? Polymer.dom(el).cloneNode(true)
 				: el.cloneNode(true)
 			);
+	}
+
+	function _saveInputCheckedState(root) {
+		var inputs = root.getElementsByTagName('input');
+		var idx = inputs.length;
+
+		while (idx--) {
+			var el = inputs[idx];
+			el.checked && savedInputChecked.push(el);
+		}
 	}
 
 	try {
