@@ -67,7 +67,7 @@
 		$ = win.jQuery || win.Zepto,
 		Polymer = win.Polymer,
 
-		captureMode = {capture: false, passive: false},
+		captureMode = false,
 
 		supportDraggable = !!('draggable' in document.createElement('div')),
 		supportCssPointerEvents = (function (el) {
@@ -230,7 +230,6 @@
 
 		// Export instance
 		el[expando] = this;
-
 
 		// Default options
 		var defaults = {
@@ -1392,6 +1391,17 @@
 				: el.cloneNode(true)
 			);
 	}
+
+	try {
+		window.addEventListener('test', null, Object.defineProperty({}, 'passive', {
+			get: function () {
+				captureMode = {
+					capture: false,
+					passive: false
+				};
+			}
+		}));
+	} catch (err) {}
 
 	// Export utils
 	Sortable.utils = {
