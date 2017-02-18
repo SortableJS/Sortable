@@ -33,6 +33,7 @@
 		rootEl,
 		nextEl,
 		lastDownEl,
+		lastOver,
 
 		scrollEl,
 		scrollParentEl,
@@ -456,6 +457,7 @@
 
 		_triggerDragStart: function (/** Event */evt, /** Touch */touch) {
 			touch = touch || (evt.pointerType == 'touch' ? evt : null);
+
 			if (touch) {
 				// Touch device support
 				tapEvt = {
@@ -495,10 +497,12 @@
 				_toggleClass(dragEl, options.ghostClass, true);
 				_toggleClass(dragEl, options.dragClass, false);
 
+				lastOver = this;
 				Sortable.active = this;
 
 				// Drag start event
 				_dispatchEvent(this, rootEl, 'start', dragEl, rootEl, oldIndex);
+				_dispatchEvent(this, rootEl, 'enter', dragEl, rootEl, oldIndex);
 			} else {
 				this._nulling();
 			}
@@ -682,6 +686,12 @@
 			}
 
 			moved = true;
+
+			if (lastOver !== this) {
+				_dispatchEvent(lastOver, lastOver.el, 'leave', dragEl);
+				_dispatchEvent(this, el, 'enter', dragEl, lastOver.el);
+				lastOver = this;
+			}
 
 			if (activeSortable && !options.disabled &&
 				(isOwner
@@ -945,6 +955,7 @@
 			nextEl =
 			cloneEl =
 			lastDownEl =
+			lastOver =
 
 			scrollEl =
 			scrollParentEl =

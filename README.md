@@ -125,6 +125,12 @@ var sortable = new Sortable(el, {
 		evt.newIndex;  // element's new index within parent
 	},
 
+	// Element enters into sortable
+	onEnter: function (/**Event*/evt) {},
+
+	// Element leaves from sortable
+	onLeave: function (/**Event*/evt) {},
+
 	// Element is dropped into the list from another list
 	onAdd: function (/**Event*/evt) {
 		var itemEl = evt.item;  // dragged HTMLElement
