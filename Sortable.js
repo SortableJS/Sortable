@@ -1428,6 +1428,7 @@
 		}
 	}
 
+	// Fixed #973: 
 	_on(document, 'touchmove', function (evt) {
 		if (Sortable.active) {
 			evt.preventDefault();
