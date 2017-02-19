@@ -1428,6 +1428,12 @@
 		}
 	}
 
+	_on(document, 'touchmove', function (evt) {
+		if (Sortable.active) {
+			evt.preventDefault();
+		}
+	});
+
 	try {
 		window.addEventListener('test', null, Object.defineProperty({}, 'passive', {
 			get: function () {
