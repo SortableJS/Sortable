@@ -1468,6 +1468,6 @@
 
 
 	// Export
-	Sortable.version = '1.5.0-rc1';
+	Sortable.version = '1.5.0';
 	return Sortable;
 });
