@@ -686,14 +686,15 @@
 				!options.dragoverBubble && evt.stopPropagation();
 			}
 
-			if (dragEl.animated) {
-				return;
-			}
+			// Smart auto-scrolling
+			_autoScroll(evt, options, this.el);
 
 			moved = true;
 
 			// Check base state
 			if (
+				_silent ||
+				dragEl.animated ||
 				!activeSortable ||
 				options.disabled ||
 				!(evt.rootEl === void 0 || evt.rootEl === this.el)  // touch fallback
@@ -719,38 +720,18 @@
 				}
 			}
 
-			target = _closest(evt.target, options.draggable, el);
-			dragRect = dragEl.getBoundingClientRect();
-
 			if (putSortable !== this) {
 				putSortable = this;
 				isMovingBetweenSortable = true;
 			}
 
-			// Smart auto-scrolling
-			_autoScroll(evt, options, this.el);
-
-			if (_silent) {
+			if (revert) {
+				_revertDragElement(activeSortable, canSort);
 				return;
 			}
 
 			target = _closest(evt.target, options.draggable, el);
 			dragRect = dragEl.getBoundingClientRect();
-			putSortable = this;
-
-			if (revert) {
-				_cloneHide(activeSortable, true);
-				parentEl = rootEl; // actualization
-
-				if (cloneEl || nextEl) {
-					rootEl.insertBefore(dragEl, cloneEl || nextEl);
-				}
-				else if (!canSort) {
-					rootEl.appendChild(dragEl);
-				}
-
-				return;
-			}
 
 			if ((el.children.length === 0) || (el.children[0] === ghostEl) ||
 				(el === evt.target) && (target = _ghostIsLast(el, evt))
@@ -1318,6 +1299,18 @@
 
 	function _unsilent() {
 		_silent = false;
+	}
+
+
+	function _revertDragElement(activeSortable, canSort) {
+		_cloneHide(activeSortable, true);
+		parentEl = rootEl; // actualization
+
+		if (cloneEl || nextEl) {
+			rootEl.insertBefore(dragEl, cloneEl || nextEl);
+		} else if (!canSort) {
+			rootEl.appendChild(dragEl);
+		}
 	}
 
 
