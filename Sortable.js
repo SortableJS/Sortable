@@ -954,7 +954,7 @@
 						this.save();
 					}
 
-					_dispatchEvent(this, el, 'leave', dragEl, lastOver.el);
+					_dispatchEvent(this, lastOver.el, 'leave', dragEl);
 				}
 			}
 
