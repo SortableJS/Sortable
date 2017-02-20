@@ -901,22 +901,32 @@
 					_toggleClass(dragEl, this.options.ghostClass, false);
 					_toggleClass(dragEl, this.options.chosenClass, false);
 
-					if (rootEl !== parentEl) {
-						newIndex = _index(dragEl, options.draggable);
+                    if (rootEl !== parentEl) {
+                      newIndex = _index(dragEl, options.draggable);
 
-						if (newIndex >= 0) {
+                      if (newIndex >= 0) {
+                        // Added these lines so as not to delete dragElements when using
+                        // reactjs
+                        var tempDragEl = _clone(dragEl);
+                        parentEl.insertBefore(tempDragEl, dragEl);
+                        rootEl.insertBefore(dragEl, cloneEl);
+                        cloneEl.remove();
 
-							// Add event
-							_dispatchEvent(null, parentEl, 'add', dragEl, rootEl, oldIndex, newIndex);
+                        // Add event
+                        //_dispatchEvent(null, parentEl, 'add', dragEl, rootEl, oldIndex, newIndex);
+                        _dispatchEvent(null, parentEl, 'add', tempDragEl, rootEl, oldIndex, newIndex);
 
-							// Remove event
-							_dispatchEvent(this, rootEl, 'remove', dragEl, rootEl, oldIndex, newIndex);
+                        // Remove event
+                        //_dispatchEvent(this, rootEl, 'remove', dragEl, rootEl, oldIndex, newIndex);
+                        _dispatchEvent(this, rootEl, 'remove', tempDragEl, rootEl, oldIndex, newIndex);
 
-							// drag from one list and drop into another
-							_dispatchEvent(null, parentEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
-							_dispatchEvent(this, rootEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
-						}
-					}
+                        // drag from one list and drop into another
+                        //_dispatchEvent(null, parentEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
+                        //_dispatchEvent(this, rootEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
+                        _dispatchEvent(null, parentEl, 'sort', tempDragEl, rootEl, oldIndex, newIndex);
+                        _dispatchEvent(this, rootEl, 'sort', tempDragEl, rootEl, oldIndex, newIndex);
+                      }
+                    }
 					else {
 						// Remove clone
 						cloneEl && cloneEl.parentNode.removeChild(cloneEl);
@@ -1257,7 +1267,7 @@
 		evt.from = fromEl || rootEl;
 		evt.item = targetEl || rootEl;
 		evt.clone = cloneEl;
-
+        
 		evt.oldIndex = startIndex;
 		evt.newIndex = newIndex;
 
@@ -1411,7 +1421,7 @@
 
 	function _clone(el) {
 		return $
-			? $(el).clone(true)[0]
+			? $(el).clone(true, true)[0]
 			: (Polymer && Polymer.dom
 				? Polymer.dom(el).cloneNode(true)
 				: el.cloneNode(true)
