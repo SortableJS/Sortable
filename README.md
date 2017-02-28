@@ -128,6 +128,7 @@ var sortable = new Sortable(el, {
 	// Element is dropped into the list from another list
 	onAdd: function (/**Event*/evt) {
 		var itemEl = evt.item;  // dragged HTMLElement
+		evt.to;    // target list
 		evt.from;  // previous list
 		// + indexes from onEnd
 	},
@@ -140,12 +141,12 @@ var sortable = new Sortable(el, {
 
 	// Called by any change to the list (add / update / remove)
 	onSort: function (/**Event*/evt) {
-		// same properties as onUpdate
+		// same properties as onAdd
 	},
 
 	// Element is removed from the list into another list
 	onRemove: function (/**Event*/evt) {
-		// same properties as onUpdate
+		// same properties as onAdd
 	},
 
 	// Attempt to drag a filtered element
