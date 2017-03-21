@@ -384,7 +384,7 @@
 				dragEl = target;
 				parentEl = dragEl.parentNode;
 				nextEl = dragEl.nextSibling;
-				lastDownEl = target
+				lastDownEl = target;
 				activeGroup = options.group;
 				oldIndex = startIndex;
 
@@ -476,11 +476,11 @@
 			}
 
 			try {
-				if (document.selection) {					
-					// Timeout neccessary for IE9					
+				if (document.selection) {
+					// Timeout neccessary for IE9
 					setTimeout(function () {
 						document.selection.empty();
-					});					
+					});
 				} else {
 					window.getSelection().removeAllRanges();
 				}
@@ -1388,12 +1388,11 @@
 	}
 
 	function _clone(el) {
-		return $
-			? $(el).clone(true)[0]
-			: (Polymer && Polymer.dom
-				? Polymer.dom(el).cloneNode(true)
+		return (Polymer && Polymer.dom)
+			? Polymer.dom(el).cloneNode(true)
+			: ($ ? $(el).clone(true)[0]
 				: el.cloneNode(true)
-			);
+		);
 	}
 
 	// Export utils
