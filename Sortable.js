@@ -887,11 +887,11 @@
 					!options.dropBubble && evt.stopPropagation();
 				}
 
-				ghostEl && ghostEl.parentNode.removeChild(ghostEl);
+				ghostEl && ghostEl.parentNode && ghostEl.parentNode.removeChild(ghostEl);
 
 				if (rootEl === parentEl || Sortable.active.lastPullMode !== 'clone') {
 					// Remove clone
-					cloneEl && cloneEl.parentNode.removeChild(cloneEl);
+					cloneEl && cloneEl.parentNode && cloneEl.parentNode.removeChild(cloneEl);
 				}
 
 				if (dragEl) {
