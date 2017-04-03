@@ -93,6 +93,7 @@ var sortable = new Sortable(el, {
 	chosenClass: "sortable-chosen",  // Class name for the chosen item
 	dragClass: "sortable-drag",  // Class name for the dragging item
 	dataIdAttr: 'data-id',
+	sendAllMove: false, // Sends all move events if enabled
 
 	forceFallback: false,  // ignore the HTML5 DnD behaviour and force the fallback to kick in
 
