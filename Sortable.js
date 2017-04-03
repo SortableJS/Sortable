@@ -929,9 +929,8 @@
 
 							if (newIndex >= 0) {
 								// drag & drop within the same list
-								console.log("DND");
-								//_dispatchEvent(this, rootEl, 'update', dragEl, rootEl, oldIndex, newIndex);
-								//_dispatchEvent(this, rootEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
+								_dispatchEvent(this, rootEl, 'update', dragEl, rootEl, oldIndex, newIndex);
+								_dispatchEvent(this, rootEl, 'sort', dragEl, rootEl, oldIndex, newIndex);
 							}
 						}
 					}
