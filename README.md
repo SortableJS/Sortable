@@ -1,5 +1,5 @@
 # Sortable
-Sortable is a minimalist JavaScript library for reorderable drag-and-drop lists.
+Sortable is a <s>minimalist</s> JavaScript library for reorderable drag-and-drop lists.
 
 Demo: http://rubaxa.github.io/Sortable/
 
@@ -70,7 +70,7 @@ var el = document.getElementById('items');
 var sortable = Sortable.create(el);
 ```
 
-You can use any element for the list and its elements, not just `ul`/`li`. Here is an [example with `div`s](http://jsbin.com/luxero/2/edit?html,js,output).
+You can use any element for the list and its elements, not just `ul`/`li`. Here is an [example with `div`s](http://jsbin.com/qumuwe/edit?html,js,output).
 
 
 ---
@@ -87,6 +87,7 @@ var sortable = new Sortable(el, {
 	animation: 150,  // ms, animation speed moving items when sorting, `0` — without animation
 	handle: ".my-handle",  // Drag handle selector within list items
 	filter: ".ignore-elements",  // Selectors that do not lead to dragging (String or Function)
+	preventOnFilter: true, // Call `event.preventDefault()` when triggered `filter`
 	draggable: ".item",  // Specifies which items inside the element should be draggable
 	ghostClass: "sortable-ghost",  // Class name for the drop placeholder
 	chosenClass: "sortable-chosen",  // Class name for the chosen item
@@ -182,10 +183,13 @@ You can also define whether lists can give away, give and keep a copy (`clone`),
  * name: `String` — group name
  * pull: `true|false|'clone'|function` — ability to move from the list. `clone` — copy the item, rather than move.
  * put: `true|false|["foo", "bar"]|function` — whether elements can be added from other lists, or an array of group names from which elements can be taken.
+ * revertClone: `boolean` — revert cloned element to initial position after moving to a another list.
+
 
 Demo:
  - http://jsbin.com/naduvo/edit?js,output
  - http://jsbin.com/rusuvot/edit?js,output — use of complex logic in the `pull` and` put`
+ - http://jsbin.com/magogub/edit?js,output — use `revertClone: true`
 
 
 ---
@@ -194,7 +198,7 @@ Demo:
 #### `sort` option
 Sorting inside list.
 
-Demo: http://jsbin.com/xizeh/2/edit?html,js,output
+Demo: http://jsbin.com/videzob/edit?html,js,output
 
 
 ---
@@ -203,7 +207,7 @@ Demo: http://jsbin.com/xizeh/2/edit?html,js,output
 #### `delay` option
 Time in milliseconds to define when the sorting should start.
 
-Demo: http://jsbin.com/xizeh/4/edit?html,js,output
+Demo: http://jsbin.com/xizeh/edit?html,js,output
 
 
 ---
@@ -212,7 +216,7 @@ Demo: http://jsbin.com/xizeh/4/edit?html,js,output
 #### `disabled` options
 Disables the sortable if set to `true`.
 
-Demo: http://jsbin.com/xiloqu/1/edit?html,js,output
+Demo: http://jsbin.com/xiloqu/edit?html,js,output
 
 ```js
 var sortable = Sortable.create(list);
@@ -233,7 +237,7 @@ To make list items draggable, Sortable disables text selection by the user.
 That's not always desirable. To allow text selection, define a drag handler,
 which is an area of every list element that allows it to be dragged around.
 
-Demo: http://jsbin.com/newize/1/edit?html,js,output
+Demo: http://jsbin.com/newize/edit?html,js,output
 
 ```js
 Sortable.create(el, {
@@ -286,7 +290,7 @@ Sortable.create(list, {
 #### `ghostClass` option
 Class name for the drop placeholder (default `sortable-ghost`).
 
-Demo: http://jsbin.com/hunifu/1/edit?css,js,output
+Demo: http://jsbin.com/hunifu/4/edit?css,js,output
 
 ```css
 .ghost {
@@ -307,7 +311,7 @@ Sortable.create(list, {
 #### `chosenClass` option
 Class name for the chosen item  (default `sortable-chosen`).
 
-Demo: http://jsbin.com/hunifu/edit?html,css,js,output
+Demo: http://jsbin.com/hunifu/3/edit?html,css,js,output
 
 ```css
 .chosen {
@@ -333,7 +337,7 @@ This gives us the possibility to test the behaviour for older Browsers even in n
 
 On top of that, the Fallback always generates a copy of that DOM Element and appends the class `fallbackClass` defined in the options. This behaviour controls the look of this 'dragged' Element.
 
-Demo: http://jsbin.com/pucurizace/edit?html,css,js,output
+Demo: http://jsbin.com/yacuqib/edit?html,css,js,output
 
 
 ---
@@ -356,8 +360,8 @@ Dragging only starts if you move the pointer past a certain tolerance, so that y
 If set to `true`, the page (or sortable-area) scrolls when coming to an edge.
 
 Demo:
- - `window`: http://jsbin.com/boqugumiqi/1/edit?html,js,output
- - `overflow: hidden`: http://jsbin.com/kohamakiwi/1/edit?html,js,output
+ - `window`: http://jsbin.com/tutuzeh/edit?html,js,output
+ - `overflow: hidden`: http://jsbin.com/kolisu/edit?html,js,output
 
 
 ---
@@ -487,7 +491,7 @@ Sortable.create(el, {
 
 <a name="bs"></a>
 ### Bootstrap
-Demo: http://jsbin.com/luxero/2/edit?html,js,output
+Demo: http://jsbin.com/qumuwe/edit?html,js,output
 
 ```html
 <!-- Latest compiled and minified CSS -->
@@ -558,11 +562,11 @@ Link to the active instance.
 
 ```html
 <!-- CDNJS :: Sortable (https://cdnjs.com/) -->
-<script src="//cdnjs.cloudflare.com/ajax/libs/Sortable/1.5.0-rc1/Sortable.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/Sortable/1.5.1/Sortable.min.js"></script>
 
 
 <!-- jsDelivr :: Sortable (http://www.jsdelivr.com/) -->
-<script src="//cdn.jsdelivr.net/sortable/1.5.0-rc1/Sortable.min.js"></script>
+<script src="//cdn.jsdelivr.net/sortable/1.5.1/Sortable.min.js"></script>
 
 
 <!-- jsDelivr :: Sortable :: Latest (http://www.jsdelivr.com/) -->
@@ -612,7 +616,7 @@ Please, [read this](CONTRIBUTING.md).
 
 
 ## MIT LICENSE
-Copyright 2013-2016 Lebedev Konstantin <ibnRubaXa@gmail.com>
+Copyright 2013-2017 Lebedev Konstantin <ibnRubaXa@gmail.com>
 http://rubaxa.github.io/Sortable/
 
 Permission is hereby granted, free of charge, to any person obtaining

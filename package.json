@@ -1,7 +1,7 @@
 {
   "name": "sortablejs",
   "exportName": "Sortable",
-  "version": "1.5.0-rc1",
+  "version": "1.5.1",
   "devDependencies": {
     "grunt": "*",
     "grunt-version": "*",
@@ -11,12 +11,17 @@
   "description": "Minimalist JavaScript library for reorderable drag-and-drop lists on modern browsers and touch devices. No jQuery. Supports AngularJS and any CSS library, e.g. Bootstrap.",
   "main": "Sortable.js",
   "scripts": {
-    "test": "grunt"
+    "test": "./node_modules/grunt/bin/grunt",
+    "prepublish": "./node_modules/grunt/bin/grunt"
   },
   "repository": {
     "type": "git",
     "url": "git://github.com/rubaxa/Sortable.git"
   },
+  "files": [
+    "Sortable.js",
+    "Sortable.min.js"
+  ],
   "keywords": [
     "sortable",
     "reorder",
