@@ -943,7 +943,7 @@
 			this._nulling();
 		},
 
-		_nulling: function () {
+		_nulling: function() {
 			rootEl =
 			dragEl =
 			parentEl =
