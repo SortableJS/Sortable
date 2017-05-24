@@ -67,7 +67,7 @@
 		$ = win.jQuery || win.Zepto,
 		Polymer = win.Polymer,
 
-		captureMode = { capture: false, passive: false },
+		captureMode = {capture: false, passive: false},
 
 		supportDraggable = !!('draggable' in document.createElement('div')),
 		supportCssPointerEvents = (function (el) {
