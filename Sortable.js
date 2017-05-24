@@ -107,7 +107,7 @@
 
 					scrollOffsetX,
 					scrollOffsetY
-					;
+				;
 
 				// Delect scrollEl
 				if (scrollParentEl !== rootEl) {
@@ -158,7 +158,7 @@
 							scrollOffsetY = vy ? vy * speed : 0;
 							scrollOffsetX = vx ? vx * speed : 0;
 
-							if ('function' === typeof (scrollCustomFn)) {
+							if ('function' === typeof(scrollCustomFn)) {
 								return scrollCustomFn.call(_this, scrollOffsetX, scrollOffsetY, evt);
 							}
 
@@ -200,7 +200,7 @@
 			var originalGroup = options.group;
 
 			if (!originalGroup || typeof originalGroup != 'object') {
-				originalGroup = { name: originalGroup };
+				originalGroup = {name: originalGroup};
 			}
 
 			group.name = originalGroup.name;
@@ -210,7 +210,7 @@
 
 			options.group = group;
 		}
-		;
+	;
 
 
 
@@ -261,7 +261,7 @@
 			fallbackClass: 'sortable-fallback',
 			fallbackOnBody: false,
 			fallbackTolerance: 0,
-			fallbackOffset: { x: 0, y: 0 }
+			fallbackOffset: {x: 0, y: 0}
 		};
 
 
@@ -384,7 +384,7 @@
 				dragEl = target;
 				parentEl = dragEl.parentNode;
 				nextEl = dragEl.nextSibling;
-				lastDownEl = target;
+				lastDownEl = target
 				activeGroup = options.group;
 				oldIndex = startIndex;
 
@@ -476,11 +476,11 @@
 			}
 
 			try {
-				if (document.selection) {
+				if (document.selection) {					
 					// Timeout neccessary for IE9					
 					setTimeout(function () {
 						document.selection.empty();
-					});
+					});					
 				} else {
 					window.getSelection().removeAllRanges();
 				}
@@ -552,7 +552,7 @@
 
 		_onTouchMove: function (/**TouchEvent*/evt) {
 			if (tapEvt) {
-				var options = this.options,
+				var	options = this.options,
 					fallbackTolerance = options.fallbackTolerance,
 					fallbackOffset = options.fallbackOffset,
 					touch = evt.touches ? evt.touches[0] : evt,
@@ -764,7 +764,7 @@
 						halfway = (floating ? (evt.clientX - targetRect.left) / width : (evt.clientY - targetRect.top) / height) > 0.5,
 						nextSibling = target.nextElementSibling,
 						after
-						;
+					;
 
 					if (floating) {
 						var elTop = dragEl.offsetTop,
@@ -945,28 +945,28 @@
 
 		_nulling: function () {
 			rootEl =
-				dragEl =
-				parentEl =
-				ghostEl =
-				nextEl =
-				cloneEl =
-				lastDownEl =
+			dragEl =
+			parentEl =
+			ghostEl =
+			nextEl =
+			cloneEl =
+			lastDownEl =
 
-				scrollEl =
-				scrollParentEl =
+			scrollEl =
+			scrollParentEl =
 
-				tapEvt =
-				touchEvt =
+			tapEvt =
+			touchEvt =
 
-				moved =
-				newIndex =
+			moved =
+			newIndex =
 
-				lastEl =
-				lastCSS =
+			lastEl =
+			lastCSS =
 
-				putSortable =
-				activeGroup =
-				Sortable.active = null;
+			putSortable =
+			activeGroup =
+			Sortable.active = null;
 		},
 
 		handleEvent: function (/**Event*/evt) {
