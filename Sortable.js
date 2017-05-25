@@ -780,34 +780,36 @@
 						isLong = (target.offsetHeight > dragEl.offsetHeight),
 						halfway = (floating ? (evt.clientX - targetRect.left) / width : (evt.clientY - targetRect.top) / height) > 0.5,
 						nextSibling = target.nextElementSibling,
-						moveVector = _onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt),
 						after = false
 					;
 
+					if (floating) {
+						var elTop = dragEl.offsetTop,
+							tgTop = target.offsetTop;
+
+						if (elTop === tgTop) {
+							after = (target.previousElementSibling === dragEl) && !isWide || halfway && isWide;
+						}
+						else if (target.previousElementSibling === dragEl || dragEl.previousElementSibling === target) {
+							after = (evt.clientY - targetRect.top) / height > 0.5;
+						} else {
+							after = tgTop > elTop;
+						}
+						} else if (!isMovingBetweenSortable) {
+						after = (nextSibling !== dragEl) && !isLong || halfway && isLong;
+					}
+
+					var moveVector = _onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt, after);
+
 					if (moveVector !== false) {
+						if (moveVector === 1 || moveVector === -1) {
+							after = (moveVector === 1);
+						}
+
 						_silent = true;
 						setTimeout(_unsilent, 30);
 
 						_cloneHide(activeSortable, isOwner);
-
-						if (moveVector === 1 || moveVector === -1) {
-							after = (moveVector === 1);
-						}
-						else if (floating) {
-							var elTop = dragEl.offsetTop,
-								tgTop = target.offsetTop;
-
-							if (elTop === tgTop) {
-								after = (target.previousElementSibling === dragEl) && !isWide || halfway && isWide;
-							}
-							else if (target.previousElementSibling === dragEl || dragEl.previousElementSibling === target) {
-								after = (evt.clientY - targetRect.top) / height > 0.5;
-							} else {
-								after = tgTop > elTop;
-							}
-						} else if (!isMovingBetweenSortable) {
-							after = (nextSibling !== dragEl) && !isLong || halfway && isLong;
-						}
 
 						if (!dragEl.contains(el)) {
 							if (after && !nextSibling) {
@@ -1278,7 +1280,7 @@
 	}
 
 
-	function _onMove(fromEl, toEl, dragEl, dragRect, targetEl, targetRect, originalEvt) {
+	function _onMove(fromEl, toEl, dragEl, dragRect, targetEl, targetRect, originalEvt, willInsertAfter) {
 		var evt,
 			sortable = fromEl[expando],
 			onMoveFn = sortable.options.onMove,
@@ -1293,6 +1295,7 @@
 		evt.draggedRect = dragRect;
 		evt.related = targetEl || toEl;
 		evt.relatedRect = targetRect || toEl.getBoundingClientRect();
+		evt.willInsertAfter = willInsertAfter;
 
 		fromEl.dispatchEvent(evt);
 
