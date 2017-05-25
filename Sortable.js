@@ -1249,7 +1249,7 @@
 	}
 
 
-	function _onMove(fromEl, toEl, dragEl, dragRect, targetEl, targetRect, originalEvt, insertAfter) {
+	function _onMove(fromEl, toEl, dragEl, dragRect, targetEl, targetRect, originalEvt, willInsertAfter) {
 		var evt,
 			sortable = fromEl[expando],
 			onMoveFn = sortable.options.onMove,
@@ -1264,7 +1264,7 @@
 		evt.draggedRect = dragRect;
 		evt.related = targetEl || toEl;
 		evt.relatedRect = targetRect || toEl.getBoundingClientRect();
-		evt.insertAfter = insertAfter;
+		evt.willInsertAfter = willInsertAfter;
 
 		fromEl.dispatchEvent(evt);
 
