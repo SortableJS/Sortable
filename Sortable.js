@@ -384,7 +384,7 @@
 				dragEl = target;
 				parentEl = dragEl.parentNode;
 				nextEl = dragEl.nextSibling;
-				lastDownEl = target
+				lastDownEl = target;
 				activeGroup = options.group;
 				oldIndex = startIndex;
 
