@@ -442,7 +442,7 @@
 				}
 
 
-				}
+			}
 		},
 
 		_disableDelayedDrag: function () {
@@ -716,7 +716,7 @@
 				dragRect = dragEl.getBoundingClientRect();
 
 				if (putSortable !== this) {
-				putSortable = this;
+					putSortable = this;
 					isMovingBetweenSortable = true;
 				}
 
@@ -1002,10 +1002,10 @@
 
 				case 'dragover':
 				case 'dragenter':
-				if (dragEl) {
-					this._onDragOver(evt);
-					_globalDragOver(evt);
-				}
+					if (dragEl) {
+						this._onDragOver(evt);
+						_globalDragOver(evt);
+					}
 					break;
 
 				case 'selectstart':
