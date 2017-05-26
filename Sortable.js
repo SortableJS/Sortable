@@ -664,7 +664,7 @@
 				}
 
 				_on(document, 'drop', this);
-				setTimeout(this._dragStarted, 0);
+				this._dragStarted();
 			}
 		},
 
