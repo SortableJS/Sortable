@@ -867,6 +867,7 @@
 			_off(ownerDocument, 'touchend', this._onDrop);
 			_off(ownerDocument, 'pointerup', this._onDrop);
 			_off(ownerDocument, 'touchcancel', this._onDrop);
+			_off(ownerDocument, 'pointercancel', this._onDrop);
 			_off(ownerDocument, 'selectstart', this);
 		},
 
@@ -1485,6 +1486,6 @@
 
 
 	// Export
-	Sortable.version = '1.5.1';
+	Sortable.version = '1.6.0';
 	return Sortable;
 });
