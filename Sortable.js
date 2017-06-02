@@ -247,6 +247,7 @@
 			chosenClass: 'sortable-chosen',
 			dragClass: 'sortable-drag',
 			ignore: 'a, img',
+			sendAllMove: false,
 			filter: null,
 			preventOnFilter: true,
 			animation: 0,
@@ -763,7 +764,7 @@
 						target && this._animate(targetRect, target);
 					}
 				}
-				else if (target && !target.animated && target !== dragEl && (target.parentNode[expando] !== void 0)) {
+				else if (target && !target.animated && (options.sendAllMove || target !== dragEl) && (target.parentNode[expando] !== void 0)) {
 					if (lastEl !== target) {
 						lastEl = target;
 						lastCSS = _css(target);
@@ -1439,7 +1440,7 @@
 		}
 	}
 
-	// Fixed #973: 
+	// Fixed #973:
 	_on(document, 'touchmove', function (evt) {
 		if (Sortable.active) {
 			evt.preventDefault();
