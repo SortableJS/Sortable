@@ -884,7 +884,9 @@
 
 			if (this.nativeDraggable) {
 				_off(document, 'drop', this);
-				_off(el, 'dragstart', this._onDragStart);
+				if (el) { // Sortable could have been destroyed while dragging
+				    _off(el, 'dragstart', this._onDragStart);
+				}
 			}
 
 			this._offUpEvents();
