@@ -322,7 +322,7 @@
 				return;
 			}
 
-			if (type === 'mousedown' && evt.button !== 0 || options.disabled) {
+			if (/mousedown|pointerdown/.test(type) && evt.button !== 0 || options.disabled) {
 				return; // only left button or enabled
 			}
 
