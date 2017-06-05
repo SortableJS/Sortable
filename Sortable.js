@@ -396,6 +396,9 @@
 
 				dragEl.style['will-change'] = 'transform';
 
+				this._lastX = evt.clientX;
+				this._lastY = evt.clientY;
+
 				dragStartFn = function () {
 					// Delayed drag has been triggered
 					// we can re-enable the events: touchmove/mousemove
@@ -554,6 +557,15 @@
 
 
 		_onTouchMove: function (/**TouchEvent*/evt) {
+
+			if (this.options.distance && this.options.distance > 0) {
+				// sorting will not start until mouse is dragged at a minimum distance
+				// this is used to prevent unwanted move during a simple click on a sortable element
+				if (!Sortable.active && !(Math.abs(evt.clientX - this._lastX) > this.options.distance || Math.abs(evt.clientY - this._lastY) > this.options.distance)) {
+					return;
+				}
+			}
+
 			if (tapEvt) {
 				var	options = this.options,
 					fallbackTolerance = options.fallbackTolerance,
