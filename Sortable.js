@@ -888,7 +888,10 @@
 			}
 
 			this._offUpEvents();
-
+			// FIX : if newIndex > startIndex is always comes with +1
+			var pull = (undefined !== this.option('group').pull && this.option('group').pull === 'clone') ? true : false;
+                    	if (newIndex > startIndex && pull)
+				newIndex--;
 			if (evt) {
 				if (moved) {
 					evt.preventDefault();
