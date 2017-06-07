@@ -7,6 +7,10 @@
 (function sortableModule(factory) {
 	"use strict";
 
+	if (typeof window === "undefined") {
+		return;	
+	}
+	
 	if (typeof define === "function" && define.amd) {
 		define(factory);
 	}
