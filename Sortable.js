@@ -1422,13 +1422,13 @@
 
 	function _clone(el) {
 		if (Polymer && Polymer.dom) {
-				return Polymer.dom(el).cloneNode(true);
+			return Polymer.dom(el).cloneNode(true);
 		}
 		else if ($) {
-				return $(el).clone(true)[0];
+			return $(el).clone(true)[0];
 		}
 		else {
-				return el.cloneNode(true);
+			return el.cloneNode(true);
 		}
 	}
 
