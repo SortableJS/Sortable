@@ -1191,12 +1191,16 @@
 
 
 	function _on(el, event, fn) {
-		el.addEventListener(event, fn, captureMode);
+		if (el) {
+			el.addEventListener(event, fn, captureMode);
+		}
 	}
 
 
 	function _off(el, event, fn) {
-		el.removeEventListener(event, fn, captureMode);
+		if (el) {
+			el.removeEventListener(event, fn, captureMode);
+		}
 	}
 
 
