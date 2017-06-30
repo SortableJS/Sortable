@@ -227,7 +227,7 @@
 
 		this.el = el; // root element
 
-		if ( this.el.className.indexOf('sortable') === -1 ) {
+		if ( this.el.className.indexOf( 'sortable' ) === -1 ) {
 			this.el.className += ' sortable';
 		}
 
@@ -1448,7 +1448,7 @@
 		}
 	}
 
-	// Fixed #973: 
+	// Fixed #973:
 	_on(document, 'touchmove', function (evt) {
 		if (Sortable.active) {
 			evt.preventDefault();
