@@ -263,6 +263,7 @@
 			dataIdAttr: 'data-id',
 			delay: 0,
 			forceFallback: false,
+			fallbackPosition: 'element', //element or cursor
 			fallbackClass: 'sortable-fallback',
 			fallbackOnBody: false,
 			fallbackTolerance: 0,
@@ -611,8 +612,16 @@
 				_toggleClass(ghostEl, options.fallbackClass, true);
 				_toggleClass(ghostEl, options.dragClass, true);
 
-				_css(ghostEl, 'top', rect.top - parseInt(css.marginTop, 10));
-				_css(ghostEl, 'left', rect.left - parseInt(css.marginLeft, 10));
+				// Support for custom fallbackPosition option
+				if ( options.fallbackPosition === 'cursor' ) {
+					_css( ghostEl, 'top', this._lastY - 10 );
+					_css( ghostEl, 'left', this._lastX - 20 );
+				}
+				else {
+					_css(ghostEl, 'top', rect.top - parseInt(css.marginTop, 10));
+					_css(ghostEl, 'left', rect.left - parseInt(css.marginLeft, 10));
+				}
+				
 				_css(ghostEl, 'width', rect.width);
 				_css(ghostEl, 'height', rect.height);
 				_css(ghostEl, 'opacity', '0.8');
