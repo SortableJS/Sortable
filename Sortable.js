@@ -55,6 +55,7 @@
 
 		moved,
 		iframe_stash,
+		root_iframes,
 
 		/** @const */
 		R_SPACE = /\s+/g,
@@ -409,6 +410,16 @@
 							iframes[i].sortable_parentElement = iframes[i].parentElement;
 							iframes[i].sortable_nextElementSibling = iframes[i].nextElementSibling;
 							iframe_stash.appendChild(iframes[i]);
+						}
+					}
+					// stop iframes from stealing mouse events, to allow dragging on them
+					root_iframes = rootEl.querySelectorAll('iframe');
+					if (root_iframes && root_iframes.length)
+					{
+						for (var i = 0; i < root_iframes.length; i++)
+						{
+							root_iframes[i].sortable_pe = root_iframes[i].style['pointer-events'];
+							root_iframes[i].style['pointer-events'] = 'none';
 						}
 					}
 
@@ -917,6 +928,10 @@
 				}
 				iframe_stash = null;
 			}
+			// make iframes clickable again
+			for (var i = 0; i < root_iframes.length; i++)
+				root_iframes[i].style['pointer-events'] = root_iframes[i].sortable_pe;
+			root_iframes = [];
 
 			if (evt) {
 				if (moved) {
