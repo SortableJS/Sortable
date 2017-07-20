@@ -54,6 +54,7 @@
 		touchEvt,
 
 		moved,
+		iframe_stash,
 
 		/** @const */
 		R_SPACE = /\s+/g,
@@ -397,6 +398,20 @@
 				dragEl.style['will-change'] = 'transform';
 
 				dragStartFn = function () {
+					// stash iframes because they prevent dragging
+					iframe_stash = null;
+					var iframes = dragEl.querySelectorAll('iframe');
+					if (iframes && iframes.length)
+					{
+						iframe_stash = document.createElement('x'); // intentionally not adding it to DOM
+						for (var i = 0; i < iframes.length; i++)
+						{
+							iframes[i].sortable_parentElement = iframes[i].parentElement;
+							iframes[i].sortable_nextElementSibling = iframes[i].nextElementSibling;
+							iframe_stash.appendChild(iframes[i]);
+						}
+					}
+
 					// Delayed drag has been triggered
 					// we can re-enable the events: touchmove/mousemove
 					_this._disableDelayedDrag();
@@ -888,6 +903,20 @@
 			}
 
 			this._offUpEvents();
+			
+			// unstash iframes
+			if (iframe_stash)
+			{
+				for (var i = 0; i < iframe_stash.children.length; i++)
+				{
+					var iframe = iframe_stash.children[i];
+					if (iframe.sortable_nextElementSibling)
+						iframe.sortable_parentElement.insertBefore(iframe, iframe.sortable_nextElementSibling)
+					else
+						iframe.sortable_parentElement.appendChild(iframe);
+				}
+				iframe_stash = null;
+			}
 
 			if (evt) {
 				if (moved) {
