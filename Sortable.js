@@ -325,7 +325,11 @@
 			if (/mousedown|pointerdown/.test(type) && evt.button !== 0 || options.disabled) {
 				return; // only left button or enabled
 			}
-
+			
+			// cancel dnd if original target is content editable
+			if (originalTarget.isContentEditable) {
+				return;
+			}
 
 			target = _closest(target, options.draggable, el);
 
