@@ -310,7 +310,7 @@
 				type = evt.type,
 				touch = evt.touches && evt.touches[0],
 				target = (touch || evt).target,
-				originalTarget = evt.target.shadowRoot && evt.path[0] || target,
+				originalTarget = evt.target.shadowRoot && (evt.path && evt.path[0]) || target,
 				filter = options.filter,
 				startIndex;
 
