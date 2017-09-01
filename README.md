@@ -25,6 +25,7 @@ Demo: http://rubaxa.github.io/Sortable/
   * [Vue](https://github.com/SortableJS/Vue.Draggable)
  * Supports any CSS library, e.g. [Bootstrap](#bs)
  * Simple API
+ * [CDN](#cdn)
  * No jQuery (but there is [support](#jq))
 
 
@@ -98,7 +99,7 @@ var sortable = new Sortable(el, {
 	fallbackClass: "sortable-fallback",  // Class name for the cloned DOM Element when using forceFallback
 	fallbackOnBody: false,  // Appends the cloned DOM Element into the Document's Body
 	fallbackTolerance: 0, // Specify in pixels how far the mouse should move before it's considered as a drag.        
-
+	
 	scroll: true, // or HTMLElement
 	scrollFn: function(offsetX, offsetY, originalEvent) { ... }, // if you have custom scrollbar scrollFn may be used for autoscrolling
 	scrollSensitivity: 30, // px, how near the mouse must be to an edge to start scrolling.
@@ -162,7 +163,7 @@ var sortable = new Sortable(el, {
 		originalEvent.clientY; // mouse position
 		// return false; — for cancel
 	},
-
+	
 	// Called when creating a clone of element
 	onClone: function (/**Event*/evt) {
 		var origEl = evt.item;
@@ -555,6 +556,27 @@ Link to the active instance.
 
 ---
 
+
+<a name="cdn"></a>
+### CDN
+
+```html
+<!-- CDNJS :: Sortable (https://cdnjs.com/) -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/Sortable/1.6.1/Sortable.min.js"></script>
+
+
+<!-- jsDelivr :: Sortable (http://www.jsdelivr.com/) -->
+<script src="//cdn.jsdelivr.net/sortable/1.6.1/Sortable.min.js"></script>
+
+
+<!-- jsDelivr :: Sortable :: Latest (http://www.jsdelivr.com/) -->
+<script src="//cdn.jsdelivr.net/sortable/latest/Sortable.min.js"></script>
+```
+
+
+---
+
+
 <a name="jq"></a>
 ### jQuery compatibility
 To assemble plugin for jQuery, perform the following steps:
@@ -615,3 +637,4 @@ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
 LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
