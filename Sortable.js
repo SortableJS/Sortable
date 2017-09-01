@@ -292,17 +292,12 @@
 		_on(el, 'mousedown', this._onTapStart);
 		_on(el, 'touchstart', this._onTapStart);
 		_on(el, 'pointerdown', this._onTapStart);
+		_on(el, 'destroy', this._destroy);
 
 		if (this.nativeDraggable) {
 			_on(el, 'dragover', this);
 			_on(el, 'dragenter', this);
 		}
-
-		_on(el, 'destroy', function() {
-			if (el[expando]) {
-				el[expando].destroy();
-			}
-		});
 
 		touchDragOverListeners.push(this._onDragOver);
 
@@ -983,6 +978,10 @@
 			this._nulling();
 		},
 
+		_destroy: function() {
+			this.destroy();
+		},
+
 		_nulling: function() {
 			rootEl =
 			dragEl =
@@ -1135,6 +1134,7 @@
 			_off(el, 'mousedown', this._onTapStart);
 			_off(el, 'touchstart', this._onTapStart);
 			_off(el, 'pointerdown', this._onTapStart);
+			_off(el, 'destroy', this._destroy);
 
 			if (this.nativeDraggable) {
 				_off(el, 'dragover', this);
