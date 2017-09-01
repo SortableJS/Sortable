@@ -299,7 +299,9 @@
 		}
 
 		_on(el, 'destroy', function() {
-			el[expando].destroy();
+			if (el[expando]) {
+				el[expando].destroy();
+			}
 		});
 
 		touchDragOverListeners.push(this._onDragOver);
@@ -621,7 +623,7 @@
 					_css(ghostEl, 'top', rect.top - parseInt(css.marginTop, 10));
 					_css(ghostEl, 'left', rect.left - parseInt(css.marginLeft, 10));
 				}
-				
+
 				_css(ghostEl, 'width', rect.width);
 				_css(ghostEl, 'height', rect.height);
 				_css(ghostEl, 'opacity', '0.8');
