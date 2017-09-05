@@ -561,16 +561,12 @@ Link to the active instance.
 ### CDN
 
 ```html
-<!-- CDNJS :: Sortable (https://cdnjs.com/) -->
-<script src="//cdnjs.cloudflare.com/ajax/libs/Sortable/1.6.1/Sortable.min.js"></script>
+<!-- jsDelivr :: Sortable (http://www.jsdelivr.com/package/npm/sortablejs) -->
+<script src="//cdn.jsdelivr.net/npm/sortablejs@1.6.1/Sortable.min.js"></script>
 
 
-<!-- jsDelivr :: Sortable (http://www.jsdelivr.com/) -->
-<script src="//cdn.jsdelivr.net/sortable/1.6.1/Sortable.min.js"></script>
-
-
-<!-- jsDelivr :: Sortable :: Latest (http://www.jsdelivr.com/) -->
-<script src="//cdn.jsdelivr.net/sortable/latest/Sortable.min.js"></script>
+<!-- jsDelivr :: Sortable :: Latest (http://www.jsdelivr.com/package/npm/sortablejs) -->
+<script src="//cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 ```
 
 
