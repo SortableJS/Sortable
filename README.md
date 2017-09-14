@@ -105,6 +105,8 @@ var sortable = new Sortable(el, {
 	scrollSensitivity: 30, // px, how near the mouse must be to an edge to start scrolling.
 	scrollSpeed: 10, // px
 
+	moveThreshold: // Minimum pointer movement, in pixels, which cancels a long press gesture
+
 	setData: function (/** DataTransfer */dataTransfer, /** HTMLElement*/dragEl) {
 		dataTransfer.setData('Text', dragEl.textContent); // `dataTransfer` object of HTML5 DragEvent
 	},
@@ -385,6 +387,17 @@ Defines how near the mouse must be to an edge to start scrolling.
 #### `scrollSpeed` option
 The speed at which the window should scroll once the mouse pointer gets within the `scrollSensitivity` distance.
 
+
+---
+
+
+#### `moveThreshold` option
+On some Android systems (probably after [this](https://chromereleases.googleblog.com/2017/08/chrome-beta-for-android-update.html)
+update) Chrome Web View reports touch movement events with subpixel precision. This disrupts normal operation of the long press
+handling.
+
+The `moveThreshold` setting defines a radius in pixels around the `touchstart` position. Touch movements inside of that radius do not
+cancel the drag detection gesture.
 
 ---
 

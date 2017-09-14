@@ -242,6 +242,7 @@
 			scroll: true,
 			scrollSensitivity: 30,
 			scrollSpeed: 10,
+			moveThreshold: 1,
 			draggable: /[uo]l/i.test(el.nodeName) ? 'li' : '>*',
 			ghostClass: 'sortable-ghost',
 			chosenClass: 'sortable-chosen',
@@ -432,9 +433,9 @@
 					_on(ownerDocument, 'mouseup', _this._disableDelayedDrag);
 					_on(ownerDocument, 'touchend', _this._disableDelayedDrag);
 					_on(ownerDocument, 'touchcancel', _this._disableDelayedDrag);
-					_on(ownerDocument, 'mousemove', _this._disableDelayedDrag);
-					_on(ownerDocument, 'touchmove', _this._disableDelayedDrag);
-					_on(ownerDocument, 'pointermove', _this._disableDelayedDrag);
+					_on(ownerDocument, 'mousemove', _this._handleMovementDuringDelay);
+					_on(ownerDocument, 'touchmove', _this._handleMovementDuringDelay);
+					_on(ownerDocument, 'pointermove', _this._handleMovementDuringDelay);
 
 					_this._dragStartTimer = setTimeout(dragStartFn, options.delay);
 				} else {
@@ -445,6 +446,17 @@
 			}
 		},
 
+                _handleMovementDuringDelay: function(ev) {
+                    var dx = ev.clientX - this._lastX;
+                    var dy = ev.clientY - this._lastY;
+                    var rSquare = dx * dx + dy * dy;
+                    var rSquareMove = this.options.moveThreshold * this.options.moveThreshold;
+
+                    if (rSquare >= rSquareMove) {
+                        this._disableDelayedDrag();
+                    }
+                },
+
 		_disableDelayedDrag: function () {
 			var ownerDocument = this.el.ownerDocument;
 
@@ -452,9 +464,9 @@
 			_off(ownerDocument, 'mouseup', this._disableDelayedDrag);
 			_off(ownerDocument, 'touchend', this._disableDelayedDrag);
 			_off(ownerDocument, 'touchcancel', this._disableDelayedDrag);
-			_off(ownerDocument, 'mousemove', this._disableDelayedDrag);
-			_off(ownerDocument, 'touchmove', this._disableDelayedDrag);
-			_off(ownerDocument, 'pointermove', this._disableDelayedDrag);
+			_off(ownerDocument, 'mousemove', this._handleMovementDuringDelay);
+			_off(ownerDocument, 'touchmove', this._handleMovementDuringDelay);
+			_off(ownerDocument, 'pointermove', this._handleMovementDuringDelay);
 		},
 
 		_triggerDragStart: function (/** Event */evt, /** Touch */touch) {
