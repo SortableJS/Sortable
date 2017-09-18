@@ -394,7 +394,7 @@
 				this._lastX = (touch || evt).clientX;
 				this._lastY = (touch || evt).clientY;
 
-				dragEl.style['will-change'] = 'transform';
+				dragEl.style['will-change'] = 'all';
 
 				dragStartFn = function () {
 					// Delayed drag has been triggered
