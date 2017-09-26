@@ -20,7 +20,7 @@
 })(function sortableFactory() {
 	"use strict";
 
-	if (typeof window == "undefined" || !window.document) {
+	if (typeof window === "undefined" || !window.document) {
 		return function sortableError() {
 			throw new Error("Sortable.js requires a window with a document");
 		};
@@ -64,13 +64,14 @@
 		win = window,
 		document = win.document,
 		parseInt = win.parseInt,
+		setTimeout = win.setTimeout,
 
 		$ = win.jQuery || win.Zepto,
 		Polymer = win.Polymer,
 
 		captureMode = false,
 
-		supportDraggable = !!('draggable' in document.createElement('div')),
+		supportDraggable = ('draggable' in document.createElement('div')),
 		supportCssPointerEvents = (function (el) {
 			// false when IE11
 			if (!!navigator.userAgent.match(/(?:Trident.*rv[ :]?11\.|msie)/i)) {
@@ -485,7 +486,7 @@
 			try {
 				if (document.selection) {
 					// Timeout neccessary for IE9
-					setTimeout(function () {
+					_nextTick(function () {
 						document.selection.empty();
 					});
 				} else {
@@ -625,8 +626,9 @@
 		},
 
 		_onDragStart: function (/**Event*/evt, /**boolean*/useFallback) {
-			var dataTransfer = evt.dataTransfer,
-				options = this.options;
+			var _this = this;
+			var dataTransfer = evt.dataTransfer;
+			var options = this.options;
 
 			this._offUpEvents();
 
@@ -639,8 +641,11 @@
 				_css(cloneEl, 'display', 'none');
 				_toggleClass(cloneEl, this.options.chosenClass, false);
 
-				rootEl.insertBefore(cloneEl, dragEl);
-				_dispatchEvent(this, rootEl, 'clone', dragEl);
+				// #1143: IFrame support workaround
+				_nextTick(function () {
+					rootEl.insertBefore(cloneEl, dragEl);
+					_dispatchEvent(_this, rootEl, 'clone', dragEl);
+				});
 			}
 
 			_toggleClass(dragEl, options.dragClass, true);
@@ -668,7 +673,7 @@
 				}
 
 				_on(document, 'drop', this);
-				setTimeout(this._dragStarted, 0);
+				_nextTick(this._dragStarted);
 			}
 		},
 
@@ -1446,6 +1451,10 @@
 		}
 	}
 
+	function _nextTick(fn) {
+		setTimeout(fn, 0);
+	}
+
 	// Fixed #973:
 	_on(document, 'touchmove', function (evt) {
 		if (Sortable.active) {
@@ -1478,7 +1487,8 @@
 		closest: _closest,
 		toggleClass: _toggleClass,
 		clone: _clone,
-		index: _index
+		index: _index,
+		nextTick: _nextTick
 	};
 
 
