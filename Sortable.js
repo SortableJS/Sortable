@@ -643,8 +643,10 @@
 
 				// #1143: IFrame support workaround
 				_nextTick(function () {
-					rootEl.insertBefore(cloneEl, dragEl);
-					_dispatchEvent(_this, rootEl, 'clone', dragEl);
+					if (dragEl && (dragEl.parentNode === rootEl)) {
+						rootEl.insertBefore(cloneEl, dragEl);
+						_dispatchEvent(_this, rootEl, 'clone', dragEl);
+					}
 				});
 			}
 
