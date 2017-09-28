@@ -628,25 +628,23 @@
 		_onDragStart: function (/**Event*/evt, /**boolean*/useFallback) {
 			var _this = this;
 			var dataTransfer = evt.dataTransfer;
-			var options = this.options;
+			var options = _this.options;
 
-			this._offUpEvents();
+			_this._offUpEvents();
 
-			if (activeGroup.checkPull(this, this, dragEl, evt)) {
+			if (activeGroup.checkPull(_this, _this, dragEl, evt)) {
 				cloneEl = _clone(dragEl);
 
 				cloneEl.draggable = false;
 				cloneEl.style['will-change'] = '';
 
 				_css(cloneEl, 'display', 'none');
-				_toggleClass(cloneEl, this.options.chosenClass, false);
+				_toggleClass(cloneEl, _this.options.chosenClass, false);
 
 				// #1143: IFrame support workaround
-				_nextTick(function () {
-					if (dragEl && (dragEl.parentNode === rootEl)) {
-						rootEl.insertBefore(cloneEl, dragEl);
-						_dispatchEvent(_this, rootEl, 'clone', dragEl);
-					}
+				_this._cloneId = _nextTick(function () {
+					rootEl.insertBefore(cloneEl, dragEl);
+					_dispatchEvent(_this, rootEl, 'clone', dragEl);
 				});
 			}
 
@@ -655,27 +653,27 @@
 			if (useFallback) {
 				if (useFallback === 'touch') {
 					// Bind touch events
-					_on(document, 'touchmove', this._onTouchMove);
-					_on(document, 'touchend', this._onDrop);
-					_on(document, 'touchcancel', this._onDrop);
-					_on(document, 'pointermove', this._onTouchMove);
-					_on(document, 'pointerup', this._onDrop);
+					_on(document, 'touchmove', _this._onTouchMove);
+					_on(document, 'touchend', _this._onDrop);
+					_on(document, 'touchcancel', _this._onDrop);
+					_on(document, 'pointermove', _this._onTouchMove);
+					_on(document, 'pointerup', _this._onDrop);
 				} else {
 					// Old brwoser
-					_on(document, 'mousemove', this._onTouchMove);
-					_on(document, 'mouseup', this._onDrop);
+					_on(document, 'mousemove', _this._onTouchMove);
+					_on(document, 'mouseup', _this._onDrop);
 				}
 
-				this._loopId = setInterval(this._emulateDragOver, 50);
+				_this._loopId = setInterval(_this._emulateDragOver, 50);
 			}
 			else {
 				if (dataTransfer) {
 					dataTransfer.effectAllowed = 'move';
-					options.setData && options.setData.call(this, dataTransfer, dragEl);
+					options.setData && options.setData.call(_this, dataTransfer, dragEl);
 				}
 
-				_on(document, 'drop', this);
-				_nextTick(this._dragStarted);
+				_on(document, 'drop', _this);
+				_this._dragStartId = _nextTick(_this._dragStarted);
 			}
 		},
 
@@ -889,6 +887,9 @@
 			clearInterval(this._loopId);
 			clearInterval(autoScroll.pid);
 			clearTimeout(this._dragStartTimer);
+
+			_cancelNextTick(this._cloneId);
+			_cancelNextTick(this._dragStartId);
 
 			// Unbind events
 			_off(document, 'mousemove', this._onTouchMove);
@@ -1454,7 +1455,11 @@
 	}
 
 	function _nextTick(fn) {
-		setTimeout(fn, 0);
+		return setTimeout(fn, 0);
+	}
+
+	function _cancelNextTick(id) {
+		return clearTimeout(id);
 	}
 
 	// Fixed #973:
@@ -1490,7 +1495,8 @@
 		toggleClass: _toggleClass,
 		clone: _clone,
 		index: _index,
-		nextTick: _nextTick
+		nextTick: _nextTick,
+		cancelNextTick: _cancelNextTick
 	};
 
 
