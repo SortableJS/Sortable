@@ -673,6 +673,11 @@
 				}
 
 				_on(document, 'drop', _this);
+
+				// #1143: Бывает элемент с IFrame внутри блокирует `drop`,
+				// поэтому если вызволся `mouseover`, значит надо отменять весь d'n'd.
+				_on(document, 'mouseover', _this);
+
 				_this._dragStartId = _nextTick(_this._dragStarted);
 			}
 		},
@@ -892,6 +897,7 @@
 			_cancelNextTick(this._dragStartId);
 
 			// Unbind events
+			_off(document, 'mouseover', this);
 			_off(document, 'mousemove', this._onTouchMove);
 
 			if (this.nativeDraggable) {
@@ -1019,6 +1025,10 @@
 						this._onDragOver(evt);
 						_globalDragOver(evt);
 					}
+					break;
+
+				case 'mouseover':
+					this._onDrop(evt);
 					break;
 
 				case 'selectstart':
