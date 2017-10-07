@@ -675,7 +675,7 @@
 				_on(document, 'drop', _this);
 
 				// #1143: Бывает элемент с IFrame внутри блокирует `drop`,
-				// поэтому если вызволся `mouseover`, значит надо отменять весь d'n'd.
+				// поэтому если вызвался `mouseover`, значит надо отменять весь d'n'd.
 				_on(document, 'mouseover', _this);
 
 				_this._dragStartId = _nextTick(_this._dragStarted);
