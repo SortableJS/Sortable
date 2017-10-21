@@ -4,20 +4,7 @@
  * @license MIT
  */
 
-(function sortableModule(factory) {
-	"use strict";
-
-	if (typeof define === "function" && define.amd) {
-		define(factory);
-	}
-	else if (typeof module != "undefined" && typeof module.exports != "undefined") {
-		module.exports = factory();
-	}
-	else {
-		/* jshint sub:true */
-		window["Sortable"] = factory();
-	}
-})(function sortableFactory() {
+define("sortable", [], function() {
 	"use strict";
 
 	if (typeof window === "undefined" || !window.document) {
@@ -527,9 +514,13 @@
 				}
 
 				var target = document.elementFromPoint(touchEvt.clientX, touchEvt.clientY),
-					parent = target,
 					i = touchDragOverListeners.length;
 
+				if (target && target.shadowRoot) {
+					target = target.shadowRoot.elementFromPoint(touchEvt.clientX, touchEvt.clientY);
+				}
+
+				var parent = target;
 				if (parent) {
 					do {
 						if (parent[expando]) {
