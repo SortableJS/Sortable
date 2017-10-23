@@ -527,9 +527,13 @@
 				}
 
 				var target = document.elementFromPoint(touchEvt.clientX, touchEvt.clientY),
-					parent = target,
 					i = touchDragOverListeners.length;
 
+				if (target && target.shadowRoot) {
+					target = target.shadowRoot.elementFromPoint(touchEvt.clientX, touchEvt.clientY);
+				}
+
+				var parent = target;
 				if (parent) {
 					do {
 						if (parent[expando]) {
