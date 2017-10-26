@@ -69,7 +69,7 @@
 		$ = win.jQuery || win.Zepto,
 		Polymer = win.Polymer,
 
-		captureMode = false,
+		captureMode = { capture: false, passive: true },
 
 		supportDraggable = ('draggable' in document.createElement('div')),
 		supportCssPointerEvents = (function (el) {
@@ -701,7 +701,6 @@
 				canSort = options.sort;
 
 			if (evt.preventDefault !== void 0) {
-				evt.preventDefault();
 				!options.dragoverBubble && evt.stopPropagation();
 			}
 
@@ -914,7 +913,6 @@
 
 			if (evt) {
 				if (moved) {
-					evt.preventDefault();
 					!options.dropBubble && evt.stopPropagation();
 				}
 
@@ -1213,7 +1211,6 @@
 		if (evt.dataTransfer) {
 			evt.dataTransfer.dropEffect = 'move';
 		}
-		evt.preventDefault();
 	}
 
 
@@ -1489,7 +1486,7 @@
 			get: function () {
 				captureMode = {
 					capture: false,
-					passive: false
+					passive: true
 				};
 			}
 		}));
