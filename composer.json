@@ -1,5 +1,5 @@
 {
-    "name": "components/Sortable",
+    "name": "rubaxa/sortable",
     "type": "component",
     "description": "Sortable is a JavaScript library for reorderable drag-and-drop lists.",
     "homepage": "http://rubaxa.github.io/Sortable/",
