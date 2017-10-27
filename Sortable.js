@@ -70,6 +70,7 @@
 		Polymer = win.Polymer,
 
 		captureMode = false,
+		passiveMode = false,
 
 		supportDraggable = ('draggable' in document.createElement('div')),
 		supportCssPointerEvents = (function (el) {
@@ -215,6 +216,18 @@
 		}
 	;
 
+	// Detect support a passive mode
+	try {
+		window.addEventListener('test', null, Object.defineProperty({}, 'passive', {
+			get: function () {
+				passiveMode = true;
+				captureMode = {
+					capture: false,
+					passive: passiveMode
+				};
+			}
+		}));
+	} catch (err) {}
 
 	/**
 	 * @class  Sortable
@@ -681,7 +694,8 @@
 
 				// #1143: Бывает элемент с IFrame внутри блокирует `drop`,
 				// поэтому если вызвался `mouseover`, значит надо отменять весь d'n'd.
-				_on(document, 'mouseover', _this);
+				// Breaking Chrome 62+
+				// _on(document, 'mouseover', _this);
 
 				_this._dragStartId = _nextTick(_this._dragStarted);
 			}
@@ -701,7 +715,7 @@
 				canSort = options.sort;
 
 			if (evt.preventDefault !== void 0) {
-				evt.preventDefault();
+				!passiveMode && evt.preventDefault();
 				!options.dragoverBubble && evt.stopPropagation();
 			}
 
@@ -914,7 +928,7 @@
 
 			if (evt) {
 				if (moved) {
-					evt.preventDefault();
+					!passiveMode && evt.preventDefault();
 					!options.dropBubble && evt.stopPropagation();
 				}
 
@@ -1213,7 +1227,7 @@
 		if (evt.dataTransfer) {
 			evt.dataTransfer.dropEffect = 'move';
 		}
-		evt.preventDefault();
+		!passiveMode && evt.preventDefault();
 	}
 
 
@@ -1483,17 +1497,6 @@
 			evt.preventDefault();
 		}
 	});
-
-	try {
-		window.addEventListener('test', null, Object.defineProperty({}, 'passive', {
-			get: function () {
-				captureMode = {
-					capture: false,
-					passive: false
-				};
-			}
-		}));
-	} catch (err) {}
 
 	// Export utils
 	Sortable.utils = {
