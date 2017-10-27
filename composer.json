@@ -1,0 +1,36 @@
+{
+    "name": "components/Sortable",
+    "type": "component",
+    "description": "Sortable is a JavaScript library for reorderable drag-and-drop lists.",
+    "homepage": "http://rubaxa.github.io/Sortable/",
+    "license": "MIT",
+    "authors": [{
+        "name": "RubaXa",
+        "email": "ibnRubaXa@gmail.com"
+    }],
+    "keywords": [
+        "sortable",
+        "reorder",
+        "list",
+        "html5",
+        "drag",
+        "and",
+        "drop",
+        "dnd"
+    ],
+    "support": {
+        "issues": "https://github.com/RubaXa/Sortable/issues",
+        "source": "https://github.com/RubaXa/Sortable.git"
+    },
+    "prefer-stable": true,
+    "minimum-stability": "dev",
+    "extra": {
+        "component": {
+            "files": [
+                "Sortable.js",
+                "Sortable.min.js",
+                "jquery.binding.js"
+            ]
+        }
+    }
+}
