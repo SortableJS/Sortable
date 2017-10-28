@@ -98,5 +98,6 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-testcafe');
 
 	grunt.registerTask('tests', ['jshint']);
-	grunt.registerTask('default', ['tests', 'version', 'uglify:dist', 'testcafe']);
+	grunt.registerTask('build', ['version', 'uglify:dist']);
+	grunt.registerTask('default', ['tests', 'build', 'testcafe']);
 };
