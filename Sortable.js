@@ -277,6 +277,7 @@
 			fallbackTolerance: 0,
 			fallbackOffset: {x: 0, y: 0},
 			supportPointer: Sortable.supportPointer !== false,
+			extendDropElement: null
 		};
 
 
@@ -305,6 +306,17 @@
 		if (this.nativeDraggable) {
 			_on(el, 'dragover', this);
 			_on(el, 'dragenter', this);
+		}
+
+		// set extendDropElement
+		if (options.extendDropElement) {
+			var extEl = options.extendDropElement
+			if (!(extEl.nodeType && extEl.nodeType === 1)) {
+				throw 'Sortable: `extendDropElement` must be HTMLElement, and not ' + {}.toString.call(extEl);
+			}
+			console.log(extEl);
+			_on(extEl, 'dragover', this);
+			_on(extEl, 'dragenter', this);
 		}
 
 		touchDragOverListeners.push(this._onDragOver);
