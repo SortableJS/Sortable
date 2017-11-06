@@ -220,7 +220,9 @@
 	try {
 		window.addEventListener('test', null, Object.defineProperty({}, 'passive', {
 			get: function () {
-				passiveMode = true;
+				// `false`, because everything starts to work incorrectly and instead of d'n'd,
+				// begins the page has scrolled.
+				passiveMode = false;
 				captureMode = {
 					capture: false,
 					passive: passiveMode
@@ -719,7 +721,7 @@
 				canSort = options.sort;
 
 			if (evt.preventDefault !== void 0) {
-				!passiveMode && evt.preventDefault();
+				evt.preventDefault();
 				!options.dragoverBubble && evt.stopPropagation();
 			}
 
@@ -932,7 +934,7 @@
 
 			if (evt) {
 				if (moved) {
-					!passiveMode && evt.preventDefault();
+					evt.preventDefault();
 					!options.dropBubble && evt.stopPropagation();
 				}
 
@@ -1231,7 +1233,7 @@
 		if (evt.dataTransfer) {
 			evt.dataTransfer.dropEffect = 'move';
 		}
-		!passiveMode && evt.preventDefault();
+		evt.preventDefault();
 	}
 
 
