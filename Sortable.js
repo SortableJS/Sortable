@@ -278,7 +278,7 @@
 			fallbackOnBody: false,
 			fallbackTolerance: 0,
 			fallbackOffset: {x: 0, y: 0},
-			supportPointer: Sortable.supportPointer !== false,
+			supportPointer: Sortable.supportPointer !== false
 		};
 
 
@@ -1535,6 +1535,6 @@
 
 
 	// Export
-	Sortable.version = '1.6.1';
+	Sortable.version = '1.7.0';
 	return Sortable;
 });
