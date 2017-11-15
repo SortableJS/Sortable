@@ -1485,7 +1485,7 @@
 
 		while (idx--) {
 			var el = inputs[idx];
-			el.checked && (savedInputChecked.indexOf(el) !== -1) && savedInputChecked.push(el);
+			el.checked && savedInputChecked.push(el);
 		}
 	}
 
