@@ -1032,7 +1032,7 @@
 			Sortable.active = null;
 
 			savedInputChecked.forEach(function (el) {
-				el.checked = true;
+				el.setAttribute('checked', true);
 			});
 			savedInputChecked.length = 0;
 		},
