@@ -91,6 +91,8 @@
 		savedInputChecked = [],
 		touchDragOverListeners = [],
 
+		alwaysFalse = function () { return false },
+
 		_autoScroll = _throttle(function (/**Event*/evt, /**Object*/options, /**HTMLElement*/rootEl) {
 			// Bug: https://bugzilla.mozilla.org/show_bug.cgi?id=505521
 			if (rootEl && options.scroll) {
@@ -180,8 +182,11 @@
 
 		_prepareGroup = function (options) {
 			function toFn(value, pull) {
-				if (value === void 0 || value === true) {
+				if (value == null || value === true) {
 					value = group.name;
+					if (value == null) {
+						return alwaysFalse;
+					}
 				}
 
 				if (typeof value === 'function') {
@@ -250,7 +255,7 @@
 
 		// Default options
 		var defaults = {
-			group: Math.random(),
+			group: null,
 			sort: true,
 			disabled: false,
 			store: null,
