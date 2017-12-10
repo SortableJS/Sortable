@@ -55,6 +55,8 @@
 
 		moved,
 
+		forRepaintDummy,
+
 		/** @const */
 		R_SPACE = /\s+/g,
 		R_FLOAT = /left|right|inline/,
@@ -91,7 +93,7 @@
 		savedInputChecked = [],
 		touchDragOverListeners = [],
 
-		alwaysFalse = function () { return false },
+		alwaysFalse = function () { return false; },
 
 		_autoScroll = _throttle(function (/**Event*/evt, /**Object*/options, /**HTMLElement*/rootEl) {
 			// Bug: https://bugzilla.mozilla.org/show_bug.cgi?id=505521
@@ -888,7 +890,7 @@
 					+ (prevRect.top - currentRect.top) + 'px,0)'
 				);
 
-				target.offsetWidth; // repaint
+				forRepaintDummy = target.offsetWidth; // repaint
 
 				_css(target, 'transition', 'all ' + ms + 'ms');
 				_css(target, 'transform', 'translate3d(0,0,0)');
@@ -1486,7 +1488,7 @@
 
 	function _saveInputCheckedState(root) {
 		savedInputChecked.length = 0;
-		
+
 		var inputs = root.getElementsByTagName('input');
 		var idx = inputs.length;
 
