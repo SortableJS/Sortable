@@ -24,7 +24,8 @@
   },
   "files": [
     "Sortable.js",
-    "Sortable.min.js"
+    "Sortable.min.js",
+    "jquery.binding.js"
   ],
   "keywords": [
     "sortable",
