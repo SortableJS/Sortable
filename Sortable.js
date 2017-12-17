@@ -54,6 +54,8 @@
 		touchEvt,
 
 		moved,
+		iframe_stash,
+		root_iframes,
 
 		forRepaintDummy,
 
@@ -425,6 +427,30 @@
 				dragEl.style['will-change'] = 'all';
 
 				dragStartFn = function () {
+					// stash iframes because they prevent dragging
+					iframe_stash = null;
+					var iframes = dragEl.querySelectorAll('iframe');
+					if (iframes && iframes.length)
+					{
+						iframe_stash = document.createElement('x'); // intentionally not adding it to DOM
+						for (var i = 0; i < iframes.length; i++)
+						{
+							iframes[i].sortable_parentElement = iframes[i].parentElement;
+							iframes[i].sortable_nextElementSibling = iframes[i].nextElementSibling;
+							iframe_stash.appendChild(iframes[i]);
+						}
+					}
+					// stop iframes from stealing mouse events, to allow dragging on them
+					root_iframes = rootEl.querySelectorAll('iframe');
+					if (root_iframes && root_iframes.length)
+					{
+						for (var i = 0; i < root_iframes.length; i++)
+						{
+							root_iframes[i].sortable_pe = root_iframes[i].style['pointer-events'];
+							root_iframes[i].style['pointer-events'] = 'none';
+						}
+					}
+
 					// Delayed drag has been triggered
 					// we can re-enable the events: touchmove/mousemove
 					_this._disableDelayedDrag();
@@ -938,6 +964,24 @@
 			}
 
 			this._offUpEvents();
+			
+			// unstash iframes
+			if (iframe_stash)
+			{
+				for (var i = 0; i < iframe_stash.children.length; i++)
+				{
+					var iframe = iframe_stash.children[i];
+					if (iframe.sortable_nextElementSibling)
+						iframe.sortable_parentElement.insertBefore(iframe, iframe.sortable_nextElementSibling)
+					else
+						iframe.sortable_parentElement.appendChild(iframe);
+				}
+				iframe_stash = null;
+			}
+			// make iframes clickable again
+			for (var i = 0; i < root_iframes.length; i++)
+				root_iframes[i].style['pointer-events'] = root_iframes[i].sortable_pe;
+			root_iframes = [];
 
 			if (evt) {
 				if (moved) {
