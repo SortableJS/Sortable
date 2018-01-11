@@ -167,7 +167,7 @@
 							scrollOffsetX = vx ? vx * speed : 0;
 
 							if ('function' === typeof(scrollCustomFn)) {
-								return scrollCustomFn.call(_this, scrollOffsetX, scrollOffsetY, evt);
+								return scrollCustomFn.call(_this, scrollOffsetX, scrollOffsetY, evt, touchEvt, el);
 							}
 
 							if (el === win) {
