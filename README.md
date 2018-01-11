@@ -121,31 +121,31 @@ var sortable = new Sortable(el, {
 
 	// Element dragging ended
 	onEnd: function (/**Event*/evt) {
-		evt.oldIndex;  // element's old index within parent
-		evt.newIndex;  // element's new index within parent
+		var itemEl = evt.item;  // dragged HTMLElement
+		evt.to;    // target list
+		evt.from;  // previous list
+		evt.oldIndex;  // element's old index within old parent
+		evt.newIndex;  // element's new index within new parent
 	},
 
 	// Element is dropped into the list from another list
 	onAdd: function (/**Event*/evt) {
-		var itemEl = evt.item;  // dragged HTMLElement
-		evt.from;  // previous list
-		// + indexes from onEnd
+		// same properties as onEnd
 	},
 
 	// Changed sorting within list
 	onUpdate: function (/**Event*/evt) {
-		var itemEl = evt.item;  // dragged HTMLElement
-		// + indexes from onEnd
+		// same properties as onEnd
 	},
 
 	// Called by any change to the list (add / update / remove)
 	onSort: function (/**Event*/evt) {
-		// same properties as onUpdate
+		// same properties as onEnd
 	},
 
 	// Element is removed from the list into another list
 	onRemove: function (/**Event*/evt) {
-		// same properties as onUpdate
+		// same properties as onEnd
 	},
 
 	// Attempt to drag a filtered element
@@ -561,16 +561,12 @@ Link to the active instance.
 ### CDN
 
 ```html
-<!-- CDNJS :: Sortable (https://cdnjs.com/) -->
-<script src="//cdnjs.cloudflare.com/ajax/libs/Sortable/1.5.1/Sortable.min.js"></script>
+<!-- jsDelivr :: Sortable (https://www.jsdelivr.com/package/npm/sortablejs) -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.6.1/Sortable.min.js"></script>
 
 
-<!-- jsDelivr :: Sortable (http://www.jsdelivr.com/) -->
-<script src="//cdn.jsdelivr.net/sortable/1.5.1/Sortable.min.js"></script>
-
-
-<!-- jsDelivr :: Sortable :: Latest (http://www.jsdelivr.com/) -->
-<script src="//cdn.jsdelivr.net/sortable/latest/Sortable.min.js"></script>
+<!-- jsDelivr :: Sortable :: Latest (https://www.jsdelivr.com/package/npm/sortablejs) -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 ```
 
 

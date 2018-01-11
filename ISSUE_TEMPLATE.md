@@ -1,8 +1,8 @@
-Before you create a issue, check it:
+Before you create an issue, check it:
 
  1. Try [master](https://github.com/RubaXa/Sortable/tree/master/)-branch, perhaps the problem has been solved;
  2. [Use the search](https://github.com/RubaXa/Sortable/search?q=problem), maybe already have an answer;
- 3. If not found, create example on [jsbin.com (draft)](http://jsbin.com/vojixek/edit?html,js,output) and describe the problem.
+ 3. If not found, create an example on [jsbin.com (draft)](http://jsbin.com/vojixek/edit?html,js,output) and describe the problem.
 
 Bindings:
  - Angular
