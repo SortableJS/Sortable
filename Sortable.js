@@ -1427,15 +1427,11 @@
 
 	function _matches(/**HTMLElement*/el, /**String*/selector) {
 		if (el) {
-			selector = selector.split('.');
-
-			var tag = selector.shift().toUpperCase(),
-				re = new RegExp('\\s(' + selector.join('|') + ')(?=\\s)', 'g');
-
-			return (
-				(tag === '' || el.nodeName.toUpperCase() == tag) &&
-				(!selector.length || ((' ' + el.className + ' ').match(re) || []).length == selector.length)
-			);
+			if (el.matches) {
+				return el.matches(selector);
+			} else if (el.msMatchesSelector) {
+				return el.msMatchesSelector(selector);
+			}
 		}
 
 		return false;
