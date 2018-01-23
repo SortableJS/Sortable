@@ -100,8 +100,7 @@ var sortable = new Sortable(el, {
 	fallbackOnBody: false,  // Appends the cloned DOM Element into the Document's Body
 	fallbackTolerance: 0, // Specify in pixels how far the mouse should move before it's considered as a drag.
 
-  scroll: true, // or HTMLElement
-  keepOriginalScroll: false // use only with scrollFn. Also keep the original scroll behavior alongside the scrollFn
+	scroll: true, // or HTMLElement
 	scrollFn: function(offsetX, offsetY, originalEvent, touchEvt, hoverTargetEl) { ... }, // if you have custom scrollbar scrollFn may be used for autoscrolling
 	scrollSensitivity: 30, // px, how near the mouse must be to an edge to start scrolling.
 	scrollSpeed: 10, // px
