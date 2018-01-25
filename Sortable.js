@@ -167,7 +167,9 @@
 							scrollOffsetX = vx ? vx * speed : 0;
 
 							if ('function' === typeof(scrollCustomFn)) {
-								return scrollCustomFn.call(_this, scrollOffsetX, scrollOffsetY, evt);
+								if (scrollCustomFn.call(_this, scrollOffsetX, scrollOffsetY, evt, touchEvt, el) !== 'continue') {
+									return;
+								}
 							}
 
 							if (el === win) {
@@ -262,7 +264,7 @@
 			disabled: false,
 			store: null,
 			handle: null,
-			scroll: true,
+      scroll: true,
 			scrollSensitivity: 30,
 			scrollSpeed: 10,
 			draggable: /[uo]l/i.test(el.nodeName) ? 'li' : '>*',
