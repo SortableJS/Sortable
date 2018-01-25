@@ -1433,10 +1433,14 @@
 
 	function _matches(/**HTMLElement*/el, /**String*/selector) {
 		if (el) {
-			if (el.matches) {
-				return el.matches(selector);
-			} else if (el.msMatchesSelector) {
-				return el.msMatchesSelector(selector);
+			try {
+				if (el.matches) {
+					return el.matches(selector);
+				} else if (el.msMatchesSelector) {
+					return el.msMatchesSelector(selector);
+				}
+			} catch(_) {
+				return false;
 			}
 		}
 
