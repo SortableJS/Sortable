@@ -1431,18 +1431,14 @@
 
 	function _matches(/**HTMLElement*/el, /**String*/selector) {
 		if (el) {
-			if (el.matches) {
-				try {
+			try {
+				if (el.matches) {
 					return el.matches(selector);
-				} catch(e) {
-					return false;
-				}
-			} else if (el.msMatchesSelector) {
-				try {
+				} else if (el.msMatchesSelector) {
 					return el.msMatchesSelector(selector);
-				} catch(e) {
-					return false;
 				}
+			} catch(_) {
+				return false;
 			}
 		}
 
