@@ -261,6 +261,7 @@
 		var defaults = {
 			group: null,
 			sort: true,
+			swap: false,
 			disabled: false,
 			store: null,
 			handle: null,
@@ -271,6 +272,7 @@
 			ghostClass: 'sortable-ghost',
 			chosenClass: 'sortable-chosen',
 			dragClass: 'sortable-drag',
+			swapHighlightClass: 'sortable-swap-highlight',
 			ignore: 'a, img',
 			filter: null,
 			preventOnFilter: true,
@@ -860,10 +862,21 @@
 						_cloneHide(activeSortable, isOwner);
 
 						if (!dragEl.contains(el)) {
-							if (after && !nextSibling) {
-								el.appendChild(dragEl);
-							} else {
-								target.parentNode.insertBefore(dragEl, after ? nextSibling : target);
+							if (this.options.swap)
+							{
+								var elements = document.getElementsByClassName(this.options.swapHighlightClass);
+								while(elements.length > 0){
+									_toggleClass(elements[0], this.options.swapHighlightClass, false);
+								}
+								_toggleClass(target, this.options.swapHighlightClass, true);
+							}
+							else
+							{
+								if (after && !nextSibling) {
+									el.appendChild(dragEl);
+								} else {
+									target.parentNode.insertBefore(dragEl, after ? nextSibling : target);
+								}
 							}
 						}
 
@@ -969,44 +982,63 @@
 					// Drag stop event
 					_dispatchEvent(this, rootEl, 'unchoose', dragEl, parentEl, rootEl, oldIndex, null, evt);
 
-					if (rootEl !== parentEl) {
-						newIndex = _index(dragEl, options.draggable);
+					if (this.options.swap)
+					{
+						var elements = document.getElementsByClassName(this.options.swapHighlightClass);
+						var dropEl = null;
+						while(elements.length > 0){
+							dropEl = elements[0];
+							_toggleClass(elements[0], this.options.swapHighlightClass, false);
+						}
 
-						if (newIndex >= 0) {
-							// Add event
-							_dispatchEvent(null, parentEl, 'add', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
-
-							// Remove event
-							_dispatchEvent(this, rootEl, 'remove', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
-
-							// drag from one list and drop into another
-							_dispatchEvent(null, parentEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
-							_dispatchEvent(this, rootEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+						if (dropEl)
+						{
+							_swapNodes(dragEl, dropEl);
+							newIndex = _index(dragEl, options.draggable);
+							_dispatchEvent(this, rootEl, 'end', dragEl, dropEl, rootEl, oldIndex, newIndex);
 						}
 					}
-					else {
-						if (dragEl.nextSibling !== nextEl) {
-							// Get the index of the dragged element within its parent
+					else
+					{
+						if (rootEl !== parentEl) {
 							newIndex = _index(dragEl, options.draggable);
 
 							if (newIndex >= 0) {
-								// drag & drop within the same list
-								_dispatchEvent(this, rootEl, 'update', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+								// Add event
+								_dispatchEvent(null, parentEl, 'add', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+
+								// Remove event
+								_dispatchEvent(this, rootEl, 'remove', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+
+								// drag from one list and drop into another
+								_dispatchEvent(null, parentEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
 								_dispatchEvent(this, rootEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
 							}
 						}
-					}
+						else {
+							if (dragEl.nextSibling !== nextEl) {
+								// Get the index of the dragged element within its parent
+								newIndex = _index(dragEl, options.draggable);
 
-					if (Sortable.active) {
-						/* jshint eqnull:true */
-						if (newIndex == null || newIndex === -1) {
-							newIndex = oldIndex;
+								if (newIndex >= 0) {
+									// drag & drop within the same list
+									_dispatchEvent(this, rootEl, 'update', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+									_dispatchEvent(this, rootEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+								}
+							}
 						}
 
-						_dispatchEvent(this, rootEl, 'end', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+						if (Sortable.active) {
+							/* jshint eqnull:true */
+							if (newIndex == null || newIndex === -1) {
+								newIndex = oldIndex;
+							}
 
-						// Save sorting
-						this.save();
+							_dispatchEvent(this, rootEl, 'end', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+
+							// Save sorting
+							this.save();
+						}
 					}
 				}
 
@@ -1510,6 +1542,32 @@
 
 	function _cancelNextTick(id) {
 		return clearTimeout(id);
+	}
+	
+	function _swapNodes(n1, n2) {
+
+		var p1 = n1.parentNode;
+		var p2 = n2.parentNode;
+		var i1, i2;
+
+		if ( !p1 || !p2 || p1.isEqualNode(n2) || p2.isEqualNode(n1) ) return;
+
+		for (var i = 0; i < p1.children.length; i++) {
+			if (p1.children[i].isEqualNode(n1)) {
+				i1 = i;
+			}
+		}
+		for (var i = 0; i < p2.children.length; i++) {
+			if (p2.children[i].isEqualNode(n2)) {
+				i2 = i;
+			}
+		}
+
+		if ( p1.isEqualNode(p2) && i1 < i2 ) {
+			i2++;
+		}
+		p1.insertBefore(n2, p1.children[i1]);
+		p2.insertBefore(n1, p2.children[i2]);
 	}
 
 	// Fixed #973:
