@@ -336,7 +336,7 @@
 				type = evt.type,
 				touch = evt.touches && evt.touches[0],
 				target = (touch || evt).target,
-				originalTarget = evt.target.shadowRoot && (evt.path && evt.path[0]) || target,
+				originalTarget = target,
 				filter = options.filter,
 				startIndex;
 
@@ -551,14 +551,16 @@
 					_css(ghostEl, 'display', 'none');
 				}
 
-				var target = document.elementFromPoint(touchEvt.clientX, touchEvt.clientY);
-				var parent = target;
-				var i = touchDragOverListeners.length;
-
-				if (target && target.shadowRoot) {
-					target = target.shadowRoot.elementFromPoint(touchEvt.clientX, touchEvt.clientY);
-					parent = target;
+				var shadowRootOrDocument = document;
+				// Check for Shadow DOM
+				for (var node = this.el; node; node = node.parentNode) {
+					if (node.toString() === "[object ShadowRoot]") {
+						shadowRootOrDocument = node;
+					}
 				}
+				var target = shadowRootOrDocument.elementFromPoint(touchEvt.clientX, touchEvt.clientY),
+					parent = target,
+					i = touchDragOverListeners.length;
 
 				if (parent) {
 					do {
