@@ -1,5 +1,5 @@
 {
-  "name": "Sortable",
+  "name": "rubaxa-sortable",
   "main": [
     "Sortable.js"
   ],
@@ -25,5 +25,9 @@
     "bower_components",
     "test",
     "tests"
-  ]
+  ],
+	"repository": {
+    "type": "git",
+    "url": "git://github.com/RubaXa/Sortable.git"
+  }
 }
