@@ -82,6 +82,7 @@ var sortable = new Sortable(el, {
 	group: "name",  // or { name: "...", pull: [true, false, clone], put: [true, false, array] }
 	sort: true,  // sorting inside list
 	delay: 0, // time in milliseconds to define when the sorting should start
+	touchMoveSensitivity: 0, // px, how many pixels the point should move before cancelling a delayed drag event
 	disabled: false, // Disables the sortable if set to true.
 	store: null,  // @see Store
 	animation: 150,  // ms, animation speed moving items when sorting, `0` — without animation
@@ -208,6 +209,20 @@ Demo: http://jsbin.com/videzob/edit?html,js,output
 Time in milliseconds to define when the sorting should start.
 
 Demo: http://jsbin.com/xizeh/edit?html,js,output
+
+
+---
+
+
+#### `touchMoveSensitivity` option
+This option is similar to `fallbackTolerance` option.
+
+When the `delay` option is set, some phones with very sensitive touch displays like the Samsung Galaxy S8 will fire 
+unwanted touchmove events even when your finger is not moving, resulting in the sort not triggering.
+
+This option sets the minimum pointer movement that must occur before the delayed sorting is cancelled.
+
+Values between 3 to 5 are good.
 
 
 ---
