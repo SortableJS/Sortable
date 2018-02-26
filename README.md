@@ -82,7 +82,7 @@ var sortable = new Sortable(el, {
 	group: "name",  // or { name: "...", pull: [true, false, clone], put: [true, false, array] }
 	sort: true,  // sorting inside list
 	delay: 0, // time in milliseconds to define when the sorting should start
-	touchMoveSensitivity: 0, // px, how many pixels the point should move before cancelling a delayed drag event
+	touchStartThreshold: 0, // px, how many pixels the point should move before cancelling a delayed drag event
 	disabled: false, // Disables the sortable if set to true.
 	store: null,  // @see Store
 	animation: 150,  // ms, animation speed moving items when sorting, `0` — without animation
@@ -214,10 +214,10 @@ Demo: http://jsbin.com/xizeh/edit?html,js,output
 ---
 
 
-#### `touchMoveSensitivity` option
+#### `touchStartThreshold` option
 This option is similar to `fallbackTolerance` option.
 
-When the `delay` option is set, some phones with very sensitive touch displays like the Samsung Galaxy S8 will fire 
+When the `delay` option is set, some phones with very sensitive touch displays like the Samsung Galaxy S8 will fire
 unwanted touchmove events even when your finger is not moving, resulting in the sort not triggering.
 
 This option sets the minimum pointer movement that must occur before the delayed sorting is cancelled.
@@ -648,4 +648,3 @@ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
 LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-

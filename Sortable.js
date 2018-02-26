@@ -282,7 +282,7 @@
 			dragoverBubble: false,
 			dataIdAttr: 'data-id',
 			delay: 0,
-			touchMoveSensitivity: 0,
+			touchStartThreshold: parseInt(window.devicePixelRatio, 10) || 1,
 			forceFallback: false,
 			fallbackClass: 'sortable-fallback',
 			fallbackOnBody: false,
@@ -477,7 +477,7 @@
 		},
 
 		_delayedDragTouchMoveHandler: function (/** TouchEvent|PointerEvent **/e) {
-			if (min(abs(e.clientX - this._lastX), abs(e.clientY - this._lastY)) > this.options.touchMoveSensitivity) {
+			if (min(abs(e.clientX - this._lastX), abs(e.clientY - this._lastY)) >= this.options.touchStartThreshold) {
 				this._disableDelayedDrag();
 			}
 		},
