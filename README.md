@@ -99,10 +99,10 @@ var sortable = new Sortable(el, {
 
 	fallbackClass: "sortable-fallback",  // Class name for the cloned DOM Element when using forceFallback
 	fallbackOnBody: false,  // Appends the cloned DOM Element into the Document's Body
-	fallbackTolerance: 0, // Specify in pixels how far the mouse should move before it's considered as a drag.        
-	
+	fallbackTolerance: 0, // Specify in pixels how far the mouse should move before it's considered as a drag.
+
 	scroll: true, // or HTMLElement
-	scrollFn: function(offsetX, offsetY, originalEvent) { ... }, // if you have custom scrollbar scrollFn may be used for autoscrolling
+	scrollFn: function(offsetX, offsetY, originalEvent, touchEvt, hoverTargetEl) { ... }, // if you have custom scrollbar scrollFn may be used for autoscrolling
 	scrollSensitivity: 30, // px, how near the mouse must be to an edge to start scrolling.
 	scrollSpeed: 10, // px
 
@@ -164,7 +164,7 @@ var sortable = new Sortable(el, {
 		originalEvent.clientY; // mouse position
 		// return false; — for cancel
 	},
-	
+
 	// Called when creating a clone of element
 	onClone: function (/**Event*/evt) {
 		var origEl = evt.item;
@@ -362,7 +362,7 @@ Demo: http://jsbin.com/yacuqib/edit?html,css,js,output
 Emulates the native drag threshold. Specify in pixels how far the mouse should move before it's considered as a drag.
 Useful if the items are also clickable like in a list of links.
 
-When the user clicks inside a sortable element, it's not uncommon for your hand to move a little between the time you press and the time you release.  
+When the user clicks inside a sortable element, it's not uncommon for your hand to move a little between the time you press and the time you release.
 Dragging only starts if you move the pointer past a certain tolerance, so that you don't accidentally start dragging every time you click.
 
 3 to 5 are probably good values.
@@ -576,12 +576,12 @@ Link to the active instance.
 ### CDN
 
 ```html
-<!-- jsDelivr :: Sortable (http://www.jsdelivr.com/package/npm/sortablejs) -->
-<script src="//cdn.jsdelivr.net/npm/sortablejs@1.6.1/Sortable.min.js"></script>
+<!-- jsDelivr :: Sortable (https://www.jsdelivr.com/package/npm/sortablejs) -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.6.1/Sortable.min.js"></script>
 
 
-<!-- jsDelivr :: Sortable :: Latest (http://www.jsdelivr.com/package/npm/sortablejs) -->
-<script src="//cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+<!-- jsDelivr :: Sortable :: Latest (https://www.jsdelivr.com/package/npm/sortablejs) -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 ```
 
 

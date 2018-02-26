@@ -55,6 +55,8 @@
 
 		moved,
 
+		forRepaintDummy,
+
 		/** @const */
 		R_SPACE = /\s+/g,
 		R_FLOAT = /left|right|inline/,
@@ -90,6 +92,8 @@
 
 		savedInputChecked = [],
 		touchDragOverListeners = [],
+
+		alwaysFalse = function () { return false; },
 
 		_autoScroll = _throttle(function (/**Event*/evt, /**Object*/options, /**HTMLElement*/rootEl) {
 			// Bug: https://bugzilla.mozilla.org/show_bug.cgi?id=505521
@@ -163,7 +167,9 @@
 							scrollOffsetX = vx ? vx * speed : 0;
 
 							if ('function' === typeof(scrollCustomFn)) {
-								return scrollCustomFn.call(_this, scrollOffsetX, scrollOffsetY, evt);
+								if (scrollCustomFn.call(_this, scrollOffsetX, scrollOffsetY, evt, touchEvt, el) !== 'continue') {
+									return;
+								}
 							}
 
 							if (el === win) {
@@ -180,8 +186,11 @@
 
 		_prepareGroup = function (options) {
 			function toFn(value, pull) {
-				if (value === void 0 || value === true) {
+				if (value == null || value === true) {
 					value = group.name;
+					if (value == null) {
+						return alwaysFalse;
+					}
 				}
 
 				if (typeof value === 'function') {
@@ -220,7 +229,9 @@
 	try {
 		window.addEventListener('test', null, Object.defineProperty({}, 'passive', {
 			get: function () {
-				passiveMode = true;
+				// `false`, because everything starts to work incorrectly and instead of d'n'd,
+				// begins the page has scrolled.
+				passiveMode = false;
 				captureMode = {
 					capture: false,
 					passive: passiveMode
@@ -248,12 +259,12 @@
 
 		// Default options
 		var defaults = {
-			group: Math.random(),
+			group: null,
 			sort: true,
 			disabled: false,
 			store: null,
 			handle: null,
-			scroll: true,
+      scroll: true,
 			scrollSensitivity: 30,
 			scrollSpeed: 10,
 			draggable: /[uo]l/i.test(el.nodeName) ? 'li' : '>*',
@@ -277,7 +288,7 @@
 			fallbackOnBody: false,
 			fallbackTolerance: 0,
 			fallbackOffset: {x: 0, y: 0},
-			supportPointer: Sortable.supportPointer !== false,
+			supportPointer: Sortable.supportPointer !== false
 		};
 
 
@@ -551,7 +562,7 @@
 				var parent = target;
 				var i = touchDragOverListeners.length;
 
-				if (target && target.shadowRoot) {
+				while (target && target.shadowRoot) {
 					target = target.shadowRoot.elementFromPoint(touchEvt.clientX, touchEvt.clientY);
 					parent = target;
 				}
@@ -726,7 +737,7 @@
 				canSort = options.sort;
 
 			if (evt.preventDefault !== void 0) {
-				!passiveMode && evt.preventDefault();
+				evt.preventDefault();
 				!options.dragoverBubble && evt.stopPropagation();
 			}
 
@@ -888,7 +899,7 @@
 					+ (prevRect.top - currentRect.top) + 'px,0)'
 				);
 
-				target.offsetWidth; // repaint
+				forRepaintDummy = target.offsetWidth; // repaint
 
 				_css(target, 'transition', 'all ' + ms + 'ms');
 				_css(target, 'transform', 'translate3d(0,0,0)');
@@ -939,7 +950,7 @@
 
 			if (evt) {
 				if (moved) {
-					!passiveMode && evt.preventDefault();
+					evt.preventDefault();
 					!options.dropBubble && evt.stopPropagation();
 				}
 
@@ -963,21 +974,21 @@
 					_toggleClass(dragEl, this.options.chosenClass, false);
 
 					// Drag stop event
-					_dispatchEvent(this, rootEl, 'unchoose', dragEl, parentEl, rootEl, oldIndex);
+					_dispatchEvent(this, rootEl, 'unchoose', dragEl, parentEl, rootEl, oldIndex, null, evt);
 
 					if (rootEl !== parentEl) {
 						newIndex = _index(dragEl, options.draggable);
 
 						if (newIndex >= 0) {
 							// Add event
-							_dispatchEvent(null, parentEl, 'add', dragEl, parentEl, rootEl, oldIndex, newIndex);
+							_dispatchEvent(null, parentEl, 'add', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
 
 							// Remove event
-							_dispatchEvent(this, rootEl, 'remove', dragEl, parentEl, rootEl, oldIndex, newIndex);
+							_dispatchEvent(this, rootEl, 'remove', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
 
 							// drag from one list and drop into another
-							_dispatchEvent(null, parentEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex);
-							_dispatchEvent(this, rootEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex);
+							_dispatchEvent(null, parentEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+							_dispatchEvent(this, rootEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
 						}
 					}
 					else {
@@ -987,8 +998,8 @@
 
 							if (newIndex >= 0) {
 								// drag & drop within the same list
-								_dispatchEvent(this, rootEl, 'update', dragEl, parentEl, rootEl, oldIndex, newIndex);
-								_dispatchEvent(this, rootEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex);
+								_dispatchEvent(this, rootEl, 'update', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+								_dispatchEvent(this, rootEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
 							}
 						}
 					}
@@ -999,7 +1010,7 @@
 							newIndex = oldIndex;
 						}
 
-						_dispatchEvent(this, rootEl, 'end', dragEl, parentEl, rootEl, oldIndex, newIndex);
+						_dispatchEvent(this, rootEl, 'end', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
 
 						// Save sorting
 						this.save();
@@ -1238,7 +1249,7 @@
 		if (evt.dataTransfer) {
 			evt.dataTransfer.dropEffect = 'move';
 		}
-		!passiveMode && evt.preventDefault();
+		evt.preventDefault();
 	}
 
 
@@ -1308,7 +1319,7 @@
 
 
 
-	function _dispatchEvent(sortable, rootEl, name, targetEl, toEl, fromEl, startIndex, newIndex) {
+	function _dispatchEvent(sortable, rootEl, name, targetEl, toEl, fromEl, startIndex, newIndex, originalEvt) {
 		sortable = (sortable || rootEl[expando]);
 
 		var evt = document.createEvent('Event'),
@@ -1324,6 +1335,8 @@
 
 		evt.oldIndex = startIndex;
 		evt.newIndex = newIndex;
+
+		evt.originalEvent = originalEvt;
 
 		rootEl.dispatchEvent(evt);
 
@@ -1349,6 +1362,8 @@
 		evt.related = targetEl || toEl;
 		evt.relatedRect = targetRect || toEl.getBoundingClientRect();
 		evt.willInsertAfter = willInsertAfter;
+
+		evt.originalEvent = originalEvt;
 
 		fromEl.dispatchEvent(evt);
 
@@ -1425,15 +1440,15 @@
 
 	function _matches(/**HTMLElement*/el, /**String*/selector) {
 		if (el) {
-			selector = selector.split('.');
-
-			var tag = selector.shift().toUpperCase(),
-				re = new RegExp('\\s(' + selector.join('|') + ')(?=\\s)', 'g');
-
-			return (
-				(tag === '' || el.nodeName.toUpperCase() == tag) &&
-				(!selector.length || ((' ' + el.className + ' ').match(re) || []).length == selector.length)
-			);
+			try {
+				if (el.matches) {
+					return el.matches(selector);
+				} else if (el.msMatchesSelector) {
+					return el.msMatchesSelector(selector);
+				}
+			} catch(_) {
+				return false;
+			}
 		}
 
 		return false;
@@ -1485,6 +1500,8 @@
 	}
 
 	function _saveInputCheckedState(root) {
+		savedInputChecked.length = 0;
+
 		var inputs = root.getElementsByTagName('input');
 		var idx = inputs.length;
 
@@ -1540,6 +1557,6 @@
 
 
 	// Export
-	Sortable.version = '1.6.1';
+	Sortable.version = '1.7.0';
 	return Sortable;
 });
