@@ -241,3 +241,7 @@ img {
 #nested ul li {
 	background-color: rgba(0,0,0,.05);
 }
+
+.sortable-swap-highlight {
+	background-color: #9AB6F1;
+}

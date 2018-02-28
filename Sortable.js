@@ -139,7 +139,7 @@
 
 				if (scrollEl) {
 					el = scrollEl;
-					rect = scrollEl.getBoundingClientRect();
+					rect = _getBoundingClientRect(scrollEl);
 					vx = (abs(rect.right - x) <= sens) - (abs(rect.left - x) <= sens);
 					vy = (abs(rect.bottom - y) <= sens) - (abs(rect.top - y) <= sens);
 				}
@@ -264,13 +264,15 @@
 			disabled: false,
 			store: null,
 			handle: null,
-      scroll: true,
+			scroll: true,
 			scrollSensitivity: 30,
 			scrollSpeed: 10,
+			swap: false,
 			draggable: /[uo]l/i.test(el.nodeName) ? 'li' : '>*',
 			ghostClass: 'sortable-ghost',
 			chosenClass: 'sortable-chosen',
 			dragClass: 'sortable-drag',
+			swapClass: 'sortable-swap-highlight',
 			ignore: 'a, img',
 			filter: null,
 			preventOnFilter: true,
@@ -633,7 +635,7 @@
 
 		_appendGhost: function () {
 			if (!ghostEl) {
-				var rect = dragEl.getBoundingClientRect(),
+				var rect = _getBoundingClientRect(dragEl),
 					css = _css(dragEl),
 					options = this.options,
 					ghostRect;
@@ -653,10 +655,14 @@
 				_css(ghostEl, 'zIndex', '100000');
 				_css(ghostEl, 'pointerEvents', 'none');
 
-				options.fallbackOnBody && document.body.appendChild(ghostEl) || rootEl.appendChild(ghostEl);
+				if (options.fallbackOnBody) {
+					_insertBefore(document.body, ghostEl, null);
+				} else {
+					_insertBefore(rootEl, ghostEl, null);
+				}
 
 				// Fixing dimensions.
-				ghostRect = ghostEl.getBoundingClientRect();
+				ghostRect = _getBoundingClientRect(ghostEl);
 				_css(ghostEl, 'width', rect.width * 2 - ghostRect.width);
 				_css(ghostEl, 'height', rect.height * 2 - ghostRect.height);
 			}
@@ -680,7 +686,7 @@
 
 				// #1143: IFrame support workaround
 				_this._cloneId = _nextTick(function () {
-					rootEl.insertBefore(cloneEl, dragEl);
+					_insertBefore(rootEl, cloneEl, dragEl);
 					_dispatchEvent(_this, rootEl, 'clone', dragEl);
 				});
 			}
@@ -768,11 +774,20 @@
 				}
 
 				target = _closest(evt.target, options.draggable, el);
-				dragRect = dragEl.getBoundingClientRect();
+				dragRect = _getBoundingClientRect(dragEl);
 
 				if (putSortable !== this) {
 					putSortable = this;
 					isMovingBetweenSortable = true;
+				}
+
+				if (options.swap) {
+					if (target) {
+						lastEl && _toggleClass(lastEl, options.swapClass, false);
+						_toggleClass(target, options.swapClass, true);
+						lastEl = target;
+					}
+					return;
 				}
 
 				if (revert) {
@@ -780,15 +795,14 @@
 					parentEl = rootEl; // actualization
 
 					if (cloneEl || nextEl) {
-						rootEl.insertBefore(dragEl, cloneEl || nextEl);
+						_insertBefore(rootEl, dragEl, cloneEl || nextEl);
 					}
 					else if (!canSort) {
-						rootEl.appendChild(dragEl);
+						_insertBefore(rootEl, dragEl, null);
 					}
 
 					return;
 				}
-
 
 				if ((el.children.length === 0) || (el.children[0] === ghostEl) ||
 					(el === evt.target) && (_ghostIsLast(el, evt))
@@ -803,14 +817,14 @@
 							return;
 						}
 
-						targetRect = target.getBoundingClientRect();
+						targetRect = _getBoundingClientRect(target);
 					}
 
 					_cloneHide(activeSortable, isOwner);
 
 					if (_onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt) !== false) {
 						if (!dragEl.contains(el)) {
-							el.appendChild(dragEl);
+							_insertBefore(el, dragEl, null);
 							parentEl = el; // actualization
 						}
 
@@ -825,7 +839,7 @@
 						lastParentCSS = _css(target.parentNode);
 					}
 
-					targetRect = target.getBoundingClientRect();
+					targetRect = _getBoundingClientRect(target);
 
 					var width = targetRect.right - targetRect.left,
 						height = targetRect.bottom - targetRect.top,
@@ -868,9 +882,9 @@
 
 						if (!dragEl.contains(el)) {
 							if (after && !nextSibling) {
-								el.appendChild(dragEl);
+								_insertBefore(el, dragEl, null);
 							} else {
-								target.parentNode.insertBefore(dragEl, after ? nextSibling : target);
+								_insertBefore(null, dragEl, after ? nextSibling : target);
 							}
 						}
 
@@ -887,10 +901,10 @@
 			var ms = this.options.animation;
 
 			if (ms) {
-				var currentRect = target.getBoundingClientRect();
+				var currentRect = _getBoundingClientRect(target);
 
 				if (prevRect.nodeType === 1) {
-					prevRect = prevRect.getBoundingClientRect();
+					prevRect = _getBoundingClientRect(prevRect);
 				}
 
 				_css(target, 'transition', 'none');
@@ -947,6 +961,22 @@
 			}
 
 			this._offUpEvents();
+
+			if (lastEl && options.swap) {
+				_toggleClass(lastEl, options.swapClass, false);
+
+				if (dragEl !== lastEl) {
+					var anchor = dragEl.nextSibling;
+					var dragRect = _getBoundingClientRect(dragEl);
+					var lastRect = _getBoundingClientRect(lastEl);
+
+					_insertBefore(null, dragEl, lastEl)
+					_insertBefore(null, lastEl, anchor);
+
+					this._animate(dragRect, dragEl);
+					this._animate(lastRect, lastEl);
+				}
+			}
 
 			if (evt) {
 				if (moved) {
@@ -1120,7 +1150,7 @@
 			order.forEach(function (id) {
 				if (items[id]) {
 					rootEl.removeChild(items[id]);
-					rootEl.appendChild(items[id]);
+					_insertBefore(rootEl, items[id], null);
 				}
 			});
 		},
@@ -1209,10 +1239,10 @@
 			if (!state) {
 				if (cloneEl.state) {
 					if (sortable.options.group.revertClone) {
-						rootEl.insertBefore(cloneEl, nextEl);
+						_insertBefore(rootEl, cloneEl, nextEl);
 						sortable._animate(dragEl, cloneEl);
 					} else {
-						rootEl.insertBefore(cloneEl, dragEl);
+						_insertBefore(rootEl, cloneEl, dragEl);
 					}
 				}
 			}
@@ -1360,7 +1390,7 @@
 		evt.dragged = dragEl;
 		evt.draggedRect = dragRect;
 		evt.related = targetEl || toEl;
-		evt.relatedRect = targetRect || toEl.getBoundingClientRect();
+		evt.relatedRect = targetRect || _getBoundingClientRect(toEl);
 		evt.willInsertAfter = willInsertAfter;
 
 		evt.originalEvent = originalEvt;
@@ -1388,7 +1418,7 @@
 	/** @returns {HTMLElement|false} */
 	function _ghostIsLast(el, evt) {
 		var lastEl = el.lastElementChild,
-			rect = lastEl.getBoundingClientRect();
+			rect = _getBoundingClientRect(lastEl);
 
 		// 5 — min delta
 		// abs — нельзя добавлять, а то глюки при наведении сверху
@@ -1519,6 +1549,18 @@
 		return clearTimeout(id);
 	}
 
+	function _getBoundingClientRect(el) {
+		return el.getBoundingClientRect();
+	}
+
+	function _insertBefore(parent, el, ref) {
+		if (parent === null) {
+			parent = ref.parentNode;
+		}
+
+		parent.insertBefore(el, ref);
+	}
+
 	// Fixed #973:
 	_on(document, 'touchmove', function (evt) {
 		if (Sortable.active) {
@@ -1542,7 +1584,9 @@
 		clone: _clone,
 		index: _index,
 		nextTick: _nextTick,
-		cancelNextTick: _cancelNextTick
+		cancelNextTick: _cancelNextTick,
+		getBoundingClientRect: _getBoundingClientRect,
+		insertBefore: _insertBefore
 	};
 
 

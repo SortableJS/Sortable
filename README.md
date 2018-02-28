@@ -85,6 +85,7 @@ var sortable = new Sortable(el, {
 	touchStartThreshold: 0, // px, how many pixels the point should move before cancelling a delayed drag event
 	disabled: false, // Disables the sortable if set to true.
 	store: null,  // @see Store
+	swap: false, // The dragged item to be swapped with the item you drop it on (instead of inserted next to it)
 	animation: 150,  // ms, animation speed moving items when sorting, `0` — without animation
 	handle: ".my-handle",  // Drag handle selector within list items
 	filter: ".ignore-elements",  // Selectors that do not lead to dragging (String or Function)
@@ -93,6 +94,7 @@ var sortable = new Sortable(el, {
 	ghostClass: "sortable-ghost",  // Class name for the drop placeholder
 	chosenClass: "sortable-chosen",  // Class name for the chosen item
 	dragClass: "sortable-drag",  // Class name for the dragging item
+	swapClass: "sortable-swap-highlight",  // Class name for the element under the dragged item.
 	dataIdAttr: 'data-id',
 
 	forceFallback: false,  // ignore the HTML5 DnD behaviour and force the fallback to kick in
@@ -400,6 +402,14 @@ Defines how near the mouse must be to an edge to start scrolling.
 #### `scrollSpeed` option
 The speed at which the window should scroll once the mouse pointer gets within the `scrollSensitivity` distance.
 
+
+---
+
+
+#### `swap` option
+Option to true will cause a dragged item to be swapped with the item you drop it on (instead of inserted next to it)
+
+Demo: http://jsbin.com/covamiqufo/1/edit?html,js,output
 
 ---
 
