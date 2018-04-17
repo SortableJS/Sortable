@@ -843,15 +843,15 @@
 							tgTop = target.offsetTop;
 
 						if (elTop === tgTop) {
-							after = (target.previousElementSibling === dragEl) && !isWide || halfway && isWide;
+							after = (target.previousElementSibling === dragEl) && !isWide || halfway;
 						}
 						else if (target.previousElementSibling === dragEl || dragEl.previousElementSibling === target) {
 							after = (evt.clientY - targetRect.top) / height > 0.5;
 						} else {
-							after = tgTop > elTop;
+							after = halfway;
 						}
-						} else if (!isMovingBetweenSortable) {
-						after = (nextSibling !== dragEl) && !isLong || halfway && isLong;
+					} else if (!isMovingBetweenSortable) {
+						after = (nextSibling !== dragEl) && !isLong || halfway;
 					}
 
 					var moveVector = _onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt, after);
