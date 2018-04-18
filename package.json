@@ -1,5 +1,5 @@
 {
-  "name": "sortablejs",
+  "name": "sortablejs-float",
   "exportName": "Sortable",
   "version": "1.7.0",
   "devDependencies": {
@@ -11,7 +11,7 @@
     "http-server": "^0.9.0",
     "testcafe": "^0.16.0"
   },
-  "description": "Minimalist JavaScript library for reorderable drag-and-drop lists on modern browsers and touch devices. No jQuery. Supports AngularJS and any CSS library, e.g. Bootstrap.",
+  "description": "This is a fork of git://github.com/rubaxa/Sortable.git that corrects an issue with placement while dragging in 'floating' containers (where contents wrap from row to row).",
   "main": "Sortable.js",
   "scripts": {
     "test": "./node_modules/grunt/bin/grunt",
@@ -20,7 +20,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/rubaxa/Sortable.git"
+    "url": "git://github.com/wchid/Sortable.git"
   },
   "files": [
     "Sortable.js",
@@ -36,7 +36,7 @@
     "react",
     "mixin"
   ],
-  "author": "Konstantin Lebedev <ibnRubaXa@gmail.com>",
+  "author": "William Chidyausiku <wjkchidyausiku@gmail.com>",
   "license": "MIT",
   "spm": {
     "main": "Sortable.js",
