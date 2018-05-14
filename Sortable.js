@@ -271,9 +271,11 @@
 			 * @start_change
 			 * Add tableMode property (and preceding line ,)
 			 */
-            fallbackOffset: {x: 0, y: 0},
+			fallbackOffset: {x: 0, y: 0},
 			tableMode: false
-			/** @end_change */
+			/** 
+			 * @end_change 
+			 **/
 		};
 
 
@@ -387,25 +389,25 @@
 				}
 			}
 
-            /**
+			/**
 			 *  @start_change
 			 * Original: 
 			 *  if (options.handle && !_closest(originalTarget, options.handle, el)) {
 			 * 	 return;
 			 *  }
 			 */
-            if (options.handle) {
-                if (typeof options.handle === 'function') {
-                    if (options.handle.call(this,evt,target,el,this)===false) {
-                        return; // cancel dnd
-                    }
-                }
-                else {
-                    if (!_closest(originalTarget, options.handle, el)) {
-                        return; // cancel dnd
-                    }
-                }
-            }
+			if (options.handle) {
+				if (typeof options.handle === 'function') {
+					if (options.handle.call(this,evt,target,el,this)===false) {
+						return; // cancel dnd
+					}
+				}
+				else {
+					if (!_closest(originalTarget, options.handle, el)) {
+						return; // cancel dnd
+					}
+				}
+			}
 			/**
 			 * @end_change
 			 */
@@ -440,7 +442,7 @@
 				 * Leave dragEl style alone when tableMode === false
 				 */
 				if ( options.tableMode === false ) {
-                    dragEl.style['will-change'] = 'transform';
+					dragEl.style['will-change'] = 'transform';
 				}
 				/** @end_change */
 
@@ -453,13 +455,13 @@
 					dragEl.draggable = _this.nativeDraggable;
 
 					// Chosen item
-                    _toggleClass(dragEl, options.chosenClass, true);
+					_toggleClass(dragEl, options.chosenClass, true);
 
 					// Bind the events: dragstart/dragend
 					_this._triggerDragStart(evt, touch);
 
                     // Drag start event
-                    /**
+					/**
 					 * @start_change
 					 * Pass extra parameter evt
 					 * Original:
@@ -532,10 +534,10 @@
 		},
 
 		_triggerDragStart: function (/** Event */evt, /** Touch */touch) {
-            touch = touch || (evt.pointerType == 'touch' ? evt : null);
+			touch = touch || (evt.pointerType == 'touch' ? evt : null);
             
 			if (touch) {
-                // Touch device support
+				// Touch device support
 				tapEvt = {
 					target: dragEl,
 					clientX: touch.clientX,
@@ -578,7 +580,7 @@
 			if (rootEl && dragEl) {
 				var options = this.options;
 
-                // Apply effect
+				// Apply effect
 				/**
 				 * @start_change
 				 * Call _toggleClass on options.dragClass, not options.ghostClass
@@ -590,8 +592,8 @@
                 
 				Sortable.active = this;
 
-                // Drag start event
-                /**
+				// Drag start event
+				/**
 				 * @start_change
 				 * Original:
 				 *  _dispatchEvent(this, rootEl, 'start', dragEl, rootEl, oldIndex);
@@ -620,15 +622,15 @@
                 
 				var target = document.elementFromPoint(touchEvt.clientX, touchEvt.clientY),
 					parent = target,
-                    i = touchDragOverListeners.length;
+					i = touchDragOverListeners.length;
 
 				/**
 				 * @start_change
 				 * If the event originated from _dragRow, use it for parent/target
 				 */
-                if ( touchEvt.hasOwnProperty( '_dragRow' ) === true ) {
-                    target = touchEvt._dragRow;
-                    parent = target;
+				if ( touchEvt.hasOwnProperty( '_dragRow' ) === true ) {
+					target = touchEvt._dragRow;
+					parent = target;
 				}
 				/** @end_change */
 
