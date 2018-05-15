@@ -1383,7 +1383,7 @@
 			};
 		}
 
-		el.addEventListener(event, fn, mode);
+		el && el.addEventListener(event, fn, mode);
 		/**
 		 * @end_change
 		 */
@@ -1406,7 +1406,7 @@
 			};
 		}
 
-		el.removeEventListener(event, fn, mode);
+		el && el.removeEventListener(event, fn, mode);
 		/**
 		 * @end_change
 		 */
