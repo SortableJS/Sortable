@@ -200,7 +200,7 @@
 							: value && (value.join
 								? value.indexOf(fromGroup) > -1
 								: (fromGroup == value)
-						);
+							);
 					};
 				}
 			}
@@ -567,9 +567,9 @@
 		_dragStarted: function () {
 		 */
 		_dragStarted: function (aEvent) {
-			/**
-			 * @end_change
-			 */
+		/**
+		 * @end_change
+		 */
 			if (rootEl && dragEl) {
 				var options = this.options;
 
@@ -1480,7 +1480,7 @@
 	 * Add one final parameters, ev
 	 * Original:
 	function _dispatchEvent(sortable, rootEl, name, targetEl, fromEl, startIndex, newIndex) {
-    */
+     */
 	function _dispatchEvent(sortable, rootEl, name, targetEl, fromEl, startIndex, newIndex, ev) {
 	/**
 	 * @end_change
