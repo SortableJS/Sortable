@@ -509,6 +509,8 @@
 				} else {
 					dragStartFn();
 				}
+
+
 			}
 		},
 
@@ -562,7 +564,7 @@
 		 * @start_change
 		 * Add parameter aEvent
 		 * Original:
-		 _dragStarted: function () {
+		_dragStarted: function () {
 		 */
 		_dragStarted: function (aEvent) {
 			/**
@@ -642,7 +644,7 @@
 
 						target = parent; // store last element
 					}
-						/* jshint boss:true */
+					/* jshint boss:true */
 					while (parent = parent.parentNode);
 				}
 
@@ -675,7 +677,7 @@
 					 * @start_change
 					 * Include evt parameter
 					 * Original:
-					 this._dragStarted();
+					this._dragStarted();
 					 */
 					this._dragStarted(evt);
 					/**
@@ -687,7 +689,6 @@
 				this._appendGhost();
 
 				moved = true;
-
 				touchEvt = touch;
 
 				/**
@@ -720,7 +721,7 @@
 				/**
 				 * @start_change
 				 * Original:
-				 _toggleClass(ghostEl, options.ghostClass, false);
+				_toggleClass(ghostEl, options.ghostClass, false);
 				 */
 				_toggleClass(ghostEl, options.ghostClass, true);
 				/**
@@ -750,7 +751,6 @@
 
 				// Fixing dimensions.
 				ghostRect = ghostEl.getBoundingClientRect();
-
 				_css(ghostEl, 'width', rect.width * 2 - ghostRect.width);
 				_css(ghostEl, 'height', rect.height * 2 - ghostRect.height);
 			}
@@ -762,7 +762,7 @@
 
 			this._offUpEvents();
 
-			if ( activeGroup.checkPull(this, this, dragEl, evt)) {
+			if (activeGroup.checkPull(this, this, dragEl, evt)) {
 				cloneEl = _clone(dragEl);
 
 				cloneEl.draggable = false;
@@ -830,14 +830,14 @@
 
 			if (activeSortable && !options.disabled &&
 				(isOwner
-						? canSort || (revert = !rootEl.contains(dragEl)) // Reverting item into the original list
-						: (
-							putSortable === this ||
-							(
-								(activeSortable.lastPullMode = activeGroup.checkPull(this, activeSortable, dragEl, evt)) &&
-								group.checkPut(this, activeSortable, dragEl, evt)
-							)
+					? canSort || (revert = !rootEl.contains(dragEl)) // Reverting item into the original list
+					: (
+						putSortable === this ||
+						(
+							(activeSortable.lastPullMode = activeGroup.checkPull(this, activeSortable, dragEl, evt)) &&
+							group.checkPut(this, activeSortable, dragEl, evt)
 						)
+					)
 				) &&
 				(evt.rootEl === void 0 || evt.rootEl === this.el) // touch fallback
 			) {
@@ -870,6 +870,7 @@
 					return;
 				}
 
+
 				if ((el.children.length === 0) || (el.children[0] === ghostEl) ||
 					(el === evt.target) && (_ghostIsLast(el, evt))
 				) {
@@ -901,12 +902,12 @@
 				/**
 				 * @start_change
 				 * Original:
-				 else if (target && !target.animated && target !== dragEl && (target.parentNode[expando] !== void 0)) {
+				else if (target && !target.animated && target !== dragEl && (target.parentNode[expando] !== void 0)) {
 				 */
 				else if (target && !target.animated && ( ( this.options.draggable !== 'tr' && target !== dragEl ) || ( this.options.draggable === 'tr' ) ) && (target.parentNode[expando] !== void 0)) {
-					/**
-					 * @end_change
-					 */
+				/**
+				 * @end_change
+				 */
 					if (lastEl !== target) {
 						lastEl = target;
 						lastCSS = _css(target);
@@ -1016,6 +1017,7 @@
 
 			_off(document, 'touchmove', this._onTouchMove);
 			_off(document, 'pointermove', this._onTouchMove);
+			_off(ownerDocument, 'mouseup', this._onDrop);
 			_off(ownerDocument, 'touchend', this._onDrop);
 			_off(ownerDocument, 'pointerup', this._onDrop);
 			_off(ownerDocument, 'touchcancel', this._onDrop);
@@ -1056,7 +1058,7 @@
 
 				if (dragEl) {
 					if (this.nativeDraggable) {
-						_off(dragEl, 'dragend', this, options);
+						_off(dragEl, 'dragend', this);
 					}
 
 					_disableDraggable(dragEl);
@@ -1140,28 +1142,28 @@
 
 		_nulling: function() {
 			rootEl =
-				dragEl =
-					parentEl =
-						ghostEl =
-							nextEl =
-								cloneEl =
-									lastDownEl =
+			dragEl =
+			parentEl =
+			ghostEl =
+			nextEl =
+			cloneEl =
+			lastDownEl =
 
-										scrollEl =
-											scrollParentEl =
+			scrollEl =
+			scrollParentEl =
 
-												tapEvt =
-													touchEvt =
+			tapEvt =
+			touchEvt =
 
-														moved =
-															newIndex =
+			moved =
+			newIndex =
 
-																lastEl =
-																	lastCSS =
+			lastEl =
+			lastCSS =
 
-																		putSortable =
-																			activeGroup =
-																				Sortable.active = null;
+			putSortable =
+			activeGroup =
+			Sortable.active = null;
 
 			savedInputChecked.forEach(function (el) {
 				el.checked = true;
@@ -1366,6 +1368,12 @@
 	}
 
 	function _on(el, event, fn) {
+		/**
+		 * @start_change
+		 * Use captureMode option if set
+		 * Original:
+		el.addEventListener(event, fn, captureMode);
+		 */
 		var mode = captureMode;
 
 		if ( opts && opts.captureMode === true ) {
@@ -1376,10 +1384,19 @@
 		}
 
 		el.addEventListener(event, fn, mode);
+		/**
+		 * @end_change
+		 */
 	}
 
 
 	function _off(el, event, fn) {
+		/**
+		 * @start_change
+		 * Use captureMode option if set
+		 * Original:
+		 el.removeEventListener(event, fn, captureMode);
+		 */
 		var mode = captureMode;
 
 		if ( opts && opts.captureMode === true ) {
@@ -1390,6 +1407,9 @@
 		}
 
 		el.removeEventListener(event, fn, mode);
+		/**
+		 * @end_change
+		 */
 	}
 
 	function _toggleClass(el, name, state) {
@@ -1400,9 +1420,9 @@
 		 if (el) {}
 		 */
 		if (el && name) {
-			/**
-			 * @end_change
-			 */
+		/**
+		 * @end_change
+		 */
 			if (el.classList) {
 				el.classList[state ? 'add' : 'remove'](name);
 			}
@@ -1459,12 +1479,12 @@
 	/** @start_change
 	 * Add one final parameters, ev
 	 * Original:
-	 *  function _dispatchEvent(sortable, rootEl, name, targetEl, fromEl, startIndex, newIndex) {
- */
+	function _dispatchEvent(sortable, rootEl, name, targetEl, fromEl, startIndex, newIndex) {
+    */
 	function _dispatchEvent(sortable, rootEl, name, targetEl, fromEl, startIndex, newIndex, ev) {
-		/**
-		 * @end_change
-		 */
+	/**
+	 * @end_change
+	 */
 		sortable = (sortable || rootEl[expando]);
 
 		var evt = document.createEvent('Event'),
@@ -1651,8 +1671,8 @@
 		return $
 			? $(el).clone(true)[0]
 			: (Polymer && Polymer.dom
-					? Polymer.dom(el).cloneNode(true)
-					: el.cloneNode(true)
+				? Polymer.dom(el).cloneNode(true)
+				: el.cloneNode(true)
 			);
 	}
 
