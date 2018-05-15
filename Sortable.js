@@ -460,7 +460,7 @@
 					// Bind the events: dragstart/dragend
 					_this._triggerDragStart(evt, touch);
 
-                    // Drag start event
+					// Drag start event
 					/**
 					 * @start_change
 					 * Pass extra parameter evt
@@ -535,7 +535,7 @@
 
 		_triggerDragStart: function (/** Event */evt, /** Touch */touch) {
 			touch = touch || (evt.pointerType == 'touch' ? evt : null);
-            
+
 			if (touch) {
 				// Touch device support
 				tapEvt = {
@@ -589,7 +589,7 @@
 				 */
 				_toggleClass(dragEl, options.dragClass, false);
 				/** @end_change */
-                
+
 				Sortable.active = this;
 
 				// Drag start event
@@ -618,8 +618,8 @@
 
 				if (!supportCssPointerEvents) {
 					_css(ghostEl, 'display', 'none');
-                }
-                
+				}
+
 				var target = document.elementFromPoint(touchEvt.clientX, touchEvt.clientY),
 					parent = target,
 					i = touchDragOverListeners.length;
@@ -688,8 +688,8 @@
 						min(abs(touch.clientX - this._lastX), abs(touch.clientY - this._lastY)) < fallbackTolerance
 					) {
 						return;
-                    }
-                    /**
+					}
+					/**
 					 * @start_change
 					 * Include evt parameter
 					 * Original:
@@ -704,23 +704,23 @@
 				// as well as creating the ghost element on the document body
 				this._appendGhost();
 
-                moved = true;
-                
-                touchEvt = touch;
+				moved = true;
+
+				touchEvt = touch;
 
 				/**
 				 * @start_change
 				 * Set touchEvt _dragRow if tapEvt has it
 				 */
-                if ( tapEvt.hasOwnProperty( '_dragRow' ) === true ) {
-                    touchEvt._dragRow = tapEvt._dragRow;
+				if ( tapEvt.hasOwnProperty( '_dragRow' ) === true ) {
+					touchEvt._dragRow = tapEvt._dragRow;
 				}
 				/** @end_change */
 
-                _css(ghostEl, 'webkitTransform', translate3d);
-                _css(ghostEl, 'mozTransform', translate3d);
-                _css(ghostEl, 'msTransform', translate3d);
-                _css(ghostEl, 'transform', translate3d);
+				_css(ghostEl, 'webkitTransform', translate3d);
+				_css(ghostEl, 'mozTransform', translate3d);
+				_css(ghostEl, 'msTransform', translate3d);
+				_css(ghostEl, 'transform', translate3d);
 
 				evt.preventDefault();
 			}
@@ -731,10 +731,10 @@
 				var rect = dragEl.getBoundingClientRect(),
 					css = _css(dragEl),
 					options = this.options,
-                    ghostRect;
+					ghostRect;
 
-                ghostEl = dragEl.cloneNode(true);
-                
+				ghostEl = dragEl.cloneNode(true);
+
 				/**
 				 * @start_change
 				 * Call _toggleClass on ghostEl, turning on chosenClass
@@ -779,10 +779,10 @@
 				options.fallbackOnBody && document.body.appendChild(ghostEl) || rootEl.appendChild(ghostEl);
 
 				// Fixing dimensions.
-                ghostRect = ghostEl.getBoundingClientRect();
-                
+				ghostRect = ghostEl.getBoundingClientRect();
+
 				_css(ghostEl, 'width', rect.width * 2 - ghostRect.width);
-                _css(ghostEl, 'height', rect.height * 2 - ghostRect.height);
+				_css(ghostEl, 'height', rect.height * 2 - ghostRect.height);
 			}
 		},
 
@@ -792,7 +792,7 @@
 
 			this._offUpEvents();
 
-            /** 
+			/**
 			 * @start_change 
 			 * Original:
 			 *  if ( activeGroup.checkPull(this, this, dragEl, evt)) {
@@ -811,9 +811,9 @@
 
 				rootEl.insertBefore(cloneEl, dragEl);
 				_dispatchEvent(this, rootEl, 'clone', dragEl);
-            }
-            
-            _toggleClass(dragEl, options.dragClass, true);
+			}
+
+			_toggleClass(dragEl, options.dragClass, true);
 
 			if (useFallback) {
 				if (useFallback === 'touch') {
@@ -885,20 +885,20 @@
 							group.checkPut(this, activeSortable, dragEl, evt)
 						)
 					)
-                ) &&
+				) &&
 				(evt.rootEl === void 0 || evt.rootEl === this.el ) // touch fallback
 			) {
-                // Smart auto-scrolling
+				// Smart auto-scrolling
 				_autoScroll(evt, options, this.el);
 
 				if (_silent) {
 					return;
 				}
 
-                target = _closest(evt.target, options.draggable, el);
-                
+				target = _closest(evt.target, options.draggable, el);
+
 				dragRect = dragEl.getBoundingClientRect();
-                
+
 				if (putSortable !== this) {
 					putSortable = this;
 					isMovingBetweenSortable = true;
@@ -906,7 +906,7 @@
 
 				if (revert) {
 					_cloneHide(activeSortable, true);
-                    parentEl = rootEl; // actualization
+					parentEl = rootEl; // actualization
 
 					if (cloneEl || nextEl) {
 						rootEl.insertBefore(dragEl, cloneEl || nextEl);
@@ -945,18 +945,18 @@
 						this._animate(dragRect, dragEl);
 						target && this._animate(targetRect, target);
 					}
-                }
+				}
 				/**
 				 * @start_change
 				 * When in tableMode, alter the logic slightly
 				 * Original:
 				 *  else if (target && !target.animated && target !== dragEl && (target.parentNode[expando] !== void 0)) {
 				 */
-                else if (target && !target.animated && ( ( this.options.tableMode === false && target !== dragEl ) || this.options.tableMode === true ) && (target.parentNode[expando] !== void 0)) {
+				else if (target && !target.animated && ( ( this.options.tableMode === false && target !== dragEl ) || this.options.tableMode === true ) && (target.parentNode[expando] !== void 0)) {
 				/**
 				 * @end_change
 				 */
-                    if (lastEl !== target) {
+					if (lastEl !== target) {
 						lastEl = target;
 						lastCSS = _css(target);
 						lastParentCSS = _css(target.parentNode);
@@ -991,8 +991,8 @@
 						after = (nextSibling !== dragEl) && !isLong || halfway && isLong;
 					}
 
-                    var moveVector = _onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt, after);
-                    
+					var moveVector = _onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt, after);
+
 					if (moveVector !== false) {
 						if (moveVector === 1 || moveVector === -1) {
 							after = (moveVector === 1);
@@ -1001,7 +1001,7 @@
 						_silent = true;
 						setTimeout(_unsilent, 30);
 
-                        _cloneHide(activeSortable, isOwner);
+						_cloneHide(activeSortable, isOwner);
 
 						/**
 						 * @start_change
@@ -1040,7 +1040,7 @@
 		},
 
 		_animate: function (prevRect, target) {
-            var ms = this.options.animation;
+			var ms = this.options.animation;
 
 			if (ms) {
 				var currentRect = target.getBoundingClientRect();
@@ -1053,8 +1053,8 @@
 				_css(target, 'transform', 'translate3d('
 					+ (prevRect.left - currentRect.left) + 'px,'
 					+ (prevRect.top - currentRect.top) + 'px,0)'
-                );
-                
+				);
+
 				target.offsetWidth; // repaint
 
 				_css(target, 'transition', 'all ' + ms + 'ms');
@@ -1145,21 +1145,21 @@
 						_off(dragEl, 'dragend', this, options);
 					}
 
-                    _disableDraggable(dragEl);
-                    
-                    /**
+					_disableDraggable(dragEl);
+
+					/**
 					 * @start_change
 					 * Original:
 					 *  dragEl.style['will-change'] = '';
 					 */
-                    if ( options.tableMode === false ) {
-                        dragEl.style['will-change'] = '';
+					if ( options.tableMode === false ) {
+						dragEl.style['will-change'] = '';
 					}
 					/** 
 					 * @end_change
 					 */
 
-                    // Remove class's
+					// Remove class's
 					/**
 					 * @start_change
 					 * When in tableMode, do not use ghostClass on dragEl
@@ -1170,8 +1170,8 @@
 						_toggleClass(dragEl, this.options.ghostClass, false);	
 					}
 
-                    _toggleClass(dragEl, this.options.chosenClass, false);
-                    
+					_toggleClass(dragEl, this.options.chosenClass, false);
+
 					// Drag stop event
 					_dispatchEvent(this, rootEl, 'unchoose', dragEl, rootEl, oldIndex);
 
@@ -1521,7 +1521,7 @@
 
 
 	function _toggleClass(el, name, state) {
-        /**
+		/**
 		 * @start_change
 		 * Check for both el and name, not just el
 		 * Original:
@@ -1607,14 +1607,14 @@
 		evt.clone = cloneEl;
 
 		evt.oldIndex = startIndex;
-        evt.newIndex = newIndex;
-        
-        /**
+		evt.newIndex = newIndex;
+
+		/**
 		 * @start_change
 		 * Store clientY in evt if ev is provided
 		 */
-        if ( ev ) {
-            evt.clientY = ev.clientY;
+		if ( ev ) {
+			evt.clientY = ev.clientY;
 		}
 		/**
 		 * @end_change
