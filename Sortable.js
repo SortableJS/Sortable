@@ -69,6 +69,13 @@
 		Polymer = win.Polymer,
 
 		captureMode = false,
+		/**
+		 * @start_change
+		 */
+		opts,
+		/**
+		 * @end_change
+		 */
 
 		supportDraggable = !!('draggable' in document.createElement('div')),
 		supportCssPointerEvents = (function (el) {
@@ -193,7 +200,7 @@
 							: value && (value.join
 								? value.indexOf(fromGroup) > -1
 								: (fromGroup == value)
-							);
+						);
 					};
 				}
 			}
@@ -269,13 +276,16 @@
 			fallbackTolerance: 0,
 			/**
 			 * @start_change
-			 * Add tableMode property (and preceding line ,)
+			 * Add captureMode (default false)
+			 * Add dragWillChange (default true)
 			 */
 			fallbackOffset: {x: 0, y: 0},
-			tableMode: false
-			/** 
-			 * @end_change 
-			 **/
+			captureMode: false,
+			// Apply transform-pending style during drag (or not)
+			dragWillChange: true
+			/**
+			 * @end_change
+			 */
 		};
 
 
@@ -299,22 +309,21 @@
 		// Bind events
 		/**
 		 * @start_change
-		 * Add options as final parameter to _on function call
-		 * Original:
-		 *  (each line as is, without the final options parameter)
+		 * Store options in opts variable
 		 */
-		_on(el, 'mousedown', this._onTapStart, options);
-		_on(el, 'touchstart', this._onTapStart, options);
-		_on(el, 'pointerdown', this._onTapStart, options);
-		_on(el, 'destroy', this._destroy, options);
-
-		if (this.nativeDraggable) {
-			_on(el, 'dragover', this, options);
-			_on(el, 'dragenter', this, options);
-		}
+		opts = options;
 		/**
 		 * @end_change
 		 */
+		_on(el, 'mousedown', this._onTapStart);
+		_on(el, 'touchstart', this._onTapStart);
+		_on(el, 'pointerdown', this._onTapStart);
+		_on(el, 'destroy', this._destroy);
+
+		if (this.nativeDraggable) {
+			_on(el, 'dragover', this);
+			_on(el, 'dragenter', this);
+		}
 
 		touchDragOverListeners.push(this._onDragOver);
 
@@ -391,14 +400,15 @@
 
 			/**
 			 *  @start_change
-			 * Original: 
-			 *  if (options.handle && !_closest(originalTarget, options.handle, el)) {
-			 * 	 return;
-			 *  }
+			 * Extend handle option to support function callbacks
+			 * Original:
+			 if (options.handle && !_closest(originalTarget, options.handle, el)) {
+				return;
+			 }
 			 */
 			if (options.handle) {
 				if (typeof options.handle === 'function') {
-					if (options.handle.call(this,evt,target,el,this)===false) {
+					if (options.handle.call(this,evt,target,el,this) === false) {
 						return; // cancel dnd
 					}
 				}
@@ -439,9 +449,9 @@
 
 				/**
 				 * @start_change
-				 * Leave dragEl style alone when tableMode === false
+				 * Leave dragEl style alone when options.dragWillChange is not true
 				 */
-				if ( options.tableMode === false ) {
+				if ( options.dragWillChange === true ) {
 					dragEl.style['will-change'] = 'transform';
 				}
 				/** @end_change */
@@ -465,7 +475,7 @@
 					 * @start_change
 					 * Pass extra parameter evt
 					 * Original:
-					 *  _dispatchEvent(_this, rootEl, 'choose', dragEl, rootEl, oldIndex);
+					 _dispatchEvent(_this, rootEl, 'choose', dragEl, rootEl, oldIndex);
 					 */
 					_dispatchEvent(_this, rootEl, 'choose', dragEl, rootEl, oldIndex, evt);
 					/**
@@ -478,37 +488,27 @@
 					_find(dragEl, criteria.trim(), _disableDraggable);
 				});
 
-				/**
-				 * @start_change
-				 * Add options as final parameter to _on function call
-				 * Original:
-				 *  (each line as is, without the final options parameter)
-				 */
-				_on(ownerDocument, 'mouseup', _this._onDrop, options);
-				_on(ownerDocument, 'touchend', _this._onDrop, options);
-				_on(ownerDocument, 'touchcancel', _this._onDrop, options);
-				_on(ownerDocument, 'pointercancel', _this._onDrop, options);
-				_on(ownerDocument, 'selectstart', _this, options);
+				_on(ownerDocument, 'mouseup', _this._onDrop);
+				_on(ownerDocument, 'touchend', _this._onDrop);
+				_on(ownerDocument, 'touchcancel', _this._onDrop);
+				_on(ownerDocument, 'pointercancel', _this._onDrop);
+				_on(ownerDocument, 'selectstart', _this);
 
 				if (options.delay) {
 					// If the user moves the pointer or let go the click or touch
 					// before the delay has been reached:
 					// disable the delayed drag
-					_on(ownerDocument, 'mouseup', _this._disableDelayedDrag, options);
-					_on(ownerDocument, 'touchend', _this._disableDelayedDrag, options);
-					_on(ownerDocument, 'touchcancel', _this._disableDelayedDrag, options);
-					_on(ownerDocument, 'mousemove', _this._disableDelayedDrag, options);
-					_on(ownerDocument, 'touchmove', _this._disableDelayedDrag, options);
-					_on(ownerDocument, 'pointermove', _this._disableDelayedDrag, options);
+					_on(ownerDocument, 'mouseup', _this._disableDelayedDrag);
+					_on(ownerDocument, 'touchend', _this._disableDelayedDrag);
+					_on(ownerDocument, 'touchcancel', _this._disableDelayedDrag);
+					_on(ownerDocument, 'mousemove', _this._disableDelayedDrag);
+					_on(ownerDocument, 'touchmove', _this._disableDelayedDrag);
+					_on(ownerDocument, 'pointermove', _this._disableDelayedDrag);
 
 					_this._dragStartTimer = setTimeout(dragStartFn, options.delay);
 				} else {
 					dragStartFn();
 				}
-				/** 
-				 * @end_change 
-				 */
-
 			}
 		},
 
@@ -516,21 +516,12 @@
 			var ownerDocument = this.el.ownerDocument;
 
 			clearTimeout(this._dragStartTimer);
-			/**
-			 * @start_change
-			 * Add this.options as final parameter to _off function call
-			 * Original:
-			 *  (each line as is, without the final this.options parameter)
-			 */
-			_off(ownerDocument, 'mouseup', this._disableDelayedDrag, this.options);
-			_off(ownerDocument, 'touchend', this._disableDelayedDrag, this.options);
-			_off(ownerDocument, 'touchcancel', this._disableDelayedDrag, this.options);
-			_off(ownerDocument, 'mousemove', this._disableDelayedDrag, this.options);
-			_off(ownerDocument, 'touchmove', this._disableDelayedDrag, this.options);
-			_off(ownerDocument, 'pointermove', this._disableDelayedDrag, this.options);
-			/** 
-			 * @end_change
-			 */
+			_off(ownerDocument, 'mouseup', this._disableDelayedDrag);
+			_off(ownerDocument, 'touchend', this._disableDelayedDrag);
+			_off(ownerDocument, 'touchcancel', this._disableDelayedDrag);
+			_off(ownerDocument, 'mousemove', this._disableDelayedDrag);
+			_off(ownerDocument, 'touchmove', this._disableDelayedDrag);
+			_off(ownerDocument, 'pointermove', this._disableDelayedDrag);
 		},
 
 		_triggerDragStart: function (/** Event */evt, /** Touch */touch) {
@@ -571,12 +562,12 @@
 		 * @start_change
 		 * Add parameter aEvent
 		 * Original:
-		 *  _dragStarted: function () {
+		 _dragStarted: function () {
 		 */
 		_dragStarted: function (aEvent) {
-		/** 
-		 * @end_change 
-		 */
+			/**
+			 * @end_change
+			 */
 			if (rootEl && dragEl) {
 				var options = this.options;
 
@@ -585,7 +576,7 @@
 				 * @start_change
 				 * Call _toggleClass on options.dragClass, not options.ghostClass
 				 * Original:
-				 *  _toggleClass(dragEl, options.ghostClass, true);
+				 _toggleClass(dragEl, options.ghostClass, true);
 				 */
 				_toggleClass(dragEl, options.dragClass, false);
 				/** @end_change */
@@ -596,10 +587,10 @@
 				/**
 				 * @start_change
 				 * Original:
-				 *  _dispatchEvent(this, rootEl, 'start', dragEl, rootEl, oldIndex);
+				 _dispatchEvent(this, rootEl, 'start', dragEl, rootEl, oldIndex);
 				 */
 				_dispatchEvent(this, rootEl, 'start', dragEl, rootEl, oldIndex, 0, aEvent);
-				/** 
+				/**
 				 * @end_change
 				 */
 			} else {
@@ -651,7 +642,7 @@
 
 						target = parent; // store last element
 					}
-					/* jshint boss:true */
+						/* jshint boss:true */
 					while (parent = parent.parentNode);
 				}
 
@@ -668,18 +659,9 @@
 					fallbackTolerance = options.fallbackTolerance,
 					fallbackOffset = options.fallbackOffset,
 					touch = evt.touches ? evt.touches[0] : evt,
-					/**
-					 * @start_change
-					 * Set dx and dy appropriately when options.tableMode === true
-					 * Original:
-					 *  dx = (touch.clientX - tapEvt.clientX) + fallbackOffset.x,
-					 *  dy = (touch.clientY - tapEvt.clientY) + fallbackOffset.y,
-					 */
-					dx = ((options.tableMode === true) ? 0 :  (touch.clientX - tapEvt.clientX)) + fallbackOffset.x,
-					dy = ((options.tableMode === true) ? ( touch.clientY - tapEvt.dragStartY ) : (touch.clientY - tapEvt.clientY)) + fallbackOffset.y,
-					/** 
-					 * @end_change 
-					 */
+					// TODO to support rotation, adjust dx and dy
+					dx = (touch.clientX - tapEvt.clientX) + fallbackOffset.x,
+					dy = (touch.clientY - tapEvt.clientY) + fallbackOffset.y,
 					translate3d = evt.touches ? 'translate3d(' + dx + 'px,' + dy + 'px,0)' : 'translate(' + dx + 'px,' + dy + 'px)';
 
 				// only set the status to dragging, when we are actually dragging
@@ -693,7 +675,7 @@
 					 * @start_change
 					 * Include evt parameter
 					 * Original:
-					 *  this._dragStarted();
+					 this._dragStarted();
 					 */
 					this._dragStarted(evt);
 					/**
@@ -737,25 +719,13 @@
 
 				/**
 				 * @start_change
-				 * Call _toggleClass on ghostEl, turning on chosenClass
-				 */
-				if ( options.tableMode === true ) {
-					_toggleClass( ghostEl, options.chosenClass, false );
-				}
-				/** @end_change */
-
-				/** 
-				 * @start_change
 				 * Original:
-				 * 	_toggleClass(ghostEl, options.ghostClass, false);
-				 * */
-				if ( options.tableMode === true ) {
-					_toggleClass(ghostEl, options.ghostClass, true);
-				}
-				else {
-					_toggleClass(ghostEl, options.ghostClass, false);
-				}
-				/** @end_change */
+				 _toggleClass(ghostEl, options.ghostClass, false);
+				 */
+				_toggleClass(ghostEl, options.ghostClass, true);
+				/**
+				 * @end_change
+				 */
 				_toggleClass(ghostEl, options.fallbackClass, true);
 				_toggleClass(ghostEl, options.dragClass, true);
 
@@ -792,15 +762,7 @@
 
 			this._offUpEvents();
 
-			/**
-			 * @start_change 
-			 * Original:
-			 *  if ( activeGroup.checkPull(this, this, dragEl, evt)) {
-			 **/
-			if ( options.tableMode === false && activeGroup.checkPull(this, this, dragEl, evt)) {
-			/** 
-			 * @end_change 
-			 **/
+			if ( activeGroup.checkPull(this, this, dragEl, evt)) {
 				cloneEl = _clone(dragEl);
 
 				cloneEl.draggable = false;
@@ -818,25 +780,16 @@
 			if (useFallback) {
 				if (useFallback === 'touch') {
 					// Bind touch events
-					/**
-					 * @start_change
-					 * Add options as final parameter to _on function call
-					 * Original:
-					 *  (each line as is, without the final options parameter)
-					 */
-					_on(document, 'touchmove', this._onTouchMove, options);
-					_on(document, 'touchend', this._onDrop, options);
-					_on(document, 'touchcancel', this._onDrop, options);
-					_on(document, 'pointermove', this._onTouchMove, options);
-					_on(document, 'pointerup', this._onDrop, options);
+					_on(document, 'touchmove', this._onTouchMove);
+					_on(document, 'touchend', this._onDrop);
+					_on(document, 'touchcancel', this._onDrop);
+					_on(document, 'pointermove', this._onTouchMove);
+					_on(document, 'pointerup', this._onDrop);
 				} else {
 					// Old brwoser
-					_on(document, 'mousemove', this._onTouchMove, options);
-					_on(document, 'mouseup', this._onDrop, options);
+					_on(document, 'mousemove', this._onTouchMove);
+					_on(document, 'mouseup', this._onDrop);
 				}
-				/**
-				 * @end_change
-				 */
 
 				this._loopId = setInterval(this._emulateDragOver, 50);
 			}
@@ -874,19 +827,19 @@
 			}
 
 			moved = true;
-			
+
 			if (activeSortable && !options.disabled &&
 				(isOwner
-					? canSort || (revert = !rootEl.contains(dragEl)) // Reverting item into the original list
-					: (
-						putSortable === this ||
-						(
-							(activeSortable.lastPullMode = activeGroup.checkPull(this, activeSortable, dragEl, evt)) &&
-							group.checkPut(this, activeSortable, dragEl, evt)
+						? canSort || (revert = !rootEl.contains(dragEl)) // Reverting item into the original list
+						: (
+							putSortable === this ||
+							(
+								(activeSortable.lastPullMode = activeGroup.checkPull(this, activeSortable, dragEl, evt)) &&
+								group.checkPut(this, activeSortable, dragEl, evt)
+							)
 						)
-					)
 				) &&
-				(evt.rootEl === void 0 || evt.rootEl === this.el ) // touch fallback
+				(evt.rootEl === void 0 || evt.rootEl === this.el) // touch fallback
 			) {
 				// Smart auto-scrolling
 				_autoScroll(evt, options, this.el);
@@ -896,7 +849,6 @@
 				}
 
 				target = _closest(evt.target, options.draggable, el);
-
 				dragRect = dragEl.getBoundingClientRect();
 
 				if (putSortable !== this) {
@@ -948,14 +900,13 @@
 				}
 				/**
 				 * @start_change
-				 * When in tableMode, alter the logic slightly
 				 * Original:
-				 *  else if (target && !target.animated && target !== dragEl && (target.parentNode[expando] !== void 0)) {
+				 else if (target && !target.animated && target !== dragEl && (target.parentNode[expando] !== void 0)) {
 				 */
-				else if (target && !target.animated && ( ( this.options.tableMode === false && target !== dragEl ) || this.options.tableMode === true ) && (target.parentNode[expando] !== void 0)) {
-				/**
-				 * @end_change
-				 */
+				else if (target && !target.animated && ( ( this.options.draggable !== 'tr' && target !== dragEl ) || ( this.options.draggable === 'tr' ) ) && (target.parentNode[expando] !== void 0)) {
+					/**
+					 * @end_change
+					 */
 					if (lastEl !== target) {
 						lastEl = target;
 						lastCSS = _css(target);
@@ -987,7 +938,7 @@
 						} else {
 							after = tgTop > elTop;
 						}
-						} else if (!isMovingBetweenSortable) {
+					} else if (!isMovingBetweenSortable) {
 						after = (nextSibling !== dragEl) && !isLong || halfway && isLong;
 					}
 
@@ -1005,9 +956,9 @@
 
 						/**
 						 * @start_change
-						 * Add this.options.tableMode === false if block
+						 * Add if ( this.options.draggable !== 'tr' ) block
 						 */
-						if ( this.options.tableMode === false ) {
+						if ( this.options.draggable !== 'tr' ) {
 							if (!dragEl.contains(el)) {
 								if (after && !nextSibling) {
 									el.appendChild(dragEl);
@@ -1023,17 +974,8 @@
 
 						parentEl = dragEl.parentNode; // actualization
 
-						/**
-						 * @start_change
-						 * Add this.options.tableMode === false if block
-						 */
-						if ( this.options.tableMode === false ) {
-							this._animate(dragRect, dragEl);
-							this._animate(targetRect, target);
-						}
-						/**
-						 * @end_change
-						 */
+						this._animate(dragRect, dragEl);
+						this._animate(targetRect, target);
 					}
 				}
 			}
@@ -1072,23 +1014,13 @@
 		_offUpEvents: function () {
 			var ownerDocument = this.el.ownerDocument;
 
-			/**
-			 * @start_change
-			 * Add this.options as final parameter to _off function call
-			 * Original:
-			 *  (each line as is, without the final this.options parameter)
-			 */
-			_off(document, 'touchmove', this._onTouchMove, this.options);
-			_off(document, 'pointermove', this._onTouchMove, this.options);
-			_off(ownerDocument, 'mouseup', this._onDrop, this.options);
-			_off(ownerDocument, 'touchend', this._onDrop, this.options);
-			_off(ownerDocument, 'pointerup', this._onDrop, this.options);
-			_off(ownerDocument, 'touchcancel', this._onDrop, this.options);
-			_off(ownerDocument, 'pointercancel', this._onDrop, this.options);
-			_off(ownerDocument, 'selectstart', this, this.options);
-			/**
-			 * @end_change
-			 */
+			_off(document, 'touchmove', this._onTouchMove);
+			_off(document, 'pointermove', this._onTouchMove);
+			_off(ownerDocument, 'touchend', this._onDrop);
+			_off(ownerDocument, 'pointerup', this._onDrop);
+			_off(ownerDocument, 'touchcancel', this._onDrop);
+			_off(ownerDocument, 'pointercancel', this._onDrop);
+			_off(ownerDocument, 'selectstart', this);
 		},
 
 		_onDrop: function (/**Event*/evt) {
@@ -1100,29 +1032,11 @@
 			clearTimeout(this._dragStartTimer);
 
 			// Unbind events
-			/**
-			 * @start_change
-			 * Add options as final parameter to _off function call
-			 * Original:
-			 *  _off(document, 'mousemove', this._onTouchMove);
-			 */
-			_off(document, 'mousemove', this._onTouchMove, options);
-			/**
-			 * @end_change
-			 */
+			_off(document, 'mousemove', this._onTouchMove);
 
 			if (this.nativeDraggable) {
-				/**
-				 * @start_change
-				 * Add options as final parameter to _off function call
-				 * Original:
-				 *  (as is, without the final parameter options)
-				 */
-				_off(document, 'drop', this, options);
-				_off(el, 'dragstart', this._onDragStart, options);
-				/**
-				 * @end_change
-				 */
+				_off(document, 'drop', this);
+				_off(el, 'dragstart', this._onDragStart);
 			}
 
 			this._offUpEvents();
@@ -1150,26 +1064,17 @@
 					/**
 					 * @start_change
 					 * Original:
-					 *  dragEl.style['will-change'] = '';
+					 dragEl.style['will-change'] = '';
 					 */
-					if ( options.tableMode === false ) {
+					if ( options.dragWillChange === true ) {
 						dragEl.style['will-change'] = '';
 					}
-					/** 
+					/**
 					 * @end_change
 					 */
 
 					// Remove class's
-					/**
-					 * @start_change
-					 * When in tableMode, do not use ghostClass on dragEl
-					 * Original:
-					 *  _toggleClass(dragEl, this.options.ghostClass, false);	
-					 */
-					if ( options.tableMode === false ) {
-						_toggleClass(dragEl, this.options.ghostClass, false);	
-					}
-
+					_toggleClass(dragEl, this.options.ghostClass, false);
 					_toggleClass(dragEl, this.options.chosenClass, false);
 
 					// Drag stop event
@@ -1208,8 +1113,16 @@
 						if (newIndex == null || newIndex === -1) {
 							newIndex = oldIndex;
 						}
-
-						_dispatchEvent(this, rootEl, 'end', dragEl, rootEl, oldIndex, newIndex);
+						/**
+						 * @start_change
+						 * Use Sortable.active, not this
+						 * Original:
+						 _dispatchEvent(this, rootEl, 'end', dragEl, rootEl, oldIndex, newIndex);
+						 */
+						_dispatchEvent(Sortable.active, rootEl, 'end', dragEl, rootEl, oldIndex, newIndex);
+						/**
+						 * @end_change
+						 */
 
 						// Save sorting
 						this.save();
@@ -1227,28 +1140,28 @@
 
 		_nulling: function() {
 			rootEl =
-			dragEl =
-			parentEl =
-			ghostEl =
-			nextEl =
-			cloneEl =
-			lastDownEl =
+				dragEl =
+					parentEl =
+						ghostEl =
+							nextEl =
+								cloneEl =
+									lastDownEl =
 
-			scrollEl =
-			scrollParentEl =
+										scrollEl =
+											scrollParentEl =
 
-			tapEvt =
-			touchEvt =
+												tapEvt =
+													touchEvt =
 
-			moved =
-			newIndex =
+														moved =
+															newIndex =
 
-			lastEl =
-			lastCSS =
+																lastEl =
+																	lastCSS =
 
-			putSortable =
-			activeGroup =
-			Sortable.active = null;
+																		putSortable =
+																			activeGroup =
+																				Sortable.active = null;
 
 			savedInputChecked.forEach(function (el) {
 				el.checked = true;
@@ -1374,24 +1287,15 @@
 
 			el[expando] = null;
 
-			/**
-			 * @start_change
-			 * Add this.options as final parameter to _off function call
-			 * Original:
-			 *  (as is, without the final this.options parameter)
-			 */
-			_off(el, 'mousedown', this._onTapStart, this.options);
-			_off(el, 'touchstart', this._onTapStart, this.options);
-			_off(el, 'pointerdown', this._onTapStart, this.options);
-			_off(el, 'destroy', this._destroy, this.options);
+			_off(el, 'mousedown', this._onTapStart);
+			_off(el, 'touchstart', this._onTapStart);
+			_off(el, 'pointerdown', this._onTapStart);
+			_off(el, 'destroy', this._destroy);
 
 			if (this.nativeDraggable) {
-				_off(el, 'dragover', this, this.options);
-				_off(el, 'dragenter', this, this.options);
+				_off(el, 'dragover', this);
+				_off(el, 'dragenter', this);
 			}
-			/**
-			 * @end_change
-			 */
 
 			// Remove draggable attributes
 			Array.prototype.forEach.call(el.querySelectorAll('[draggable]'), function (el) {
@@ -1461,76 +1365,44 @@
 		evt.preventDefault();
 	}
 
-
-	/** 
-	 * @start_change 
-	 * Add options as final parameter
-	 * Original:
-	 *  function _on(el, event, fn) {
-	 **/
-	function _on(el, event, fn, options) {
-	/**
-	 * @end_change
-	 */
-		/** 
-		 * @start_change
-		 * When in tableMode, use a capture: true captureMode
-		 * Original:
-		 *  el.addEventListener(event, fn, captureMode);
-		 */
+	function _on(el, event, fn) {
 		var mode = captureMode;
 
-		if ( options && options.hasOwnProperty( 'tableMode' ) === true && options.tableMode === true ) {
-			mode = { capture: true, passive: false };
+		if ( opts && opts.captureMode === true ) {
+			mode = {
+				capture: true,
+				passive: false,
+			};
 		}
 
 		el.addEventListener(event, fn, mode);
-		/**
-		 * @end_change
-		 */
 	}
 
 
-	/** 
-	 * @start_change 
-	 * Add options as final parameter
-	 * Original:
-	 *  function _on(el, event, fn) {
-	 **/
-	function _off(el, event, fn, options) {
-	/**
-	 * @end_change
-	 */
-		/** 
-		 * @start_change
-		 * When in tableMode, use a capture: true captureMode
-		 * Original:
-		 *  el.removeEventListener(event, fn, captureMode);
-		 */
+	function _off(el, event, fn) {
 		var mode = captureMode;
 
-		if ( options && options.hasOwnProperty( 'tableMode' ) === true && options.tableMode === true ) {
-			mode = { capture: true, passive: false };
+		if ( opts && opts.captureMode === true ) {
+			mode = {
+				capture: true,
+				passive: false,
+			};
 		}
 
 		el.removeEventListener(event, fn, mode);
-		/**
-		 * @end_change
-		 */
 	}
-
 
 	function _toggleClass(el, name, state) {
 		/**
 		 * @start_change
 		 * Check for both el and name, not just el
 		 * Original:
-		 *  if (el) {}
+		 if (el) {}
 		 */
 		if (el && name) {
-		/**
-		 * @end_change
-		 */
+			/**
+			 * @end_change
+			 */
 			if (el.classList) {
 				el.classList[state ? 'add' : 'remove'](name);
 			}
@@ -1584,15 +1456,15 @@
 	}
 
 
-/** @start_change
- * Add one final parameters, ev
- * Original:
- *  function _dispatchEvent(sortable, rootEl, name, targetEl, fromEl, startIndex, newIndex) {
+	/** @start_change
+	 * Add one final parameters, ev
+	 * Original:
+	 *  function _dispatchEvent(sortable, rootEl, name, targetEl, fromEl, startIndex, newIndex) {
  */
 	function _dispatchEvent(sortable, rootEl, name, targetEl, fromEl, startIndex, newIndex, ev) {
-/**
- * @end_change
- */
+		/**
+		 * @end_change
+		 */
 		sortable = (sortable || rootEl[expando]);
 
 		var evt = document.createEvent('Event'),
@@ -1644,6 +1516,14 @@
 		evt.related = targetEl || toEl;
 		evt.relatedRect = targetRect || toEl.getBoundingClientRect();
 		evt.willInsertAfter = willInsertAfter;
+		/** @start_change
+		 * Include original event click coordinates (clientY and clientX)
+		 */
+		evt.clientY = originalEvt.clientY;
+		evt.clientX = originalEvt.clientX;
+		/**
+		 * @end_change
+		 */
 
 		fromEl.dispatchEvent(evt);
 
@@ -1771,8 +1651,8 @@
 		return $
 			? $(el).clone(true)[0]
 			: (Polymer && Polymer.dom
-				? Polymer.dom(el).cloneNode(true)
-				: el.cloneNode(true)
+					? Polymer.dom(el).cloneNode(true)
+					: el.cloneNode(true)
 			);
 	}
 
@@ -1847,6 +1727,6 @@
 
 
 	// Export
-	Sortable.version = '1.6.2';
+	Sortable.version = '1.6.1';
 	return Sortable;
 });
