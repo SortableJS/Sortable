@@ -276,13 +276,16 @@
 			fallbackTolerance: 0,
 			/**
 			 * @start_change
+			 * Add trailing comma after fallbackOffset value
 			 * Add captureMode (default false)
 			 * Add dragWillChange (default true)
+			 * Add allowDragX and allowDragY (both default to true)
 			 */
 			fallbackOffset: {x: 0, y: 0},
 			captureMode: false,
-			// Apply transform-pending style during drag (or not)
-			dragWillChange: true
+			dragWillChange: true,
+			allowDragX: true,
+			allowDragY: true
 			/**
 			 * @end_change
 			 */
@@ -402,9 +405,9 @@
 			 *  @start_change
 			 * Extend handle option to support function callbacks
 			 * Original:
-			 if (options.handle && !_closest(originalTarget, options.handle, el)) {
+			if (options.handle && !_closest(originalTarget, options.handle, el)) {
 				return;
-			 }
+			}
 			 */
 			if (options.handle) {
 				if (typeof options.handle === 'function') {
@@ -475,7 +478,7 @@
 					 * @start_change
 					 * Pass extra parameter evt
 					 * Original:
-					 _dispatchEvent(_this, rootEl, 'choose', dragEl, rootEl, oldIndex);
+					_dispatchEvent(_this, rootEl, 'choose', dragEl, rootEl, oldIndex);
 					 */
 					_dispatchEvent(_this, rootEl, 'choose', dragEl, rootEl, oldIndex, evt);
 					/**
@@ -574,14 +577,7 @@
 				var options = this.options;
 
 				// Apply effect
-				/**
-				 * @start_change
-				 * Call _toggleClass on options.dragClass, not options.ghostClass
-				 * Original:
-				 _toggleClass(dragEl, options.ghostClass, true);
-				 */
-				_toggleClass(dragEl, options.dragClass, false);
-				/** @end_change */
+				_toggleClass(dragEl, options.ghostClass, true);
 
 				Sortable.active = this;
 
@@ -589,7 +585,7 @@
 				/**
 				 * @start_change
 				 * Original:
-				 _dispatchEvent(this, rootEl, 'start', dragEl, rootEl, oldIndex);
+				_dispatchEvent(this, rootEl, 'start', dragEl, rootEl, oldIndex);
 				 */
 				_dispatchEvent(this, rootEl, 'start', dragEl, rootEl, oldIndex, 0, aEvent);
 				/**
@@ -612,20 +608,26 @@
 				if (!supportCssPointerEvents) {
 					_css(ghostEl, 'display', 'none');
 				}
-
+				/**
+				 * @start_change
+				 * Add support for elementFromPoint callback function
+				 * Original:
 				var target = document.elementFromPoint(touchEvt.clientX, touchEvt.clientY),
 					parent = target,
 					i = touchDragOverListeners.length;
-
-				/**
-				 * @start_change
-				 * If the event originated from _dragRow, use it for parent/target
 				 */
-				if ( touchEvt.hasOwnProperty( '_dragRow' ) === true ) {
-					target = touchEvt._dragRow;
-					parent = target;
+				var i = touchDragOverListeners.length,
+					target, parent;
+
+                if (this.options.hasOwnProperty('elementFromPoint') === true && typeof this.options.elementFromPoint === 'function') {
+                    parent = target = this.options.elementFromPoint(touchEvt.clientX, touchEvt.clientY);
+                }
+				else {
+					parent = target = document.elementFromPoint(touchEvt.clientX, touchEvt.clientY);
 				}
-				/** @end_change */
+				/**
+				 * @end_change
+				 */
 
 				if (parent) {
 					do {
@@ -662,8 +664,18 @@
 					fallbackOffset = options.fallbackOffset,
 					touch = evt.touches ? evt.touches[0] : evt,
 					// TODO to support rotation, adjust dx and dy
+					/**
+					 * @start_change
+					 * Implement allowDragX and allowDragY options to limit x or y movement
+					 * Original:
 					dx = (touch.clientX - tapEvt.clientX) + fallbackOffset.x,
 					dy = (touch.clientY - tapEvt.clientY) + fallbackOffset.y,
+					 */
+					dx = (options.allowDragX !== false) ? (touch.clientX - tapEvt.clientX) + fallbackOffset.x : 0,
+					dy = (options.allowDragY !== false) ? (touch.clientY - tapEvt.clientY) + fallbackOffset.y : 0,
+					/**
+					 * @end_change
+					 */
 					translate3d = evt.touches ? 'translate3d(' + dx + 'px,' + dy + 'px,0)' : 'translate(' + dx + 'px,' + dy + 'px)';
 
 				// only set the status to dragging, when we are actually dragging
@@ -691,15 +703,6 @@
 				moved = true;
 				touchEvt = touch;
 
-				/**
-				 * @start_change
-				 * Set touchEvt _dragRow if tapEvt has it
-				 */
-				if ( tapEvt.hasOwnProperty( '_dragRow' ) === true ) {
-					touchEvt._dragRow = tapEvt._dragRow;
-				}
-				/** @end_change */
-
 				_css(ghostEl, 'webkitTransform', translate3d);
 				_css(ghostEl, 'mozTransform', translate3d);
 				_css(ghostEl, 'msTransform', translate3d);
@@ -716,17 +719,23 @@
 					options = this.options,
 					ghostRect;
 
-				ghostEl = dragEl.cloneNode(true);
-
 				/**
 				 * @start_change
+				 * Use 'ghost' options callback to construct ghost (if provided)
 				 * Original:
-				_toggleClass(ghostEl, options.ghostClass, false);
+				ghostEl = dragEl.cloneNode(true);
 				 */
-				_toggleClass(ghostEl, options.ghostClass, true);
+				if ( options.ghost && typeof options.ghost === 'function' ) {
+					ghostEl = options.ghost(dragEl);
+				}
+				else {
+					ghostEl = dragEl.cloneNode(true);
+				}
 				/**
 				 * @end_change
 				 */
+
+				_toggleClass(ghostEl, options.ghostClass, false);
 				_toggleClass(ghostEl, options.fallbackClass, true);
 				_toggleClass(ghostEl, options.dragClass, true);
 
@@ -899,15 +908,7 @@
 						target && this._animate(targetRect, target);
 					}
 				}
-				/**
-				 * @start_change
-				 * Original:
 				else if (target && !target.animated && target !== dragEl && (target.parentNode[expando] !== void 0)) {
-				 */
-				else if (target && !target.animated && ( ( this.options.draggable !== 'tr' && target !== dragEl ) || ( this.options.draggable === 'tr' ) ) && (target.parentNode[expando] !== void 0)) {
-				/**
-				 * @end_change
-				 */
 					if (lastEl !== target) {
 						lastEl = target;
 						lastCSS = _css(target);
@@ -955,23 +956,13 @@
 
 						_cloneHide(activeSortable, isOwner);
 
-						/**
-						 * @start_change
-						 * Add if ( this.options.draggable !== 'tr' ) block
-						 */
-						if ( this.options.draggable !== 'tr' ) {
-							if (!dragEl.contains(el)) {
-								if (after && !nextSibling) {
-									el.appendChild(dragEl);
-								} else {
-									target.parentNode.insertBefore(dragEl, after ? nextSibling : target);
-									console.log('added ', dragEl, ' to target.parentNode');
-								}
+						if (!dragEl.contains(el)) {
+							if (after && !nextSibling) {
+								el.appendChild(dragEl);
+							} else {
+								target.parentNode.insertBefore(dragEl, after ? nextSibling : target);
 							}
 						}
-						/**
-						 * @end_change
-						 */
 
 						parentEl = dragEl.parentNode; // actualization
 
@@ -1289,6 +1280,14 @@
 
 			el[expando] = null;
 
+			/**
+			 * @start_change
+			 * Remove the 'sortable' class from this.el that was added during construction
+			 */
+			 _toggleClass(el, 'sortable', false);
+			 /**
+			  * @end_change
+			  */
 			_off(el, 'mousedown', this._onTapStart);
 			_off(el, 'touchstart', this._onTapStart);
 			_off(el, 'pointerdown', this._onTapStart);
@@ -1383,7 +1382,7 @@
 			};
 		}
 
-		el && el.addEventListener(event, fn, mode);
+		el.addEventListener(event, fn, mode);
 		/**
 		 * @end_change
 		 */
@@ -1395,7 +1394,7 @@
 		 * @start_change
 		 * Use captureMode option if set
 		 * Original:
-		 el.removeEventListener(event, fn, captureMode);
+		el.removeEventListener(event, fn, captureMode);
 		 */
 		var mode = captureMode;
 
@@ -1406,7 +1405,7 @@
 			};
 		}
 
-		el && el.removeEventListener(event, fn, mode);
+		el.removeEventListener(event, fn, mode);
 		/**
 		 * @end_change
 		 */
@@ -1415,9 +1414,9 @@
 	function _toggleClass(el, name, state) {
 		/**
 		 * @start_change
-		 * Check for both el and name, not just el
+		 * Check for both el and name, not just el (we use blank classes for some options which breaks js otherwise)
 		 * Original:
-		 if (el) {}
+		if (el) {}
 		 */
 		if (el && name) {
 		/**
