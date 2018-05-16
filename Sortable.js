@@ -578,6 +578,7 @@
 
 				// Apply effect
 				_toggleClass(dragEl, options.ghostClass, true);
+				_toggleClass(dragEl, options.dragClass, false);
 
 				Sortable.active = this;
 
@@ -620,8 +621,8 @@
 					target, parent;
 
                 if (this.options.hasOwnProperty('elementFromPoint') === true && typeof this.options.elementFromPoint === 'function') {
-                    parent = target = this.options.elementFromPoint(touchEvt.clientX, touchEvt.clientY);
-                }
+					parent = target = this.options.elementFromPoint(touchEvt.clientX, touchEvt.clientY);
+				}
 				else {
 					parent = target = document.elementFromPoint(touchEvt.clientX, touchEvt.clientY);
 				}

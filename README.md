@@ -107,6 +107,10 @@ var sortable = new Sortable(el, {
     captureMode: false, // when true, use event capturing
     dragWillChange: true, // when true, apply will-change transform style to dragEl during drag
 
+    ghost: function(aEvent) // Optional callback responsible for creating the ghostEl markup
+
+    elementFromPoint: function(aX, aY) // Optional callback responsible for finding draggable items given a point
+
 	setData: function (/** DataTransfer */dataTransfer, /** HTMLElement*/dragEl) {
 		dataTransfer.setData('Text', dragEl.textContent); // `dataTransfer` object of HTML5 DragEvent
 	},
