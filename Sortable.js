@@ -280,12 +280,16 @@
 			 * Add captureMode (default false)
 			 * Add dragWillChange (default true)
 			 * Add allowDragX and allowDragY (both default to true)
+			 * Add elementFromPoint (default false, can be set to function)
+			 * Add ghost (default false, can be set to function)
 			 */
 			fallbackOffset: {x: 0, y: 0},
 			captureMode: false,
 			dragWillChange: true,
 			allowDragX: true,
-			allowDragY: true
+			allowDragY: true,
+			elementFromPoint: false,
+			ghost: false
 			/**
 			 * @end_change
 			 */
@@ -620,7 +624,7 @@
 				var i = touchDragOverListeners.length,
 					target, parent;
 
-                if (this.options.hasOwnProperty('elementFromPoint') === true && typeof this.options.elementFromPoint === 'function') {
+                if (typeof this.options.elementFromPoint === 'function') {
 					parent = target = this.options.elementFromPoint(touchEvt.clientX, touchEvt.clientY);
 				}
 				else {
@@ -726,7 +730,7 @@
 				 * Original:
 				ghostEl = dragEl.cloneNode(true);
 				 */
-				if ( options.ghost && typeof options.ghost === 'function' ) {
+				if (typeof options.ghost === 'function') {
 					ghostEl = options.ghost(dragEl);
 				}
 				else {
