@@ -281,7 +281,8 @@
 			 * Add dragWillChange (default true)
 			 * Add allowDragX and allowDragY (both default to true)
 			 * Add elementFromPoint (default false, can be set to function)
-			 * Add ghost (default false, can be set to function)
+			 * Add ghost (default false, can be set to function to create custom ghost markup)
+			 * Add onGhostMove (default false, can be set to a function to track ghost movement)
 			 */
 			fallbackOffset: {x: 0, y: 0},
 			captureMode: false,
@@ -289,7 +290,8 @@
 			allowDragX: true,
 			allowDragY: true,
 			elementFromPoint: false,
-			ghost: false
+			ghost: false,
+			onGhostMove: false
 			/**
 			 * @end_change
 			 */
@@ -707,6 +709,34 @@
 
 				moved = true;
 				touchEvt = touch;
+
+				/**
+				 * @start_change
+				 * Constrain if data-constrain attribute is present on ghostEl
+				 * Also fire onGhostMove if configured in options to do so
+				 */
+				var d_rect, root_rect;
+
+				if (ghostEl.hasAttribute('data-constrain') === true && dy !== 0) {
+					d_rect = dragEl.getBoundingClientRect();
+					root_rect = this.el.getBoundingClientRect();
+
+					if (d_rect.top + dy < root_rect.top) {
+						dy = root_rect.top - d_rect.top;
+					}
+					else if (d_rect.bottom + dy > root_rect.bottom) {
+						dy = root_rect.bottom - d_rect.bottom;
+					}
+
+					translate3d = evt.touches ? 'translate3d(' + dx + 'px,' + dy + 'px,0)' : 'translate(' + dx + 'px,' + dy + 'px)';
+				}
+
+				if (typeof options.onGhostMove === 'function') {
+					options.onGhostMove(ghostEl, dx, dy);
+				}
+				/**
+				 * @end_change
+				 */
 
 				_css(ghostEl, 'webkitTransform', translate3d);
 				_css(ghostEl, 'mozTransform', translate3d);
