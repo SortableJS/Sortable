@@ -108,6 +108,9 @@ var sortable = new Sortable(el, {
     dragWillChange: true, // when true, apply will-change transform style to dragEl during drag
 
     ghost: function(aEvent) // Optional callback responsible for creating the ghostEl markup
+    onGhostMove: function( ) // Optional callback to track ghost movement
+    allowDragX: (default true) // Allow x movement during dragging (boolean)
+    allowDragY: (default true) // Allow y movement during dragging (boolean)
 
     elementFromPoint: function(aX, aY) // Optional callback responsible for finding draggable items given a point
 
