@@ -283,6 +283,7 @@
 			 * Add elementFromPoint (default false, can be set to function)
 			 * Add ghost (default false, can be set to function to create custom ghost markup)
 			 * Add onGhostMove (default false, can be set to a function to track ghost movement)
+			 * Add constrainGhost (default false, to constrain the ghost to the root element given during init)
 			 */
 			fallbackOffset: {x: 0, y: 0},
 			captureMode: false,
@@ -291,7 +292,8 @@
 			allowDragY: true,
 			elementFromPoint: false,
 			ghost: false,
-			onGhostMove: false
+			onGhostMove: false,
+			constrainGhost: false
 			/**
 			 * @end_change
 			 */
@@ -626,7 +628,7 @@
 				var i = touchDragOverListeners.length,
 					target, parent;
 
-                if (typeof this.options.elementFromPoint === 'function') {
+				if (typeof this.options.elementFromPoint === 'function') {
 					parent = target = this.options.elementFromPoint(touchEvt.clientX, touchEvt.clientY);
 				}
 				else {
@@ -712,12 +714,12 @@
 
 				/**
 				 * @start_change
-				 * Constrain if data-constrain attribute is present on ghostEl
+				 * Constrain ghost to root el if constrainGhost option is set
 				 * Also fire onGhostMove if configured in options to do so
 				 */
 				var d_rect, root_rect;
 
-				if (ghostEl.hasAttribute('data-constrain') === true && dy !== 0) {
+				if (options.constrainGhost === true && dy !== 0) {
 					d_rect = dragEl.getBoundingClientRect();
 					root_rect = this.el.getBoundingClientRect();
 
