@@ -719,7 +719,7 @@
 				 */
 				var d_rect, root_rect;
 
-				if (options.constrainGhost === true && dy !== 0) {
+				if (options.constrainGhost === true && (dy !== 0 || dx !== 0)) {
 					d_rect = dragEl.getBoundingClientRect();
 					root_rect = this.el.getBoundingClientRect();
 
@@ -728,6 +728,13 @@
 					}
 					else if (d_rect.bottom + dy > root_rect.bottom) {
 						dy = root_rect.bottom - d_rect.bottom;
+					}
+
+					if (d_rect.left + dx < root_rect.left) {
+						dx = root_rect.left - d_rect.left;
+					}
+					else if (d_rect.right + dx > root_rect.right) {
+						dx = root_rect.right - d_rect.right;
 					}
 
 					translate3d = evt.touches ? 'translate3d(' + dx + 'px,' + dy + 'px,0)' : 'translate(' + dx + 'px,' + dy + 'px)';
