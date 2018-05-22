@@ -770,7 +770,9 @@
 				ghostEl = dragEl.cloneNode(true);
 				 */
 				if (typeof options.ghost === 'function') {
-					ghostEl = options.ghost(dragEl);
+					var _ghost = options.ghost(dragEl);
+                    ghostEl = _ghost.el;
+                    rect = _ghost.rect;
 				}
 				else {
 					ghostEl = dragEl.cloneNode(true);
