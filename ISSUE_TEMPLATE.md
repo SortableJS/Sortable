@@ -1,3 +1,8 @@
+## Hi, this project very much requires the maintainer, if you have a chewing and appropriate skills, please [contact me](mailto:ibn@rubaxa.org?subject=Sortable%20vs.%20Maintainer)!
+
+
+---
+
 Before you create an issue, check it:
 
  1. Try [master](https://github.com/RubaXa/Sortable/tree/master/)-branch, perhaps the problem has been solved;
@@ -14,4 +19,3 @@ Bindings:
  - Polymer: https://github.com/SortableJS/polymer-sortablejs/issues
  - Knockout: https://github.com/SortableJS/knockout-sortablejs/issues
  - Meteor: https://github.com/SortableJS/meteor-sortablejs/issues
-

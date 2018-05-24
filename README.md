@@ -1,3 +1,7 @@
+## Hi, this project very much requires the maintainer, if you have a chewing and appropriate skills, please [contact me](mailto:ibn@rubaxa.org?subject=Sortable%20vs.%20Maintainer)!
+
+---
+
 # Sortable
 Sortable is a <s>minimalist</s> JavaScript library for reorderable drag-and-drop lists.
 
