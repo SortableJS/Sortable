@@ -264,7 +264,8 @@
 			disabled: false,
 			store: null,
 			handle: null,
-      scroll: true,
+			allowDuplicates: true,
+			scroll: true,
 			scrollSensitivity: 30,
 			scrollSpeed: 10,
 			draggable: /[uo]l/i.test(el.nodeName) ? 'li' : '>*',
@@ -819,6 +820,17 @@
 					}
 				}
 				else if (target && !target.animated && target !== dragEl && (target.parentNode[expando] !== void 0)) {
+					if (!options.allowDuplicates && el !== rootEl) {
+						var duplicates = el.querySelectorAll("#"+dragEl.id);
+						if (duplicates.length > 1) {
+							return;
+						}
+						if (duplicates.length == 1) {
+							if (!duplicates[0].classList.contains(options.ghostClass)) {
+								return;
+							}
+						}
+					}
 					if (lastEl !== target) {
 						lastEl = target;
 						lastCSS = _css(target);
