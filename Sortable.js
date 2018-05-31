@@ -49,6 +49,7 @@
 		putSortable,
 
 		autoScroll = {},
+		destructive = false,
 
 		tapEvt,
 		touchEvt,
@@ -265,6 +266,7 @@
 			store: null,
 			handle: null,
 			allowDuplicates: true,
+			isDestructive: false,
 			scroll: true,
 			scrollSensitivity: 30,
 			scrollSpeed: 10,
@@ -737,6 +739,8 @@
 				isMovingBetweenSortable = false,
 				canSort = options.sort;
 
+			destructive = options.isDestructive;
+
 			if (evt.preventDefault !== void 0) {
 				evt.preventDefault();
 				!options.dragoverBubble && evt.stopPropagation();
@@ -1001,6 +1005,9 @@
 							// drag from one list and drop into another
 							_dispatchEvent(null, parentEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
 							_dispatchEvent(this, rootEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+							if (destructive) {
+								dragEl && dragEl.parentNode && dragEl.parentNode.removeChild(dragEl);
+							}
 						}
 					}
 					else {
