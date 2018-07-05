@@ -55,8 +55,6 @@
 
 		moved,
 
-		forRepaintDummy,
-
 		/** @const */
 		R_SPACE = /\s+/g,
 		R_FLOAT = /left|right|inline/,
@@ -899,7 +897,7 @@
 					+ (prevRect.top - currentRect.top) + 'px,0)'
 				);
 
-				forRepaintDummy = target.offsetWidth; // repaint
+				this._repaint(target);
 
 				_css(target, 'transition', 'all ' + ms + 'ms');
 				_css(target, 'transform', 'translate3d(0,0,0)');
@@ -911,6 +909,10 @@
 					target.animated = false;
 				}, ms);
 			}
+		},
+
+		_repaint: function(target) {
+			return target.offsetWidth;
 		},
 
 		_offUpEvents: function () {
