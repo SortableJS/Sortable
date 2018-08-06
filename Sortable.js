@@ -1117,12 +1117,14 @@
 				}
 			}, this);
 
-			order.forEach(function (id) {
-				if (items[id]) {
-					rootEl.removeChild(items[id]);
-					rootEl.appendChild(items[id]);
-				}
-			});
+			if (typeof order !== 'undefined') {
+				order.forEach(function (id) {
+					if (items[id]) {
+						rootEl.removeChild(items[id]);
+						rootEl.appendChild(items[id]);
+					}
+				});
+			}
 		},
 
 
