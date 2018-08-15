@@ -14,8 +14,8 @@
   "description": "Minimalist JavaScript library for reorderable drag-and-drop lists on modern browsers and touch devices. No jQuery. Supports AngularJS and any CSS library, e.g. Bootstrap.",
   "main": "Sortable.js",
   "scripts": {
-    "test": "./node_modules/grunt/bin/grunt",
-    "prepublish": "./node_modules/grunt/bin/grunt",
+    "test": "grunt",
+    "prepublish": "grunt",
     "http-server": "http-server -s ./"
   },
   "repository": {
