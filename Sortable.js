@@ -966,12 +966,10 @@
 				_toggleClass(lastEl, options.swapClass, false);
 
 				if (dragEl !== lastEl) {
-					var anchor = dragEl.nextSibling;
 					var dragRect = _getBoundingClientRect(dragEl);
 					var lastRect = _getBoundingClientRect(lastEl);
 
-					_insertBefore(null, dragEl, lastEl)
-					_insertBefore(null, lastEl, anchor);
+					_swapNodes(dragEl, lastEl);
 
 					this._animate(dragRect, dragEl);
 					this._animate(lastRect, lastEl);
@@ -1040,7 +1038,14 @@
 							newIndex = oldIndex;
 						}
 
-						_dispatchEvent(this, rootEl, 'end', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+						if (options.swap && lastEl)
+						{
+							_dispatchEvent(this, rootEl, 'end', dragEl, parentEl, rootEl, oldIndex, newIndex, evt, {swapItem:lastEl});
+						}
+						else
+						{
+							_dispatchEvent(this, rootEl, 'end', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+						}
 
 						// Save sorting
 						this.save();
@@ -1349,7 +1354,7 @@
 
 
 
-	function _dispatchEvent(sortable, rootEl, name, targetEl, toEl, fromEl, startIndex, newIndex, originalEvt) {
+	function _dispatchEvent(sortable, rootEl, name, targetEl, toEl, fromEl, startIndex, newIndex, originalEvt, eventOptions) {
 		sortable = (sortable || rootEl[expando]);
 
 		var evt = document.createEvent('Event'),
@@ -1367,6 +1372,14 @@
 		evt.newIndex = newIndex;
 
 		evt.originalEvent = originalEvt;
+
+		if (eventOptions)
+		{
+			for (var option in eventOptions)
+			{
+				evt[option] = eventOptions[option];
+			}
+		}
 
 		rootEl.dispatchEvent(evt);
 
@@ -1559,6 +1572,32 @@
 		}
 
 		parent.insertBefore(el, ref);
+	}
+
+	function _swapNodes(n1, n2) {
+
+		var p1 = n1.parentNode;
+		var p2 = n2.parentNode;
+		var i1, i2;
+
+		if ( !p1 || !p2 || p1.isEqualNode(n2) || p2.isEqualNode(n1) ) return;
+
+		for (var i = 0; i < p1.children.length; i++) {
+			if (p1.children[i].isEqualNode(n1)) {
+				i1 = i;
+			}
+		}
+		for (var i = 0; i < p2.children.length; i++) {
+			if (p2.children[i].isEqualNode(n2)) {
+				i2 = i;
+			}
+		}
+
+		if ( p1.isEqualNode(p2) && i1 < i2 ) {
+			i2++;
+		}
+		p1.insertBefore(n2, p1.children[i1]);
+		p2.insertBefore(n1, p2.children[i2]);
 	}
 
 	// Fixed #973:
