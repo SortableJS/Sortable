@@ -1040,7 +1040,10 @@
 
 						if (options.swap && lastEl)
 						{
-							_dispatchEvent(this, rootEl, 'end', dragEl, parentEl, rootEl, oldIndex, newIndex, evt, {swapItem:lastEl});
+							if (dragEl !== lastEl)
+							{
+								_dispatchEvent(this, rootEl, 'end', dragEl, parentEl, rootEl, oldIndex, newIndex, evt, {swapItem:lastEl});
+							}
 						}
 						else
 						{
