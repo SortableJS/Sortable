@@ -1239,9 +1239,9 @@
 
 
 	function _getParentOrHost(el) {
-		var parent = el.host;
-
-		return (parent && parent.nodeType) ? parent : el.parentNode;
+		return (el.host && el !== document && el.host.nodeType)
+			? el.host
+			: el.parentNode;
 	}
 
 
