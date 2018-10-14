@@ -564,6 +564,7 @@
 
 				let previousTarget = target;
 				do {
+					previousTarget = target;
 					target = target.shadowRoot.elementFromPoint(touchEvt.clientX, touchEvt.clientY);
 				} while (target && target.shadowRoot && previousTarget !== target);
 				parent = target;
