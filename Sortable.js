@@ -562,9 +562,10 @@
 				var parent = target;
 				var i = touchDragOverListeners.length;
 
+				let previousTarget = target;
 				do {
-				  target = target.shadowRoot.elementFromPoint(touchEvt.clientX, touchEvt.clientY);
-				} while (target && target.shadowRoot);
+					target = target.shadowRoot.elementFromPoint(touchEvt.clientX, touchEvt.clientY);
+				} while (target && target.shadowRoot && previousTarget !== target);
 				parent = target;
 
 
