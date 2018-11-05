@@ -434,15 +434,15 @@
 
 					// Make the element draggable
 					dragEl.draggable = _this.nativeDraggable;
+					
+					// Drag start event
+					_dispatchEvent(_this, rootEl, 'choose', dragEl, rootEl, rootEl, oldIndex);
 
 					// Chosen item
 					_toggleClass(dragEl, options.chosenClass, true);
 
 					// Bind the events: dragstart/dragend
 					_this._triggerDragStart(evt, touch);
-
-					// Drag start event
-					_dispatchEvent(_this, rootEl, 'choose', dragEl, rootEl, rootEl, oldIndex);
 				};
 
 				// Disable "draggable"
