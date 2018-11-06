@@ -17,16 +17,16 @@ Demo: http://rubaxa.github.io/Sortable/
  * Smart auto-scrolling
  * Built using native HTML5 drag and drop API
  * Supports
-  * [Meteor](https://github.com/SortableJS/meteor-sortablejs)
-  * AngularJS
-    * [2.0+](https://github.com/SortableJS/angular-sortablejs)
-    * [1.*](https://github.com/SortableJS/angular-legacy-sortablejs)
-  * React
-    * [ES2015+](https://github.com/SortableJS/react-sortablejs)
-    * [Mixin](https://github.com/SortableJS/react-mixin-sortablejs)
-  * [Knockout](https://github.com/SortableJS/knockout-sortablejs)
-  * [Polymer](https://github.com/SortableJS/polymer-sortablejs)
-  * [Vue](https://github.com/SortableJS/Vue.Draggable)
+   * [Meteor](https://github.com/SortableJS/meteor-sortablejs)
+   * AngularJS
+     * [2.0+](https://github.com/SortableJS/angular-sortablejs)
+     * [1.*](https://github.com/SortableJS/angular-legacy-sortablejs)
+   * React
+     * [ES2015+](https://github.com/SortableJS/react-sortablejs)
+     * [Mixin](https://github.com/SortableJS/react-mixin-sortablejs)
+   * [Knockout](https://github.com/SortableJS/knockout-sortablejs)
+   * [Polymer](https://github.com/SortableJS/polymer-sortablejs)
+   * [Vue](https://github.com/SortableJS/Vue.Draggable)
  * Supports any CSS library, e.g. [Bootstrap](#bs)
  * Simple API
  * [CDN](#cdn)
