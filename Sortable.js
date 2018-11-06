@@ -440,7 +440,7 @@
 
 					// Drag start event
 					_dispatchEvent(_this, rootEl, 'choose', dragEl, rootEl, rootEl, oldIndex);
-					
+
 					// Chosen item
 					_toggleClass(dragEl, options.chosenClass, true);
 				};
