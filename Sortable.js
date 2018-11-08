@@ -467,7 +467,7 @@
 					_on(ownerDocument, 'touchmove', _this._delayedDragTouchMoveHandler);
 					options.supportPointer && _on(ownerDocument, 'pointermove', _this._delayedDragTouchMoveHandler);
 
-					_this._dragStartTimer = setTimeout(dragStartFn, options.delay).bind(_this);
+					_this._dragStartTimer = setTimeout(dragStartFn.bind(_this), options.delay);
 				} else {
 					dragStartFn();
 				}
