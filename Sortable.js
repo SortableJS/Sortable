@@ -144,7 +144,7 @@
 				if (scrollParentEl !== rootEl) {
 					_clearAutoScrolls();
 
-					scrollEl = document.querySelector(options.scroll);
+					scrollEl = options.scroll;
 					scrollCustomFn = options.scrollFn;
 
 					if (scrollEl === true) {
