@@ -186,25 +186,17 @@
 
 		_prepareGroup = function (options) {
 			function toFn(value, pull) {
-				if (value == null || value === true) {
-					if (value == null) {
-						return alwaysFalse;
-					}
-					value = group.name;
-				}
-
-				if (typeof value === 'function') {
+				if (value == null || value === false) {
+					return alwaysFalse;
+				} else if (typeof value === 'function') {
 					return value;
 				} else {
 					return function (to, from) {
-						var fromGroup = from.options.group.name;
+						var otherGroup = (pull ? to : from).options.group.name;
 
-						return pull
-							? value
-							: value && (value.join
-								? value.indexOf(fromGroup) > -1
-								: (fromGroup == value)
-							);
+						return value === true ||
+						(typeof value === 'string' && value === otherGroup) ||
+						(value.indexOf && value.indexOf(otherGroup) > -1);
 					};
 				}
 			}
