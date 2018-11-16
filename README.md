@@ -186,8 +186,8 @@ To drag elements from one list into another, both lists must have the same `grou
 You can also define whether lists can give away, give and keep a copy (`clone`), and receive elements.
 
  * name: `String` — group name
- * pull: `true|false|'clone'|function` — ability to move from the list. `clone` — copy the item, rather than move.
- * put: `true|false|["foo", "bar"]|function` — whether elements can be added from other lists, or an array of group names from which elements can be taken.
+ * pull: `true|false|["foo", "bar"]|'clone'|function` — ability to move from the list. `clone` — copy the item, rather than move. Or an array of group names which the elements may be put in.
+ * put: `true|false|["baz", "qux"]|function` — whether elements can be added from other lists, or an array of group names from which elements can be taken.
  * revertClone: `boolean` — revert cloned element to initial position after moving to a another list.
 
 
