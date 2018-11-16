@@ -187,10 +187,10 @@
 		_prepareGroup = function (options) {
 			function toFn(value, pull) {
 				if (value == null || value === true) {
-					value = group.name;
 					if (value == null) {
 						return alwaysFalse;
 					}
+					value = group.name;
 				}
 
 				if (typeof value === 'function') {
