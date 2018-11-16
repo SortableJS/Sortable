@@ -188,6 +188,10 @@
 			function toFn(value, pull) {
 				if (value == null || value === false) {
 					return alwaysFalse;
+				} else if (pull && value === 'clone') {
+					return function() {
+						return value;
+					};
 				} else if (typeof value === 'function') {
 					return value;
 				} else {
