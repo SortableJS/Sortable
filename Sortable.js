@@ -728,7 +728,7 @@
 				options = this.options,
 				group = options.group,
 				activeSortable = Sortable.active,
-				isOwner = (activeGroup === group),
+				isOwner = (activeGroup.name === group.name),
 				isMovingBetweenSortable = false,
 				canSort = options.sort;
 
