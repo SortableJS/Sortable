@@ -744,6 +744,8 @@
 			moved = true;
 			
 			target = evt.target == el ? evt.target : _closest(evt.target, options.draggable, el);
+			
+			if (target === el) return;
 
 			if (activeSortable && !options.disabled &&
 				(isOwner
