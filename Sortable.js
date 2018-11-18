@@ -742,6 +742,8 @@
 			}
 
 			moved = true;
+			
+			target = evt.target == el ? evt.target : _closest(evt.target, options.draggable, el);
 
 			if (activeSortable && !options.disabled &&
 				(isOwner
@@ -763,7 +765,6 @@
 					return;
 				}
 
-				target = _closest(evt.target, options.draggable, el);
 				dragRect = dragEl.getBoundingClientRect();
 
 				if (putSortable !== this) {
