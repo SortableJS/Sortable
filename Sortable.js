@@ -49,6 +49,7 @@
 		putSortable,
 
 		autoScroll = {},
+		destructive = false,
 
 		tapEvt,
 		touchEvt,
@@ -260,7 +261,9 @@
 			disabled: false,
 			store: null,
 			handle: null,
-      scroll: true,
+			allowDuplicates: true,
+			isDestructive: false,
+			scroll: true,
 			scrollSensitivity: 30,
 			scrollSpeed: 10,
 			draggable: /[uo]l/i.test(el.nodeName) ? 'li' : '>*',
@@ -732,6 +735,8 @@
 				isMovingBetweenSortable = false,
 				canSort = options.sort;
 
+			destructive = options.isDestructive;
+
 			if (evt.preventDefault !== void 0) {
 				evt.preventDefault();
 				!options.dragoverBubble && evt.stopPropagation();
@@ -818,6 +823,17 @@
 					}
 				}
 				else if (target && !target.animated && target !== dragEl && (target.parentNode[expando] !== void 0)) {
+					if (!options.allowDuplicates && el !== rootEl) {
+						var duplicates = el.querySelectorAll("#"+dragEl.id);
+						if (duplicates.length > 1) {
+							return;
+						}
+						if (duplicates.length == 1) {
+							if (!duplicates[0].classList.contains(options.ghostClass)) {
+								return;
+							}
+						}
+					}
 					if (lastEl !== target) {
 						lastEl = target;
 						lastCSS = _css(target);
@@ -988,6 +1004,9 @@
 							// drag from one list and drop into another
 							_dispatchEvent(null, parentEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
 							_dispatchEvent(this, rootEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+							if (destructive) {
+								dragEl && dragEl.parentNode && dragEl.parentNode.removeChild(dragEl);
+							}
 						}
 					}
 					else {
