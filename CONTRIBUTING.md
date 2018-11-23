@@ -10,8 +10,8 @@
 
 ### Pull Request
 
- 1. Before PR run `grunt`;
- 2. Only into [master](https://github.com/RubaXa/Sortable/tree/master/)-branch.
+ 1. Only into [master](https://github.com/RubaXa/Sortable/tree/master/)-branch.
+ 2. Do not modify `Sortable.min.js`, this will be compiled before each release.
 
 ### Setup
 
