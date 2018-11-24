@@ -110,7 +110,7 @@
 					(elem.clientWidth < elem.scrollWidth) ||
 					(elem.clientHeight < elem.scrollHeight)
 				) {
-					if (!elem || !elem.getBoundingClientRect) return;
+					if (!elem || !elem.getBoundingClientRect || elem === document.body) return;
 
 					if (gotSelf || includeSelf) return elem;
 					gotSelf = true;
@@ -154,7 +154,6 @@
 				}
 
 
-				// DO PARENT LOOP HERE, APPLYING BELOW FOR EACH PARENT ELEMENT AND ROOTEL
 				var layersOut = 0;
 				var currentParent = scrollEl;
 				do {
@@ -484,7 +483,7 @@
 
 			} else {
 				// if DnD is enabled, first autoscroll will already scroll, so get parent autoscroll of first autoscroll
-				if (!options.bubbleScroll) return;
+				if (!_this.options.bubbleScroll) return;
 				_autoScroll(evt, _this.options, _getParentAutoScrollElement(elem, false));
 			}
 		},
