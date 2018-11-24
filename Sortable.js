@@ -212,7 +212,7 @@
 						}
 					}
 					layersOut++;
-				} while (currentParent = _getParentAutoScrollElement(currentParent, false));
+				} while (options.bubbleScroll && (currentParent = _getParentAutoScrollElement(currentParent, false)));
 			}
 		}, 30),
 
@@ -306,6 +306,7 @@
       		scroll: true,
 			scrollSensitivity: 30,
 			scrollSpeed: 10,
+			bubbleScroll: true,
 			draggable: /[uo]l/i.test(el.nodeName) ? 'li' : '>*',
 			ghostClass: 'sortable-ghost',
 			chosenClass: 'sortable-chosen',
@@ -446,19 +447,19 @@
 
 		_handleAutoScroll: function(evt) {
 			if (!dragEl || !this.options.scroll || (this.options.supportPointer && evt.type == 'touchmove')) return;
-
 			var
-			x = (evt.touches ? evt.touches[0] : evt).clientX,
-			y = (evt.touches ? evt.touches[0] : evt).clientY,
+				x = (evt.touches ? evt.touches[0] : evt).clientX,
+				y = (evt.touches ? evt.touches[0] : evt).clientY,
 
-			elem = document.elementFromPoint(x, y),
-			_this = this;
+				elem = document.elementFromPoint(x, y),
+				_this = this
+			;
 
 
 			// touch does not have native autoscroll, even with DnD enabled
-			if (!this.nativeDraggable || evt.touches || (evt.pointerType && evt.pointerType == 'touch')) {
+			if (!_this.nativeDraggable || evt.touches || (evt.pointerType && evt.pointerType == 'touch')) {
 
-				_autoScroll(evt.touches ? evt.touches[0] : evt, this.options, elem);
+				_autoScroll(evt.touches ? evt.touches[0] : evt, _this.options, elem);
 
 				// Listener for pointer element change
 				var ogElemScroller = _getParentAutoScrollElement(elem, true);
@@ -467,8 +468,9 @@
 					y != lastPointerElemY) {
 
 					pointerElemChangedInterval && clearInterval(pointerElemChangedInterval);
-
+					// Detect for pointer elem change, emulating native DnD behaviour
 					pointerElemChangedInterval = setInterval(function() {
+						if (!dragEl) return;
 						var newElem = _getParentAutoScrollElement(document.elementFromPoint(x, y), true);
 						if (newElem != ogElemScroller) {
 							ogElemScroller = newElem;
@@ -482,7 +484,8 @@
 
 			} else {
 				// if DnD is enabled, first autoscroll will already scroll, so get parent autoscroll of first autoscroll
-				_autoScroll(evt, this.options, _getParentAutoScrollElement(elem, false));
+				if (!options.bubbleScroll) return;
+				_autoScroll(evt, _this.options, _getParentAutoScrollElement(elem, false));
 			}
 		},
 
@@ -1019,8 +1022,9 @@
 
 			clearInterval(this._loopId);
 
+			clearInterval(pointerElemChangedInterval);
 			_clearAutoScrolls();
-			clearInterval(pointerElemChangedInterval);;
+			_cancelThrottle();
 
 			clearTimeout(this._dragStartTimer);
 
@@ -1546,25 +1550,30 @@
 		return false;
 	}
 
+	var _throttleTimeout;
 	function _throttle(callback, ms) {
-		var args, _this;
-
 		return function () {
-			if (args === void 0) {
-				args = arguments;
-				_this = this;
+			if (!_throttleTimeout) {
+				var args = arguments,
+					_this = this
+				;
 
-				setTimeout(function () {
+				_throttleTimeout = setTimeout(function () {
 					if (args.length === 1) {
 						callback.call(_this, args[0]);
 					} else {
 						callback.apply(_this, args);
 					}
 
-					args = void 0;
+					_throttleTimeout = void 0;
 				}, ms);
 			}
 		};
+	}
+
+	function _cancelThrottle() {
+		clearTimeout(_throttleTimeout);
+		_throttleTimeout = void 0;
 	}
 
 	function _extend(dst, src) {
