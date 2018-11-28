@@ -55,6 +55,10 @@
 
 		moved,
 
+		lastTarget,
+		lastDirection,
+		pastFirstInverseThresh = false,
+
 		forRepaintDummy,
 
 		/** @const */
@@ -260,10 +264,24 @@
 			disabled: false,
 			store: null,
 			handle: null,
-      scroll: true,
+			scroll: true,
 			scrollSensitivity: 30,
 			scrollSpeed: 10,
 			draggable: /[uo]l/i.test(el.nodeName) ? 'li' : '>*',
+
+			swapThreshold: 1, // percentage; 0 <= x <= 1
+			direction: (
+				el.children[0] &&
+				(
+					getComputedStyle(el.children[0]).display === 'block' ||
+					el.getBoundingClientRect().width <= el.children[0].getBoundingClientRect().width ||
+					el.children[1] &&
+						el.children[0].getBoundingClientRect().width + el.children[1].getBoundingClientRect().width > el.getBoundingClientRect().width
+				)
+			) ? 'vertical' : 'horizontal',
+			inverseSwapZone: false, // inverse always
+			inverseSwapThreshold: null, // will be set to same as swapThreshold if default
+
 			ghostClass: 'sortable-ghost',
 			chosenClass: 'sortable-chosen',
 			dragClass: 'sortable-drag',
@@ -294,6 +312,8 @@
 		}
 
 		_prepareGroup(options);
+
+		options.inverseSwapThreshold == null && (options.inverseSwapThreshold = options.swapThreshold);
 
 		// Bind all private methods
 		for (var fn in this) {
@@ -356,7 +376,7 @@
 
 			target = _closest(target, options.draggable, el);
 
-			if (!target) {
+			if (!target || target === el) {
 				return;
 			}
 
@@ -710,11 +730,6 @@
 
 				_on(document, 'drop', _this);
 
-				// #1143: Бывает элемент с IFrame внутри блокирует `drop`,
-				// поэтому если вызвался `mouseover`, значит надо отменять весь d'n'd.
-				// Breaking Chrome 62+
-				// _on(document, 'mouseover', _this);
-
 				_this._dragStartId = _nextTick(_this._dragStarted);
 			}
 		},
@@ -742,10 +757,15 @@
 			}
 
 			moved = true;
-			
-			target = evt.target == el ? evt.target : _closest(evt.target, options.draggable, el);
-			
-			if (target === el) return;
+
+			target = _closest(evt.target, options.draggable, el);
+
+
+			if (target === dragEl) {
+				pastFirstInverseThresh = false;
+				lastTarget = target;
+				return;
+			}
 
 			if (activeSortable && !options.disabled &&
 				(isOwner
@@ -765,6 +785,23 @@
 
 				if (_silent) {
 					return;
+				}
+
+
+				var direction;
+
+				if (target !== el) {
+					direction = _getSwapDirection(evt, target, options.direction, options.swapThreshold, options.inverseSwapThreshold, options.inverseSwapZone, lastTarget === target);
+					if (direction == 0) return;
+					console.log(direction)
+					
+					if (lastTarget != target && (!target || !target.animated)) {
+						pastFirstInverseThresh = false;
+						lastTarget = target;
+					}
+
+
+					lastDirection = direction;
 				}
 
 				dragRect = dragEl.getBoundingClientRect();
@@ -790,7 +827,7 @@
 
 
 				if ((el.children.length === 0) || (el.children[0] === ghostEl) ||
-					(el === evt.target) && (_ghostIsLast(el, evt))
+					(el === evt.target) && (_ghostIsLast(evt, options.direction, el))
 				) {
 					//assign target only if condition is true
 					if (el.children.length !== 0 && el.children[0] !== ghostEl && el === evt.target) {
@@ -826,34 +863,13 @@
 
 					targetRect = target.getBoundingClientRect();
 
-					var width = targetRect.right - targetRect.left,
-						height = targetRect.bottom - targetRect.top,
-						floating = R_FLOAT.test(lastCSS.cssFloat + lastCSS.display)
-							|| (lastParentCSS.display == 'flex' && lastParentCSS['flex-direction'].indexOf('row') === 0),
-						isWide = (target.offsetWidth > dragEl.offsetWidth),
-						isLong = (target.offsetHeight > dragEl.offsetHeight),
-						halfway = (floating ? (evt.clientX - targetRect.left) / width : (evt.clientY - targetRect.top) / height) > 0.5,
-						nextSibling = target.nextElementSibling,
+					var nextSibling = target.nextElementSibling,
 						after = false
 					;
 
-					if (floating) {
-						var elTop = dragEl.offsetTop,
-							tgTop = target.offsetTop;
-
-						if (elTop === tgTop) {
-							after = (target.previousElementSibling === dragEl) && !isWide || halfway && isWide;
-						}
-						else if (target.previousElementSibling === dragEl || dragEl.previousElementSibling === target) {
-							after = (evt.clientY - targetRect.top) / height > 0.5;
-						} else {
-							after = tgTop > elTop;
-						}
-						} else if (!isMovingBetweenSortable) {
-						after = (nextSibling !== dragEl) && !isLong || halfway && isLong;
-					}
-
 					var moveVector = _onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt, after);
+
+					after = direction === 1;
 
 					if (moveVector !== false) {
 						if (moveVector === 1 || moveVector === -1) {
@@ -929,6 +945,9 @@
 			var el = this.el,
 				options = this.options;
 
+			lastTarget = null;
+			pastFirstInverseThresh = false;
+
 			clearInterval(this._loopId);
 			clearInterval(autoScroll.pid);
 			clearTimeout(this._dragStartTimer);
@@ -937,7 +956,6 @@
 			_cancelNextTick(this._dragStartId);
 
 			// Unbind events
-			_off(document, 'mouseover', this);
 			_off(document, 'mousemove', this._onTouchMove);
 
 			if (this.nativeDraggable) {
@@ -1065,10 +1083,6 @@
 						this._onDragOver(evt);
 						_globalDragOver(evt);
 					}
-					break;
-
-				case 'mouseover':
-					this._onDrop(evt);
 					break;
 
 				case 'selectstart':
@@ -1226,7 +1240,7 @@
 			ctx = ctx || document;
 
 			do {
-				if ((selector === '>*' && el.parentNode === ctx) || _matches(el, selector)) {
+				if ((selector === '>*' && el.parentNode === ctx) || _matches(el, selector) || el === ctx) {
 					return el;
 				}
 				/* jshint boss:true */
@@ -1384,15 +1398,97 @@
 	}
 
 
-	/** @returns {HTMLElement|false} */
-	function _ghostIsLast(el, evt) {
-		var lastEl = el.lastElementChild,
-			rect = lastEl.getBoundingClientRect();
+	function _ghostIsLast(evt, axis, el) {
+		console.log('ghost is last')
+		var elRect = el.lastElementChild.getBoundingClientRect(),
+			mouseOnOppAxis = axis === 'vertical' ? evt.clientX : evt.clientY,
+			targetS1Opp = axis === 'vertical' ? elRect.left : elRect.top,
+			targetS2Opp = axis === 'vertical' ? elRect.right : elRect.bottom
+		;
 
-		// 5 — min delta
-		// abs — нельзя добавлять, а то глюки при наведении сверху
-		return (evt.clientY - (rect.top + rect.height) > 5) ||
-			(evt.clientX - (rect.left + rect.width) > 5);
+		return (
+			mouseOnOppAxis > targetS1Opp &&
+			mouseOnOppAxis < targetS2Opp
+		);
+	}
+
+	function _getSwapDirection(evt, target, axis, swapThreshold, inverseSwapThreshold, inverseSwapZone, inside) {
+		var targetRect = target.getBoundingClientRect(),
+			mouseOnAxis = axis === 'vertical' ? evt.clientY : evt.clientX,
+			targetLength = axis === 'vertical' ? targetRect.height : targetRect.width,
+			targetS1 = axis === 'vertical' ? targetRect.top : targetRect.left,
+			targetS2 = axis === 'vertical' ? targetRect.bottom : targetRect.right,
+			dragRect = dragEl.getBoundingClientRect(),
+			dragLength = axis === 'vertical' ? dragRect.height : dragRect.width,
+			inverse = false
+		;
+
+		if (!inverseSwapZone) {
+			// Never inverse or create dragEl shadow when width causes mouse to move past the end of regualr swapThreshold
+			if (inside && dragLength < swapThreshold * targetLength) {
+				// check if past first inverse threshold on side opposite of lastDirection
+				if (!pastFirstInverseThresh &&
+					(lastDirection === 1 ?
+						(
+							mouseOnAxis > targetS1 + targetLength * inverseSwapThreshold / 2
+						) :
+						(
+							mouseOnAxis < targetS2 - targetLength * inverseSwapThreshold / 2
+						)
+					)
+				)
+				{
+					// past first inverse threshold, do not restrict inverse threshold to dragEl shadow
+					pastFirstInverseThresh = true;
+				}
+
+				if (!pastFirstInverseThresh) {
+					var dragS1 = axis === 'vertical' ? dragRect.top : dragRect.left,
+						dragS2 = axis === 'vertical' ? dragRect.bottom : dragRect.right
+					;
+					console.log('using shadow')
+					// dragEl shadow
+					if (
+						lastDirection === 1 ?
+						(
+							mouseOnAxis < targetS1 + dragLength // over dragEl shadow
+						) :
+						(
+							mouseOnAxis > targetS2 - dragLength
+						)
+					)
+					{
+						return lastDirection * -1;
+					}
+				} else {
+					inverse = true;
+				}
+			} else {
+				// Regular
+				if (
+					mouseOnAxis > targetS1 + (targetLength * (1 - swapThreshold) / 2) &&
+					mouseOnAxis < targetS2 - (targetLength * (1 - swapThreshold) / 2)
+				) {
+					return ((mouseOnAxis > targetS1 + targetLength / 2) ? -1 : 1);
+				}
+			}
+		}
+
+		inverse = inverse || inverseSwapZone;
+
+		if (inverse) {
+			console.log('using inverse')
+			// Inverse of regular
+			if (
+				mouseOnAxis < targetS1 + (targetLength * inverseSwapThreshold / 2) ||
+				mouseOnAxis > targetS2 - (targetLength * inverseSwapThreshold / 2)
+			)
+			{
+				return ((mouseOnAxis > targetS1 + targetLength / 2) ? 1 : -1);
+			}
+		}
+
+		return 0;
 	}
 
 
