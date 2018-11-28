@@ -641,7 +641,6 @@
 
 				var target = document.elementFromPoint(touchEvt.clientX, touchEvt.clientY);
 				var parent = target;
-				var i = touchDragOverListeners.length;
 
 				while (target && target.shadowRoot) {
 					target = target.shadowRoot.elementFromPoint(touchEvt.clientX, touchEvt.clientY);
@@ -651,6 +650,7 @@
 				if (parent) {
 					do {
 						if (parent[expando]) {
+							var i = touchDragOverListeners.length;
 							while (i--) {
 								touchDragOverListeners[i]({
 									clientX: touchEvt.clientX,
@@ -660,7 +660,9 @@
 								});
 							}
 
-							break;
+							if (!this.options.dragoverBubble) {
+								break;
+							}
 						}
 
 						target = parent; // store last element
