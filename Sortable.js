@@ -516,7 +516,7 @@
 
 					// Make the element draggable
 					dragEl.draggable = _this.nativeDraggable;
-					
+
 					// Bind the events: dragstart/dragend
 					_this._triggerDragStart(evt, touch);
 
@@ -545,7 +545,7 @@
 					_on(ownerDocument, 'mouseup', _this._disableDelayedDrag);
 					_on(ownerDocument, 'touchend', _this._disableDelayedDrag);
 					_on(ownerDocument, 'touchcancel', _this._disableDelayedDrag);
-					_on(ownerDocument, 'mousemove', _this._disableDelayedDrag);
+					_on(ownerDocument, 'mousemove', _this._delayedDragTouchMoveHandler);
 					_on(ownerDocument, 'touchmove', _this._delayedDragTouchMoveHandler);
 					options.supportPointer && _on(ownerDocument, 'pointermove', _this._delayedDragTouchMoveHandler);
 
@@ -559,7 +559,10 @@
 		},
 
 		_delayedDragTouchMoveHandler: function (/** TouchEvent|PointerEvent **/e) {
-			if (min(abs(e.clientX - this._lastX), abs(e.clientY - this._lastY)) >= this.options.touchStartThreshold) {
+			var touch = e.touches ? e.touches[0] : e;
+			if (min(abs(touch.clientX - this._lastX), abs(touch.clientY - this._lastY))
+					>= this.options.touchStartThreshold
+			) {
 				this._disableDelayedDrag();
 			}
 		},
@@ -571,9 +574,9 @@
 			_off(ownerDocument, 'mouseup', this._disableDelayedDrag);
 			_off(ownerDocument, 'touchend', this._disableDelayedDrag);
 			_off(ownerDocument, 'touchcancel', this._disableDelayedDrag);
-			_off(ownerDocument, 'mousemove', this._disableDelayedDrag);
-			_off(ownerDocument, 'touchmove', this._disableDelayedDrag);
-			_off(ownerDocument, 'pointermove', this._disableDelayedDrag);
+			_off(ownerDocument, 'mousemove', this._delayedDragTouchMoveHandler);
+			_off(ownerDocument, 'touchmove', this._delayedDragTouchMoveHandler);
+			_off(ownerDocument, 'pointermove', this._delayedDragTouchMoveHandler);
 		},
 
 		_triggerDragStart: function (/** Event */evt, /** Touch */touch) {
@@ -835,9 +838,9 @@
 			}
 
 			moved = true;
-			
+
 			target = evt.target == el ? evt.target : _closest(evt.target, options.draggable, el);
-			
+
 			if (target === el) return;
 
 			if (activeSortable && !options.disabled &&
