@@ -224,22 +224,24 @@
 
 		_prepareGroup = function (options) {
 			function toFn(value, pull) {
-				if (value == null || value === false) {
-					return alwaysFalse;
-				} else if (pull && value === 'clone') {
-					return function() {
-						return value;
-					};
-				} else if (typeof value === 'function') {
-					return value;
-				} else {
-					return function (to, from) {
+				return function(to, from, dragEl, evt) {
+					var ret;
+
+					if (value == null || value === false) {
+						ret = false;
+					} else if (pull && value === 'clone') {
+						ret = value;
+					} else if (typeof value === 'function') {
+						ret = value(to, from, dragEl, evt);
+					} else {
 						var otherGroup = (pull ? to : from).options.group.name;
 
-						return value === true ||
+						ret = (value === true ||
 						(typeof value === 'string' && value === otherGroup) ||
-						(value.indexOf && value.indexOf(otherGroup) > -1);
-					};
+						(value.join && value.indexOf(otherGroup) > -1));
+					}
+
+					return ret || to.options.group.name === from.options.group.name;
 				}
 			}
 
@@ -819,7 +821,7 @@
 				options = this.options,
 				group = options.group,
 				activeSortable = Sortable.active,
-				isOwner = (activeGroup.name === group.name),
+				isOwner = (activeGroup === group),
 				isMovingBetweenSortable = false,
 				canSort = options.sort;
 
