@@ -110,6 +110,7 @@ var sortable = new Sortable(el, {
 	scrollFn: function(offsetX, offsetY, originalEvent, touchEvt, hoverTargetEl) { ... }, // if you have custom scrollbar scrollFn may be used for autoscrolling
 	scrollSensitivity: 30, // px, how near the mouse must be to an edge to start scrolling.
 	scrollSpeed: 10, // px
+	bubbleScroll: true, // apply autoscroll to all parent elements, allowing for easier movement
 
 	setData: function (/** DataTransfer */dataTransfer, /** HTMLElement*/dragEl) {
 		dataTransfer.setData('Text', dragEl.textContent); // `dataTransfer` object of HTML5 DragEvent
@@ -455,6 +456,14 @@ The speed at which the window should scroll once the mouse pointer gets within t
 
 ---
 
+
+#### `bubbleScroll` option
+If set to `true`, the normal `autoscroll` function will also be applied to all parent elements of the element the user is dragging over.
+
+Demo: https://jsbin.com/kesewor/edit?html,js,output
+
+
+---
 
 ### Event object ([demo](http://jsbin.com/xedusu/edit?js,output))
 

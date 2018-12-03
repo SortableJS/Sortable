@@ -48,7 +48,11 @@
 		activeGroup,
 		putSortable,
 
-		autoScroll = {},
+		autoScrolls = [],
+
+		pointerElemChangedInterval,
+		lastPointerElemX,
+		lastPointerElemY,
 
 		tapEvt,
 		touchEvt,
@@ -144,11 +148,30 @@
 			);
 		},
 
+		_getParentAutoScrollElement = function(rootEl, includeSelf) {
+			// will skip to window in _autoScroll
+			if (!rootEl || !rootEl.getBoundingClientRect) return;
+
+			var elem = rootEl;
+			var gotSelf = false;
+			do {
+				if (
+					(elem.clientWidth < elem.scrollWidth) ||
+					(elem.clientHeight < elem.scrollHeight)
+				) {
+					if (!elem || !elem.getBoundingClientRect || elem === document.body) return;
+
+					if (gotSelf || includeSelf) return elem;
+					gotSelf = true;
+				}
+
+			} while (elem = elem.parentNode);
+		},
+
 		_autoScroll = _throttle(function (/**Event*/evt, /**Object*/options, /**HTMLElement*/rootEl) {
 			// Bug: https://bugzilla.mozilla.org/show_bug.cgi?id=505521
-			if (rootEl && options.scroll) {
-				var _this = rootEl[expando],
-					el,
+			if (options.scroll) {
+				var _this = rootEl ? rootEl[expando] : window,
 					rect,
 					sens = options.scrollSensitivity,
 					speed = options.scrollSpeed,
@@ -166,91 +189,108 @@
 					scrollOffsetY
 				;
 
-				// Delect scrollEl
+				// Detect scrollEl
 				if (scrollParentEl !== rootEl) {
+					_clearAutoScrolls();
+
 					scrollEl = options.scroll;
-					scrollParentEl = rootEl;
 					scrollCustomFn = options.scrollFn;
 
 					if (scrollEl === true) {
-						scrollEl = rootEl;
-
-						do {
-							if ((scrollEl.offsetWidth < scrollEl.scrollWidth) ||
-								(scrollEl.offsetHeight < scrollEl.scrollHeight)
-							) {
-								break;
-							}
-							/* jshint boss:true */
-						} while (scrollEl = scrollEl.parentNode);
+						scrollEl = _getParentAutoScrollElement(rootEl, true);
+						scrollParentEl = scrollEl;
 					}
 				}
 
-				if (scrollEl) {
-					el = scrollEl;
-					rect = scrollEl.getBoundingClientRect();
-					vx = (abs(rect.right - x) <= sens) - (abs(rect.left - x) <= sens);
-					vy = (abs(rect.bottom - y) <= sens) - (abs(rect.top - y) <= sens);
-				}
+
+				var layersOut = 0;
+				var currentParent = scrollEl;
+				do {
+					var el;
+
+					if (currentParent) {
+						el = currentParent;
+						rect = currentParent.getBoundingClientRect();
+						vx = (abs(rect.right - x) <= sens) - (abs(rect.left - x) <= sens);
+						vy = (abs(rect.bottom - y) <= sens) - (abs(rect.top - y) <= sens);
+					}
 
 
-				if (!(vx || vy)) {
-					vx = (winWidth - x <= sens) - (x <= sens);
-					vy = (winHeight - y <= sens) - (y <= sens);
+					if (!(vx || vy)) {
+						vx = (winWidth - x <= sens) - (x <= sens);
+						vy = (winHeight - y <= sens) - (y <= sens);
 
-					/* jshint expr:true */
-					(vx || vy) && (el = win);
-				}
+						/* jshint expr:true */
+						(vx || vy) && (el = win);
+					}
 
+					if (!autoScrolls[layersOut]) {
+						for (var i = 0; i <= layersOut; i++) {
+							if (!autoScrolls[i]) {
+								autoScrolls[i] = {};
+							}
+						}
+					}
 
-				if (autoScroll.vx !== vx || autoScroll.vy !== vy || autoScroll.el !== el) {
-					autoScroll.el = el;
-					autoScroll.vx = vx;
-					autoScroll.vy = vy;
+					if (autoScrolls[layersOut].vx !== vx || autoScrolls[layersOut].vy !== vy || autoScrolls[layersOut].el !== el) {
+						autoScrolls[layersOut].el = el;
+						autoScrolls[layersOut].vx = vx;
+						autoScrolls[layersOut].vy = vy;
 
-					clearInterval(autoScroll.pid);
+						clearInterval(autoScrolls[layersOut].pid);
 
-					if (el) {
-						autoScroll.pid = setInterval(function () {
-							scrollOffsetY = vy ? vy * speed : 0;
-							scrollOffsetX = vx ? vx * speed : 0;
+						if (el) {
+							autoScrolls[layersOut].pid = setInterval((function () {
+								scrollOffsetY = autoScrolls[this.layersOut].vy ? autoScrolls[this.layersOut].vy * speed : 0;
+								scrollOffsetX = autoScrolls[this.layersOut].vx ? autoScrolls[this.layersOut].vx * speed : 0;
 
-							if ('function' === typeof(scrollCustomFn)) {
-								if (scrollCustomFn.call(_this, scrollOffsetX, scrollOffsetY, evt, touchEvt, el) !== 'continue') {
-									return;
+								if ('function' === typeof(scrollCustomFn)) {
+									if (scrollCustomFn.call(_this, scrollOffsetX, scrollOffsetY, evt, touchEvt, autoScrolls[this.layersOut].el) !== 'continue') {
+										return;
+									}
 								}
-							}
 
-							if (el === win) {
-								win.scrollTo(win.pageXOffset + scrollOffsetX, win.pageYOffset + scrollOffsetY);
-							} else {
-								el.scrollTop += scrollOffsetY;
-								el.scrollLeft += scrollOffsetX;
-							}
-						}, 24);
+								if (autoScrolls[this.layersOut].el === win) {
+									win.scrollTo(win.pageXOffset + scrollOffsetX, win.pageYOffset + scrollOffsetY);
+								} else {
+									autoScrolls[this.layersOut].el.scrollTop += scrollOffsetY;
+									autoScrolls[this.layersOut].el.scrollLeft += scrollOffsetX;
+								}
+							}).bind({layersOut: layersOut}), 24);
+						}
 					}
-				}
+					layersOut++;
+				} while (options.bubbleScroll && (currentParent = _getParentAutoScrollElement(currentParent, false)));
 			}
 		}, 30),
 
+		_clearAutoScrolls = function () {
+			autoScrolls.forEach(function(autoScroll) {
+				clearInterval(autoScroll.pid);
+			});
+			autoScrolls = [];
+		},
+
 		_prepareGroup = function (options) {
 			function toFn(value, pull) {
-				if (value == null || value === false) {
-					return alwaysFalse;
-				} else if (pull && value === 'clone') {
-					return function() {
-						return value;
-					};
-				} else if (typeof value === 'function') {
-					return value;
-				} else {
-					return function (to, from) {
+				return function(to, from, dragEl, evt) {
+					var ret;
+
+					if (value == null || value === false) {
+						ret = false;
+					} else if (pull && value === 'clone') {
+						ret = value;
+					} else if (typeof value === 'function') {
+						ret = value(to, from, dragEl, evt);
+					} else {
 						var otherGroup = (pull ? to : from).options.group.name;
 
-						return value === true ||
+						ret = (value === true ||
 						(typeof value === 'string' && value === otherGroup) ||
-						(value.indexOf && value.indexOf(otherGroup) > -1);
-					};
+						(value.join && value.indexOf(otherGroup) > -1));
+					}
+
+					return ret || to.options.group.name === from.options.group.name;
 				}
 			}
 
@@ -312,6 +352,7 @@
 			scroll: true,
 			scrollSensitivity: 30,
 			scrollSpeed: 10,
+			bubbleScroll: true,
 			draggable: /[uo]l/i.test(el.nodeName) ? 'li' : '>*',
 
 			swapThreshold: 1, // percentage; 0 <= x <= 1
@@ -457,6 +498,51 @@
 			this._prepareDragStart(evt, touch, target, startIndex);
 		},
 
+
+		_handleAutoScroll: function(evt) {
+			if (!dragEl || !this.options.scroll || (this.options.supportPointer && evt.type == 'touchmove')) return;
+			var
+				x = (evt.touches ? evt.touches[0] : evt).clientX,
+				y = (evt.touches ? evt.touches[0] : evt).clientY,
+
+				elem = document.elementFromPoint(x, y),
+				_this = this
+			;
+
+
+			// touch does not have native autoscroll, even with DnD enabled
+			if (!_this.nativeDraggable || evt.touches || (evt.pointerType && evt.pointerType == 'touch')) {
+
+				_autoScroll(evt.touches ? evt.touches[0] : evt, _this.options, elem);
+
+				// Listener for pointer element change
+				var ogElemScroller = _getParentAutoScrollElement(elem, true);
+				if (!pointerElemChangedInterval ||
+					x != lastPointerElemX ||
+					y != lastPointerElemY) {
+
+					pointerElemChangedInterval && clearInterval(pointerElemChangedInterval);
+					// Detect for pointer elem change, emulating native DnD behaviour
+					pointerElemChangedInterval = setInterval(function() {
+						if (!dragEl) return;
+						var newElem = _getParentAutoScrollElement(document.elementFromPoint(x, y), true);
+						if (newElem != ogElemScroller) {
+							ogElemScroller = newElem;
+							_clearAutoScrolls();
+							_autoScroll(evt.touches ? evt.touches[0] : evt, _this.options, ogElemScroller);
+						}
+					}, 10);
+					lastPointerElemX = x;
+					lastPointerElemY = y;
+				}
+
+			} else {
+				// if DnD is enabled, first autoscroll will already scroll, so get parent autoscroll of first autoscroll
+				if (!_this.options.bubbleScroll) return;
+				_autoScroll(evt, _this.options, _getParentAutoScrollElement(elem, false));
+			}
+		},
+
 		_prepareDragStart: function (/** Event */evt, /** Touch */touch, /** HTMLElement */target, /** Number */startIndex) {
 			var _this = this,
 				el = _this.el,
@@ -487,7 +573,7 @@
 
 					// Make the element draggable
 					dragEl.draggable = _this.nativeDraggable;
-					
+
 					// Bind the events: dragstart/dragend
 					_this._triggerDragStart(evt, touch);
 
@@ -516,7 +602,7 @@
 					_on(ownerDocument, 'mouseup', _this._disableDelayedDrag);
 					_on(ownerDocument, 'touchend', _this._disableDelayedDrag);
 					_on(ownerDocument, 'touchcancel', _this._disableDelayedDrag);
-					_on(ownerDocument, 'mousemove', _this._disableDelayedDrag);
+					_on(ownerDocument, 'mousemove', _this._delayedDragTouchMoveHandler);
 					_on(ownerDocument, 'touchmove', _this._delayedDragTouchMoveHandler);
 					options.supportPointer && _on(ownerDocument, 'pointermove', _this._delayedDragTouchMoveHandler);
 
@@ -530,7 +616,10 @@
 		},
 
 		_delayedDragTouchMoveHandler: function (/** TouchEvent|PointerEvent **/e) {
-			if (min(abs(e.clientX - this._lastX), abs(e.clientY - this._lastY)) >= this.options.touchStartThreshold) {
+			var touch = e.touches ? e.touches[0] : e;
+			if (min(abs(touch.clientX - this._lastX), abs(touch.clientY - this._lastY))
+					>= this.options.touchStartThreshold
+			) {
 				this._disableDelayedDrag();
 			}
 		},
@@ -542,9 +631,9 @@
 			_off(ownerDocument, 'mouseup', this._disableDelayedDrag);
 			_off(ownerDocument, 'touchend', this._disableDelayedDrag);
 			_off(ownerDocument, 'touchcancel', this._disableDelayedDrag);
-			_off(ownerDocument, 'mousemove', this._disableDelayedDrag);
-			_off(ownerDocument, 'touchmove', this._disableDelayedDrag);
-			_off(ownerDocument, 'pointermove', this._disableDelayedDrag);
+			_off(ownerDocument, 'mousemove', this._delayedDragTouchMoveHandler);
+			_off(ownerDocument, 'touchmove', this._delayedDragTouchMoveHandler);
+			_off(ownerDocument, 'pointermove', this._delayedDragTouchMoveHandler);
 		},
 
 		_triggerDragStart: function (/** Event */evt, /** Touch */touch) {
@@ -583,6 +672,7 @@
 
 		_dragStarted: function () {
 			if (rootEl && dragEl) {
+				_on(document, 'drag', this._handleAutoScroll);
 				var options = this.options;
 
 				// Apply effect
@@ -613,7 +703,6 @@
 
 				var target = document.elementFromPoint(touchEvt.clientX, touchEvt.clientY);
 				var parent = target;
-				var i = touchDragOverListeners.length;
 
 				while (target && target.shadowRoot) {
 					target = target.shadowRoot.elementFromPoint(touchEvt.clientX, touchEvt.clientY);
@@ -623,6 +712,7 @@
 				if (parent) {
 					do {
 						if (parent[expando]) {
+							var i = touchDragOverListeners.length;
 							while (i--) {
 								touchDragOverListeners[i]({
 									clientX: touchEvt.clientX,
@@ -632,7 +722,9 @@
 								});
 							}
 
-							break;
+							if (!this.options.dragoverBubble) {
+								break;
+							}
 						}
 
 						target = parent; // store last element
@@ -744,15 +836,19 @@
 				if (useFallback === 'touch') {
 					// Bind touch events
 					_on(document, 'touchmove', _this._onTouchMove);
+					// onTouchMove before handleAutoScroll in this case, because onTouchMove sets touchEvt
+					_on(document, 'touchmove', _this._handleAutoScroll);
 					_on(document, 'touchend', _this._onDrop);
 					_on(document, 'touchcancel', _this._onDrop);
 
 					if (options.supportPointer) {
+						_on(document, 'pointermove', _this._handleAutoScroll);
 						_on(document, 'pointermove', _this._onTouchMove);
 						_on(document, 'pointerup', _this._onDrop);
 					}
 				} else {
 					// Old brwoser
+					_on(document, 'mousemove', _this._handleAutoScroll);
 					_on(document, 'mousemove', _this._onTouchMove);
 					_on(document, 'mouseup', _this._onDrop);
 				}
@@ -780,7 +876,7 @@
 				options = this.options,
 				group = options.group,
 				activeSortable = Sortable.active,
-				isOwner = (activeGroup.name === group.name),
+				isOwner = (activeGroup === group),
 				isMovingBetweenSortable = false,
 				canSort = options.sort
 			;
@@ -817,9 +913,6 @@
 				) &&
 				(evt.rootEl === void 0 || evt.rootEl === this.el) // touch fallback
 			) {
-				// Smart auto-scrolling
-				_autoScroll(evt, options, this.el);
-
 				if (_silent) {
 					return;
 				}
@@ -969,6 +1062,9 @@
 		_offUpEvents: function () {
 			var ownerDocument = this.el.ownerDocument;
 
+			_off(document, 'touchmove', this._handleAutoScroll);
+			_off(document, 'pointermove', this._handleAutoScroll);
+			_off(document, 'mousemove', this._handleAutoScroll);
 			_off(document, 'touchmove', this._onTouchMove);
 			_off(document, 'pointermove', this._onTouchMove);
 			_off(ownerDocument, 'mouseup', this._onDrop);
@@ -987,7 +1083,11 @@
 			pastFirstInvertThresh = false;
 
 			clearInterval(this._loopId);
-			clearInterval(autoScroll.pid);
+
+			clearInterval(pointerElemChangedInterval);
+			_clearAutoScrolls();
+			_cancelThrottle();
+
 			clearTimeout(this._dragStartTimer);
 
 			_cancelNextTick(this._cloneId);
@@ -996,9 +1096,11 @@
 			// Unbind events
 			_off(document, 'mousemove', this._onTouchMove);
 
+
 			if (this.nativeDraggable) {
 				_off(document, 'drop', this);
 				_off(el, 'dragstart', this._onDragStart);
+				_off(document, 'drag', this._handleAutoScroll);
 			}
 
 			this._offUpEvents();
@@ -1610,25 +1712,30 @@
 		return false;
 	}
 
+	var _throttleTimeout;
 	function _throttle(callback, ms) {
-		var args, _this;
-
 		return function () {
-			if (args === void 0) {
-				args = arguments;
-				_this = this;
+			if (!_throttleTimeout) {
+				var args = arguments,
+					_this = this
+				;
 
-				setTimeout(function () {
+				_throttleTimeout = setTimeout(function () {
 					if (args.length === 1) {
 						callback.call(_this, args[0]);
 					} else {
 						callback.apply(_this, args);
 					}
 
-					args = void 0;
+					_throttleTimeout = void 0;
 				}, ms);
 			}
 		};
+	}
+
+	function _cancelThrottle() {
+		clearTimeout(_throttleTimeout);
+		_throttleTimeout = void 0;
 	}
 
 	function _extend(dst, src) {
