@@ -34,9 +34,9 @@ Demo: http://rubaxa.github.io/Sortable/
 
 ### Articles
 
+ * [Swap Thresholds and Direction](https://github.com/RubaXa/Sortable/wiki/Swap-Thresholds-and-Direction) (December 2, 2018)
  * [Sortable v1.0 — New capabilities](https://github.com/RubaXa/Sortable/wiki/Sortable-v1.0-—-New-capabilities/) (December 22, 2014)
  * [Sorting with the help of HTML5 Drag'n'Drop API](https://github.com/RubaXa/Sortable/wiki/Sorting-with-the-help-of-HTML5-Drag'n'Drop-API/) (December 23, 2013)
-
 
 <br/>
 
