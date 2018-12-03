@@ -1,7 +1,3 @@
-## Hi, this project very much requires the maintainer, if you have a chewing and appropriate skills, please [contact me](mailto:ibn@rubaxa.org?subject=Sortable%20vs.%20Maintainer)!
-
----
-
 # Sortable
 Sortable is a <s>minimalist</s> JavaScript library for reorderable drag-and-drop lists.
 
@@ -98,6 +94,11 @@ var sortable = new Sortable(el, {
 	chosenClass: "sortable-chosen",  // Class name for the chosen item
 	dragClass: "sortable-drag",  // Class name for the dragging item
 	dataIdAttr: 'data-id',
+
+	swapThreshold: 1, // Threshold of the swap zone
+	invertSwap: false, // Will always use inverted swap zone if set to true
+	invertedSwapThreshold: 1, // Threshold of the inverted swap zone (will be set to swapThreshold value by default)
+	direction: 'horizontal', // Direction of Sortable (will be detected automatically if not given)
 
 	forceFallback: false,  // ignore the HTML5 DnD behaviour and force the fallback to kick in
 
@@ -213,6 +214,53 @@ Demo: http://jsbin.com/videzob/edit?html,js,output
 Time in milliseconds to define when the sorting should start.
 
 Demo: http://jsbin.com/xizeh/edit?html,js,output
+
+
+---
+
+
+#### `swapThreshold` option
+Percentage of the target that the swap zone will take up, as float between `0` and `1`.
+
+Read more: https://github.com/RubaXa/Sortable/wiki/Swap-Thresholds-and-Direction#swap-threshold
+
+
+---
+
+
+#### `invertSwap` option
+Set to `true` to set the swap zone to the sides of the target, for the effect of sorting "in between" items.
+
+Read more: https://github.com/RubaXa/Sortable/wiki/Swap-Thresholds-and-Direction#forcing-inverted-swap-zone
+
+
+---
+
+
+#### `invertedSwapThreshold` option
+Percentage of the target that the inverted swap zone will take up. If not given, will default to `swapThreshold`.
+
+Read more: https://github.com/RubaXa/Sortable/wiki/Swap-Thresholds-and-Direction#dealing-with-swap-glitching
+
+
+---
+
+
+#### `direction` option
+Direction that the Sortable should sort in. Can be set to `'vertical'`, `'horizontal'`, or a function, which will be called whenever a target is dragged over.
+
+Read more: https://github.com/RubaXa/Sortable/wiki/Swap-Thresholds-and-Direction#direction
+
+
+Example of dynamic direction detection:
+
+```js
+Sortable.create(el, {
+	direction: function(evt, target, dragEl) {
+		return Sortable.utils.detectDirection(el);
+	}
+});
+```
 
 
 ---
@@ -571,6 +619,7 @@ Link to the active instance.
 * closest(el`:HTMLElement`, selector`:String`[, ctx`:HTMLElement`])`:HTMLElement|Null` — for each element in the set, get the first element that matches the selector by testing the element itself and traversing up through its ancestors in the DOM tree
 * clone(el`:HTMLElement`)`:HTMLElement` — create a deep copy of the set of matched elements
 * toggleClass(el`:HTMLElement`, name`:String`, state`:Boolean`) — add or remove one classes from each element
+* detectDirection(el`:HTMLElement`)`:String` — automatically detect the direction of the element as either `'vertical'` or `'horizontal'`
 
 
 ---
