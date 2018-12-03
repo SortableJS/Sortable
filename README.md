@@ -220,7 +220,7 @@ Demo: http://jsbin.com/xizeh/edit?html,js,output
 
 
 #### `swapThreshold` option
-Percentage of the target that the swap zone will take up, as float between `0` and `1`.
+Percentage of the target that the swap zone will take up, as a float between `0` and `1`.
 
 Read more: https://github.com/RubaXa/Sortable/wiki/Swap-Thresholds-and-Direction#swap-threshold
 
@@ -238,7 +238,7 @@ Read more: https://github.com/RubaXa/Sortable/wiki/Swap-Thresholds-and-Direction
 
 
 #### `invertedSwapThreshold` option
-Percentage of the target that the inverted swap zone will take up. If not given, will default to `swapThreshold`.
+Percentage of the target that the inverted swap zone will take up, as a float between `0` and `1`. If not given, will default to `swapThreshold`.
 
 Read more: https://github.com/RubaXa/Sortable/wiki/Swap-Thresholds-and-Direction#dealing-with-swap-glitching
 
