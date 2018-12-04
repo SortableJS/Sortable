@@ -1,7 +1,7 @@
 # Sortable
 Sortable is a <s>minimalist</s> JavaScript library for reorderable drag-and-drop lists.
 
-Demo: http://rubaxa.github.io/Sortable/
+Demo: http://sortablejs.github.io/Sortable/
 
 
 ## Features
@@ -34,8 +34,8 @@ Demo: http://rubaxa.github.io/Sortable/
 
 ### Articles
 
- * [Sortable v1.0 — New capabilities](https://github.com/RubaXa/Sortable/wiki/Sortable-v1.0-—-New-capabilities/) (December 22, 2014)
- * [Sorting with the help of HTML5 Drag'n'Drop API](https://github.com/RubaXa/Sortable/wiki/Sorting-with-the-help-of-HTML5-Drag'n'Drop-API/) (December 23, 2013)
+ * [Sortable v1.0 — New capabilities](https://github.com/SortableJS/Sortable/wiki/Sortable-v1.0-—-New-capabilities/) (December 22, 2014)
+ * [Sorting with the help of HTML5 Drag'n'Drop API](https://github.com/SortableJS/Sortable/wiki/Sorting-with-the-help-of-HTML5-Drag'n'Drop-API/) (December 23, 2013)
 
 
 <br/>
@@ -523,12 +523,12 @@ Demo: http://jsbin.com/qumuwe/edit?html,js,output
 
 
 <!-- Latest Sortable -->
-<script src="http://rubaxa.github.io/Sortable/Sortable.js"></script>
+<script src="http://SortableJS.github.io/Sortable/Sortable.js"></script>
 
 
 <!-- Simple List -->
 <ul id="simpleList" class="list-group">
-	<li class="list-group-item">This is <a href="http://rubaxa.github.io/Sortable/">Sortable</a></li>
+	<li class="list-group-item">This is <a href="http://SortableJS.github.io/Sortable/">Sortable</a></li>
 	<li class="list-group-item">It works with Bootstrap...</li>
 	<li class="list-group-item">...out of the box.</li>
 	<li class="list-group-item">It has support for touch devices.</li>
@@ -637,7 +637,7 @@ Please, [read this](CONTRIBUTING.md).
 
 ## MIT LICENSE
 Copyright 2013-2017 Lebedev Konstantin <ibnRubaXa@gmail.com>
-http://rubaxa.github.io/Sortable/
+http://SortableJS.github.io/Sortable/
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
