@@ -580,7 +580,8 @@
 		},
 
 		_triggerDragStart: function (/** Event */evt, /** Touch */touch) {
-			touch = touch || (evt.pointerType == 'touch' ? evt : null);
+			var touchType = evt && (evt.pointerType == 'touch' || evt.type == 'pointerDown' || evt.type == 'pointerdown')
+			touch = touch || (touchType ? evt : null);
 
 			if (touch) {
 				// Touch device support
