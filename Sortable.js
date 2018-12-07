@@ -62,12 +62,12 @@
 		lastTarget,
 		lastDirection,
 		pastFirstInvertThresh = false,
+		isCircumstantialInvert = false,
 
 		forRepaintDummy,
 
 		/** @const */
 		R_SPACE = /\s+/g,
-		R_FLOAT = /left|right|inline/,
 
 		expando = 'Sortable' + (new Date).getTime(),
 
@@ -100,29 +100,32 @@
 
 		savedInputChecked = [],
 		touchDragOverListeners = [],
+		sortables = [],
+		outsideRowColData = [],
 
 		alwaysFalse = function () { return false; },
 
-		_detectDirection = function(el) {
+		_detectDirection = function(el, options) {
 			var elCSS = _css(el),
 				elWidth = parseInt(elCSS.width),
-				firstChildCSS = el.children[0] && _css(el.children[0]),
-				secondChildCSS = el.children[1] && _css(el.children[1]),
-				firstChildWidth = firstChildCSS && parseInt(firstChildCSS.marginLeft) + parseInt(firstChildCSS.marginRight) + el.children[0].getBoundingClientRect().width,
-				secondChildWidth = secondChildCSS && parseInt(secondChildCSS.marginLeft) + parseInt(secondChildCSS.marginRight) + el.children[1].getBoundingClientRect().width
+				child1 = _getChild(el, 0, options),
+				child2 = _getChild(el, 1, options),
+				firstChildCSS = child1 && _css(child1),
+				secondChildCSS = child2 && _css(child2),
+				firstChildWidth = firstChildCSS && parseInt(firstChildCSS.marginLeft) + parseInt(firstChildCSS.marginRight) + child1.getBoundingClientRect().width,
+				secondChildWidth = secondChildCSS && parseInt(secondChildCSS.marginLeft) + parseInt(secondChildCSS.marginRight) + child2.getBoundingClientRect().width
 			;
 			if (elCSS.display === 'flex') {
-				return elCSS.flexDirection === 'row' || elCss.flexDirection === 'row-reverse'
+				return elCSS.flexDirection === 'column' || elCSS.flexDirection === 'column-reverse'
 				? 'vertical' : 'horizontal';
 			}
-			return (el.children[0] &&
+			return (child1 &&
 				(
 					firstChildCSS.display === 'block' ||
 					firstChildCSS.display === 'grid' ||
-					firstChildCSS.display === 'list-item' ||
 					firstChildWidth >= elWidth &&
 					elCSS.float === 'none' ||
-					el.children[1] &&
+					child2 &&
 					elCSS.float === 'none' &&
 					firstChildWidth + secondChildWidth > elWidth
 				) ?
@@ -130,22 +133,14 @@
 			);
 		},
 
-		_isOnRowColumn = function(dragEl, target, axis) {
-			var dragRect = dragEl.getBoundingClientRect(),
-				targetRect = target.getBoundingClientRect(),
-				dragS1Opp = axis === 'vertical' ? dragRect.left : dragRect.top,
-				dragS2Opp = axis === 'vertical' ? dragRect.right : dragRect.bottom,
-				dragOppLength = axis === 'vertical' ? dragRect.width : dragRect.height,
+		_isInRowColumn = function(x, y, el, axis, options) {
+			var targetRect = dragEl.getBoundingClientRect(),//_getChild(el, 0, options).getBoundingClientRect(),
 				targetS1Opp = axis === 'vertical' ? targetRect.left : targetRect.top,
 				targetS2Opp = axis === 'vertical' ? targetRect.right : targetRect.bottom,
-				targetOppLength = axis === 'vertical' ? targetRect.width : targetRect.height
+				mouseOnOppAxis = axis === 'vertical' ? x : y
 			;
 
-			return (
-				dragS1Opp === targetS1Opp ||
-				dragS2Opp === targetS2Opp ||
-				(dragS1Opp + dragOppLength / 2) === (targetS1Opp + targetOppLength / 2)
-			);
+			return targetS1Opp < mouseOnOppAxis && mouseOnOppAxis < targetS2Opp;
 		},
 
 		_getParentAutoScrollElement = function(rootEl, includeSelf) {
@@ -164,7 +159,7 @@
 					if (gotSelf || includeSelf) return elem;
 					gotSelf = true;
 				}
-
+			/* jshint boss:true */
 			} while (elem = elem.parentNode);
 		},
 
@@ -183,10 +178,7 @@
 					winHeight = window.innerHeight,
 
 					vx,
-					vy,
-
-					scrollOffsetX,
-					scrollOffsetY
+					vy
 				;
 
 				// Detect scrollEl
@@ -240,23 +232,24 @@
 						clearInterval(autoScrolls[layersOut].pid);
 
 						if (el) {
+							/* jshint loopfunc:true */
 							autoScrolls[layersOut].pid = setInterval((function () {
-								scrollOffsetY = autoScrolls[this.layersOut].vy ? autoScrolls[this.layersOut].vy * speed : 0;
-								scrollOffsetX = autoScrolls[this.layersOut].vx ? autoScrolls[this.layersOut].vx * speed : 0;
+								var scrollOffsetY = autoScrolls[this.layer].vy ? autoScrolls[this.layer].vy * speed : 0;
+								var scrollOffsetX = autoScrolls[this.layer].vx ? autoScrolls[this.layer].vx * speed : 0;
 
 								if ('function' === typeof(scrollCustomFn)) {
-									if (scrollCustomFn.call(_this, scrollOffsetX, scrollOffsetY, evt, touchEvt, autoScrolls[this.layersOut].el) !== 'continue') {
+									if (scrollCustomFn.call(_this, scrollOffsetX, scrollOffsetY, evt, touchEvt, autoScrolls[this.layer].el) !== 'continue') {
 										return;
 									}
 								}
 
-								if (autoScrolls[this.layersOut].el === win) {
+								if (autoScrolls[this.layer].el === win) {
 									win.scrollTo(win.pageXOffset + scrollOffsetX, win.pageYOffset + scrollOffsetY);
 								} else {
-									autoScrolls[this.layersOut].el.scrollTop += scrollOffsetY;
-									autoScrolls[this.layersOut].el.scrollLeft += scrollOffsetX;
+									autoScrolls[this.layer].el.scrollTop += scrollOffsetY;
+									autoScrolls[this.layer].el.scrollLeft += scrollOffsetX;
 								}
-							}).bind({layersOut: layersOut}), 24);
+							}).bind({layer: layersOut}), 24);
 						}
 					}
 					layersOut++;
@@ -291,7 +284,7 @@
 					}
 
 					return ret || to.options.group.name === from.options.group.name;
-				}
+				};
 			}
 
 			var group = {};
@@ -356,7 +349,6 @@
 			draggable: /[uo]l/i.test(el.nodeName) ? 'li' : '>*',
 
 			swapThreshold: 1, // percentage; 0 <= x <= 1
-			direction: _detectDirection(el),
 			invertSwap: false, // invert always
 			invertedSwapThreshold: null, // will be set to same as swapThreshold if default
 
@@ -389,6 +381,12 @@
 			!(name in options) && (options[name] = defaults[name]);
 		}
 
+		if (!('direction' in options)) {
+			options.direction = function() {
+				return _detectDirection(el, options);
+			};
+		}
+
 		_prepareGroup(options);
 
 		options.invertedSwapThreshold == null && (options.invertedSwapThreshold = options.swapThreshold);
@@ -408,20 +406,32 @@
 		options.supportPointer && _on(el, 'pointerdown', this._onTapStart);
 
 		if (this.nativeDraggable) {
+			_on(document, 'dragover', this._computeIsInRowColData);
 			_on(el, 'dragover', this);
+			_on(el, 'dragover', this._computeIsInRowColData);
 			_on(el, 'dragenter', this);
 		}
-		_on(el, 'mouseenter', this);
 
 		touchDragOverListeners.push(this._onDragOver);
+		sortables.push(this.el);
 
 		// Restore sorting
-		options.store && this.sort(options.store.get(this));
+		options.store && options.store.get && this.sort(options.store.get(this));
 	}
-
 
 	Sortable.prototype = /** @lends Sortable.prototype */ {
 		constructor: Sortable,
+
+		_computeIsInRowColData: function(evt) {
+			if (!dragEl || _silent) return;
+			if (evt.currentTarget !== this.el) {
+				_silent = true;
+				setTimeout(_unsilent, 30);
+			}
+			for (var i in sortables) {
+				outsideRowColData[i] = _isInRowColumn(evt.clientX, evt.clientY, sortables[i], sortables[i][expando].options.direction(), sortables[i][expando].options);
+			}
+		},
 
 		_onTapStart: function (/** Event|TouchEvent */evt) {
 			var _this = this,
@@ -452,9 +462,9 @@
 				return;
 			}
 
-			target = _closest(target, options.draggable, el);
+			target = _closest(target, options.draggable, el, true);
 
-			if (!target || target === el) {
+			if (!target) {
 				return;
 			}
 
@@ -476,7 +486,7 @@
 			}
 			else if (filter) {
 				filter = filter.split(',').some(function (criteria) {
-					criteria = _closest(originalTarget, criteria.trim(), el);
+					criteria = _closest(originalTarget, criteria.trim(), el, false);
 
 					if (criteria) {
 						_dispatchEvent(_this, criteria, 'filter', target, el, el, startIndex);
@@ -490,7 +500,7 @@
 				}
 			}
 
-			if (options.handle && !_closest(originalTarget, options.handle, el)) {
+			if (options.handle && !_closest(originalTarget, options.handle, el, false)) {
 				return;
 			}
 
@@ -672,12 +682,14 @@
 
 		_dragStarted: function () {
 			if (rootEl && dragEl) {
-				_on(document, 'drag', this._handleAutoScroll);
+				if (this.nativeDraggable) {
+					_on(document, 'drag', this._handleAutoScroll);
+				}
 				var options = this.options;
 
 				// Apply effect
-				_toggleClass(dragEl, options.ghostClass, true);
 				_toggleClass(dragEl, options.dragClass, false);
+				_toggleClass(dragEl, options.ghostClass, true);
 
 				Sortable.active = this;
 
@@ -732,6 +744,7 @@
 					/* jshint boss:true */
 					while (parent = parent.parentNode);
 				}
+				this._computeIsInRowColData(touchEvt);
 
 				if (!supportCssPointerEvents) {
 					_css(ghostEl, 'display', '');
@@ -763,6 +776,7 @@
 
 				// as well as creating the ghost element on the document body
 				this._appendGhost();
+
 
 				moved = true;
 				touchEvt = touch;
@@ -854,6 +868,7 @@
 				}
 
 				_this._loopId = setInterval(_this._emulateDragOver, 50);
+				_toggleClass(dragEl, options.dragClass, false);
 			}
 			else {
 				if (dataTransfer) {
@@ -881,24 +896,31 @@
 				canSort = options.sort
 			;
 
+			if (evt.rootEl !== void 0 && evt.rootEl !== this.el) return; // touch fallback
+
 			if (evt.preventDefault !== void 0) {
 				evt.preventDefault();
 				!options.dragoverBubble && evt.stopPropagation();
 			}
 
-			if (dragEl.animated) {
-				return;
-			}
 
 			moved = true;
 
-			target = _closest(evt.target, options.draggable, el);
-
-			if (target === dragEl) {
-				pastFirstInvertThresh = false;
-				lastTarget = target;
+			target = _closest(evt.target, options.draggable, el, true);
+			
+			if (dragEl.animated && target === dragEl) {
 				return;
 			}
+
+			if (target !== lastTarget) {
+				isCircumstantialInvert = false;
+				pastFirstInvertThresh = false;
+				lastTarget = null;
+			}
+
+				
+			if (target === dragEl) return;
+
 
 			if (activeSortable && !options.disabled &&
 				(isOwner
@@ -910,20 +932,26 @@
 							group.checkPut(this, activeSortable, dragEl, evt)
 						)
 					)
-				) &&
-				(evt.rootEl === void 0 || evt.rootEl === this.el) // touch fallback
+				)
 			) {
 				if (_silent) {
 					return;
 				}
 
 
+				var isOutside = false;
+				if (target !== el) {
+					isOutside = !outsideRowColData[sortables.indexOf(el)];
+				}
+
 				var direction;
 				var axis = (typeof options.direction === 'function') ? options.direction.call(this, evt, target, dragEl) : options.direction;
 				if (target !== el) {
+					isCircumstantialInvert = isCircumstantialInvert || options.invertSwap || dragEl.parentNode !== el || isOutside;
+					
 					direction = _getSwapDirection(evt, target, axis,
 						options.swapThreshold, options.invertedSwapThreshold,
-						options.invertSwap || !_isOnRowColumn(dragEl, target, axis) || lastTarget === document,
+						isCircumstantialInvert,
 						lastTarget === target);
 					if (direction === 0) return;
 
@@ -1175,7 +1203,7 @@
 				}
 
 			}
-
+			Sortable.active = null;
 			this._nulling();
 		},
 
@@ -1217,20 +1245,11 @@
 					this._onDrop(evt);
 					break;
 
-				case 'dragover':
 				case 'dragenter':
+				case 'dragover':
 					if (dragEl) {
 						this._onDragOver(evt);
 						_globalDragOver(evt);
-					}
-					break;
-
-				case 'mouseenter':
-					// Detection if dragged into el
-					if (dragEl) {
-						if (!_closest(evt.relatedTarget, '', this.el)) {
-							lastTarget = document;
-						}
 					}
 					break;
 
@@ -1255,7 +1274,7 @@
 
 			for (; i < n; i++) {
 				el = children[i];
-				if (_closest(el, options.draggable, this.el)) {
+				if (_closest(el, options.draggable, this.el, false)) {
 					order.push(el.getAttribute(options.dataIdAttr) || _generateId(el));
 				}
 			}
@@ -1274,7 +1293,7 @@
 			this.toArray().forEach(function (id, i) {
 				var el = rootEl.children[i];
 
-				if (_closest(el, this.options.draggable, rootEl)) {
+				if (_closest(el, this.options.draggable, rootEl, false)) {
 					items[id] = el;
 				}
 			}, this);
@@ -1304,7 +1323,7 @@
 		 * @returns {HTMLElement|null}
 		 */
 		closest: function (el, selector) {
-			return _closest(el, selector || this.options.draggable, this.el, true);
+			return _closest(el, selector || this.options.draggable, this.el, false);
 		},
 
 
@@ -1340,11 +1359,12 @@
 			_off(el, 'mousedown', this._onTapStart);
 			_off(el, 'touchstart', this._onTapStart);
 			_off(el, 'pointerdown', this._onTapStart);
-			_off(el, 'mouseenter', this);
+			_off(el, 'dragover', this._computeIsInRowColData);
 
 			if (this.nativeDraggable) {
 				_off(el, 'dragover', this);
 				_off(el, 'dragenter', this);
+				_off(document, 'dragover', this._computeIsInRowColData);
 			}
 			// Remove draggable attributes
 			Array.prototype.forEach.call(el.querySelectorAll('[draggable]'), function (el) {
@@ -1384,14 +1404,16 @@
 	}
 
 
-	function _closest(/**HTMLElement*/el, /**String*/selector, /**HTMLElement*/ctx, excludeCTX) {
+	function _closest(/**HTMLElement*/el, /**String*/selector, /**HTMLElement*/ctx, includeCTX) {
 		if (el) {
 			ctx = ctx || document;
 
 			do {
-				if ((selector === '>*' && el.parentNode === ctx) || _matches(el, selector) || (!excludeCTX && el === ctx)) {
+				if ((selector === '>*' && el.parentNode === ctx) || _matches(el, selector) || (includeCTX && el === ctx)) {
 					return el;
 				}
+
+				if (el === ctx) break;
 				/* jshint boss:true */
 			} while (el = _getParentOrHost(el));
 		}
@@ -1549,6 +1571,29 @@
 
 	function _unsilent() {
 		_silent = false;
+	}
+
+	function _getChild(el, childNum, options) {
+		var currentChild = 0,
+			i = 0,
+			children = el.children
+		;
+		while (i < children.length) {
+			if (
+				children[i].style.display !== 'none' &&
+				children[i] !== ghostEl &&
+				children[i] !== dragEl &&
+				_closest(children[i], options.draggable, el, false)
+			) {
+				if (currentChild === childNum) {
+					return children[i];
+				}
+				currentChild++;
+			}
+
+			i++;
+		}
+		return null;
 	}
 
 	function _lastChild(el) {
@@ -1796,7 +1841,7 @@
 		css: _css,
 		find: _find,
 		is: function (el, selector) {
-			return !!_closest(el, selector, el);
+			return !!_closest(el, selector, el, false);
 		},
 		extend: _extend,
 		throttle: _throttle,
@@ -1806,7 +1851,8 @@
 		index: _index,
 		nextTick: _nextTick,
 		cancelNextTick: _cancelNextTick,
-		detectDirection: _detectDirection
+		detectDirection: _detectDirection,
+		getChild: _getChild
 	};
 
 
