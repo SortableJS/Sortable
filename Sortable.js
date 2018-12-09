@@ -1,6 +1,7 @@
 /**!
  * Sortable
  * @author	RubaXa   <trash@rubaxa.org>
+ * @author	owenm    <owen23355@gmail.com>
  * @license MIT
  */
 
@@ -38,10 +39,6 @@
 		scrollParentEl,
 		scrollCustomFn,
 
-		lastEl,
-		lastCSS,
-		lastParentCSS,
-
 		oldIndex,
 		newIndex,
 
@@ -65,6 +62,7 @@
 		isCircumstantialInvert = false,
 
 		forRepaintDummy,
+		realDragElRect, // dragEl rect after current animation
 
 		/** @const */
 		R_SPACE = /\s+/g,
@@ -100,8 +98,6 @@
 
 		savedInputChecked = [],
 		touchDragOverListeners = [],
-		sortables = [],
-		outsideRowColData = [],
 
 		alwaysFalse = function () { return false; },
 
@@ -134,7 +130,7 @@
 		},
 
 		_isInRowColumn = function(x, y, el, axis, options) {
-			var targetRect = dragEl.getBoundingClientRect(),//_getChild(el, 0, options).getBoundingClientRect(),
+			var targetRect = realDragElRect || dragEl.getBoundingClientRect(),
 				targetS1Opp = axis === 'vertical' ? targetRect.left : targetRect.top,
 				targetS2Opp = axis === 'vertical' ? targetRect.right : targetRect.bottom,
 				mouseOnOppAxis = axis === 'vertical' ? x : y
@@ -300,6 +296,11 @@
 			group.revertClone = originalGroup.revertClone;
 
 			options.group = group;
+		},
+
+		_checkAlignment = function(evt) {
+			if (!dragEl) return;
+			dragEl.parentNode[expando] && dragEl.parentNode[expando]._computeIsAligned(evt);
 		}
 	;
 
@@ -317,6 +318,9 @@
 			}
 		}));
 	} catch (err) {}
+
+	// Create global dragover for check if aligned
+	_on(document, 'dragover', _checkAlignment);
 
 	/**
 	 * @class  Sortable
@@ -406,14 +410,12 @@
 		options.supportPointer && _on(el, 'pointerdown', this._onTapStart);
 
 		if (this.nativeDraggable) {
-			_on(document, 'dragover', this._computeIsInRowColData);
 			_on(el, 'dragover', this);
-			_on(el, 'dragover', this._computeIsInRowColData);
+			_on(el, 'dragover', _checkAlignment);
 			_on(el, 'dragenter', this);
 		}
 
 		touchDragOverListeners.push(this._onDragOver);
-		sortables.push(this.el);
 
 		// Restore sorting
 		options.store && options.store.get && this.sort(options.store.get(this));
@@ -422,15 +424,16 @@
 	Sortable.prototype = /** @lends Sortable.prototype */ {
 		constructor: Sortable,
 
-		_computeIsInRowColData: function(evt) {
-			if (!dragEl || _silent) return;
-			if (evt.currentTarget !== this.el) {
-				_silent = true;
-				setTimeout(_unsilent, 30);
-			}
-			for (var i in sortables) {
-				outsideRowColData[i] = _isInRowColumn(evt.clientX, evt.clientY, sortables[i], sortables[i][expando].options.direction(), sortables[i][expando].options);
-			}
+		// is mouse aligned with dragEl?
+		_isAligned: true,
+
+		_computeIsAligned: function(evt) {
+			if (!dragEl || dragEl.parentNode !== this.el || evt.currentTarget === this.el && this.options.dragoverBubble) return;
+			this._isAligned = evt.target === dragEl || this._isAligned && _isInRowColumn(evt.clientX, evt.clientY, this.el, this._getDirection(evt, null), this.options);
+		},
+
+		_getDirection: function(evt, target) {
+			return (typeof this.options.direction === 'function') ? this.options.direction.call(this, evt, target, dragEl) : this.options.direction;
 		},
 
 		_onTapStart: function (/** Event|TouchEvent */evt) {
@@ -693,6 +696,8 @@
 
 				Sortable.active = this;
 
+				this._isAligned = true;
+
 				// Drag start event
 				_dispatchEvent(this, rootEl, 'start', dragEl, rootEl, rootEl, oldIndex);
 			} else {
@@ -744,7 +749,8 @@
 					/* jshint boss:true */
 					while (parent = parent.parentNode);
 				}
-				this._computeIsInRowColData(touchEvt);
+
+				dragEl.parentNode[expando]._computeIsAligned(touchEvt);
 
 				if (!supportCssPointerEvents) {
 					_css(ghostEl, 'display', '');
@@ -907,19 +913,18 @@
 			moved = true;
 
 			target = _closest(evt.target, options.draggable, el, true);
-			
-			if (dragEl.animated && target === dragEl) {
+
+
+			if (dragEl.animated && target === dragEl || target.animated || _silent) {
 				return;
 			}
+
 
 			if (target !== lastTarget) {
 				isCircumstantialInvert = false;
 				pastFirstInvertThresh = false;
 				lastTarget = null;
 			}
-
-				
-			if (target === dragEl) return;
 
 
 			if (activeSortable && !options.disabled &&
@@ -934,35 +939,9 @@
 					)
 				)
 			) {
-				if (_silent) {
-					return;
-				}
-
-
-				var isOutside = false;
-				if (target !== el) {
-					isOutside = !outsideRowColData[sortables.indexOf(el)];
-				}
-
 				var direction;
-				var axis = (typeof options.direction === 'function') ? options.direction.call(this, evt, target, dragEl) : options.direction;
-				if (target !== el) {
-					isCircumstantialInvert = isCircumstantialInvert || options.invertSwap || dragEl.parentNode !== el || isOutside;
-					
-					direction = _getSwapDirection(evt, target, axis,
-						options.swapThreshold, options.invertedSwapThreshold,
-						isCircumstantialInvert,
-						lastTarget === target);
-					if (direction === 0) return;
-
-					if (lastTarget != target && (!target || !target.animated)) {
-						pastFirstInvertThresh = false;
-						lastTarget = target;
-					}
-
-
-					lastDirection = direction;
-				}
+				var axis = this._getDirection(evt, target);
+				
 
 				dragRect = dragEl.getBoundingClientRect();
 
@@ -1007,6 +986,8 @@
 						if (!dragEl.contains(el)) {
 							el.appendChild(dragEl);
 							parentEl = el; // actualization
+							this._isAligned = true; // must be for _ghostIsLast to pass
+							realDragElRect = null;
 						}
 
 						this._animate(dragRect, dragEl);
@@ -1014,11 +995,25 @@
 					}
 				}
 				else if (target && !target.animated && target !== dragEl && (target.parentNode[expando] !== void 0) && target !== el) {
-					if (lastEl !== target) {
-						lastEl = target;
-						lastCSS = _css(target);
-						lastParentCSS = _css(target.parentNode);
+					
+					isCircumstantialInvert = isCircumstantialInvert || options.invertSwap || dragEl.parentNode !== el || !this._isAligned;
+					direction = _getSwapDirection(evt, target, axis,
+						options.swapThreshold, options.invertedSwapThreshold,
+						isCircumstantialInvert,
+						lastTarget === target);
+					if (direction === 0) return;
+					realDragElRect = null;
+
+
+					this._isAligned = true;
+
+					if (!lastTarget || lastTarget !== target && (!target || !target.animated)) {
+						pastFirstInvertThresh = false;
+						lastTarget = target;
 					}
+
+
+					lastDirection = direction;
 
 					targetRect = target.getBoundingClientRect();
 
@@ -1063,9 +1058,18 @@
 			if (ms) {
 				var currentRect = target.getBoundingClientRect();
 
+				if (target === dragEl) {
+					realDragElRect = currentRect;
+				}
+
 				if (prevRect.nodeType === 1) {
 					prevRect = prevRect.getBoundingClientRect();
 				}
+
+				// Check if actually moving position
+				if ((prevRect.left + prevRect.width / 2) === (currentRect.left + currentRect.width / 2)
+					&& (prevRect.top + prevRect.height / 2) === (currentRect.top + currentRect.height / 2)
+				) return;
 
 				_css(target, 'transition', 'none');
 				_css(target, 'transform', 'translate3d('
@@ -1107,7 +1111,7 @@
 			var el = this.el,
 				options = this.options;
 
-			lastTarget = null;
+			isCircumstantialInvert = false;
 			pastFirstInvertThresh = false;
 
 			clearInterval(this._loopId);
@@ -1203,7 +1207,6 @@
 				}
 
 			}
-			Sortable.active = null;
 			this._nulling();
 		},
 
@@ -1218,15 +1221,24 @@
 
 			scrollEl =
 			scrollParentEl =
+			autoScrolls.length =
+
+			pointerElemChangedInterval =
+			lastPointerElemX =
+			lastPointerElemY =
 
 			tapEvt =
 			touchEvt =
 
 			moved =
 			newIndex =
+			oldIndex =
 
-			lastEl =
-			lastCSS =
+			lastTarget =
+			lastDirection =
+
+			forRepaintDummy =
+			realDragElRect =
 
 			putSortable =
 			activeGroup =
@@ -1359,12 +1371,11 @@
 			_off(el, 'mousedown', this._onTapStart);
 			_off(el, 'touchstart', this._onTapStart);
 			_off(el, 'pointerdown', this._onTapStart);
-			_off(el, 'dragover', this._computeIsInRowColData);
 
 			if (this.nativeDraggable) {
 				_off(el, 'dragover', this);
 				_off(el, 'dragenter', this);
-				_off(document, 'dragover', this._computeIsInRowColData);
+				_off(el, 'dragover', _checkAlignment);
 			}
 			// Remove draggable attributes
 			Array.prototype.forEach.call(el.querySelectorAll('[draggable]'), function (el) {
@@ -1631,11 +1642,12 @@
 			dragLength = axis === 'vertical' ? dragRect.height : dragRect.width,
 			invert = false
 		;
-
+		var dragStyle = _css(dragEl);
+		dragLength += parseInt(dragStyle.marginLeft) + parseInt(dragStyle.marginRight);
 
 		if (!invertSwap) {
-			// Never invert or create dragEl shadow when width causes mouse to move past the end of regualr swapThreshold
-			if (inside && dragLength < swapThreshold * targetLength) {
+			// Never invert or create dragEl shadow when width causes mouse to move past the end of regular swapThreshold
+			if (inside && dragLength < targetLength * swapThreshold) { // multiplied only by swapThreshold because mouse will already be inside target by (1 - threshold) * targetLength / 2
 				// check if past first invert threshold on side opposite of lastDirection
 				if (!pastFirstInvertThresh &&
 					(lastDirection === 1 ?
