@@ -107,8 +107,8 @@
 			var gotSelf = false;
 			do {
 				if (
-					(elem.clientWidth < elem.scrollWidth && ['auto', 'scroll'].includes(elem.style.overflowX)) ||
-          (elem.clientHeight < elem.scrollHeight && ['auto', 'scroll'].includes(elem.style.overflowY))
+					(elem.clientWidth < elem.scrollWidth && (elem.style.overflowX == 'auto' || elem.style.overflowX == 'scroll')) ||
+          (elem.clientHeight < elem.scrollHeight && (elem.style.overflowY == 'auto' || elem.style.overflowY == 'scroll'))
 				) {
 					if (!elem || !elem.getBoundingClientRect || elem === document.body) return;
 
