@@ -864,9 +864,12 @@
 
 				dragRect = dragEl.getBoundingClientRect();
 
-				if (putSortable !== this) {
+				if (putSortable !== this && this !== Sortable.active) {
 					putSortable = this;
 					isMovingBetweenSortable = true;
+				} else if (this === Sortable.active) {
+					isMovingBetweenSortable = false;
+					putSortable = null;
 				}
 
 				if (revert) {
@@ -1067,7 +1070,7 @@
 
 				ghostEl && ghostEl.parentNode && ghostEl.parentNode.removeChild(ghostEl);
 
-				if (rootEl === parentEl || this.lastPutMode !== 'clone') {
+				if (rootEl === parentEl || (putSortable && putSortable.lastPutMode !== 'clone')) {
 					// Remove clone
 					cloneEl && cloneEl.parentNode && cloneEl.parentNode.removeChild(cloneEl);
 				}
