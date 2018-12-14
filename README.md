@@ -70,7 +70,7 @@ var el = document.getElementById('items');
 var sortable = Sortable.create(el);
 ```
 
-You can use any element for the list and its elements, not just `ul`/`li`. Here is an [example with `div`s](http://jsbin.com/qumuwe/edit?html,js,output).
+You can use any element for the list and its elements, not just `ul`/`li`. Here is an [example with `div`s](https://jsbin.com/visimub/edit?html,js,output).
 
 
 ---
@@ -164,7 +164,7 @@ var sortable = new Sortable(el, {
 
 	// Event when you move an item in the list or between lists
 	onMove: function (/**Event*/evt, /**Event*/originalEvent) {
-		// Example: http://jsbin.com/tuyafe/1/edit?js,output
+		// Example: https://jsbin.com/nawahef/edit?js,output
 		evt.dragged; // dragged HTMLElement
 		evt.draggedRect; // TextRectangle {left, top, right и bottom}
 		evt.related; // HTMLElement on which have guided
@@ -196,9 +196,9 @@ You can also define whether lists can give away, give and keep a copy (`clone`),
 
 
 Demo:
- - http://jsbin.com/naduvo/edit?js,output
- - http://jsbin.com/rusuvot/edit?js,output — use of complex logic in the `pull` and` put`
- - http://jsbin.com/magogub/edit?js,output — use `revertClone: true`
+ - https://jsbin.com/hijetos/edit?js,output
+ - https://jsbin.com/nacoyah/edit?js,output — use of complex logic in the `pull` and` put`
+ - https://jsbin.com/bifuyab/edit?js,output — use `revertClone: true`
 
 
 ---
@@ -207,7 +207,7 @@ Demo:
 #### `sort` option
 Sorting inside list.
 
-Demo: http://jsbin.com/videzob/edit?html,js,output
+Demo: https://jsbin.com/jayedig/edit?js,output
 
 
 ---
@@ -216,7 +216,7 @@ Demo: http://jsbin.com/videzob/edit?html,js,output
 #### `delay` option
 Time in milliseconds to define when the sorting should start.
 
-Demo: http://jsbin.com/xizeh/edit?html,js,output
+Demo: https://jsbin.com/zosiwah/edit?js,output
 
 
 ---
@@ -286,7 +286,7 @@ Values between 3 to 5 are good.
 #### `disabled` options
 Disables the sortable if set to `true`.
 
-Demo: http://jsbin.com/xiloqu/edit?html,js,output
+Demo: https://jsbin.com/sewokud/edit?js,output
 
 ```js
 var sortable = Sortable.create(list);
@@ -307,7 +307,7 @@ To make list items draggable, Sortable disables text selection by the user.
 That's not always desirable. To allow text selection, define a drag handler,
 which is an area of every list element that allows it to be dragged around.
 
-Demo: http://jsbin.com/newize/edit?html,js,output
+Demo: https://jsbin.com/numakuh/edit?html,js,output
 
 ```js
 Sortable.create(el, {
@@ -360,7 +360,7 @@ Sortable.create(list, {
 #### `ghostClass` option
 Class name for the drop placeholder (default `sortable-ghost`).
 
-Demo: http://jsbin.com/hunifu/4/edit?css,js,output
+Demo: https://jsbin.com/henuyiw/edit?css,js,output
 
 ```css
 .ghost {
@@ -381,7 +381,7 @@ Sortable.create(list, {
 #### `chosenClass` option
 Class name for the chosen item  (default `sortable-chosen`).
 
-Demo: http://jsbin.com/hunifu/3/edit?html,css,js,output
+Demo: https://jsbin.com/hoqufox/edit?css,js,output
 
 ```css
 .chosen {
@@ -407,7 +407,7 @@ This gives us the possibility to test the behaviour for older Browsers even in n
 
 On top of that, the Fallback always generates a copy of that DOM Element and appends the class `fallbackClass` defined in the options. This behaviour controls the look of this 'dragged' Element.
 
-Demo: http://jsbin.com/yacuqib/edit?html,css,js,output
+Demo: https://jsbin.com/sibiput/edit?html,css,js,output
 
 
 ---
@@ -430,8 +430,8 @@ Dragging only starts if you move the pointer past a certain tolerance, so that y
 If set to `true`, the page (or sortable-area) scrolls when coming to an edge.
 
 Demo:
- - `window`: http://jsbin.com/tutuzeh/edit?html,js,output
- - `overflow: hidden`: http://jsbin.com/kolisu/edit?html,js,output
+ - `window`: https://jsbin.com/dosilir/edit?js,output
+ - `overflow: hidden`: https://jsbin.com/xecihez/edit?html,js,output
 
 
 ---
@@ -471,13 +471,11 @@ Demo: https://jsbin.com/kesewor/edit?html,js,output
 #### `dragoverBubble` option
 If set to `true`, the dragover event will bubble to parent Sortables. Useful for nested Sortables. Works on both fallback and native dragover event.
 
-Demo: https://jsbin.com/kesewor/edit?html,js,output
-
 
 ---
 
 
-### Event object ([demo](http://jsbin.com/xedusu/edit?js,output))
+### Event object ([demo](https://jsbin.com/fogujiv/edit?js,output))
 
  - to:`HTMLElement` — list, in which moved element.
  - from:`HTMLElement` — previous list
@@ -579,7 +577,7 @@ Sortable.create(el, {
 
 <a name="bs"></a>
 ### Bootstrap
-Demo: http://jsbin.com/qumuwe/edit?html,js,output
+Demo: https://jsbin.com/visimub/edit?html,js,output
 
 ```html
 <!-- Latest compiled and minified CSS -->
