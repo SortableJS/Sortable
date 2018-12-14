@@ -20,7 +20,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/rubaxa/Sortable.git"
+    "url": "git://github.com/SortableJS/Sortable.git"
   },
   "files": [
     "Sortable.js",
