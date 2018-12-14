@@ -225,7 +225,7 @@ Demo: https://jsbin.com/zosiwah/edit?js,output
 #### `swapThreshold` option
 Percentage of the target that the swap zone will take up, as a float between `0` and `1`.
 
-Read more: https://github.com/RubaXa/Sortable/wiki/Swap-Thresholds-and-Direction#swap-threshold
+Read more: https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction#swap-threshold
 
 
 ---
@@ -234,7 +234,7 @@ Read more: https://github.com/RubaXa/Sortable/wiki/Swap-Thresholds-and-Direction
 #### `invertSwap` option
 Set to `true` to set the swap zone to the sides of the target, for the effect of sorting "in between" items.
 
-Read more: https://github.com/RubaXa/Sortable/wiki/Swap-Thresholds-and-Direction#forcing-inverted-swap-zone
+Read more: https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction#forcing-inverted-swap-zone
 
 
 ---
@@ -243,7 +243,7 @@ Read more: https://github.com/RubaXa/Sortable/wiki/Swap-Thresholds-and-Direction
 #### `invertedSwapThreshold` option
 Percentage of the target that the inverted swap zone will take up, as a float between `0` and `1`. If not given, will default to `swapThreshold`.
 
-Read more: https://github.com/RubaXa/Sortable/wiki/Swap-Thresholds-and-Direction#dealing-with-swap-glitching
+Read more: https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction#dealing-with-swap-glitching
 
 
 ---
@@ -252,7 +252,7 @@ Read more: https://github.com/RubaXa/Sortable/wiki/Swap-Thresholds-and-Direction
 #### `direction` option
 Direction that the Sortable should sort in. Can be set to `'vertical'`, `'horizontal'`, or a function, which will be called whenever a target is dragged over.
 
-Read more: https://github.com/RubaXa/Sortable/wiki/Swap-Thresholds-and-Direction#direction
+Read more: https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction#direction
 
 
 Example of dynamic direction detection:
