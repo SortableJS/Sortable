@@ -143,31 +143,38 @@
 			return targetS1Opp < mouseOnOppAxis && mouseOnOppAxis < targetS2Opp;
 		},
 
-		_getParentAutoScrollElement = function(rootEl, includeSelf) {
-			// will skip to window in _autoScroll
-			if (!rootEl || !rootEl.getBoundingClientRect) return;
+		_getParentAutoScrollElement = function(el, includeSelf) {
+			// skip to window
+			if (!el || !el.getBoundingClientRect) return win;
 
-			var elem = rootEl;
+			var elem = el;
 			var gotSelf = false;
 			do {
-				if (
-					(elem.clientWidth < elem.scrollWidth && (elem.style.overflowX == 'auto' || elem.style.overflowX == 'scroll')) ||
-          (elem.clientHeight < elem.scrollHeight && (elem.style.overflowY == 'auto' || elem.style.overflowY == 'scroll'))
-				) {
-					if (!elem || !elem.getBoundingClientRect || elem === document.body) return;
+				// we don't need to get elem css if it isn't even overflowing in the first place (performance)
+				if (elem.clientWidth < elem.scrollWidth || elem.clientHeight < elem.scrollHeight) {
+					var elemCSS = _css(elem);
+					if (
+						elem.clientWidth < elem.scrollWidth && (elemCSS.overflowX == 'auto' || elemCSS.overflowX == 'scroll') ||
+						elem.clientHeight < elem.scrollHeight && (elemCSS.overflowY == 'auto' || elemCSS.overflowY == 'scroll')
+					) {
+						if (!elem || !elem.getBoundingClientRect || elem === document.body) return win;
 
-					if (gotSelf || includeSelf) return elem;
-					gotSelf = true;
+						if (gotSelf || includeSelf) return elem;
+						gotSelf = true;
+					}
 				}
 			/* jshint boss:true */
 			} while (elem = elem.parentNode);
+
+			return win;
 		},
 
-		_autoScroll = _throttle(function (/**Event*/evt, /**Object*/options, /**HTMLElement*/rootEl, isFallback) {
+		_autoScroll = _throttle(function (/**Event*/evt, /**Object*/options, /**HTMLElement*/rootEl, /**Boolean*/isFallback) {
 			// Bug: https://bugzilla.mozilla.org/show_bug.cgi?id=505521
 			if (options.scroll) {
 				var _this = rootEl ? rootEl[expando] : window,
 					rect,
+					css,
 					sens = options.scrollSensitivity,
 					speed = options.scrollSpeed,
 
@@ -202,20 +209,19 @@
 				do {
 					var el;
 
-					if (currentParent) {
+					if (currentParent && currentParent !== win) {
 						el = currentParent;
+						css = _css(el);
 						rect = currentParent.getBoundingClientRect();
-						vx = (abs(rect.right - x) <= sens) - (abs(rect.left - x) <= sens);
-						vy = (abs(rect.bottom - y) <= sens) - (abs(rect.top - y) <= sens);
-					}
+						vx = el.clientWidth < el.scrollWidth && (css.overflowX == 'auto' || css.overflowX == 'scroll') &&
+							 ((abs(rect.right - x) <= sens) - (abs(rect.left - x) <= sens));
 
-
-					if (!(vx || vy)) {
+						vy = el.clientHeight < el.scrollHeight && (css.overflowY == 'auto' || css.overflowY == 'scroll') &&
+							 ((abs(rect.bottom - y) <= sens) - (abs(rect.top - y) <= sens));
+					} else if (currentParent === win) {
+						el = win;
 						vx = (winWidth - x <= sens) - (x <= sens);
 						vy = (winHeight - y <= sens) - (y <= sens);
-
-						/* jshint expr:true */
-						(vx || vy) && (el = win);
 					}
 
 					if (!autoScrolls[layersOut]) {
@@ -226,14 +232,14 @@
 						}
 					}
 
-					if (autoScrolls[layersOut].vx !== vx || autoScrolls[layersOut].vy !== vy || autoScrolls[layersOut].el !== el) {
+					if (autoScrolls[layersOut].vx != vx || autoScrolls[layersOut].vy != vy || autoScrolls[layersOut].el !== el) {
 						autoScrolls[layersOut].el = el;
 						autoScrolls[layersOut].vx = vx;
 						autoScrolls[layersOut].vy = vy;
 
 						clearInterval(autoScrolls[layersOut].pid);
 
-						if (el && (vx !== 0 || vy !== 0)) {
+						if (el && (vx != 0 || vy != 0)) {
 							scrollThisInstance = true;
 							/* jshint loopfunc:true */
 							autoScrolls[layersOut].pid = setInterval((function () {
@@ -249,7 +255,6 @@
 										return;
 									}
 								}
-
 								if (autoScrolls[this.layer].el === win) {
 									win.scrollTo(win.pageXOffset + scrollOffsetX, win.pageYOffset + scrollOffsetY);
 								} else {
@@ -260,8 +265,8 @@
 						}
 					}
 					layersOut++;
-				} while (options.bubbleScroll && (currentParent = _getParentAutoScrollElement(currentParent, false)));
-				scrolling = scrollThisInstance;
+				} while (options.bubbleScroll && currentParent !== win && (currentParent = _getParentAutoScrollElement(currentParent, false)));
+				scrolling = scrollThisInstance; // in case another function catches scrolling as false in between when it is not
 			}
 		}, 30),
 
@@ -432,9 +437,7 @@
 			if (isDragEl !== true && isDragEl !== false) {
 				isDragEl = !!_closest(evt.target, null, dragEl, true);
 			}
-			console.log('scrolling?', scrolling)
 			this._isAligned = !scrolling && (isDragEl || this._isAligned && _isInRowColumn(evt.clientX, evt.clientY, this.el, this._getDirection(evt, null), this.options));
-
 			_alignedSilent = true;
 			setTimeout(function() {
 				_alignedSilent = false;
@@ -536,14 +539,20 @@
 
 				// Listener for pointer element change
 				var ogElemScroller = _getParentAutoScrollElement(elem, true);
-				if (!pointerElemChangedInterval ||
-					x !== lastPointerElemX ||
-					y !== lastPointerElemY) {
+				if (
+					scrolling &&
+					(
+						!pointerElemChangedInterval ||
+						x !== lastPointerElemX ||
+						y !== lastPointerElemY
+					)
+				) {
 
 					pointerElemChangedInterval && clearInterval(pointerElemChangedInterval);
 					// Detect for pointer elem change, emulating native DnD behaviour
 					pointerElemChangedInterval = setInterval(function() {
 						if (!dragEl) return;
+						// could also check if scroll direction on newElem changes due to parent autoscrolling
 						var newElem = _getParentAutoScrollElement(document.elementFromPoint(x, y), true);
 						if (newElem !== ogElemScroller) {
 							ogElemScroller = newElem;
@@ -557,7 +566,10 @@
 
 			} else {
 				// if DnD is enabled (not on firefox), first autoscroll will already scroll, so get parent autoscroll of first autoscroll
-				if (!_this.options.bubbleScroll) return;
+				if (!_this.options.bubbleScroll || _getParentAutoScrollElement(elem, true) === window) {
+					_clearAutoScrolls();
+					return;
+				}
 				_autoScroll(evt, _this.options, _getParentAutoScrollElement(elem, false));
 			}
 		},
