@@ -150,8 +150,8 @@
 			var gotSelf = false;
 			do {
 				if (
-					(elem.clientWidth < elem.scrollWidth) ||
-					(elem.clientHeight < elem.scrollHeight)
+					(elem.clientWidth < elem.scrollWidth && (elem.style.overflowX == 'auto' || elem.style.overflowX == 'scroll')) ||
+          (elem.clientHeight < elem.scrollHeight && (elem.style.overflowY == 'auto' || elem.style.overflowY == 'scroll'))
 				) {
 					if (!elem || !elem.getBoundingClientRect || elem === document.body) return;
 
