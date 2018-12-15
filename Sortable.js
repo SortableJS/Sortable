@@ -46,6 +46,7 @@
 		putSortable,
 
 		autoScrolls = [],
+		scrolling = false,
 
 		pointerElemChangedInterval,
 		lastPointerElemX,
@@ -162,7 +163,7 @@
 			} while (elem = elem.parentNode);
 		},
 
-		_autoScroll = _throttle(function (/**Event*/evt, /**Object*/options, /**HTMLElement*/rootEl) {
+		_autoScroll = _throttle(function (/**Event*/evt, /**Object*/options, /**HTMLElement*/rootEl, isFallback) {
 			// Bug: https://bugzilla.mozilla.org/show_bug.cgi?id=505521
 			if (options.scroll) {
 				var _this = rootEl ? rootEl[expando] : window,
@@ -177,7 +178,9 @@
 					winHeight = window.innerHeight,
 
 					vx,
-					vy
+					vy,
+
+					scrollThisInstance = false
 				;
 
 				// Detect scrollEl
@@ -230,9 +233,14 @@
 
 						clearInterval(autoScrolls[layersOut].pid);
 
-						if (el) {
+						if (el && (vx !== 0 || vy !== 0)) {
+							scrollThisInstance = true;
 							/* jshint loopfunc:true */
 							autoScrolls[layersOut].pid = setInterval((function () {
+								// emulate drag over during autoscroll (fallback), emulating native DnD behaviour
+								if (isFallback && this.layer === 0) {
+									Sortable.active._emulateDragOver(true);
+								}
 								var scrollOffsetY = autoScrolls[this.layer].vy ? autoScrolls[this.layer].vy * speed : 0;
 								var scrollOffsetX = autoScrolls[this.layer].vx ? autoScrolls[this.layer].vx * speed : 0;
 
@@ -253,6 +261,7 @@
 					}
 					layersOut++;
 				} while (options.bubbleScroll && (currentParent = _getParentAutoScrollElement(currentParent, false)));
+				scrolling = scrollThisInstance;
 			}
 		}, 30),
 
@@ -309,9 +318,6 @@
 		}
 	;
 
-
-	// Create global dragover for check if aligned
-	_on(document, 'dragover', _checkAlignment);
 
 	/**
 	 * @class  Sortable
@@ -426,7 +432,8 @@
 			if (isDragEl !== true && isDragEl !== false) {
 				isDragEl = !!_closest(evt.target, null, dragEl, true);
 			}
-			this._isAligned = isDragEl || this._isAligned && _isInRowColumn(evt.clientX, evt.clientY, this.el, this._getDirection(evt, null), this.options);
+			console.log('scrolling?', scrolling)
+			this._isAligned = !scrolling && (isDragEl || this._isAligned && _isInRowColumn(evt.clientX, evt.clientY, this.el, this._getDirection(evt, null), this.options));
 
 			_alignedSilent = true;
 			setTimeout(function() {
@@ -525,7 +532,7 @@
 
 			// firefox does not have native autoscroll
 			if (fallback || (window.navigator && window.navigator.userAgent.toLowerCase().indexOf('firefox') > -1)) {
-				_autoScroll(evt, _this.options, elem);
+				_autoScroll(evt, _this.options, elem, true);
 
 				// Listener for pointer element change
 				var ogElemScroller = _getParentAutoScrollElement(elem, true);
@@ -541,7 +548,7 @@
 						if (newElem !== ogElemScroller) {
 							ogElemScroller = newElem;
 							_clearAutoScrolls();
-							_autoScroll(evt.touches ? evt.touches[0] : evt, _this.options, ogElemScroller);
+							_autoScroll(evt, _this.options, ogElemScroller, true);
 						}
 					}, 10);
 					lastPointerElemX = x;
@@ -687,6 +694,7 @@
 			if (rootEl && dragEl) {
 				if (this.nativeDraggable) {
 					_on(document, 'dragover', this._handleAutoScroll);
+					_on(document, 'dragover', _checkAlignment);
 				}
 				var options = this.options;
 
@@ -705,9 +713,9 @@
 			}
 		},
 
-		_emulateDragOver: function () {
+		_emulateDragOver: function (bypassLastTouchCheck) {
 			if (touchEvt) {
-				if (this._lastX === touchEvt.clientX && this._lastY === touchEvt.clientY) {
+				if (this._lastX === touchEvt.clientX && this._lastY === touchEvt.clientY && !bypassLastTouchCheck) {
 					return;
 				}
 
@@ -913,7 +921,7 @@
 			// no bubbling and not fallback
 			if (!options.dragoverBubble && !evt.rootEl) {
 				this._handleAutoScroll(evt);
-				this._computeIsAligned(evt);
+				dragEl.parentNode[expando]._computeIsAligned(evt);
 			}
 
 			if (evt.preventDefault !== void 0) {
@@ -1132,6 +1140,7 @@
 			var el = this.el,
 				options = this.options;
 
+			scrolling = false;
 			isCircumstantialInvert = false;
 			pastFirstInvertThresh = false;
 
@@ -1154,6 +1163,7 @@
 				_off(document, 'drop', this);
 				_off(el, 'dragstart', this._onDragStart);
 				_off(document, 'dragover', this._handleAutoScroll);
+				_off(document, 'dragover', _checkAlignment);
 			}
 
 			this._offUpEvents();
@@ -1419,11 +1429,20 @@
 		},
 
 		_showClone: function(putSortable) {
-			if (putSortable.lastPutMode !== 'clone') return;
+			if (putSortable.lastPutMode !== 'clone') {
+				this._hideClone();
+				return;
+			}
 
 			if (cloneEl.cloneHidden) {
 				// show clone at dragEl or original position
-				rootEl.insertBefore(cloneEl, rootEl.contains(dragEl) && !this.options.group.revertClone ? dragEl : nextEl);
+				if (rootEl.contains(dragEl) && !this.options.group.revertClone) {
+					rootEl.insertBefore(cloneEl, dragEl);
+				} else if (nextEl) {
+					rootEl.insertBefore(cloneEl, nextEl);
+				} else {
+					rootEl.appendChild(cloneEl);
+				}
 
 				if (this.options.group.revertClone) {
 					this._animate(dragEl, cloneEl);
