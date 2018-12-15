@@ -1,7 +1,7 @@
 {
   "name": "sortablejs",
   "exportName": "Sortable",
-  "version": "1.7.0",
+  "version": "1.8.0-rc1",
   "devDependencies": {
     "grunt": "*",
     "grunt-contrib-jshint": "*",
@@ -18,9 +18,13 @@
     "prepublish": "./node_modules/grunt/bin/grunt",
     "http-server": "http-server -s ./"
   },
+  "contributors" : [
+    "Konstantin Lebedev <ibnRubaXa@gmail.com>",
+    "Owen Mills <owen23355@gmail.com>"
+  ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/rubaxa/Sortable.git"
+    "url": "git://github.com/SortableJS/Sortable.git"
   },
   "files": [
     "Sortable.js",
@@ -34,9 +38,9 @@
     "angular",
     "ng-sortable",
     "react",
+    "vue",
     "mixin"
   ],
-  "author": "Konstantin Lebedev <ibnRubaXa@gmail.com>",
   "license": "MIT",
   "spm": {
     "main": "Sortable.js",

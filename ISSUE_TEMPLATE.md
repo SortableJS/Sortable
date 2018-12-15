@@ -1,12 +1,15 @@
-## Hi, this project very much requires the maintainer, if you have a chewing and appropriate skills, please [contact me](mailto:ibn@rubaxa.org?subject=Sortable%20vs.%20Maintainer)!
+#### Problem:
+
+
+
+#### JSBin/JSFiddle demonstrating the problem:
 
 
 ---
-
 Before you create an issue, check it:
 
- 1. Try [master](https://github.com/RubaXa/Sortable/tree/master/)-branch, perhaps the problem has been solved;
- 2. [Use the search](https://github.com/RubaXa/Sortable/search?q=problem), maybe already have an answer;
+ 1. Try [master](https://github.com/SortableJS/Sortable/tree/master/)-branch, perhaps the problem has been solved;
+ 2. [Use the search](https://github.com/SortableJS/Sortable/search?q=problem), maybe we already have an answer;
  3. If not found, create an example on [jsbin.com (draft)](http://jsbin.com/vojixek/edit?html,js,output) and describe the problem.
 
 Bindings:

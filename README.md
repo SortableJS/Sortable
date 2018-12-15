@@ -34,9 +34,9 @@ Demo: http://sortablejs.github.io/Sortable/
 
 ### Articles
 
+ * [Swap Thresholds and Direction](https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction) (December 2, 2018)
  * [Sortable v1.0 — New capabilities](https://github.com/SortableJS/Sortable/wiki/Sortable-v1.0-—-New-capabilities/) (December 22, 2014)
  * [Sorting with the help of HTML5 Drag'n'Drop API](https://github.com/SortableJS/Sortable/wiki/Sorting-with-the-help-of-HTML5-Drag'n'Drop-API/) (December 23, 2013)
-
 
 <br/>
 
@@ -79,7 +79,7 @@ You can use any element for the list and its elements, not just `ul`/`li`. Here 
 ### Options
 ```js
 var sortable = new Sortable(el, {
-	group: "name",  // or { name: "...", pull: [true, false, clone], put: [true, false, array] }
+	group: "name",  // or { name: "...", pull: [true, false, 'clone', array], put: [true, false, array] }
 	sort: true,  // sorting inside list
 	delay: 0, // time in milliseconds to define when the sorting should start
 	touchStartThreshold: 0, // px, how many pixels the point should move before cancelling a delayed drag event
@@ -95,6 +95,11 @@ var sortable = new Sortable(el, {
 	dragClass: "sortable-drag",  // Class name for the dragging item
 	dataIdAttr: 'data-id',
 
+	swapThreshold: 1, // Threshold of the swap zone
+	invertSwap: false, // Will always use inverted swap zone if set to true
+	invertedSwapThreshold: 1, // Threshold of the inverted swap zone (will be set to swapThreshold value by default)
+	direction: 'horizontal', // Direction of Sortable (will be detected automatically if not given)
+
 	forceFallback: false,  // ignore the HTML5 DnD behaviour and force the fallback to kick in
 
 	fallbackClass: "sortable-fallback",  // Class name for the cloned DOM Element when using forceFallback
@@ -106,6 +111,8 @@ var sortable = new Sortable(el, {
 	scrollSensitivity: 30, // px, how near the mouse must be to an edge to start scrolling.
 	scrollSpeed: 10, // px
 	bubbleScroll: true, // apply autoscroll to all parent elements, allowing for easier movement
+
+	dragoverBubble: false,
 
 	setData: function (/** DataTransfer */dataTransfer, /** HTMLElement*/dragEl) {
 		dataTransfer.setData('Text', dragEl.textContent); // `dataTransfer` object of HTML5 DragEvent
@@ -183,7 +190,7 @@ To drag elements from one list into another, both lists must have the same `grou
 You can also define whether lists can give away, give and keep a copy (`clone`), and receive elements.
 
  * name: `String` — group name
- * pull: `true|false|["foo", "bar"]|'clone'|function` — ability to move from the list. `clone` — copy the item, rather than move. Or an array of group names which the elements may be put in.
+ * pull: `true|false|["foo", "bar"]|'clone'|function` — ability to move from the list. `clone` — copy the item, rather than move. Or an array of group names which the elements may be put in. Defaults to `true`.
  * put: `true|false|["baz", "qux"]|function` — whether elements can be added from other lists, or an array of group names from which elements can be taken.
  * revertClone: `boolean` — revert cloned element to initial position after moving to a another list.
 
@@ -210,6 +217,53 @@ Demo: https://jsbin.com/jayedig/edit?js,output
 Time in milliseconds to define when the sorting should start.
 
 Demo: https://jsbin.com/zosiwah/edit?js,output
+
+
+---
+
+
+#### `swapThreshold` option
+Percentage of the target that the swap zone will take up, as a float between `0` and `1`.
+
+Read more: https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction#swap-threshold
+
+
+---
+
+
+#### `invertSwap` option
+Set to `true` to set the swap zone to the sides of the target, for the effect of sorting "in between" items.
+
+Read more: https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction#forcing-inverted-swap-zone
+
+
+---
+
+
+#### `invertedSwapThreshold` option
+Percentage of the target that the inverted swap zone will take up, as a float between `0` and `1`. If not given, will default to `swapThreshold`.
+
+Read more: https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction#dealing-with-swap-glitching
+
+
+---
+
+
+#### `direction` option
+Direction that the Sortable should sort in. Can be set to `'vertical'`, `'horizontal'`, or a function, which will be called whenever a target is dragged over. Must return `'vertical'` or `'horizontal'`.
+
+Read more: https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction#direction
+
+
+Example of dynamic direction detection:
+
+```js
+Sortable.create(el, {
+	direction: function(evt, target, dragEl) {
+		return Sortable.utils.detectDirection(el);
+	}
+});
+```
 
 
 ---
@@ -413,6 +467,14 @@ Demo: https://jsbin.com/kesewor/edit?html,js,output
 
 ---
 
+
+#### `dragoverBubble` option
+If set to `true`, the dragover event will bubble to parent Sortables. Useful for nested Sortables. Works on both fallback and native dragover event.
+
+
+---
+
+
 ### Event object ([demo](https://jsbin.com/fogujiv/edit?js,output))
 
  - to:`HTMLElement` — list, in which moved element.
@@ -576,6 +638,7 @@ Link to the active instance.
 * closest(el`:HTMLElement`, selector`:String`[, ctx`:HTMLElement`])`:HTMLElement|Null` — for each element in the set, get the first element that matches the selector by testing the element itself and traversing up through its ancestors in the DOM tree
 * clone(el`:HTMLElement`)`:HTMLElement` — create a deep copy of the set of matched elements
 * toggleClass(el`:HTMLElement`, name`:String`, state`:Boolean`) — add or remove one classes from each element
+* detectDirection(el`:HTMLElement`)`:String` — automatically detect the direction of the element as either `'vertical'` or `'horizontal'`
 
 
 ---
@@ -636,9 +699,6 @@ Please, [read this](CONTRIBUTING.md).
 
 
 ## MIT LICENSE
-Copyright 2013-2017 Lebedev Konstantin <ibnRubaXa@gmail.com>
-http://SortableJS.github.io/Sortable/
-
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
 "Software"), to deal in the Software without restriction, including
