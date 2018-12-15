@@ -1,11 +1,12 @@
 {
   "name": "Sortable",
   "main": "Sortable.js",
-  "version": "1.7.0",
-  "homepage": "http://rubaxa.github.io/Sortable/",
-  "repo": "RubaXa/Sortable",
+  "version": "1.8.0-rc1",
+  "homepage": "http://SortableJS.github.io/Sortable/",
+  "repo": "SortableJS/Sortable",
   "authors": [
-    "RubaXa <ibnRubaXa@gmail.com>"
+    "RubaXa <ibnRubaXa@gmail.com>",
+    "owenm <owen23355@gmail.com>"
   ],
   "description": "Minimalist library for reorderable drag-and-drop lists on modern browsers and touch devices. No jQuery.",
   "keywords": [

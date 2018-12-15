@@ -18,6 +18,10 @@
     "prepublish": "./node_modules/grunt/bin/grunt",
     "http-server": "http-server -s ./"
   },
+  "contributors" : [
+    "Konstantin Lebedev <ibnRubaXa@gmail.com>",
+    "Owen Mills <owen23355@gmail.com>"
+  ],
   "repository": {
     "type": "git",
     "url": "git://github.com/SortableJS/Sortable.git"

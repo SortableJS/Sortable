@@ -250,7 +250,7 @@ Read more: https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direc
 
 
 #### `direction` option
-Direction that the Sortable should sort in. Can be set to `'vertical'`, `'horizontal'`, or a function, which will be called whenever a target is dragged over.
+Direction that the Sortable should sort in. Can be set to `'vertical'`, `'horizontal'`, or a function, which will be called whenever a target is dragged over. Must return `'vertical'` or `'horizontal'`.
 
 Read more: https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction#direction
 

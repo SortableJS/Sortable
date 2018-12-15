@@ -297,8 +297,7 @@
 						(typeof value === 'string' && value === otherGroup) ||
 						(value.join && value.indexOf(otherGroup) > -1));
 					}
-
-					return ret || to.options.group.name === from.options.group.name;
+					return ret || (to.options.group.name && from.options.group.name && to.options.group.name === from.options.group.name);
 				};
 			}
 
@@ -623,7 +622,6 @@
 				_on(ownerDocument, 'mouseup', _this._onDrop);
 				_on(ownerDocument, 'touchend', _this._onDrop);
 				_on(ownerDocument, 'touchcancel', _this._onDrop);
-				_on(ownerDocument, 'selectstart', _this);
 				options.supportPointer && _on(ownerDocument, 'pointercancel', _this._onDrop);
 
 				if (options.delay) {
@@ -713,6 +711,8 @@
 				// Apply effect
 				_toggleClass(dragEl, options.dragClass, false);
 				_toggleClass(dragEl, options.ghostClass, true);
+
+				_css(dragEl, 'transform', '');
 
 				Sortable.active = this;
 
@@ -858,7 +858,6 @@
 			var options = _this.options;
 
 			_this._offUpEvents();
-
 			if (activeGroup.checkPull(_this, _this, dragEl, evt)) {
 				cloneEl = _clone(dragEl);
 
@@ -909,8 +908,12 @@
 
 				_on(document, 'drop', _this);
 
+				// #1276 fix:
+				_css(dragEl, 'transform', 'translateZ(0)');
+
 				_this._dragStartId = _nextTick(_this._dragStarted);
 			}
+			_on(document, 'selectstart', _this);
 		},
 
 		_onDragOver: function (/**Event*/evt) {
@@ -1145,13 +1148,12 @@
 			_off(ownerDocument, 'pointerup', this._onDrop);
 			_off(ownerDocument, 'touchcancel', this._onDrop);
 			_off(ownerDocument, 'pointercancel', this._onDrop);
-			_off(ownerDocument, 'selectstart', this);
+			_off(document, 'selectstart', this);
 		},
 
 		_onDrop: function (/**Event*/evt) {
 			var el = this.el,
 				options = this.options;
-
 			scrolling = false;
 			isCircumstantialInvert = false;
 			pastFirstInvertThresh = false;
