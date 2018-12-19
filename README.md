@@ -26,7 +26,7 @@ Demo: http://sortablejs.github.io/Sortable/
  * Supports any CSS library, e.g. [Bootstrap](#bs)
  * Simple API
  * [CDN](#cdn)
- * No jQuery (but there is [support](#jq))
+ * No jQuery required (but there is [support](https://github.com/SortableJS/jquery-sortablejs))
 
 
 <br/>
@@ -652,36 +652,6 @@ Link to the active instance.
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 ```
 
-
----
-
-
-<a name="jq"></a>
-### jQuery compatibility
-To assemble plugin for jQuery, perform the following steps:
-
-```bash
-  cd Sortable
-  npm install
-  grunt jquery
-```
-
-Now you can use `jquery.fn.sortable.js`:<br/>
-(or `jquery.fn.sortable.min.js` if you run `grunt jquery:min`)
-
-```js
-  $("#list").sortable({ /* options */ }); // init
-
-  $("#list").sortable("widget"); // get Sortable instance
-
-  $("#list").sortable("destroy"); // destroy Sortable instance
-
-  $("#list").sortable("{method-name}"); // call an instance method
-
-  $("#list").sortable("{method-name}", "foo", "bar"); // call an instance method with parameters
-```
-
-And `grunt jquery:mySortableFunc` → `jquery.fn.mySortableFunc.js`
 
 ---
 
