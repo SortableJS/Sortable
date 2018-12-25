@@ -86,6 +86,7 @@ var sortable = new Sortable(el, {
 	disabled: false, // Disables the sortable if set to true.
 	store: null,  // @see Store
 	animation: 150,  // ms, animation speed moving items when sorting, `0` — without animation
+	easing: "cubic-bezier(1, 0, 0, 1)", // Easing for animation. Defaults to null. See https://easings.net/ for examples.
 	handle: ".my-handle",  // Drag handle selector within list items
 	filter: ".ignore-elements",  // Selectors that do not lead to dragging (String or Function)
 	preventOnFilter: true, // Call `event.preventDefault()` when triggered `filter`
@@ -121,6 +122,11 @@ var sortable = new Sortable(el, {
 	// Element is chosen
 	onChoose: function (/**Event*/evt) {
 		evt.oldIndex;  // element index within parent
+	},
+
+	// Element is unchosen
+	onUnchoose: function(/**Event*/evt) {
+		// same properties as onEnd
 	},
 
 	// Element dragging started
@@ -177,6 +183,12 @@ var sortable = new Sortable(el, {
 	onClone: function (/**Event*/evt) {
 		var origEl = evt.item;
 		var cloneEl = evt.clone;
+	},
+
+	// Called when dragging element changes position
+	onChange: function(/**Event*/evt) {
+		evt.newIndex // most likely why this event is used is to get the dragging element's current index
+		// same properties as onEnd
 	}
 });
 ```
@@ -469,7 +481,10 @@ Demo: https://jsbin.com/kesewor/edit?html,js,output
 
 
 #### `dragoverBubble` option
-If set to `true`, the dragover event will bubble to parent Sortables. Useful for nested Sortables. Works on both fallback and native dragover event.
+If set to `true`, the dragover event will bubble to parent sortables. Works on both fallback and native dragover event.
+By default, it is false, but Sortable will only stop bubbling the event once the element has been inserted into a parent Sortable, or *can* be inserted into a parent Sortable, but isn't at that specific time (due to animation, etc).
+
+Since 1.8.0, you will probably want to leave this option as false. Before 1.8.0, it may need to be `true` for nested sortables to work.
 
 
 ---
@@ -638,7 +653,7 @@ Link to the active instance.
 * closest(el`:HTMLElement`, selector`:String`[, ctx`:HTMLElement`])`:HTMLElement|Null` — for each element in the set, get the first element that matches the selector by testing the element itself and traversing up through its ancestors in the DOM tree
 * clone(el`:HTMLElement`)`:HTMLElement` — create a deep copy of the set of matched elements
 * toggleClass(el`:HTMLElement`, name`:String`, state`:Boolean`) — add or remove one classes from each element
-* detectDirection(el`:HTMLElement`)`:String` — automatically detect the direction of the element as either `'vertical'` or `'horizontal'`
+* detectDirection(el`:HTMLElement`)`:String` — automatically detect the [direction](https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction#direction) of the element as either `'vertical'` or `'horizontal'`
 
 
 ---
