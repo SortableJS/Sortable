@@ -2032,6 +2032,8 @@
 					return el.matches(selector);
 				} else if (el.msMatchesSelector) {
 					return el.msMatchesSelector(selector);
+				} else if (el.webkitMatchesSelector) {
+					return el.webkitMatchesSelector(selector);
 				}
 			} catch(_) {
 				return false;
