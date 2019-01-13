@@ -1,5 +1,5 @@
 # Sortable
-Sortable is a <s>minimalist</s> JavaScript library for reorderable drag-and-drop lists.
+Sortable is a JavaScript library for reorderable drag-and-drop lists.
 
 Demo: http://sortablejs.github.io/Sortable/
 
@@ -11,6 +11,7 @@ Demo: http://sortablejs.github.io/Sortable/
  * CSS animation when moving items
  * Supports drag handles *and selectable text* (better than voidberg's html5sortable)
  * Smart auto-scrolling
+ * Advanced swap detection
  * Built using native HTML5 drag and drop API
  * Supports
    * [Meteor](https://github.com/SortableJS/meteor-sortablejs)
@@ -114,6 +115,9 @@ var sortable = new Sortable(el, {
 	bubbleScroll: true, // apply autoscroll to all parent elements, allowing for easier movement
 
 	dragoverBubble: false,
+	removeCloneOnHide: true, // Remove the clone element when it is not showing, rather than just hiding it
+	emptyInsertThreshold: 5, // px, distance mouse must be from empty sortable to insert drag element into it
+
 
 	setData: function (/** DataTransfer */dataTransfer, /** HTMLElement*/dragEl) {
 		dataTransfer.setData('Text', dragEl.textContent); // `dataTransfer` object of HTML5 DragEvent
@@ -172,11 +176,14 @@ var sortable = new Sortable(el, {
 	onMove: function (/**Event*/evt, /**Event*/originalEvent) {
 		// Example: https://jsbin.com/nawahef/edit?js,output
 		evt.dragged; // dragged HTMLElement
-		evt.draggedRect; // TextRectangle {left, top, right и bottom}
+		evt.draggedRect; // DOMRect {left, top, right, bottom}
 		evt.related; // HTMLElement on which have guided
-		evt.relatedRect; // TextRectangle
+		evt.relatedRect; // DOMRect
+		evt.willInsertAfter; // Boolean that is true if Sortable will insert drag element after target by default
 		originalEvent.clientY; // mouse position
 		// return false; — for cancel
+		// return -1; — insert before target
+		// return 1; — insert after target
 	},
 
 	// Called when creating a clone of element
@@ -203,7 +210,7 @@ You can also define whether lists can give away, give and keep a copy (`clone`),
 
  * name: `String` — group name
  * pull: `true|false|["foo", "bar"]|'clone'|function` — ability to move from the list. `clone` — copy the item, rather than move. Or an array of group names which the elements may be put in. Defaults to `true`.
- * put: `true|false|["baz", "qux"]|function` — whether elements can be added from other lists, or an array of group names from which elements can be taken.
+ * put: `true|false|["baz", "qux"]|function` — whether elements can be added from other lists, or an array of group names from which elements can be added.
  * revertClone: `boolean` — revert cloned element to initial position after moving to a another list.
 
 
@@ -490,9 +497,23 @@ Since 1.8.0, you will probably want to leave this option as false. Before 1.8.0,
 ---
 
 
+#### `removeCloneOnHide` option
+If set to `true`, Sortable will remove the cloned element from the DOM when it is supposed to be hidden.
+By default, this option is `false`, and the clone is hidden by having it's CSS `display` property set to `none`.
+
+
+---
+
+
+#### `emptyInsertThreshold` option
+The distance (in pixels) the mouse must be from an empty sortable while dragging for the drag element to be inserted into that sortable. Defaults to `5`. Set to `0` to disable this feature.
+
+Demo: https://jsbin.com/becavoj/edit?js,output
+
+---
 ### Event object ([demo](https://jsbin.com/fogujiv/edit?js,output))
 
- - to:`HTMLElement` — list, in which moved element.
+ - to:`HTMLElement` — list, in which moved element
  - from:`HTMLElement` — previous list
  - item:`HTMLElement` — dragged element
  - clone:`HTMLElement`
@@ -504,9 +525,10 @@ Since 1.8.0, you will probably want to leave this option as false. Before 1.8.0,
  - to:`HTMLElement`
  - from:`HTMLElement`
  - dragged:`HTMLElement`
- - draggedRect:` TextRectangle`
+ - draggedRect:`DOMRect`
  - related:`HTMLElement` — element on which have guided
- - relatedRect:` TextRectangle`
+ - relatedRect:`DOMRect`
+ - willInsertAfter:`Boolean` — `true` if will element be inserted after target (or `false` if before)
 
 
 ---

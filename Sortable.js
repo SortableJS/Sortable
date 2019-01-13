@@ -175,8 +175,8 @@
 		},
 
 		_isElInRowColumn = function(el1, el2, axis) {
-			var el1Rect = _getRect(el1),
-				el2Rect = _getRect(el2),
+			var el1Rect = el1 === dragEl && realDragElRect || _getRect(el1),
+				el2Rect = el2 === dragEl && realDragElRect || _getRect(el2),
 				el1S1Opp = axis === 'vertical' ? el1Rect.left : el1Rect.top,
 				el1S2Opp = axis === 'vertical' ? el1Rect.right : el1Rect.bottom,
 				el1OppLength = axis === 'vertical' ? el1Rect.width : el1Rect.height,
@@ -507,7 +507,6 @@
 
 		_prepareGroup(options);
 
-		options.invertedSwapThreshold == null && (options.invertedSwapThreshold = options.swapThreshold);
 		// Bind all private methods
 		for (var fn in this) {
 			if (fn.charAt(0) === '_' && typeof this[fn] === 'function') {
@@ -547,10 +546,15 @@
 
 			var children = this.el.children;
 			for (var i = 0; i < children.length; i++) {
-
+				// Don't change for target in case it is changed to aligned before onDragOver is fired
 				if (_closest(children[i], this.options.draggable, this.el, false) && children[i] !== target) {
 					children[i].sortableMouseAligned = _isClientInRowColumn(evt.clientX, evt.clientY, children[i], this._getDirection(evt, null), this.options);
 				}
+			}
+
+			// Used for nulling last target when not in element, nothing to do with checking if aligned
+			if (!_closest(evt.target, this.options.draggable, this.el, false)) {
+				lastTarget = null;
 			}
 
 			_alignedSilent = true;
@@ -1000,6 +1004,7 @@
 
 			// Set proper drop events
 			if (fallback) {
+				ignoreNextClick = true;
 				_this._loopId = setInterval(_this._emulateDragOver, 50);
 			} else {
 				// Undo what was set in _prepareDragStart before drag started
@@ -1017,7 +1022,6 @@
 
 				// #1276 fix:
 				_css(dragEl, 'transform', 'translateZ(0)');
-
 			}
 
 			awaitingDragStarted = true;
@@ -1043,6 +1047,17 @@
 			if (_silent) return;
 			// Return invocation when no further action is needed in another sortable
 			function completed() {
+				// Set ghost class to new sortable's ghost class
+				_toggleClass(dragEl, putSortable ? putSortable.options.ghostClass : activeSortable.options.ghostClass, false);
+				_toggleClass(dragEl, options.ghostClass, true);
+
+				if (putSortable !== _this && _this !== Sortable.active) {
+					putSortable = _this;
+				} else if (_this === Sortable.active) {
+					putSortable = null;
+				}
+
+
 				// Null lastTarget if it is not inside a previously swapped element
 				if ((target === dragEl && !dragEl.animated) || target === el) {
 					lastTarget = null;
@@ -1077,6 +1092,10 @@
 				return completed();
 			}
 
+			if (target !== dragEl) {
+				ignoreNextClick = false;
+			}
+
 			if (activeSortable && !options.disabled &&
 				(isOwner
 					? canSort || (revert = !rootEl.contains(dragEl)) // Reverting item into the original list
@@ -1090,7 +1109,6 @@
 				)
 			) {
 				var axis = this._getDirection(evt, target);
-				var inserted = false;
 
 				dragRect = _getRect(dragEl);
 
@@ -1098,10 +1116,9 @@
 					this._hideClone();
 					parentEl = rootEl; // actualization
 
-					if (cloneEl || nextEl) {
-						rootEl.insertBefore(dragEl, cloneEl || nextEl);
-					}
-					else if (!canSort) {
+					if (nextEl) {
+						rootEl.insertBefore(dragEl, nextEl);
+					} else {
 						rootEl.appendChild(dragEl);
 					}
 
@@ -1109,7 +1126,7 @@
 				}
 
 				if ((el.children.length === 0) || (el.children[0] === ghostEl) ||
-					(el === evt.target) && _ghostIsLast(evt, axis, el)
+					_ghostIsLast(evt, axis, el) && !dragEl.animated
 				) {
 					//assign target only if condition is true
 					if (el.children.length !== 0 && el.children[0] !== ghostEl && el === evt.target) {
@@ -1128,7 +1145,6 @@
 
 					if (_onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt, !!target) !== false) {
 						el.appendChild(dragEl);
-						inserted = true;
 						parentEl = el; // actualization
 						realDragElRect = null;
 
@@ -1142,40 +1158,40 @@
 				else if (target && target !== dragEl && (target.parentNode[expando] !== void 0) && target !== el) {
 					var direction = 0,
 						targetBeforeFirstSwap,
-						aligned = target.sortableMouseAligned;
+						aligned = target.sortableMouseAligned,
+						differentLevel = dragEl.parentNode !== el,
+						scrolledPastTop = _isScrolledPast(target, axis === 'vertical' ? 'top' : 'left');
 
 					if (lastTarget !== target) {
 						lastMode = null;
+						targetBeforeFirstSwap = _getRect(target)[axis === 'vertical' ? 'top' : 'left'];
+						pastFirstInvertThresh = false;
 					}
 
 					// Reference: https://www.lucidchart.com/documents/view/10fa0e93-e362-4126-aca2-b709ee56bd8b/0
 					if (
-						(
-							_isElInRowColumn(dragEl, target, axis) && dragEl.parentNode === el
-							|| target.contains(dragEl)
-							|| dragEl.parentNode !== el
-						)
-						&& !(!aligned && dragEl.parentNode === el) && lastMode !== 'insert' || lastMode === 'swap'
+						_isElInRowColumn(dragEl, target, axis) && aligned ||
+						differentLevel ||
+						scrolledPastTop ||
+						options.invertSwap ||
+						lastMode === 'insert' ||
+						// Needed, in the case that we are inside target and inserted because not aligned... aligned will stay false while inside
+						// and lastMode will change to 'insert', but we must swap
+						lastMode === 'swap'
 					) {
 						// New target that we will be inside
-						if (lastTarget !== target) {
-							targetBeforeFirstSwap = _getRect(target)[axis === 'vertical' ? 'top' : 'left'];
-							isCircumstantialInvert = options.invertSwap || dragEl.parentNode !== el || scrolling || _isScrolledPast(target, 'top');
-							pastFirstInvertThresh = false;
+						if (lastMode !== 'swap') {
+							isCircumstantialInvert = options.invertSwap || differentLevel || scrolling || scrolledPastTop;
 						}
 
 						direction = _getSwapDirection(evt, target, axis,
-							options.swapThreshold, options.invertedSwapThreshold,
+							options.swapThreshold, options.invertedSwapThreshold == null ? options.swapThreshold : options.invertedSwapThreshold,
 							isCircumstantialInvert,
 							lastTarget === target);
 						lastMode = 'swap';
 					} else {
-						if (lastTarget !== target) { // prevents swap glitching for insert
-							// Insert at position
-							direction = _getInsertDirection(target, options);
-						} else {
-							direction = lastDirection;
-						}
+						// Insert at position
+						direction = _getInsertDirection(target, options);
 						lastMode = 'insert';
 					}
 					if (direction === 0) return completed();
@@ -1214,7 +1230,6 @@
 							target.parentNode.insertBefore(dragEl, after ? nextSibling : target);
 						}
 
-						inserted = true;
 						parentEl = dragEl.parentNode; // actualization
 
 						// must be done before animation
@@ -1223,7 +1238,7 @@
 						}
 
 						changed();
-						this._animate(targetRect, target);
+						!differentLevel && this._animate(targetRect, target);
 						this._animate(dragRect, dragEl);
 
 
@@ -1231,13 +1246,6 @@
 					}
 				}
 
-				if (inserted) {
-					if (putSortable !== this && this !== Sortable.active) {
-						putSortable = this;
-					} else if (this === Sortable.active) {
-						putSortable = null;
-					}
-				}
 
 				if (el.contains(dragEl)) {
 					return completed();
@@ -1264,12 +1272,6 @@
 				if ((prevRect.left + prevRect.width / 2) !== (currentRect.left + currentRect.width / 2)
 					|| (prevRect.top + prevRect.height / 2) !== (currentRect.top + currentRect.height / 2)
 				) {
-					// Bring to top
-					if (target === dragEl) {
-						// _css(target.parentNode, 'position', 'relative');
-						// _css(target, 'position', 'relative');
-						_css(target, 'z-index', '99999');
-					}
 					var matrix = _matrix(this.el),
 						scaleX = matrix && matrix.a,
 						scaleY = matrix && matrix.d;
@@ -1289,7 +1291,6 @@
 				target.animated = setTimeout(function () {
 					_css(target, 'transition', '');
 					_css(target, 'transform', '');
-					target === dragEl && _css(target, 'z-index', '');
 					target.animated = false;
 				}, ms);
 			}
@@ -1347,10 +1348,6 @@
 				if (moved) {
 					evt.cancelable && evt.preventDefault();
 					!options.dropBubble && evt.stopPropagation();
-
-					if (dragEl.nextSibling === nextEl) {
-						ignoreNextClick = true;
-					}
 				}
 
 				ghostEl && ghostEl.parentNode && ghostEl.parentNode.removeChild(ghostEl);
@@ -1369,7 +1366,7 @@
 					dragEl.style['will-change'] = '';
 
 					// Remove class's
-					_toggleClass(dragEl, this.options.ghostClass, false);
+					_toggleClass(dragEl, putSortable ? putSortable.options.ghostClass : this.options.ghostClass, false);
 					_toggleClass(dragEl, this.options.chosenClass, false);
 
 					// Drag stop event
