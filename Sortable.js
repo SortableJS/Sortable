@@ -1338,8 +1338,8 @@
 
 		evt.originalEvent = originalEvt;
 
-		if(rootEl) {
-		  rootEl.dispatchEvent(evt);
+		if (rootEl) {
+			rootEl.dispatchEvent(evt);
 	        }
 
 		if (options[onName]) {
