@@ -96,7 +96,7 @@
 		Edge = !!navigator.userAgent.match(/Edge/i),
 		FireFox = !!navigator.userAgent.match(/firefox/i),
 
-		CSSFloatProperty = Edge || IE11OrLess ? 'cssFloat' : 'float', // test edge.. older versions of IE
+		CSSFloatProperty = Edge || IE11OrLess ? 'cssFloat' : 'float',
 
 		supportDraggable = ('draggable' in document.createElement('div')),
 		supportCssPointerEvents = (function (el) {

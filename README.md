@@ -498,8 +498,8 @@ Since 1.8.0, you will probably want to leave this option as false. Before 1.8.0,
 
 
 #### `removeCloneOnHide` option
-If set to `true`, Sortable will remove the cloned element from the DOM when it is supposed to be hidden.
-By default, this option is `false`, and the clone is hidden by having it's CSS `display` property set to `none`.
+If set to `false`, the clone is hidden by having it's CSS `display` property set to `none`.
+By default, this option is `true`, meaning Sortable will remove the cloned element from the DOM when it is supposed to be hidden.
 
 
 ---
