@@ -95,6 +95,8 @@
 		IE11OrLess = !!navigator.userAgent.match(/(?:Trident.*rv[ :]?11\.|msie|iemobile)/i),
 		Edge = !!navigator.userAgent.match(/Edge/i),
 		// FireFox = !!navigator.userAgent.match(/firefox/i),
+		AndroidChrome = navigator.userAgent.toLowerCase().indexOf('android') > -1
+			&& navigator.userAgent.toLowerCase().indexOf('chrome') > -1,
 
 		CSSFloatProperty = Edge || IE11OrLess ? 'cssFloat' : 'float',
 
@@ -364,7 +366,6 @@
 		_prepareGroup = function (options) {
 			function toFn(value, pull) {
 				return function(to, from, dragEl, evt) {
-					var ret;
 					var sameGroup = to.options.group.name &&
 									from.options.group.name &&
 									to.options.group.name === from.options.group.name;
@@ -378,7 +379,7 @@
 					} else if (pull && value === 'clone') {
 						return value;
 					} else if (typeof value === 'function') {
-						return toFn(value(to, from, dragEl, evt));
+						return toFn(value(to, from, dragEl, evt), pull)(to, from, dragEl, evt);
 					} else {
 						var otherGroup = (pull ? to : from).options.group.name;
 
@@ -860,10 +861,8 @@
 
 			if (!this.nativeDraggable || touch) {
 				if (this.options.supportPointer) {
-					touch && _on(document, 'touchmove', _preventScroll); // must be touchmove to prevent scroll
 					_on(document, 'pointermove', this._onTouchMove);
 				} else if (touch) {
-					_on(document, 'touchmove', _preventScroll);
 					_on(document, 'touchmove', this._onTouchMove);
 				} else {
 					_on(document, 'mousemove', this._onTouchMove);
@@ -1362,8 +1361,6 @@
 		_offUpEvents: function () {
 			var ownerDocument = this.el.ownerDocument;
 
-			_off(document, 'touchmove', _preventScroll);
-			_off(document, 'pointermove', _preventScroll);
 			_off(document, 'touchmove', this._onTouchMove);
 			_off(document, 'pointermove', this._onTouchMove);
 			_off(ownerDocument, 'mouseup', this._onDrop);
@@ -2178,12 +2175,6 @@
 	}
 
 
-	function _preventScroll(evt) {
-		if ((Sortable.active || awaitingDragStarted) && evt.cancelable) {
-			evt.preventDefault();
-		}
-	}
-
 	/**
 	 * Returns the "bounding client rect" of given element
 	 * @param  {HTMLElement} el                The element whose boundingClientRect is wanted
@@ -2301,6 +2292,13 @@
 
 		return false;
 	}
+
+	// Fixed #973:
+	_on(document, 'touchmove', function (evt) {
+		if ((Sortable.active || awaitingDragStarted) && evt.cancelable) {
+			evt.preventDefault();
+		}
+	});
 
 
 	// Export utils
