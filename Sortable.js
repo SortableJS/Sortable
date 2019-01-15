@@ -98,13 +98,15 @@
 
 		CSSFloatProperty = Edge || IE11OrLess ? 'cssFloat' : 'float',
 
+		// This will not pass for IE9, because IE9 DnD only works on anchors
 		supportDraggable = ('draggable' in document.createElement('div')),
-		supportCssPointerEvents = (function (el) {
+
+		supportCssPointerEvents = (function() {
 			// false when <= IE11
 			if (IE11OrLess) {
 				return false;
 			}
-			el = document.createElement('x');
+			var el = document.createElement('x');
 			el.style.cssText = 'pointer-events:auto';
 			return el.style.pointerEvents === 'auto';
 		})(),
@@ -133,6 +135,8 @@
 			return (child1 &&
 				(
 					firstChildCSS.display === 'block' ||
+					firstChildCSS.display === 'flex' ||
+					firstChildCSS.display === 'table' ||
 					firstChildCSS.display === 'grid' ||
 					firstChildWidth >= elWidth &&
 					elCSS[CSSFloatProperty] === 'none' ||
@@ -401,8 +405,43 @@
 		},
 
 		_checkAlignment = function(evt) {
-			if (!dragEl) return;
+			if (!dragEl || !dragEl.parentNode) return;
 			dragEl.parentNode[expando] && dragEl.parentNode[expando]._computeIsAligned(evt);
+		},
+
+		_isTrueParentSortable = function(el, target) {
+			var trueParent = target;
+			while (!trueParent[expando]) {
+				trueParent = trueParent.parentNode;
+			}
+
+			return el === trueParent;
+		},
+
+		_artificalBubble = function(sortable, originalEvt, method) {
+			// Artificial IE bubbling
+			var nextParent = sortable.parentNode;
+			while (nextParent && !nextParent[expando]) {
+				nextParent = nextParent.parentNode;
+			}
+
+			if (nextParent) {
+				nextParent[expando][method](_extend(originalEvt, {
+					artificialBubble: true
+				}));
+			}
+		},
+
+		_hideGhostForTarget = function() {
+			if (!supportCssPointerEvents && ghostEl) {
+				_css(ghostEl, 'display', 'none');
+			}
+		},
+
+		_unhideGhostForTarget = function() {
+			if (!supportCssPointerEvents && ghostEl) {
+				_css(ghostEl, 'display', '');
+			}
 		};
 
 
@@ -540,7 +579,17 @@
 		constructor: Sortable,
 
 		_computeIsAligned: function(evt) {
-			var target = _closest(evt.target, this.options.draggable, this.el, false);
+			var target;
+
+			if (ghostEl) {
+				_hideGhostForTarget();
+				target = document.elementFromPoint(evt.clientX, evt.clientY);
+				_unhideGhostForTarget();
+			} else {
+				target = evt.target;
+			}
+
+			target = _closest(target, this.options.draggable, this.el, false);
 			if (_alignedSilent) return;
 			if (!dragEl || dragEl.parentNode !== this.el) return;
 
@@ -551,9 +600,8 @@
 					children[i].sortableMouseAligned = _isClientInRowColumn(evt.clientX, evt.clientY, children[i], this._getDirection(evt, null), this.options);
 				}
 			}
-
 			// Used for nulling last target when not in element, nothing to do with checking if aligned
-			if (!_closest(evt.target, this.options.draggable, this.el, false)) {
+			if (!_closest(target, this.options.draggable, this.el, true)) {
 				lastTarget = null;
 			}
 
@@ -561,6 +609,7 @@
 			setTimeout(function() {
 				_alignedSilent = false;
 			}, 30);
+
 		},
 
 		_getDirection: function(evt, target) {
@@ -584,13 +633,19 @@
 			_saveInputCheckedState(el);
 
 
+			// IE: Calls events in capture mode if event element is nested. This ensures only correct element's _onTapStart goes through.
+			// This process is also done in _onDragOver
+			if (IE11OrLess && !evt.artificialBubble && !_isTrueParentSortable(el, target)) {
+				return;
+			}
+
 			// Don't trigger start event when an element is been dragged, otherwise the evt.oldindex always wrong when set option.group.
 			if (dragEl) {
 				return;
 			}
 
 			if (/mousedown|pointerdown/.test(type) && evt.button !== 0 || options.disabled) {
-				return; // only left button or enabled
+				return; // only left button and enabled
 			}
 
 			// cancel dnd if original target is content editable
@@ -598,9 +653,12 @@
 				return;
 			}
 
-			target = _closest(target, options.draggable, el, true);
+			target = _closest(target, options.draggable, el, false);
 
 			if (!target) {
+				if (IE11OrLess) {
+					_artificalBubble(el, evt, '_onTapStart');
+				}
 				return;
 			}
 
@@ -800,7 +858,6 @@
 		_triggerDragStart: function (/** Event */evt, /** Touch */touch) {
 			touch = touch || (evt.pointerType == 'touch' ? evt : null);
 
-
 			if (!this.nativeDraggable || touch) {
 				if (this.options.supportPointer) {
 					touch && _on(document, 'touchmove', _preventScroll); // must be touchmove to prevent scroll
@@ -864,9 +921,7 @@
 				this._lastX = touchEvt.clientX;
 				this._lastY = touchEvt.clientY;
 
-				if (!supportCssPointerEvents) {
-					_css(ghostEl, 'display', 'none');
-				}
+				_hideGhostForTarget();
 
 				var target = document.elementFromPoint(touchEvt.clientX, touchEvt.clientY);
 				var parent = target;
@@ -900,9 +955,7 @@
 				}
 				dragEl.parentNode[expando]._computeIsAligned(touchEvt);
 
-				if (!supportCssPointerEvents) {
-					_css(ghostEl, 'display', '');
-				}
+				_unhideGhostForTarget();
 			}
 		},
 
@@ -1033,7 +1086,7 @@
 		// Returns true - if no further action is needed (either inserted or another condition)
 		_onDragOver: function (/**Event*/evt) {
 			var el = this.el,
-				target,
+				target = evt.target,
 				dragRect,
 				targetRect,
 				revert,
@@ -1045,11 +1098,19 @@
 				_this = this;
 
 			if (_silent) return;
+
+			// IE event order fix
+			if (IE11OrLess && !evt.rootEl && !evt.artificialBubble && !_isTrueParentSortable(el, target)) {
+				return;
+			}
+
 			// Return invocation when no further action is needed in another sortable
 			function completed() {
-				// Set ghost class to new sortable's ghost class
-				_toggleClass(dragEl, putSortable ? putSortable.options.ghostClass : activeSortable.options.ghostClass, false);
-				_toggleClass(dragEl, options.ghostClass, true);
+				if (activeSortable) {
+					// Set ghost class to new sortable's ghost class
+					_toggleClass(dragEl, putSortable ? putSortable.options.ghostClass : activeSortable.options.ghostClass, false);
+					_toggleClass(dragEl, options.ghostClass, true);
+				}
 
 				if (putSortable !== _this && _this !== Sortable.active) {
 					putSortable = _this;
@@ -1059,7 +1120,7 @@
 
 
 				// Null lastTarget if it is not inside a previously swapped element
-				if ((target === dragEl && !dragEl.animated) || target === el) {
+				if ((target === dragEl && !dragEl.animated) || (target === el && !target.animated)) {
 					lastTarget = null;
 				}
 				// no bubbling and not fallback
@@ -1069,6 +1130,7 @@
 				}
 
 				!options.dragoverBubble && evt.stopPropagation && evt.stopPropagation();
+
 				return true;
 			}
 
@@ -1085,7 +1147,7 @@
 
 			moved = true;
 
-			target = _closest(evt.target, options.draggable, el, true);
+			target = _closest(target, options.draggable, el, true);
 
 			// target is dragEl or target is animated
 			if (!!_closest(evt.target, null, dragEl, true) || target.animated) {
@@ -1151,7 +1213,6 @@
 						changed();
 						this._animate(dragRect, dragEl);
 						target && this._animate(targetRect, target);
-
 						return completed();
 					}
 				}
@@ -1236,21 +1297,23 @@
 						if (targetBeforeFirstSwap !== undefined && !isCircumstantialInvert) {
 							targetMoveDistance = abs(targetBeforeFirstSwap - _getRect(target)[axis === 'vertical' ? 'top' : 'left']);
 						}
-
 						changed();
 						!differentLevel && this._animate(targetRect, target);
 						this._animate(dragRect, dragEl);
-
 
 						return completed();
 					}
 				}
 
-
 				if (el.contains(dragEl)) {
 					return completed();
 				}
 			}
+
+			if (IE11OrLess && !evt.rootEl) {
+				_artificalBubble(el, evt, '_onDragOver');
+			}
+
 			return false;
 		},
 
@@ -2159,7 +2222,7 @@
 
 			// solves #1123 (see: https://stackoverflow.com/a/37953806/6088312)
 			// Not needed on <= IE11
-			if (!(IE11OrLess)) {
+			if (!IE11OrLess) {
 				do {
 					if (container && container.getBoundingClientRect && _css(container, 'transform') !== 'none') {
 						var containerRect = container.getBoundingClientRect();

@@ -274,12 +274,15 @@ Direction that the Sortable should sort in. Can be set to `'vertical'`, `'horizo
 Read more: https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction#direction
 
 
-Example of dynamic direction detection:
+Example of direction detection for vertical list that includes full column and half column elements:
 
 ```js
 Sortable.create(el, {
 	direction: function(evt, target, dragEl) {
-		return Sortable.utils.detectDirection(el);
+		if (target !== null && target.className.includes('half-column') && dragEl.className.includes('half-column')) {
+			return 'horizontal';
+		}
+		return 'vertical';
 	}
 });
 ```
