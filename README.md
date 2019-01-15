@@ -1,5 +1,5 @@
 # Sortable
-Sortable is a <s>minimalist</s> JavaScript library for reorderable drag-and-drop lists.
+Sortable is a JavaScript library for reorderable drag-and-drop lists.
 
 Demo: http://sortablejs.github.io/Sortable/
 
@@ -11,6 +11,7 @@ Demo: http://sortablejs.github.io/Sortable/
  * CSS animation when moving items
  * Supports drag handles *and selectable text* (better than voidberg's html5sortable)
  * Smart auto-scrolling
+ * Advanced swap detection
  * Built using native HTML5 drag and drop API
  * Supports
    * [Meteor](https://github.com/SortableJS/meteor-sortablejs)
@@ -86,6 +87,7 @@ var sortable = new Sortable(el, {
 	disabled: false, // Disables the sortable if set to true.
 	store: null,  // @see Store
 	animation: 150,  // ms, animation speed moving items when sorting, `0` — without animation
+	easing: "cubic-bezier(1, 0, 0, 1)", // Easing for animation. Defaults to null. See https://easings.net/ for examples.
 	handle: ".my-handle",  // Drag handle selector within list items
 	filter: ".ignore-elements",  // Selectors that do not lead to dragging (String or Function)
 	preventOnFilter: true, // Call `event.preventDefault()` when triggered `filter`
@@ -113,6 +115,9 @@ var sortable = new Sortable(el, {
 	bubbleScroll: true, // apply autoscroll to all parent elements, allowing for easier movement
 
 	dragoverBubble: false,
+	removeCloneOnHide: true, // Remove the clone element when it is not showing, rather than just hiding it
+	emptyInsertThreshold: 5, // px, distance mouse must be from empty sortable to insert drag element into it
+
 
 	setData: function (/** DataTransfer */dataTransfer, /** HTMLElement*/dragEl) {
 		dataTransfer.setData('Text', dragEl.textContent); // `dataTransfer` object of HTML5 DragEvent
@@ -121,6 +126,11 @@ var sortable = new Sortable(el, {
 	// Element is chosen
 	onChoose: function (/**Event*/evt) {
 		evt.oldIndex;  // element index within parent
+	},
+
+	// Element is unchosen
+	onUnchoose: function(/**Event*/evt) {
+		// same properties as onEnd
 	},
 
 	// Element dragging started
@@ -166,17 +176,26 @@ var sortable = new Sortable(el, {
 	onMove: function (/**Event*/evt, /**Event*/originalEvent) {
 		// Example: https://jsbin.com/nawahef/edit?js,output
 		evt.dragged; // dragged HTMLElement
-		evt.draggedRect; // TextRectangle {left, top, right и bottom}
+		evt.draggedRect; // DOMRect {left, top, right, bottom}
 		evt.related; // HTMLElement on which have guided
-		evt.relatedRect; // TextRectangle
+		evt.relatedRect; // DOMRect
+		evt.willInsertAfter; // Boolean that is true if Sortable will insert drag element after target by default
 		originalEvent.clientY; // mouse position
 		// return false; — for cancel
+		// return -1; — insert before target
+		// return 1; — insert after target
 	},
 
 	// Called when creating a clone of element
 	onClone: function (/**Event*/evt) {
 		var origEl = evt.item;
 		var cloneEl = evt.clone;
+	},
+
+	// Called when dragging element changes position
+	onChange: function(/**Event*/evt) {
+		evt.newIndex // most likely why this event is used is to get the dragging element's current index
+		// same properties as onEnd
 	}
 });
 ```
@@ -191,7 +210,7 @@ You can also define whether lists can give away, give and keep a copy (`clone`),
 
  * name: `String` — group name
  * pull: `true|false|["foo", "bar"]|'clone'|function` — ability to move from the list. `clone` — copy the item, rather than move. Or an array of group names which the elements may be put in. Defaults to `true`.
- * put: `true|false|["baz", "qux"]|function` — whether elements can be added from other lists, or an array of group names from which elements can be taken.
+ * put: `true|false|["baz", "qux"]|function` — whether elements can be added from other lists, or an array of group names from which elements can be added.
  * revertClone: `boolean` — revert cloned element to initial position after moving to a another list.
 
 
@@ -227,6 +246,8 @@ Percentage of the target that the swap zone will take up, as a float between `0`
 
 Read more: https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction#swap-threshold
 
+Demo: http://sortablejs.github.io/Sortable#thresholds
+
 
 ---
 
@@ -235,6 +256,8 @@ Read more: https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direc
 Set to `true` to set the swap zone to the sides of the target, for the effect of sorting "in between" items.
 
 Read more: https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction#forcing-inverted-swap-zone
+
+Demo: http://sortablejs.github.io/Sortable#thresholds
 
 
 ---
@@ -255,12 +278,15 @@ Direction that the Sortable should sort in. Can be set to `'vertical'`, `'horizo
 Read more: https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction#direction
 
 
-Example of dynamic direction detection:
+Example of direction detection for vertical list that includes full column and half column elements:
 
 ```js
 Sortable.create(el, {
 	direction: function(evt, target, dragEl) {
-		return Sortable.utils.detectDirection(el);
+		if (target !== null && target.className.includes('half-column') && dragEl.className.includes('half-column')) {
+			return 'horizontal';
+		}
+		return 'vertical';
 	}
 });
 ```
@@ -469,15 +495,33 @@ Demo: https://jsbin.com/kesewor/edit?html,js,output
 
 
 #### `dragoverBubble` option
-If set to `true`, the dragover event will bubble to parent Sortables. Useful for nested Sortables. Works on both fallback and native dragover event.
+If set to `true`, the dragover event will bubble to parent sortables. Works on both fallback and native dragover event.
+By default, it is false, but Sortable will only stop bubbling the event once the element has been inserted into a parent Sortable, or *can* be inserted into a parent Sortable, but isn't at that specific time (due to animation, etc).
+
+Since 1.8.0, you will probably want to leave this option as false. Before 1.8.0, it may need to be `true` for nested sortables to work.
 
 
 ---
 
 
+#### `removeCloneOnHide` option
+If set to `false`, the clone is hidden by having it's CSS `display` property set to `none`.
+By default, this option is `true`, meaning Sortable will remove the cloned element from the DOM when it is supposed to be hidden.
+
+
+---
+
+
+#### `emptyInsertThreshold` option
+The distance (in pixels) the mouse must be from an empty sortable while dragging for the drag element to be inserted into that sortable. Defaults to `5`. Set to `0` to disable this feature.
+
+Demo: https://jsbin.com/becavoj/edit?js,output
+
+
+---
 ### Event object ([demo](https://jsbin.com/fogujiv/edit?js,output))
 
- - to:`HTMLElement` — list, in which moved element.
+ - to:`HTMLElement` — list, in which moved element
  - from:`HTMLElement` — previous list
  - item:`HTMLElement` — dragged element
  - clone:`HTMLElement`
@@ -489,9 +533,10 @@ If set to `true`, the dragover event will bubble to parent Sortables. Useful for
  - to:`HTMLElement`
  - from:`HTMLElement`
  - dragged:`HTMLElement`
- - draggedRect:` TextRectangle`
+ - draggedRect:`DOMRect`
  - related:`HTMLElement` — element on which have guided
- - relatedRect:` TextRectangle`
+ - relatedRect:`DOMRect`
+ - willInsertAfter:`Boolean` — `true` if will element be inserted after target (or `false` if before)
 
 
 ---
@@ -638,7 +683,7 @@ Link to the active instance.
 * closest(el`:HTMLElement`, selector`:String`[, ctx`:HTMLElement`])`:HTMLElement|Null` — for each element in the set, get the first element that matches the selector by testing the element itself and traversing up through its ancestors in the DOM tree
 * clone(el`:HTMLElement`)`:HTMLElement` — create a deep copy of the set of matched elements
 * toggleClass(el`:HTMLElement`, name`:String`, state`:Boolean`) — add or remove one classes from each element
-* detectDirection(el`:HTMLElement`)`:String` — automatically detect the direction of the element as either `'vertical'` or `'horizontal'`
+* detectDirection(el`:HTMLElement`)`:String` — automatically detect the [direction](https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction#direction) of the element as either `'vertical'` or `'horizontal'`
 
 
 ---
