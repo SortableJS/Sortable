@@ -1,226 +1,202 @@
-(function () {
-	'use strict';
+var example1 = document.getElementById('example1'),
+	example2Left = document.getElementById('example2-left'),
+	example2Right = document.getElementById('example2-right'),
+	example3Left = document.getElementById('example3-left'),
+	example3Right = document.getElementById('example3-right'),
+	example4Left = document.getElementById('example4-left'),
+	example4Right = document.getElementById('example4-right'),
+	example5 = document.getElementById('example5'),
+	example6 = document.getElementById('example6'),
+	example7 = document.getElementById('example7'),
+	gridDemo = document.getElementById('gridDemo');
 
-	var byId = function (id) { return document.getElementById(id); },
-
-		loadScripts = function (desc, callback) {
-			var deps = [], key, idx = 0;
-
-			for (key in desc) {
-				deps.push(key);
-			}
-
-			(function _next() {
-				var pid,
-					name = deps[idx],
-					script = document.createElement('script');
-
-				script.type = 'text/javascript';
-				script.src = desc[deps[idx]];
-
-				pid = setInterval(function () {
-					if (window[name]) {
-						clearTimeout(pid);
-
-						deps[idx++] = window[name];
-
-						if (deps[idx]) {
-							_next();
-						} else {
-							callback.apply(null, deps);
-						}
-					}
-				}, 30);
-
-				document.getElementsByTagName('head')[0].appendChild(script);
-			})()
-		},
-
-		console = window.console;
+// Example 1 - Simple list
+new Sortable(example1, {
+	animation: 150,
+	ghostClass: 'blue-background-class'
+});
 
 
-	if (!console.log) {
-		console.log = function () {
-			alert([].join.apply(arguments, ' '));
-		};
+// Example 2 - Shared lists
+new Sortable(example2Left, {
+	group: 'shared', // set both lists to same group
+	animation: 150
+});
+
+new Sortable(example2Right, {
+	group: 'shared',
+	animation: 150
+});
+
+// Example 3 - Cloning
+new Sortable(example3Left, {
+	group: {
+		name: 'shared',
+		pull: 'clone' // To clone: set pull to 'clone'
+	},
+	animation: 150
+});
+
+new Sortable(example3Right, {
+	group: {
+		name: 'shared',
+		pull: 'clone'
+	},
+	animation: 150
+});
+
+
+// Example 4 - No Sorting
+new Sortable(example4Left, {
+	group: {
+		name: 'shared',
+		pull: 'clone',
+		put: false // Do not allow items to be put into this list
+	},
+	animation: 150,
+	sort: false // To disable sorting: set sort to false
+});
+
+new Sortable(example4Right, {
+	group: 'shared',
+	animation: 150
+});
+
+
+// Example 5 - Handle
+new Sortable(example5, {
+    handle: '.handle', // handle class
+    animation: 150
+});
+
+// Example 6 - Filter
+new Sortable(example6, {
+    filter: '.filtered',
+    animation: 150
+});
+
+// Example 7 - Thresholds
+var example7Sortable = new Sortable(example7, {
+    animation: 150
+});
+
+
+var example7SwapThreshold = 1;
+var example7SwapThresholdInput = document.getElementById('example7SwapThresholdInput');
+var example7SwapThresholdCode = document.getElementById('example7SwapThresholdCode');
+var example7SwapThresholdIndicators = [].slice.call(document.querySelectorAll('.swap-threshold-indicator'));
+
+var example7InvertSwapInput = document.getElementById('example7InvertSwapInput');
+var example7InvertSwapCode = document.getElementById('example7InvertSwapCode');
+var example7InvertedSwapThresholdIndicators = [].slice.call(document.querySelectorAll('.inverted-swap-threshold-indicator'));
+
+var example7Squares = [].slice.call(document.querySelectorAll('.square'));
+
+var activeIndicators = example7SwapThresholdIndicators;
+
+var example7DirectionInput = document.getElementById('example7DirectionInput');
+var example7SizeProperty = 'width';
+
+
+function renderThresholdWidth(evt) {
+	example7SwapThreshold = Number(evt.target.value);
+	example7SwapThresholdCode.innerHTML = evt.target.value.indexOf('.') > -1 ? evt.target.value.padEnd(4, '0') : evt.target.value;
+
+	for (var i = 0; i < activeIndicators.length; i++) {
+		activeIndicators[i].style[example7SizeProperty] = (evt.target.value * 100) /
+			(activeIndicators == example7SwapThresholdIndicators ? 1 : 2) + '%';
 	}
 
+	example7Sortable.option('swapThreshold', example7SwapThreshold);
+}
 
-	Sortable.create(byId('foo'), {
-		group: "words",
-		animation: 150,
-		store: {
-			get: function (sortable) {
-				var order = localStorage.getItem(sortable.options.group);
-				return order ? order.split('|') : [];
-			},
-			set: function (sortable) {
-				var order = sortable.toArray();
-				localStorage.setItem(sortable.options.group, order.join('|'));
-			}
-		},
-		onAdd: function (evt){ console.log('onAdd.foo:', [evt.item, evt.from]); },
-		onUpdate: function (evt){ console.log('onUpdate.foo:', [evt.item, evt.from]); },
-		onRemove: function (evt){ console.log('onRemove.foo:', [evt.item, evt.from]); },
-		onStart:function(evt){ console.log('onStart.foo:', [evt.item, evt.from]);},
-		onSort:function(evt){ console.log('onStart.foo:', [evt.item, evt.from]);},
-		onEnd: function(evt){ console.log('onEnd.foo:', [evt.item, evt.from]);}
+example7SwapThresholdInput.addEventListener('input', renderThresholdWidth);
+
+example7InvertSwapInput.addEventListener('input', function(evt) {
+	example7Sortable.option('invertSwap', evt.target.checked);
+
+
+	for (var i = 0; i < activeIndicators.length; i++) {
+		activeIndicators[i].style.display = 'none';
+	}
+
+	if (evt.target.checked) {
+
+		example7InvertSwapCode.style.display = '';
+
+		activeIndicators = example7InvertedSwapThresholdIndicators;
+	} else {
+		example7InvertSwapCode.style.display = 'none';
+		activeIndicators = example7SwapThresholdIndicators;
+	}
+
+	renderThresholdWidth({
+		target: example7SwapThresholdInput
 	});
 
+	for (i = 0; i < activeIndicators.length; i++) {
+		activeIndicators[i].style.display = '';
+	}
+});
 
-	Sortable.create(byId('bar'), {
-		group: "words",
-		animation: 150,
-		onAdd: function (evt){ console.log('onAdd.bar:', evt.item); },
-		onUpdate: function (evt){ console.log('onUpdate.bar:', evt.item); },
-		onRemove: function (evt){ console.log('onRemove.bar:', evt.item); },
-		onStart:function(evt){ console.log('onStart.foo:', evt.item);},
-		onEnd: function(evt){ console.log('onEnd.foo:', evt.item);}
-	});
+function renderDirection(evt) {
+	for (var i = 0; i < example7Squares.length; i++) {
+		example7Squares[i].style.display = evt.target.value === 'h' ? 'inline-block' : 'block';
+	}
 
+	for (i = 0; i < example7InvertedSwapThresholdIndicators.length; i++) {
+		/* jshint expr:true */
+		evt.target.value === 'h' && (example7InvertedSwapThresholdIndicators[i].style.height = '100%');
+		evt.target.value === 'v' && (example7InvertedSwapThresholdIndicators[i].style.width = '100%');
+	}
 
-	// Multi groups
-	Sortable.create(byId('multi'), {
-		animation: 150,
-		draggable: '.tile',
-		handle: '.tile__name'
-	});
+	for (i = 0; i < example7SwapThresholdIndicators.length; i++) {
+		if (evt.target.value === 'h') {
+			example7SwapThresholdIndicators[i].style.height = '100%';
+			example7SwapThresholdIndicators[i].style.marginLeft = '50%';
+			example7SwapThresholdIndicators[i].style.transform = 'translateX(-50%)';
 
-	[].forEach.call(byId('multi').getElementsByClassName('tile__list'), function (el){
-		Sortable.create(el, {
-			group: 'photo',
-			animation: 150
-		});
-	});
+			example7SwapThresholdIndicators[i].style.marginTop = '0';
+		} else {
+			example7SwapThresholdIndicators[i].style.width = '100%';
+			example7SwapThresholdIndicators[i].style.marginTop = '50%';
+			example7SwapThresholdIndicators[i].style.transform = 'translateY(-50%)';
 
-
-	// Editable list
-	var editableList = Sortable.create(byId('editable'), {
-		animation: 150,
-		filter: '.js-remove',
-		onFilter: function (evt) {
-			evt.item.parentNode.removeChild(evt.item);
+			example7SwapThresholdIndicators[i].style.marginLeft = '0';
 		}
+	}
+
+	if (evt.target.value === 'h') {
+		example7SizeProperty = 'width';
+		example7Sortable.option('direction', 'horizontal');
+	} else {
+		example7SizeProperty = 'height';
+		example7Sortable.option('direction', 'vertical');
+	}
+
+	renderThresholdWidth({
+		target: example7SwapThresholdInput
 	});
+}
+example7DirectionInput.addEventListener('input', renderDirection);
+
+renderDirection({
+	target: example7DirectionInput
+});
 
 
-	byId('addUser').onclick = function () {
-		Ply.dialog('prompt', {
-			title: 'Add',
-			form: { name: 'name' }
-		}).done(function (ui) {
-			var el = document.createElement('li');
-			el.innerHTML = ui.data.name + '<i class="js-remove">✖</i>';
-			editableList.el.appendChild(el);
-		});
-	};
+// Grid demo
+new Sortable(gridDemo, {
+	animation: 150,
+	ghostClass: 'blue-background-class'
+});
 
+// Nested demo
+var nestedSortables = [].slice.call(document.querySelectorAll('.nested-sortable'));
 
-	// Advanced groups
-	[{
-		name: 'advanced',
-		pull: true,
-		put: true
-	},
-	{
-		name: 'advanced',
-		pull: 'clone',
-		put: false
-	}, {
-		name: 'advanced',
-		pull: false,
-		put: true
-	}].forEach(function (groupOpts, i) {
-		Sortable.create(byId('advanced-' + (i + 1)), {
-			sort: (i != 1),
-			group: groupOpts,
-			animation: 150
-		});
-	});
-
-
-	// 'handle' option
-	Sortable.create(byId('handle-1'), {
-		handle: '.drag-handle',
+for (var i = 0; i < nestedSortables.length; i++) {
+	new Sortable(nestedSortables[i], {
+		group: 'nested',
 		animation: 150
 	});
-
-
-	// Angular example
-	angular.module('todoApp', ['ng-sortable'])
-		.constant('ngSortableConfig', {onEnd: function() {
-			console.log('default onEnd()');
-		}})
-		.controller('TodoController', ['$scope', function ($scope) {
-			$scope.todos = [
-				{text: 'learn angular', done: true},
-				{text: 'build an angular app', done: false}
-			];
-
-			$scope.addTodo = function () {
-				$scope.todos.push({text: $scope.todoText, done: false});
-				$scope.todoText = '';
-			};
-
-			$scope.remaining = function () {
-				var count = 0;
-				angular.forEach($scope.todos, function (todo) {
-					count += todo.done ? 0 : 1;
-				});
-				return count;
-			};
-
-			$scope.archive = function () {
-				var oldTodos = $scope.todos;
-				$scope.todos = [];
-				angular.forEach(oldTodos, function (todo) {
-					if (!todo.done) $scope.todos.push(todo);
-				});
-			};
-		}])
-		.controller('TodoControllerNext', ['$scope', function ($scope) {
-			$scope.todos = [
-				{text: 'learn Sortable', done: true},
-				{text: 'use ng-sortable', done: false},
-				{text: 'Enjoy', done: false}
-			];
-
-			$scope.remaining = function () {
-				var count = 0;
-				angular.forEach($scope.todos, function (todo) {
-					count += todo.done ? 0 : 1;
-				});
-				return count;
-			};
-
-			$scope.sortableConfig = { group: 'todo', animation: 150 };
-			'Start End Add Update Remove Sort'.split(' ').forEach(function (name) {
-				$scope.sortableConfig['on' + name] = console.log.bind(console, name);
-			});
-		}]);
-})();
-
-
-
-// Background
-document.addEventListener("DOMContentLoaded", function () {
-	function setNoiseBackground(el, width, height, opacity) {
-		var canvas = document.createElement("canvas");
-		var context = canvas.getContext("2d");
-
-		canvas.width = width;
-		canvas.height = height;
-
-		for (var i = 0; i < width; i++) {
-			for (var j = 0; j < height; j++) {
-				var val = Math.floor(Math.random() * 255);
-				context.fillStyle = "rgba(" + val + "," + val + "," + val + "," + opacity + ")";
-				context.fillRect(i, j, 1, 1);
-			}
-		}
-
-		el.style.background = "url(" + canvas.toDataURL("image/png") + ")";
-	}
-
-	setNoiseBackground(document.getElementsByTagName('body')[0], 50, 50, 0.02);
-}, false);
+}
