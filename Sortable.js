@@ -1841,7 +1841,9 @@
 
 		evt.originalEvent = originalEvt;
 
-		rootEl.dispatchEvent(evt);
+		if (rootEl) {
+			rootEl.dispatchEvent(evt);
+	        }
 
 		if (options[onName]) {
 			options[onName].call(sortable, evt);
@@ -2095,6 +2097,8 @@
 					return el.matches(selector);
 				} else if (el.msMatchesSelector) {
 					return el.msMatchesSelector(selector);
+				} else if (el.webkitMatchesSelector) {
+					return el.webkitMatchesSelector(selector);
 				}
 			} catch(_) {
 				return false;
