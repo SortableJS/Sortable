@@ -94,7 +94,7 @@
 
 		IE11OrLess = !!navigator.userAgent.match(/(?:Trident.*rv[ :]?11\.|msie|iemobile)/i),
 		Edge = !!navigator.userAgent.match(/Edge/i),
-		FireFox = !!navigator.userAgent.match(/firefox/i),
+		// FireFox = !!navigator.userAgent.match(/firefox/i),
 
 		CSSFloatProperty = Edge || IE11OrLess ? 'cssFloat' : 'float',
 
@@ -581,7 +581,7 @@
 		_computeIsAligned: function(evt) {
 			var target;
 
-			if (ghostEl) {
+			if (ghostEl && !supportCssPointerEvents) {
 				_hideGhostForTarget();
 				target = document.elementFromPoint(evt.clientX, evt.clientY);
 				_unhideGhostForTarget();

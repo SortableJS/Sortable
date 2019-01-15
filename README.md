@@ -246,6 +246,8 @@ Percentage of the target that the swap zone will take up, as a float between `0`
 
 Read more: https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction#swap-threshold
 
+Demo: http://sortablejs.github.io/Sortable#thresholds
+
 
 ---
 
@@ -254,6 +256,8 @@ Read more: https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direc
 Set to `true` to set the swap zone to the sides of the target, for the effect of sorting "in between" items.
 
 Read more: https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction#forcing-inverted-swap-zone
+
+Demo: http://sortablejs.github.io/Sortable#thresholds
 
 
 ---
@@ -512,6 +516,7 @@ By default, this option is `true`, meaning Sortable will remove the cloned eleme
 The distance (in pixels) the mouse must be from an empty sortable while dragging for the drag element to be inserted into that sortable. Defaults to `5`. Set to `0` to disable this feature.
 
 Demo: https://jsbin.com/becavoj/edit?js,output
+
 
 ---
 ### Event object ([demo](https://jsbin.com/fogujiv/edit?js,output))

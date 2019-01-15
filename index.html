@@ -216,7 +216,7 @@ new Sortable(example4Right, {
 
 		<div id="thresholds" class="row">
 			<h4 class="col-12">Thresholds</h4>
-			<p class="col-12">Try modifying the inputs below to effect the swap thresholds. You can see the swap zones of the squares colored in dark blue, while the "dead zones" are colored in light blue.</p>
+			<p class="col-12">Try modifying the inputs below to affect the swap thresholds. You can see the swap zones of the squares colored in dark blue, while the "dead zones" (that do not cause a swap) are colored in light blue.</p>
 			<div id="example7" class="square-section col">
 				<div class="square">
 					<div style="display: none;" class="inverted-swap-threshold-indicator indicator-left"></div>
@@ -300,6 +300,7 @@ new Sortable(example4Right, {
 
 		<div id="nested" class="row">
 			<h4 class="col-12">Nested Sortables Example</h4>
+			<p class="col-12">NOTE: When using nested Sortables with animation, it is recommended that the <code>fallbackOnBody</code> option is set to true.</p>
 			<div id="nestedDemo" class="list-group col nested-sortable">
 				<div class="list-group-item nested-1">Item 1.1
 					<div class="list-group nested-sortable">
