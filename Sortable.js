@@ -95,8 +95,6 @@
 		IE11OrLess = !!navigator.userAgent.match(/(?:Trident.*rv[ :]?11\.|msie|iemobile)/i),
 		Edge = !!navigator.userAgent.match(/Edge/i),
 		// FireFox = !!navigator.userAgent.match(/firefox/i),
-		AndroidChrome = navigator.userAgent.toLowerCase().indexOf('android') > -1
-			&& navigator.userAgent.toLowerCase().indexOf('chrome') > -1,
 
 		CSSFloatProperty = Edge || IE11OrLess ? 'cssFloat' : 'float',
 
@@ -2294,7 +2292,7 @@
 	}
 
 	// Fixed #973:
-	_on(document, 'touchmove', function (evt) {
+	_on(document, 'touchmove', function(evt) {
 		if ((Sortable.active || awaitingDragStarted) && evt.cancelable) {
 			evt.preventDefault();
 		}
