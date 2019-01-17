@@ -34,6 +34,7 @@
 		rootEl,
 		nextEl,
 		lastDownEl,
+		lastEl,
 
 		scrollEl,
 		scrollParentEl,
@@ -496,6 +497,7 @@
 			sort: true,
 			disabled: false,
 			store: null,
+			swap: false,
 			handle: null,
 			scroll: true,
 			scrollSensitivity: 30,
@@ -512,6 +514,7 @@
 			ghostClass: 'sortable-ghost',
 			chosenClass: 'sortable-chosen',
 			dragClass: 'sortable-drag',
+			swapClass: "sortable-swap-highlight",
 			ignore: 'a, img',
 			filter: null,
 			preventOnFilter: true,
@@ -1171,6 +1174,16 @@
 
 				dragRect = _getRect(dragEl);
 
+				if (options.swap) {
+					target = _closest(target, options.draggable, el);
+					if (target) {
+						lastEl && _toggleClass(lastEl, options.swapClass, false);
+						_toggleClass(target, options.swapClass, true);
+						lastEl = target;
+					}
+					return;
+				}
+
 				if (revert) {
 					this._hideClone();
 					parentEl = rootEl; // actualization
@@ -1219,6 +1232,10 @@
 						aligned = target.sortableMouseAligned,
 						differentLevel = dragEl.parentNode !== el,
 						scrolledPastTop = _isScrolledPast(target, axis === 'vertical' ? 'top' : 'left');
+
+					if (lastEl !== target) {
+						lastEl = target;
+					}
 
 					if (lastTarget !== target) {
 						lastMode = null;
@@ -1402,6 +1419,20 @@
 
 			this._offUpEvents();
 
+			if (lastEl && options.swap) {
+				_toggleClass(lastEl, options.swapClass, false);
+
+				if (dragEl !== lastEl) {
+					var dragRect = dragEl.getBoundingClientRect();
+					var lastRect = lastEl.getBoundingClientRect();
+
+					_swapNodes(dragEl, lastEl);
+
+					this._animate(dragRect, dragEl);
+					this._animate(lastRect, lastEl);
+				}
+			}
+
 			if (evt) {
 				if (moved) {
 					evt.cancelable && evt.preventDefault();
@@ -1466,7 +1497,17 @@
 							newIndex = oldIndex;
 						}
 
-						_dispatchEvent(this, rootEl, 'end', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+						if (options.swap && lastEl)
+						{
+							if (dragEl !== lastEl)
+							{
+								_dispatchEvent(this, rootEl, 'end', dragEl, parentEl, rootEl, oldIndex, newIndex, evt, {swapItem:lastEl});
+							}
+						}
+						else
+						{
+							_dispatchEvent(this, rootEl, 'end', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+						}
 
 						// Save sorting
 						this.save();
@@ -1485,6 +1526,7 @@
 			nextEl =
 			cloneEl =
 			lastDownEl =
+			lastEl =
 
 			scrollEl =
 			scrollParentEl =
@@ -1810,7 +1852,7 @@
 
 
 
-	function _dispatchEvent(sortable, rootEl, name, targetEl, toEl, fromEl, startIndex, newIndex, originalEvt) {
+	function _dispatchEvent(sortable, rootEl, name, targetEl, toEl, fromEl, startIndex, newIndex, originalEvt, eventOptions) {
 		sortable = (sortable || rootEl[expando]);
 		var evt,
 			options = sortable.options,
@@ -1835,6 +1877,14 @@
 		evt.newIndex = newIndex;
 
 		evt.originalEvent = originalEvt;
+
+		if (eventOptions)
+		{
+			for (var option in eventOptions)
+			{
+				evt[option] = eventOptions[option];
+			}
+		}
 
 		if (rootEl) {
 			rootEl.dispatchEvent(evt);
@@ -2170,6 +2220,32 @@
 
 	function _cancelNextTick(id) {
 		return clearTimeout(id);
+	}
+
+	function _swapNodes(n1, n2) {
+
+		var p1 = n1.parentNode;
+		var p2 = n2.parentNode;
+		var i1, i2;
+
+		if ( !p1 || !p2 || p1.isEqualNode(n2) || p2.isEqualNode(n1) ) return;
+
+		for (var i = 0; i < p1.children.length; i++) {
+			if (p1.children[i].isEqualNode(n1)) {
+				i1 = i;
+			}
+		}
+		for (var i = 0; i < p2.children.length; i++) {
+			if (p2.children[i].isEqualNode(n2)) {
+				i2 = i;
+			}
+		}
+
+		if ( p1.isEqualNode(p2) && i1 < i2 ) {
+			i2++;
+		}
+		p1.insertBefore(n2, p1.children[i1]);
+		p2.insertBefore(n1, p2.children[i2]);
 	}
 
 
