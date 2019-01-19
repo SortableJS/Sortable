@@ -617,7 +617,6 @@
 
 		_onTapStart: function (/** Event|TouchEvent */evt) {
 			if (!evt.cancelable) return;
-
 			var _this = this,
 				el = this.el,
 				options = this.options,
@@ -808,7 +807,6 @@
 
 				if (options.supportPointer) {
 					_on(ownerDocument, 'pointerup', _this._onDrop);
-					_on(ownerDocument, 'pointercancel', _this._onDrop);
 				} else {
 					_on(ownerDocument, 'mouseup', _this._onDrop);
 					_on(ownerDocument, 'touchend', _this._onDrop);
@@ -1061,7 +1059,6 @@
 				_off(document, 'mouseup', _this._onDrop);
 				_off(document, 'touchend', _this._onDrop);
 				_off(document, 'touchcancel', _this._onDrop);
-				_off(document, 'pointercancel', _this._onDrop);
 
 				if (dataTransfer) {
 					dataTransfer.effectAllowed = 'move';
@@ -1365,14 +1362,12 @@
 			_off(ownerDocument, 'touchend', this._onDrop);
 			_off(ownerDocument, 'pointerup', this._onDrop);
 			_off(ownerDocument, 'touchcancel', this._onDrop);
-			_off(ownerDocument, 'pointercancel', this._onDrop);
 			_off(document, 'selectstart', this);
 		},
 
 		_onDrop: function (/**Event*/evt) {
 			var el = this.el,
 				options = this.options;
-
 			awaitingDragStarted = false;
 			scrolling = false;
 			isCircumstantialInvert = false;
@@ -1718,7 +1713,7 @@
 
 	function _globalDragOver(/**Event*/evt) {
 		if (evt.dataTransfer) {
-			evt.dataTransfer.dropEffect = 'move';
+			evt.dataTransfer.dropEffect = 'none';
 		}
 		evt.cancelable && evt.preventDefault();
 	}
