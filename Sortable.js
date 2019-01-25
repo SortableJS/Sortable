@@ -197,7 +197,7 @@
 
 		_getParentAutoScrollElement = function(el, includeSelf) {
 			// skip to window
-			if (!el || !el.getBoundingClientRect) return win;
+			if (!el || !el.getBoundingClientRect) return _getWindowScrollingElement();
 
 			var elem = el;
 			var gotSelf = false;
@@ -209,7 +209,7 @@
 						elem.clientWidth < elem.scrollWidth && (elemCSS.overflowX == 'auto' || elemCSS.overflowX == 'scroll') ||
 						elem.clientHeight < elem.scrollHeight && (elemCSS.overflowY == 'auto' || elemCSS.overflowY == 'scroll')
 					) {
-						if (!elem || !elem.getBoundingClientRect || elem === document.body) return win;
+						if (!elem || !elem.getBoundingClientRect || elem === document.body) return _getWindowScrollingElement();
 
 						if (gotSelf || includeSelf) return elem;
 						gotSelf = true;
@@ -218,7 +218,24 @@
 			/* jshint boss:true */
 			} while (elem = elem.parentNode);
 
-			return win;
+			return _getWindowScrollingElement();
+		},
+
+		_getWindowScrollingElement = function() {
+			if (IE11OrLess) {
+				return document.documentElement;
+			} else {
+				return document.scrollingElement;
+			}
+		},
+
+		_getScrollPosition = function(el) {
+			return [ el.scrollLeft, el.scrollTop ];
+		},
+
+		_scrollBy = function(el, x, y) {
+			el.scrollLeft += x;
+			el.scrollTop += y;
 		},
 
 		_autoScroll = _throttle(function (/**Event*/evt, /**Object*/options, /**HTMLElement*/rootEl, /**Boolean*/isFallback) {
@@ -233,6 +250,8 @@
 
 					winWidth = window.innerWidth,
 					winHeight = window.innerHeight,
+
+					winScroller = _getWindowScrollingElement(),
 
 					scrollThisInstance = false;
 
@@ -279,28 +298,20 @@
 						scrollPosY;
 
 
-					if (el !== win) {
-						scrollWidth = el.scrollWidth;
-						scrollHeight = el.scrollHeight;
+					scrollWidth = el.scrollWidth;
+					scrollHeight = el.scrollHeight;
 
-						css = _css(el);
+					css = _css(el);
 
-						canScrollX = width < scrollWidth && (css.overflowX === 'auto' || css.overflowX === 'scroll');
-						canScrollY = height < scrollHeight && (css.overflowY === 'auto' || css.overflowY === 'scroll');
+					scrollPosX = el.scrollLeft;
+					scrollPosY = el.scrollTop;
 
-						scrollPosX = el.scrollLeft;
-						scrollPosY = el.scrollTop;
-					} else {
-						scrollWidth = document.documentElement.scrollWidth;
-						scrollHeight = document.documentElement.scrollHeight;
-
-						css = _css(document.documentElement);
-
+					if (el === winScroller) {
 						canScrollX = width < scrollWidth && (css.overflowX === 'auto' || css.overflowX === 'scroll' || css.overflowX === 'visible');
 						canScrollY = height < scrollHeight && (css.overflowY === 'auto' || css.overflowY === 'scroll' || css.overflowY === 'visible');
-
-						scrollPosX = document.documentElement.scrollLeft;
-						scrollPosY = document.documentElement.scrollTop;
+					} else {
+						canScrollX = width < scrollWidth && (css.overflowX === 'auto' || css.overflowX === 'scroll');
+						canScrollY = height < scrollHeight && (css.overflowY === 'auto' || css.overflowY === 'scroll');
 					}
 
 					vx = canScrollX && (abs(right - x) <= sens && (scrollPosX + width) < scrollWidth) - (abs(left - x) <= sens && !!scrollPosX);
@@ -339,17 +350,13 @@
 										return;
 									}
 								}
-								if (autoScrolls[this.layer].el === win) {
-									win.scrollTo(win.pageXOffset + scrollOffsetX, win.pageYOffset + scrollOffsetY);
-								} else {
-									autoScrolls[this.layer].el.scrollTop += scrollOffsetY;
-									autoScrolls[this.layer].el.scrollLeft += scrollOffsetX;
-								}
+
+								_scrollBy(autoScrolls[this.layer].el, scrollOffsetX, scrollOffsetY);
 							}).bind({layer: layersOut}), 24);
 						}
 					}
 					layersOut++;
-				} while (options.bubbleScroll && currentParent !== win && (currentParent = _getParentAutoScrollElement(currentParent, false)));
+				} while (options.bubbleScroll && currentParent !== winScroller && (currentParent = _getParentAutoScrollElement(currentParent, false)));
 				scrolling = scrollThisInstance; // in case another function catches scrolling as false in between when it is not
 			}
 		}, 30),
@@ -744,7 +751,7 @@
 
 			} else {
 				// if DnD is enabled (and browser has good autoscrolling), first autoscroll will already scroll, so get parent autoscroll of first autoscroll
-				if (!_this.options.bubbleScroll || _getParentAutoScrollElement(elem, true) === window) {
+				if (!_this.options.bubbleScroll || _getParentAutoScrollElement(elem, true) === _getWindowScrollingElement()) {
 					_clearAutoScrolls();
 					return;
 				}
@@ -1077,6 +1084,7 @@
 			_on(document, 'selectstart', _this);
 		},
 
+
 		// Returns true - if no further action is needed (either inserted or another condition)
 		_onDragOver: function (/**Event*/evt) {
 			var el = this.el,
@@ -1215,11 +1223,14 @@
 						targetBeforeFirstSwap,
 						aligned = target.sortableMouseAligned,
 						differentLevel = dragEl.parentNode !== el,
-						scrolledPastTop = _isScrolledPast(target, axis === 'vertical' ? 'top' : 'left');
+						side1 = axis === 'vertical' ? 'top' : 'left',
+						scrolledPastTop = _isScrolledPast(target, side1) || _isScrolledPast(dragEl, side1),
+						scrollBefore = scrolledPastTop ? _getScrollPosition(scrolledPastTop)[1] : void 0;
+
 
 					if (lastTarget !== target) {
 						lastMode = null;
-						targetBeforeFirstSwap = _getRect(target)[axis === 'vertical' ? 'top' : 'left'];
+						targetBeforeFirstSwap = _getRect(target)[side1];
 						pastFirstInvertThresh = false;
 					}
 
@@ -1236,7 +1247,7 @@
 					) {
 						// New target that we will be inside
 						if (lastMode !== 'swap') {
-							isCircumstantialInvert = options.invertSwap || differentLevel || scrolling || scrolledPastTop;
+							isCircumstantialInvert = options.invertSwap || differentLevel;
 						}
 
 						direction = _getSwapDirection(evt, target, axis,
@@ -1285,13 +1296,19 @@
 							target.parentNode.insertBefore(dragEl, after ? nextSibling : target);
 						}
 
+						// Undo chrome's scroll adjustment
+						if (scrolledPastTop) {
+							_scrollBy(scrolledPastTop, 0, scrollBefore - _getScrollPosition(scrolledPastTop)[1]);
+						}
+
 						parentEl = dragEl.parentNode; // actualization
 
 						// must be done before animation
 						if (targetBeforeFirstSwap !== undefined && !isCircumstantialInvert) {
-							targetMoveDistance = abs(targetBeforeFirstSwap - _getRect(target)[axis === 'vertical' ? 'top' : 'left']);
+							targetMoveDistance = abs(targetBeforeFirstSwap - _getRect(target)[side1]);
 						}
 						changed();
+
 						!differentLevel && this._animate(targetRect, target);
 						this._animate(dragRect, dragEl);
 
@@ -2180,7 +2197,6 @@
 	 * @param  {HTMLElement} el                The element whose boundingClientRect is wanted
 	 * @param  {[HTMLElement]} container       the parent the element will be placed in
 	 * @param  {[Boolean]} adjustForTransform  Whether the rect should compensate for parent's transform
-	 * (used for fixed positioning on el)
 	 * @return {Object}                        The boundingClientRect of el
 	 */
 	function _getRect(el, container, adjustForTransform) {
@@ -2194,7 +2210,7 @@
 			height,
 			width;
 
-		if (el !== win) {
+		if (el !== win && el !== _getWindowScrollingElement()) {
 			elRect = el.getBoundingClientRect();
 			top = elRect.top;
 			left = elRect.left;
@@ -2266,10 +2282,11 @@
 	 * Checks if a side of an element is scrolled past a side of it's parents
 	 * @param  {HTMLElement}  el       The element who's side being scrolled out of view is in question
 	 * @param  {String}       side     Side of the element in question ('top', 'left', 'right', 'bottom')
-	 * @return {Boolean}               Whether the element is overflowing the viewport on the given side of it's parent
+	 * @return {int}                   Amount the element is overflowing over the specified side of it's parent scroll element
+	 * @return {HTMLElement}           The parent scroll element that the el's side is scrolled past, or null if there is no such element
 	 */
 	function _isScrolledPast(el, side) {
-		var parent = _getParentAutoScrollElement(parent, true),
+		var parent = _getParentAutoScrollElement(el, true),
 			elSide = _getRect(el)[side];
 
 		/* jshint boss:true */
@@ -2283,9 +2300,9 @@
 				visible = elSide <= parentSide;
 			}
 
-			if (!visible) return true;
+			if (!visible) return parent;
 
-			if (parent === win) break;
+			if (parent === _getWindowScrollingElement()) break;
 
 			parent = _getParentAutoScrollElement(parent, false);
 		}
