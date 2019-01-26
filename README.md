@@ -92,10 +92,13 @@ var sortable = new Sortable(el, {
 	filter: ".ignore-elements",  // Selectors that do not lead to dragging (String or Function)
 	preventOnFilter: true, // Call `event.preventDefault()` when triggered `filter`
 	draggable: ".item",  // Specifies which items inside the element should be draggable
+
 	ghostClass: "sortable-ghost",  // Class name for the drop placeholder
 	chosenClass: "sortable-chosen",  // Class name for the chosen item
 	dragClass: "sortable-drag",  // Class name for the dragging item
 	dataIdAttr: 'data-id',
+
+	swap: false, // Enable swap mode
 
 	swapThreshold: 1, // Threshold of the swap zone
 	invertSwap: false, // Will always use inverted swap zone if set to true
@@ -224,13 +227,21 @@ Demo:
 
 
 #### `sort` option
-Sorting inside list.
+Enable sorting or swapping inside list.
 
 Demo: https://jsbin.com/jayedig/edit?js,output
 
 
 ---
 
+
+#### `swap` option
+Enable swapping mode rather than sorting mode.
+
+Demo: 
+
+
+---
 
 #### `delay` option
 Time in milliseconds to define when the sorting should start.
@@ -242,7 +253,7 @@ Demo: https://jsbin.com/zosiwah/edit?js,output
 
 
 #### `swapThreshold` option
-Percentage of the target that the swap zone will take up, as a float between `0` and `1`.
+Percentage of the target that the swap zone will take up, as a float between `0` and `1`. This option has nothing to do with the `swap` option.
 
 Read more: https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction#swap-threshold
 
@@ -253,7 +264,7 @@ Demo: http://sortablejs.github.io/Sortable#thresholds
 
 
 #### `invertSwap` option
-Set to `true` to set the swap zone to the sides of the target, for the effect of sorting "in between" items.
+Set to `true` to set the swap zone to the sides of the target, for the effect of sorting "in between" items. This option has nothing to do with the `swap` option.
 
 Read more: https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction#forcing-inverted-swap-zone
 
@@ -264,7 +275,7 @@ Demo: http://sortablejs.github.io/Sortable#thresholds
 
 
 #### `invertedSwapThreshold` option
-Percentage of the target that the inverted swap zone will take up, as a float between `0` and `1`. If not given, will default to `swapThreshold`.
+Percentage of the target that the inverted swap zone will take up, as a float between `0` and `1`. If not given, will default to `swapThreshold`. This option has nothing to do with the `swap` option.
 
 Read more: https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction#dealing-with-swap-glitching
 

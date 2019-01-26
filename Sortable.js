@@ -34,7 +34,7 @@
 		rootEl,
 		nextEl,
 		lastDownEl,
-		lastEl,
+		lastSwapEl,
 
 		scrollEl,
 		scrollParentEl,
@@ -674,7 +674,7 @@
 
 			// Check filter
 			if (typeof filter === 'function') {
-				if (filter.call(this, evt, target, this)) {
+				if (filter.call(this, evt, originalTarget, this)) {
 					_dispatchEvent(_this, originalTarget, 'filter', target, el, el, startIndex);
 					preventOnFilter && evt.cancelable && evt.preventDefault();
 					return; // cancel dnd
@@ -1033,6 +1033,8 @@
 			var dataTransfer = evt.dataTransfer;
 			var options = _this.options;
 
+			lastSwapEl = dragEl;
+
 			// Setup clone
 			cloneEl = _clone(dragEl);
 
@@ -1136,7 +1138,7 @@
 
 			// Call when dragEl has been inserted
 			function changed() {
-				_dispatchEvent(_this, rootEl, 'change', target, el, rootEl, oldIndex, _index(dragEl, options.draggable), evt);
+				_dispatchEvent(_this, rootEl, 'change', target, el, rootEl, oldIndex, _index(lastSwapEl || dragEl, options.draggable), evt);
 			}
 
 
@@ -1174,14 +1176,15 @@
 
 				dragRect = _getRect(dragEl);
 
+				lastSwapEl && _toggleClass(lastSwapEl, options.swapClass, false);
 				if (options.swap) {
-					target = _closest(target, options.draggable, el);
-					if (target) {
-						lastEl && _toggleClass(lastEl, options.swapClass, false);
+					if (target && target !== el) {
 						_toggleClass(target, options.swapClass, true);
-						lastEl = target;
+						lastSwapEl = target;
 					}
-					return;
+					changed();
+
+					return completed();
 				}
 
 				if (revert) {
@@ -1233,9 +1236,6 @@
 						differentLevel = dragEl.parentNode !== el,
 						scrolledPastTop = _isScrolledPast(target, axis === 'vertical' ? 'top' : 'left');
 
-					if (lastEl !== target) {
-						lastEl = target;
-					}
 
 					if (lastTarget !== target) {
 						lastMode = null;
@@ -1419,17 +1419,16 @@
 
 			this._offUpEvents();
 
-			if (lastEl && options.swap) {
-				_toggleClass(lastEl, options.swapClass, false);
+			lastSwapEl && _toggleClass(lastSwapEl, options.swapClass, false);
+			if (lastSwapEl && (options.swap || putSortable && putSortable.options.swap)) {
+				if (dragEl !== lastSwapEl) {
+					var dragRect = _getRect(dragEl),
+						lastRect = _getRect(lastSwapEl);
 
-				if (dragEl !== lastEl) {
-					var dragRect = dragEl.getBoundingClientRect();
-					var lastRect = lastEl.getBoundingClientRect();
-
-					_swapNodes(dragEl, lastEl);
+					_swapNodes(dragEl, lastSwapEl);
 
 					this._animate(dragRect, dragEl);
-					this._animate(lastRect, lastEl);
+					this._animate(lastRect, lastSwapEl);
 				}
 			}
 
@@ -1497,12 +1496,9 @@
 							newIndex = oldIndex;
 						}
 
-						if (options.swap && lastEl)
+						if (options.swap && lastSwapEl)
 						{
-							if (dragEl !== lastEl)
-							{
-								_dispatchEvent(this, rootEl, 'end', dragEl, parentEl, rootEl, oldIndex, newIndex, evt, {swapItem:lastEl});
-							}
+							_dispatchEvent(this, rootEl, 'end', dragEl, parentEl, rootEl, oldIndex, newIndex, evt, { swapItem: lastSwapEl });
 						}
 						else
 						{
@@ -1526,7 +1522,7 @@
 			nextEl =
 			cloneEl =
 			lastDownEl =
-			lastEl =
+			lastSwapEl =
 
 			scrollEl =
 			scrollParentEl =
@@ -1878,17 +1874,15 @@
 
 		evt.originalEvent = originalEvt;
 
-		if (eventOptions)
-		{
-			for (var option in eventOptions)
-			{
+		if (eventOptions) {
+			for (var option in eventOptions) {
 				evt[option] = eventOptions[option];
 			}
 		}
 
 		if (rootEl) {
 			rootEl.dispatchEvent(evt);
-	        }
+		}
 
 		if (options[onName]) {
 			options[onName].call(sortable, evt);
@@ -2116,10 +2110,9 @@
 	 * Returns the index of an element within its parent for a selected set of
 	 * elements
 	 * @param  {HTMLElement} el
-	 * @param  {selector} selector
 	 * @return {number}
 	 */
-	function _index(el, selector) {
+	function _index(el) {
 		var index = 0;
 
 		if (!el || !el.parentNode) {
@@ -2228,20 +2221,12 @@
 		var p2 = n2.parentNode;
 		var i1, i2;
 
-		if ( !p1 || !p2 || p1.isEqualNode(n2) || p2.isEqualNode(n1) ) return;
+		if (!p1 || !p2 || p1.isEqualNode(n2) || p2.isEqualNode(n1)) return;
 
-		for (var i = 0; i < p1.children.length; i++) {
-			if (p1.children[i].isEqualNode(n1)) {
-				i1 = i;
-			}
-		}
-		for (var i = 0; i < p2.children.length; i++) {
-			if (p2.children[i].isEqualNode(n2)) {
-				i2 = i;
-			}
-		}
+		i1 = _index(n1);
+		i2 = _index(n2);
 
-		if ( p1.isEqualNode(p2) && i1 < i2 ) {
+		if (p1.isEqualNode(p2) && i1 < i2) {
 			i2++;
 		}
 		p1.insertBefore(n2, p1.children[i1]);
