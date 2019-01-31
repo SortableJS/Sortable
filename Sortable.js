@@ -66,7 +66,6 @@
 		lastDirection,
 		pastFirstInvertThresh = false,
 		isCircumstantialInvert = false,
-		lastMode, // 'swap' or 'insert'
 
 		targetMoveDistance,
 
@@ -112,7 +111,6 @@
 		})(),
 
 		_silent = false,
-		_alignedSilent = false,
 
 		abs = Math.abs,
 		min = Math.min,
@@ -167,32 +165,6 @@
 					return sortables[i];
 				}
 			}
-		},
-
-		_isClientInRowColumn = function(x, y, el, axis, options) {
-			var targetRect = _getRect(el),
-				targetS1Opp = axis === 'vertical' ? targetRect.left : targetRect.top,
-				targetS2Opp = axis === 'vertical' ? targetRect.right : targetRect.bottom,
-				mouseOnOppAxis = axis === 'vertical' ? x : y;
-
-			return targetS1Opp < mouseOnOppAxis && mouseOnOppAxis < targetS2Opp;
-		},
-
-		_isElInRowColumn = function(el1, el2, axis) {
-			var el1Rect = el1 === dragEl && realDragElRect || _getRect(el1),
-				el2Rect = el2 === dragEl && realDragElRect || _getRect(el2),
-				el1S1Opp = axis === 'vertical' ? el1Rect.left : el1Rect.top,
-				el1S2Opp = axis === 'vertical' ? el1Rect.right : el1Rect.bottom,
-				el1OppLength = axis === 'vertical' ? el1Rect.width : el1Rect.height,
-				el2S1Opp = axis === 'vertical' ? el2Rect.left : el2Rect.top,
-				el2S2Opp = axis === 'vertical' ? el2Rect.right : el2Rect.bottom,
-				el2OppLength = axis === 'vertical' ? el2Rect.width : el2Rect.height;
-
-			return (
-				el1S1Opp === el2S1Opp ||
-				el1S2Opp === el2S2Opp ||
-				(el1S1Opp + el1OppLength / 2) === (el2S1Opp + el2OppLength / 2)
-			);
 		},
 
 		_getParentAutoScrollElement = function(el, includeSelf) {
@@ -410,11 +382,6 @@
 			options.group = group;
 		},
 
-		_checkAlignment = function(evt) {
-			if (!dragEl || !dragEl.parentNode) return;
-			dragEl.parentNode[expando] && dragEl.parentNode[expando]._computeIsAligned(evt);
-		},
-
 		_isTrueParentSortable = function(el, target) {
 			var trueParent = target;
 			while (!trueParent[expando]) {
@@ -479,6 +446,14 @@
 	// We do not want this to be triggered if completed (bubbling canceled), so only define it here
 	document.addEventListener('dragover', nearestEmptyInsertDetectEvent);
 	document.addEventListener('mousemove', nearestEmptyInsertDetectEvent);
+
+
+	var _checkOutsideTargetEl = function(evt) {
+		if (dragEl) {
+			dragEl.parentNode[expando]._isOutsideThisEl(evt.target);
+		}
+	};
+
 
 	/**
 	 * @class  Sortable
@@ -584,38 +559,10 @@
 	Sortable.prototype = /** @lends Sortable.prototype */ {
 		constructor: Sortable,
 
-		_computeIsAligned: function(evt) {
-			var target;
-
-			if (ghostEl && !supportCssPointerEvents) {
-				_hideGhostForTarget();
-				target = document.elementFromPoint(evt.clientX, evt.clientY);
-				_unhideGhostForTarget();
-			} else {
-				target = evt.target;
-			}
-
-			target = _closest(target, this.options.draggable, this.el, false);
-			if (_alignedSilent) return;
-			if (!dragEl || dragEl.parentNode !== this.el) return;
-
-			var children = this.el.children;
-			for (var i = 0; i < children.length; i++) {
-				// Don't change for target in case it is changed to aligned before onDragOver is fired
-				if (_closest(children[i], this.options.draggable, this.el, false) && children[i] !== target) {
-					children[i].sortableMouseAligned = _isClientInRowColumn(evt.clientX, evt.clientY, children[i], this._getDirection(evt, null), this.options);
-				}
-			}
-			// Used for nulling last target when not in element, nothing to do with checking if aligned
-			if (!_closest(target, this.options.draggable, this.el, true)) {
+		_isOutsideThisEl: function(target) {
+			if (!this.el.contains(target) && target !== this.el) {
 				lastTarget = null;
 			}
-
-			_alignedSilent = true;
-			setTimeout(function() {
-				_alignedSilent = false;
-			}, 30);
-
 		},
 
 		_getDirection: function(evt, target) {
@@ -893,7 +840,7 @@
 			if (rootEl && dragEl) {
 				if (this.nativeDraggable) {
 					_on(document, 'dragover', this._handleAutoScroll);
-					_on(document, 'dragover', _checkAlignment);
+					_on(document, 'dragover', _checkOutsideTargetEl);
 				}
 				var options = this.options;
 
@@ -933,6 +880,8 @@
 					parent = target;
 				}
 
+				dragEl.parentNode[expando]._isOutsideThisEl(target);
+
 				if (parent) {
 					do {
 						if (parent[expando]) {
@@ -955,7 +904,6 @@
 					/* jshint boss:true */
 					while (parent = parent.parentNode);
 				}
-				dragEl.parentNode[expando]._computeIsAligned(touchEvt);
 
 				_unhideGhostForTarget();
 			}
@@ -964,7 +912,6 @@
 
 		_onTouchMove: function (/**TouchEvent*/evt) {
 			if (tapEvt) {
-				if (!evt.cancelable) return;
 				var	options = this.options,
 					fallbackTolerance = options.fallbackTolerance,
 					fallbackOffset = options.fallbackOffset,
@@ -1128,7 +1075,7 @@
 				// no bubbling and not fallback
 				if (!options.dragoverBubble && !evt.rootEl && target !== document) {
 					_this._handleAutoScroll(evt);
-					dragEl.parentNode[expando]._computeIsAligned(evt);
+					dragEl.parentNode[expando]._isOutsideThisEl(evt.target);
 				}
 
 				!options.dragoverBubble && evt.stopPropagation && evt.stopPropagation();
@@ -1221,45 +1168,26 @@
 				else if (target && target !== dragEl && target.parentNode === el) {
 					var direction = 0,
 						targetBeforeFirstSwap,
-						aligned = target.sortableMouseAligned,
 						differentLevel = dragEl.parentNode !== el,
 						side1 = axis === 'vertical' ? 'top' : 'left',
 						scrolledPastTop = _isScrolledPast(target, side1) || _isScrolledPast(dragEl, side1),
-						scrollBefore = scrolledPastTop ? _getScrollPosition(scrolledPastTop)[1] : void 0;
+						scrollBefore = scrolledPastTop && (scrolledPastTop ? _getScrollPosition(scrolledPastTop)[1] : void 0);
 
 
 					if (lastTarget !== target) {
-						lastMode = null;
 						targetBeforeFirstSwap = _getRect(target)[side1];
 						pastFirstInvertThresh = false;
+						isCircumstantialInvert = options.invertSwap || differentLevel;
 					}
 
-					// Reference: https://www.lucidchart.com/documents/view/10fa0e93-e362-4126-aca2-b709ee56bd8b/0
-					if (
-						_isElInRowColumn(dragEl, target, axis) && aligned ||
-						differentLevel ||
-						scrolledPastTop ||
-						options.invertSwap ||
-						lastMode === 'insert' ||
-						// Needed, in the case that we are inside target and inserted because not aligned... aligned will stay false while inside
-						// and lastMode will change to 'insert', but we must swap
-						lastMode === 'swap'
-					) {
-						// New target that we will be inside
-						if (lastMode !== 'swap') {
-							isCircumstantialInvert = options.invertSwap || differentLevel;
-						}
+					direction = _getSwapDirection(
+						evt, target, axis,
+						options.swapThreshold,
+						options.invertedSwapThreshold == null ? options.swapThreshold : options.invertedSwapThreshold,
+						isCircumstantialInvert,
+						lastTarget === target
+					);
 
-						direction = _getSwapDirection(evt, target, axis,
-							options.swapThreshold, options.invertedSwapThreshold == null ? options.swapThreshold : options.invertedSwapThreshold,
-							isCircumstantialInvert,
-							lastTarget === target);
-						lastMode = 'swap';
-					} else {
-						// Insert at position
-						direction = _getInsertDirection(target, options);
-						lastMode = 'insert';
-					}
 					if (direction === 0) return completed();
 
 					realDragElRect = null;
@@ -1296,7 +1224,7 @@
 							target.parentNode.insertBefore(dragEl, after ? nextSibling : target);
 						}
 
-						// Undo chrome's scroll adjustment
+						// Undo chrome's scroll adjustment (has no effect on other browsers)
 						if (scrolledPastTop) {
 							_scrollBy(scrolledPastTop, 0, scrollBefore - _getScrollPosition(scrolledPastTop)[1]);
 						}
@@ -1409,7 +1337,6 @@
 				_off(document, 'drop', this);
 				_off(el, 'dragstart', this._onDragStart);
 				_off(document, 'dragover', this._handleAutoScroll);
-				_off(document, 'dragover', _checkAlignment);
 			}
 
 			this._offUpEvents();
@@ -2023,7 +1950,8 @@
 					mouseOnAxis > targetS1 + (targetLength * (1 - swapThreshold) / 2) &&
 					mouseOnAxis < targetS2 - (targetLength * (1 - swapThreshold) / 2)
 				) {
-					return ((mouseOnAxis > targetS1 + targetLength / 2) ? -1 : 1);
+					return _getInsertDirection(target);
+					// return ((mouseOnAxis > targetS1 + targetLength / 2) ? -1 : 1);
 				}
 			}
 		}
@@ -2052,8 +1980,8 @@
 	 * @return {Number}                   Direction dragEl must be swapped
 	 */
 	function _getInsertDirection(target, options) {
-		var dragElIndex = _index(dragEl, options.draggable),
-			targetIndex = _index(target, options.draggable);
+		var dragElIndex = _index(dragEl),
+			targetIndex = _index(target);
 
 		if (dragElIndex < targetIndex) {
 			return 1;
@@ -2085,10 +2013,9 @@
 	 * Returns the index of an element within its parent for a selected set of
 	 * elements
 	 * @param  {HTMLElement} el
-	 * @param  {selector} selector
 	 * @return {number}
 	 */
-	function _index(el, selector) {
+	function _index(el) {
 		var index = 0;
 
 		if (!el || !el.parentNode) {
@@ -2282,7 +2209,6 @@
 	 * Checks if a side of an element is scrolled past a side of it's parents
 	 * @param  {HTMLElement}  el       The element who's side being scrolled out of view is in question
 	 * @param  {String}       side     Side of the element in question ('top', 'left', 'right', 'bottom')
-	 * @return {int}                   Amount the element is overflowing over the specified side of it's parent scroll element
 	 * @return {HTMLElement}           The parent scroll element that the el's side is scrolled past, or null if there is no such element
 	 */
 	function _isScrolledPast(el, side) {
