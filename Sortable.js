@@ -673,11 +673,33 @@
 			startIndex = _index(target, options.draggable);
 
 			// Check filter
+			if (this._checkFilter(evt, target, originalTarget, startIndex)) {
+				preventOnFilter && evt.cancelable && evt.preventDefault();
+				return; // cancel dnd
+			}
+
+			if (options.handle && !_closest(originalTarget, options.handle, el, false)) {
+				return;
+			}
+
+			// Prepare `dragstart`
+			this._prepareDragStart(evt, touch, target, startIndex);
+		},
+
+		/**
+		 * Returns true if the element should be filtered
+		 */
+		_checkFilter: function(evt, target, originalTarget = null, startIndex = 0) {
+			var _this = this,
+				el = this.el,
+				filter = this.options.filter;
+
+			if (originalTarget === null) originalTarget = target;
+
 			if (typeof filter === 'function') {
 				if (filter.call(this, evt, originalTarget, this)) {
 					_dispatchEvent(_this, originalTarget, 'filter', target, el, el, startIndex);
-					preventOnFilter && evt.cancelable && evt.preventDefault();
-					return; // cancel dnd
+					return true;
 				}
 			}
 			else if (filter) {
@@ -691,19 +713,12 @@
 				});
 
 				if (filter) {
-					preventOnFilter && evt.cancelable && evt.preventDefault();
-					return; // cancel dnd
+					return true;
 				}
 			}
 
-			if (options.handle && !_closest(originalTarget, options.handle, el, false)) {
-				return;
-			}
-
-			// Prepare `dragstart`
-			this._prepareDragStart(evt, touch, target, startIndex);
+			return false
 		},
-
 
 		_handleAutoScroll: function(evt, fallback) {
 			if (!dragEl || !this.options.scroll) return;
@@ -1179,7 +1194,12 @@
 				lastSwapEl && _toggleClass(lastSwapEl, options.swapClass, false);
 				if (options.swap) {
 					if (target && target !== el) {
-						_toggleClass(target, options.swapClass, true);
+
+						// don't show the swapClass if the element is filtered
+						if (!this._checkFilter(evt, target)) {
+							_toggleClass(target, options.swapClass, true);
+						}
+
 						lastSwapEl = target;
 					}
 					changed();
@@ -1421,7 +1441,8 @@
 
 			lastSwapEl && _toggleClass(lastSwapEl, options.swapClass, false);
 			if (lastSwapEl && (options.swap || putSortable && putSortable.options.swap)) {
-				if (dragEl !== lastSwapEl) {
+				//only allow swapping when dropping onto a different item that is not filtered
+				if (dragEl !== lastSwapEl && !this._checkFilter(evt, lastSwapEl)) {
 					var dragRect = _getRect(dragEl),
 						lastRect = _getRect(lastSwapEl);
 
@@ -1429,6 +1450,9 @@
 
 					this._animate(dragRect, dragEl);
 					this._animate(lastRect, lastSwapEl);
+				}
+				else {
+					lastSwapEl = null; //swapping was not possible, so prevent the end event from firing
 				}
 			}
 
@@ -1496,9 +1520,11 @@
 							newIndex = oldIndex;
 						}
 
-						if (options.swap && lastSwapEl)
+						if (options.swap)
 						{
-							_dispatchEvent(this, rootEl, 'end', dragEl, parentEl, rootEl, oldIndex, newIndex, evt, { swapItem: lastSwapEl });
+							if (lastSwapEl) {
+								_dispatchEvent(this, rootEl, 'end', dragEl, parentEl, rootEl, oldIndex, newIndex, evt, { swapItem: lastSwapEl });
+							}
 						}
 						else
 						{
