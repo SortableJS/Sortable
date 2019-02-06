@@ -1530,10 +1530,9 @@
 						putSortable && putSortable.save();
 					}
 					else {
+            // Get the index of the dragged element within its parent
+            newIndex = _index(dragEl, options.draggable);
 						if (dragEl.nextSibling !== nextEl) {
-							// Get the index of the dragged element within its parent
-							newIndex = _index(dragEl, options.draggable);
-
 							if (newIndex >= 0) {
 								// drag & drop within the same list
 								_dispatchEvent(this, rootEl, 'update', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
