@@ -30,10 +30,13 @@
 	var dragEl,
 		parentEl,
 		ghostEl,
-		cloneEl,
 		rootEl,
 		nextEl,
 		lastDownEl,
+
+		cloneEl,
+		multiDragClones = [],
+		cloneHidden,
 
 		scrollEl,
 		scrollParentEl,
@@ -56,11 +59,14 @@
 		lastPointerElemX,
 		lastPointerElemY,
 
+		multiDragElements = [],
+		lastMultiDragSelect, // for selection with modifier key down (SHIFT)
+		multiDragSortable,
+
 		tapEvt,
 		touchEvt,
 
 		moved,
-
 
 		lastTarget,
 		lastDirection,
@@ -68,7 +74,6 @@
 		isCircumstantialInvert = false,
 
 		targetMoveDistance,
-
 
 		forRepaintDummy,
 		realDragElRect, // dragEl rect after current animation
@@ -494,13 +499,22 @@
 			ghostClass: 'sortable-ghost',
 			chosenClass: 'sortable-chosen',
 			dragClass: 'sortable-drag',
+			selectedClass: 'sortable-selected', // for multi-drag
 			ignore: 'a, img',
 			filter: null,
 			preventOnFilter: true,
 			animation: 0,
 			easing: null,
 			setData: function (dataTransfer, dragEl) {
-				dataTransfer.setData('Text', dragEl.textContent);
+				var data = '';
+				if (multiDragElements.length) {
+					for (var i = 0; i < multiDragElements.length; i++) {
+						data += (!i ? '' : ', ') + multiDragElements[i].textContent;
+					}
+				} else {
+					data = dragEl.textContent;
+				}
+				dataTransfer.setData('Text', data);
 			},
 			dropBubble: false,
 			dragoverBubble: false,
@@ -516,7 +530,8 @@
 				('PointerEvent' in window) ||
 				window.navigator && ('msPointerEnabled' in window.navigator) // microsoft
 			),
-			emptyInsertThreshold: 5
+			emptyInsertThreshold: 5,
+			multiDrag: false
 		};
 
 
@@ -540,7 +555,12 @@
 		// Bind events
 		if (options.supportPointer) {
 			_on(el, 'pointerdown', this._onTapStart);
+
+			_on(document, 'pointerup', this._deselectMultiDrag);
 		} else {
+			_on(document, 'mouseup', this._deselectMultiDrag);
+			_on(document, 'touchend', this._deselectMultiDrag);
+
 			_on(el, 'mousedown', this._onTapStart);
 			_on(el, 'touchstart', this._onTapStart);
 		}
@@ -583,7 +603,6 @@
 				startIndex;
 
 			_saveInputCheckedState(el);
-
 
 			// IE: Calls events in capture mode if event element is nested. This ensures only correct element's _onTapStart goes through.
 			// This process is also done in _onDragOver
@@ -937,7 +956,6 @@
 				this._handleAutoScroll(touch, true);
 
 
-				moved = true;
 				touchEvt = touch;
 
 
@@ -982,21 +1000,60 @@
 			var dataTransfer = evt.dataTransfer;
 			var options = _this.options;
 
-			// Setup clone
-			cloneEl = _clone(dragEl);
+			if (!~multiDragElements.indexOf(dragEl) && multiDragSortable) {
+				multiDragSortable[expando]._deselectMultiDrag();
+			}
 
-			cloneEl.draggable = false;
-			cloneEl.style['will-change'] = '';
+			for (var i in multiDragElements) {
+				multiDragElements[i].sortableIndex = _index(multiDragElements[i]);
+			}
+
+			// Sort multi-drag elements
+			multiDragElements = multiDragElements.sort(function(a, b) {
+				return a.sortableIndex - b.sortableIndex;
+			});
+
+
+
+			// Setup clone(s)
+			if (multiDragElements.length) {
+				for (var i = 0; i < multiDragElements.length; i++) {
+					multiDragClones.push(_clone(multiDragElements[i]));
+
+					multiDragClones[i].sortableIndex = multiDragElements[i].sortableIndex;
+
+					multiDragClones[i].draggable = false;
+					multiDragClones[i].style['will-change'] = '';
+
+					_toggleClass(multiDragClones[i], _this.options.selectedClass, false);
+					multiDragElements[i] === dragEl && _toggleClass(multiDragClones[i], _this.options.chosenClass, false);
+				}
+			} else {
+				cloneEl = _clone(dragEl);
+
+				cloneEl.draggable = false;
+				cloneEl.style['will-change'] = '';
+
+				_toggleClass(cloneEl, _this.options.chosenClass, false);
+			}
 
 			this._hideClone();
 
-			_toggleClass(cloneEl, _this.options.chosenClass, false);
-
 
 			// #1143: IFrame support workaround
-			_this._cloneId = _nextTick(function () {
+			_this._cloneId = _nextTick(function() {
+				// Remove all auxiliary multidrag items from el, if sorting enabled
+				// (needs to be next tick, but before clone insert)
+				if (_this.options.sort) {
+					_removeMultiDragElements();
+				}
+
 				if (!_this.options.removeCloneOnHide) {
-					rootEl.insertBefore(cloneEl, dragEl);
+					if (options.multiDrag) {
+						_insertMultiDrag(true);
+					} else {
+						rootEl.insertBefore(cloneEl, dragEl);
+					}
 				}
 				_dispatchEvent(_this, rootEl, 'clone', dragEl);
 			});
@@ -1029,6 +1086,8 @@
 
 			_this._dragStartId = _nextTick(_this._dragStarted.bind(_this, fallback));
 			_on(document, 'selectstart', _this);
+
+			moved = true;
 		},
 
 
@@ -1053,8 +1112,15 @@
 				return;
 			}
 
-			// Return invocation when no further action is needed in another sortable
+			// Return invocation when dragEl is inserted
 			function completed() {
+				if (isOwner) {
+					activeSortable._hideClone();
+				} else {
+					_removeMultiDragElements();
+					activeSortable._showClone(_this);
+				}
+
 				if (activeSortable) {
 					// Set ghost class to new sortable's ghost class
 					_toggleClass(dragEl, putSortable ? putSortable.options.ghostClass : activeSortable.options.ghostClass, false);
@@ -1094,13 +1160,11 @@
 			}
 
 
-			moved = true;
-
 			target = _closest(target, options.draggable, el, true);
 
 			// target is dragEl or target is animated
 			if (!!_closest(evt.target, null, dragEl, true) || target.animated) {
-				return completed();
+				return true; // not completed() because dragEl not inserted
 			}
 
 			if (target !== dragEl) {
@@ -1124,13 +1188,17 @@
 				dragRect = _getRect(dragEl);
 
 				if (revert) {
-					this._hideClone();
 					parentEl = rootEl; // actualization
+					this._hideClone();
 
-					if (nextEl) {
-						rootEl.insertBefore(dragEl, nextEl);
+					if (multiDragElements.length) {
+						_insertMultiDrag();
 					} else {
-						rootEl.appendChild(dragEl);
+						if (nextEl) {
+							rootEl.insertBefore(dragEl, nextEl);
+						} else {
+							rootEl.appendChild(dragEl);
+						}
 					}
 
 					return completed();
@@ -1146,12 +1214,6 @@
 
 					if (target) {
 						targetRect = _getRect(target);
-					}
-
-					if (isOwner) {
-						activeSortable._hideClone();
-					} else {
-						activeSortable._showClone(this);
 					}
 
 					if (_onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt, !!target) !== false) {
@@ -1211,12 +1273,6 @@
 
 						_silent = true;
 						setTimeout(_unsilent, 30);
-
-						if (isOwner) {
-							activeSortable._hideClone();
-						} else {
-							activeSortable._showClone(this);
-						}
 
 						if (after && !nextSibling) {
 							el.appendChild(dragEl);
@@ -1310,9 +1366,24 @@
 			_off(document, 'selectstart', this);
 		},
 
+		_deselectMultiDrag: function(evt) {
+			// Only deselect if selection is in this sortable
+			if (multiDragSortable !== this.el) return;
+
+			// Only deselect if target is not item in this sortable
+			if (evt && _closest(evt.target, this.options.draggable, this.el, false)) return;
+
+			for (var i = 0; i < multiDragElements.length; i++) {
+				_toggleClass(multiDragElements[i], this.options.selectedClass, false);
+			}
+			multiDragElements = [];
+		},
+
 		_onDrop: function (/**Event*/evt) {
 			var el = this.el,
-				options = this.options;
+				options = this.options,
+				i, n;
+
 			awaitingDragStarted = false;
 			scrolling = false;
 			isCircumstantialInvert = false;
@@ -1341,6 +1412,75 @@
 
 			this._offUpEvents();
 
+
+			// Multi-drag selection
+			if (!moved && options.multiDrag) {
+				_toggleClass(dragEl, options.selectedClass, !~multiDragElements.indexOf(dragEl));
+
+				if (!~multiDragElements.indexOf(dragEl)) {
+					multiDragElements.push(dragEl);
+					dragEl.sortableIndex = _index(dragEl);
+
+					// Modifier activated, select from last to dragEl
+					if (evt.shiftKey && lastMultiDragSelect && this.el.contains(lastMultiDragSelect)) {
+						var lastIndex = _index(lastMultiDragSelect),
+							currentIndex = _index(dragEl);
+
+						if (~lastIndex && ~currentIndex && lastIndex !== currentIndex) {
+							var children = parentEl.children;
+
+
+							if (currentIndex > lastIndex) {
+								i = lastIndex + 1;
+								n = currentIndex;
+							} else {
+								i = currentIndex + 1;
+								n = lastIndex;
+							}
+
+							for (; i < n; i++) {
+								if (~multiDragElements.indexOf(children[i])) continue;
+								children[i].sortableIndex = _index(children[i]);
+								_toggleClass(children[i], options.selectedClass, true);
+								multiDragElements.push(children[i]);
+							}
+						}
+					}
+
+					lastMultiDragSelect = dragEl;
+					multiDragSortable = parentEl;
+				} else {
+					multiDragElements.splice(multiDragElements.indexOf(dragEl), 1);
+					lastMultiDragSelect = null;
+				}
+			}
+
+			// Multi-drag drop
+			if (moved && options.multiDrag && multiDragElements.length) {
+				// Do not "unfold" after around dragEl if sorting disabled (either reverted or never left it's sort:false root)
+				if (parentEl[expando].options.sort) {
+					var firstMultiDragElementIndex = _index(dragEl),
+						firstMultiDragRect = _getRect(dragEl);
+
+					// insert first multi drag at dragEl's position
+					parentEl.insertBefore(multiDragElements[0], dragEl);
+					multiDragElements[0] !== dragEl && parentEl.removeChild(dragEl);
+
+
+					for (i = 1; i < multiDragElements.length; i++) {
+						if (multiDragElements[i - 1].nextSibling) {
+							parentEl.insertBefore(multiDragElements[i], multiDragElements[i - 1].nextSibling);
+						} else {
+							parentEl.appendChild(multiDragElements[i]);
+						}
+
+						this._animate(firstMultiDragRect, multiDragElements[i]);
+					}
+				}
+
+				multiDragSortable = parentEl;
+			}
+
 			if (evt) {
 				if (moved) {
 					evt.cancelable && evt.preventDefault();
@@ -1362,8 +1502,11 @@
 					_disableDraggable(dragEl);
 					dragEl.style['will-change'] = '';
 
-					// Remove class's
-					_toggleClass(dragEl, putSortable ? putSortable.options.ghostClass : this.options.ghostClass, false);
+					// Remove classes
+					// ghostClass is added in dragStarted
+					if (moved && !awaitingDragStarted) {
+						_toggleClass(dragEl, putSortable ? putSortable.options.ghostClass : this.options.ghostClass, false);
+					}
 					_toggleClass(dragEl, this.options.chosenClass, false);
 
 					// Drag stop event
@@ -1454,7 +1597,8 @@
 				el.checked = true;
 			});
 
-			savedInputChecked.length = 0;
+			savedInputChecked.length =
+			multiDragClones.length = 0;
 		},
 
 		handleEvent: function (/**Event*/evt) {
@@ -1596,12 +1740,19 @@
 		},
 
 		_hideClone: function() {
-			if (!cloneEl.cloneHidden) {
-				_css(cloneEl, 'display', 'none');
-				cloneEl.cloneHidden = true;
-				if (cloneEl.parentNode && this.options.removeCloneOnHide) {
-					cloneEl.parentNode.removeChild(cloneEl);
+			if (!cloneHidden) {
+				for (var i = 0; i < (multiDragClones.length || 1); i++) {
+					var clone = multiDragClones[i];
+					if (!clone) {
+						clone = cloneEl;
+					}
+
+					_css(clone, 'display', 'none');
+					if (this.options.removeCloneOnHide && clone.parentNode) {
+						clone.parentNode.removeChild(clone);
+					}
 				}
+				cloneHidden = true;
 			}
 		},
 
@@ -1611,21 +1762,30 @@
 				return;
 			}
 
-			if (cloneEl.cloneHidden) {
-				// show clone at dragEl or original position
-				if (rootEl.contains(dragEl) && !this.options.group.revertClone) {
-					rootEl.insertBefore(cloneEl, dragEl);
-				} else if (nextEl) {
-					rootEl.insertBefore(cloneEl, nextEl);
-				} else {
-					rootEl.appendChild(cloneEl);
-				}
 
-				if (this.options.group.revertClone) {
-					this._animate(dragEl, cloneEl);
+			if (cloneHidden) {
+				if (multiDragClones.length) {
+					_insertMultiDrag(true);
+					for (var i = 0; i < multiDragClones.length; i++) {
+						_css(multiDragClones[i], 'display', '');
+					}
+				} else {
+					// show clone at dragEl or original position
+					if (rootEl.contains(dragEl) && !this.options.group.revertClone) {
+						rootEl.insertBefore(cloneEl, dragEl);
+					} else if (nextEl) {
+						rootEl.insertBefore(cloneEl, nextEl);
+					} else {
+						rootEl.appendChild(cloneEl);
+					}
+
+					if (this.options.group.revertClone) {
+						this._animate(dragEl, cloneEl);
+					}
+
+					_css(cloneEl, 'display', '');
 				}
-				_css(cloneEl, 'display', '');
-				cloneEl.cloneHidden = false;
+				cloneHidden = false;
 			}
 		}
 	};
@@ -1775,7 +1935,9 @@
 		evt.to = toEl || rootEl;
 		evt.from = fromEl || rootEl;
 		evt.item = targetEl || rootEl;
+		evt.items = multiDragElements || [];
 		evt.clone = cloneEl;
+		evt.clones = multiDragClones || [];
 
 		evt.oldIndex = startIndex;
 		evt.newIndex = newIndex;
@@ -2234,6 +2396,25 @@
 		}
 
 		return false;
+	}
+
+	function _insertMultiDrag(clones) {
+		var multiDrags = clones ? multiDragClones : multiDragElements;
+		for (var i = 0; i < multiDrags.length; i++) {
+			var target = rootEl.children[multiDrags[i].sortableIndex];
+			if (target) {
+				rootEl.insertBefore(multiDrags[i], target);
+			} else {
+				rootEl.appendChild(multiDrags[i]);
+			}
+		}
+	}
+
+	function _removeMultiDragElements() {
+		for (var i = 0; i < multiDragElements.length; i++) {
+			if (multiDragElements[i] === dragEl) continue;
+			multiDragElements[i].parentNode && multiDragElements[i].parentNode.removeChild(multiDragElements[i]);
+		}
 	}
 
 	// Fixed #973:

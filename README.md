@@ -92,10 +92,12 @@ var sortable = new Sortable(el, {
 	filter: ".ignore-elements",  // Selectors that do not lead to dragging (String or Function)
 	preventOnFilter: true, // Call `event.preventDefault()` when triggered `filter`
 	draggable: ".item",  // Specifies which items inside the element should be draggable
+	dataIdAttr: 'data-id',
+	
 	ghostClass: "sortable-ghost",  // Class name for the drop placeholder
 	chosenClass: "sortable-chosen",  // Class name for the chosen item
 	dragClass: "sortable-drag",  // Class name for the dragging item
-	dataIdAttr: 'data-id',
+	selectedClass: "sortable-selected", // Class name for selected item (if multi-drag is enabled)
 
 	swapThreshold: 1, // Threshold of the swap zone
 	invertSwap: false, // Will always use inverted swap zone if set to true
@@ -117,6 +119,8 @@ var sortable = new Sortable(el, {
 	dragoverBubble: false,
 	removeCloneOnHide: true, // Remove the clone element when it is not showing, rather than just hiding it
 	emptyInsertThreshold: 5, // px, distance mouse must be from empty sortable to insert drag element into it
+
+	multiDrag: false, // Enable multi-dragging
 
 
 	setData: function (/** DataTransfer */dataTransfer, /** HTMLElement*/dragEl) {
@@ -355,6 +359,15 @@ Sortable.create(el, {
 }
 ```
 
+---
+
+
+### `multiDrag` option
+This option will allow users to select multiple items within the sortable at once, and drag them as one item.
+Once placed, the items will unfold into their original order, but all beside eachother at the new position.
+
+Demo: https://jsbin.com/wopavom/edit?js,output
+
 
 ---
 
@@ -420,6 +433,27 @@ Demo: https://jsbin.com/hoqufox/edit?css,js,output
 Sortable.create(list, {
   delay: 500,
   chosenClass: "chosen"
+});
+```
+
+
+---
+
+
+#### `selectedClass`
+Class name for the selected item(s) if multiDrag is enabled. Defaults to `sortable-selected`.
+
+```css
+.selected {
+  background-color: #f9c7c8;
+  border: solid red 1px;
+}
+```
+
+```js
+Sortable.create(list, {
+  multiDrag: true,
+  selectedClass: "selected"
 });
 ```
 
@@ -524,7 +558,9 @@ Demo: https://jsbin.com/becavoj/edit?js,output
  - to:`HTMLElement` — list, in which moved element
  - from:`HTMLElement` — previous list
  - item:`HTMLElement` — dragged element
+ - items:`HTMLElement[]` - Array of selected items (if multi-drag is enabled), otherwise empty
  - clone:`HTMLElement`
+ - clones:`HTMLElement[]` - Array of clones (if multi-drag is enabled), otherwise empty
  - oldIndex:`Number|undefined` — old index within parent
  - newIndex:`Number|undefined` — new index within parent
 
