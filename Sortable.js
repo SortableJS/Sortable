@@ -134,7 +134,7 @@
 			}
 			return (child1 &&
 				(
-					firstChildCSS.display === 'block' ||
+					child1.style.display === 'block' || // getComputedStyle() gives 'block' when 'inline-block'
 					firstChildCSS.display === 'flex' ||
 					firstChildCSS.display === 'table' ||
 					firstChildCSS.display === 'grid' ||
