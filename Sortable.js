@@ -1176,11 +1176,19 @@
 
 				dragRect = _getRect(dragEl);
 
-				lastSwapEl && _toggleClass(lastSwapEl, options.swapClass, false);
 				if (options.swap) {
 					if (target && target !== el) {
-						_toggleClass(target, options.swapClass, true);
-						lastSwapEl = target;
+						var prevSwapEl = lastSwapEl;
+						if (_onMove(rootEl, el, dragEl, dragRect, target, _getRect(target), evt, false) !== false) {
+							_toggleClass(target, options.swapClass, true);
+							lastSwapEl = target;
+						} else {
+							lastSwapEl = null;
+						}
+
+						if (prevSwapEl && prevSwapEl !== lastSwapEl) {
+							_toggleClass(prevSwapEl, options.swapClass, false);
+						}
 					}
 					changed();
 
