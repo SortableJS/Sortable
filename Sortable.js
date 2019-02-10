@@ -1702,9 +1702,9 @@
 					selector != null &&
 					(
 						selector[0] === '>' && el.parentNode === ctx && _matches(el, selector.substring(1)) ||
-						_matches(el, selector) ||
-						(includeCTX && el === ctx)
-					)
+						_matches(el, selector)
+					) ||
+					includeCTX && el === ctx
 				) {
 					return el;
 				}
