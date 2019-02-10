@@ -132,9 +132,15 @@
 				return elCSS.flexDirection === 'column' || elCSS.flexDirection === 'column-reverse'
 				? 'vertical' : 'horizontal';
 			}
+			if (child1 && firstChildCSS.float !== 'none') {
+				var touchingSideChild2 = firstChildCSS.float === 'left' ? 'left' : 'right';
+
+				return child2 && (secondChildCSS.clear === 'both' || secondChildCSS.clear === touchingSideChild2) ?
+					'vertical' : 'horizontal';
+			}
 			return (child1 &&
 				(
-					child1.style.display === 'block' || // getComputedStyle() gives 'block' when 'inline-block'
+					firstChildCSS.display === 'block' ||
 					firstChildCSS.display === 'flex' ||
 					firstChildCSS.display === 'table' ||
 					firstChildCSS.display === 'grid' ||
@@ -1923,15 +1929,17 @@
 	}
 
 	/**
-	 * Gets the last child in the el, ignoring ghostEl
+	 * Gets the last child in the el, ignoring ghostEl or invisible elements (clones)
 	 * @param  {HTMLElement} el       Parent element
 	 * @return {HTMLElement}          The last child, ignoring ghostEl
 	 */
 	function _lastChild(el) {
 		var last = el.lastElementChild;
 
-		if (last === ghostEl) {
-			last = el.children[el.childElementCount - 2];
+		while (last === ghostEl || last.style.display === 'none') {
+			last = last.previousElementSibling;
+
+			if (!last) break;
 		}
 
 		return last || null;
@@ -1943,12 +1951,13 @@
 			mouseOnOppAxis = axis === 'vertical' ? evt.clientX : evt.clientY,
 			targetS2 = axis === 'vertical' ? elRect.bottom : elRect.right,
 			targetS1Opp = axis === 'vertical' ? elRect.left : elRect.top,
-			targetS2Opp = axis === 'vertical' ? elRect.right : elRect.bottom;
+			targetS2Opp = axis === 'vertical' ? elRect.right : elRect.bottom,
+			spacer = 10;
 
 		return (
-			mouseOnOppAxis > targetS1Opp &&
-			mouseOnOppAxis < targetS2Opp &&
-			mouseOnAxis > targetS2
+			axis === 'vertical' ?
+				(mouseOnOppAxis > targetS2Opp + spacer || mouseOnOppAxis <= targetS2Opp && mouseOnAxis > targetS2 && mouseOnOppAxis >= targetS1Opp) :
+				(mouseOnAxis > targetS2 && mouseOnOppAxis > targetS1Opp || mouseOnAxis <= targetS2 && mouseOnOppAxis > targetS2Opp + spacer)
 		);
 	}
 
