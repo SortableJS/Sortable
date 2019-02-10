@@ -135,6 +135,12 @@
 				return elCSS.flexDirection === 'column' || elCSS.flexDirection === 'column-reverse'
 				? 'vertical' : 'horizontal';
 			}
+			if (child1 && firstChildCSS.float !== 'none') {
+				var touchingSideChild2 = firstChildCSS.float === 'left' ? 'left' : 'right';
+
+				return child2 && (secondChildCSS.clear === 'both' || secondChildCSS.clear === touchingSideChild2) ?
+					'vertical' : 'horizontal';
+			}
 			return (child1 &&
 				(
 					firstChildCSS.display === 'block' ||
@@ -435,6 +441,7 @@
 	}, true);
 
 	var nearestEmptyInsertDetectEvent = function(evt) {
+		evt = evt.touches ? evt.touches[0] : evt;
 		if (dragEl) {
 			var nearest = _detectNearestEmptySortable(evt.clientX, evt.clientY);
 
@@ -449,8 +456,9 @@
 		}
 	};
 	// We do not want this to be triggered if completed (bubbling canceled), so only define it here
-	document.addEventListener('dragover', nearestEmptyInsertDetectEvent);
-	document.addEventListener('mousemove', nearestEmptyInsertDetectEvent);
+	_on(document, 'dragover', nearestEmptyInsertDetectEvent);
+	_on(document, 'mousemove', nearestEmptyInsertDetectEvent);
+	_on(document, 'touchmove', nearestEmptyInsertDetectEvent);
 
 
 	var _checkOutsideTargetEl = function(evt) {
@@ -1799,9 +1807,9 @@
 					selector != null &&
 					(
 						selector[0] === '>' && el.parentNode === ctx && _matches(el, selector.substring(1)) ||
-						_matches(el, selector) ||
-						(includeCTX && el === ctx)
-					)
+						_matches(el, selector)
+					) ||
+					includeCTX && el === ctx
 				) {
 					return el;
 				}
@@ -2029,15 +2037,17 @@
 	}
 
 	/**
-	 * Gets the last child in the el, ignoring ghostEl
+	 * Gets the last child in the el, ignoring ghostEl or invisible elements (clones)
 	 * @param  {HTMLElement} el       Parent element
 	 * @return {HTMLElement}          The last child, ignoring ghostEl
 	 */
 	function _lastChild(el) {
 		var last = el.lastElementChild;
 
-		if (last === ghostEl) {
-			last = el.children[el.childElementCount - 2];
+		while (last === ghostEl || last.style.display === 'none') {
+			last = last.previousElementSibling;
+
+			if (!last) break;
 		}
 
 		return last || null;
@@ -2049,12 +2059,13 @@
 			mouseOnOppAxis = axis === 'vertical' ? evt.clientX : evt.clientY,
 			targetS2 = axis === 'vertical' ? elRect.bottom : elRect.right,
 			targetS1Opp = axis === 'vertical' ? elRect.left : elRect.top,
-			targetS2Opp = axis === 'vertical' ? elRect.right : elRect.bottom;
+			targetS2Opp = axis === 'vertical' ? elRect.right : elRect.bottom,
+			spacer = 10;
 
 		return (
-			mouseOnOppAxis > targetS1Opp &&
-			mouseOnOppAxis < targetS2Opp &&
-			mouseOnAxis > targetS2
+			axis === 'vertical' ?
+				(mouseOnOppAxis > targetS2Opp + spacer || mouseOnOppAxis <= targetS2Opp && mouseOnAxis > targetS2 && mouseOnOppAxis >= targetS1Opp) :
+				(mouseOnAxis > targetS2 && mouseOnOppAxis > targetS1Opp || mouseOnAxis <= targetS2 && mouseOnOppAxis > targetS2Opp + spacer)
 		);
 	}
 
@@ -2458,6 +2469,6 @@
 
 
 	// Export
-	Sortable.version = '1.8.1';
+	Sortable.version = '1.8.2';
 	return Sortable;
 });

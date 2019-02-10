@@ -1,7 +1,7 @@
 {
 	"name": "sortablejs",
 	"exportName": "Sortable",
-	"version": "1.8.1",
+	"version": "1.8.2",
 	"devDependencies": {
 		"gulp": "^4.0.0",
 		"gulp-each": "^0.5.0",
