@@ -462,6 +462,7 @@
 	}, true);
 
 	var nearestEmptyInsertDetectEvent = function(evt) {
+		evt = evt.touches ? evt.touches[0] : evt;
 		if (dragEl) {
 			var nearest = _detectNearestEmptySortable(evt.clientX, evt.clientY);
 
@@ -476,8 +477,9 @@
 		}
 	};
 	// We do not want this to be triggered if completed (bubbling canceled), so only define it here
-	document.addEventListener('dragover', nearestEmptyInsertDetectEvent);
-	document.addEventListener('mousemove', nearestEmptyInsertDetectEvent);
+	_on(document, 'dragover', nearestEmptyInsertDetectEvent);
+	_on(document, 'mousemove', nearestEmptyInsertDetectEvent);
+	_on(document, 'touchmove', nearestEmptyInsertDetectEvent);
 
 	/**
 	 * @class  Sortable
