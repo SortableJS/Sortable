@@ -132,6 +132,12 @@
 				return elCSS.flexDirection === 'column' || elCSS.flexDirection === 'column-reverse'
 				? 'vertical' : 'horizontal';
 			}
+			if (child1 && firstChildCSS.float !== 'none') {
+				var touchingSideChild2 = firstChildCSS.float === 'left' ? 'left' : 'right';
+
+				return child2 && (secondChildCSS.clear === 'both' || secondChildCSS.clear === touchingSideChild2) ?
+					'vertical' : 'horizontal';
+			}
 			return (child1 &&
 				(
 					firstChildCSS.display === 'block' ||
@@ -456,6 +462,7 @@
 	}, true);
 
 	var nearestEmptyInsertDetectEvent = function(evt) {
+		evt = evt.touches ? evt.touches[0] : evt;
 		if (dragEl) {
 			var nearest = _detectNearestEmptySortable(evt.clientX, evt.clientY);
 
@@ -470,8 +477,9 @@
 		}
 	};
 	// We do not want this to be triggered if completed (bubbling canceled), so only define it here
-	document.addEventListener('dragover', nearestEmptyInsertDetectEvent);
-	document.addEventListener('mousemove', nearestEmptyInsertDetectEvent);
+	_on(document, 'dragover', nearestEmptyInsertDetectEvent);
+	_on(document, 'mousemove', nearestEmptyInsertDetectEvent);
+	_on(document, 'touchmove', nearestEmptyInsertDetectEvent);
 
 	/**
 	 * @class  Sortable
@@ -501,7 +509,7 @@
 			scrollSensitivity: 30,
 			scrollSpeed: 10,
 			bubbleScroll: true,
-			draggable: /[uo]l/i.test(el.nodeName) ? 'li' : '>*',
+			draggable: /[uo]l/i.test(el.nodeName) ? '>li' : '>*',
 			swapThreshold: 1, // percentage; 0 <= x <= 1
 			invertSwap: false, // invert always
 			invertedSwapThreshold: null, // will be set to same as swapThreshold if default
@@ -617,7 +625,6 @@
 
 		_onTapStart: function (/** Event|TouchEvent */evt) {
 			if (!evt.cancelable) return;
-
 			var _this = this,
 				el = this.el,
 				options = this.options,
@@ -808,7 +815,6 @@
 
 				if (options.supportPointer) {
 					_on(ownerDocument, 'pointerup', _this._onDrop);
-					_on(ownerDocument, 'pointercancel', _this._onDrop);
 				} else {
 					_on(ownerDocument, 'mouseup', _this._onDrop);
 					_on(ownerDocument, 'touchend', _this._onDrop);
@@ -959,7 +965,6 @@
 
 		_onTouchMove: function (/**TouchEvent*/evt) {
 			if (tapEvt) {
-				if (!evt.cancelable) return;
 				var	options = this.options,
 					fallbackTolerance = options.fallbackTolerance,
 					fallbackOffset = options.fallbackOffset,
@@ -1061,7 +1066,6 @@
 				_off(document, 'mouseup', _this._onDrop);
 				_off(document, 'touchend', _this._onDrop);
 				_off(document, 'touchcancel', _this._onDrop);
-				_off(document, 'pointercancel', _this._onDrop);
 
 				if (dataTransfer) {
 					dataTransfer.effectAllowed = 'move';
@@ -1213,7 +1217,7 @@
 						return completed();
 					}
 				}
-				else if (target && target !== dragEl && (target.parentNode[expando] !== void 0) && target !== el) {
+				else if (target && target !== dragEl && target.parentNode === el) {
 					var direction = 0,
 						targetBeforeFirstSwap,
 						aligned = target.sortableMouseAligned,
@@ -1365,14 +1369,12 @@
 			_off(ownerDocument, 'touchend', this._onDrop);
 			_off(ownerDocument, 'pointerup', this._onDrop);
 			_off(ownerDocument, 'touchcancel', this._onDrop);
-			_off(ownerDocument, 'pointercancel', this._onDrop);
 			_off(document, 'selectstart', this);
 		},
 
 		_onDrop: function (/**Event*/evt) {
 			var el = this.el,
 				options = this.options;
-
 			awaitingDragStarted = false;
 			scrolling = false;
 			isCircumstantialInvert = false;
@@ -1696,7 +1698,14 @@
 			ctx = ctx || document;
 
 			do {
-				if ((selector === '>*' && el.parentNode === ctx) || _matches(el, selector) || (includeCTX && el === ctx)) {
+				if (
+					selector != null &&
+					(
+						selector[0] === '>' && el.parentNode === ctx && _matches(el, selector.substring(1)) ||
+						_matches(el, selector)
+					) ||
+					includeCTX && el === ctx
+				) {
 					return el;
 				}
 
@@ -1718,7 +1727,7 @@
 
 	function _globalDragOver(/**Event*/evt) {
 		if (evt.dataTransfer) {
-			evt.dataTransfer.dropEffect = 'move';
+			evt.dataTransfer.dropEffect = 'none';
 		}
 		evt.cancelable && evt.preventDefault();
 	}
@@ -1921,15 +1930,17 @@
 	}
 
 	/**
-	 * Gets the last child in the el, ignoring ghostEl
+	 * Gets the last child in the el, ignoring ghostEl or invisible elements (clones)
 	 * @param  {HTMLElement} el       Parent element
 	 * @return {HTMLElement}          The last child, ignoring ghostEl
 	 */
 	function _lastChild(el) {
 		var last = el.lastElementChild;
 
-		if (last === ghostEl) {
-			last = el.children[el.childElementCount - 2];
+		while (last === ghostEl || last.style.display === 'none') {
+			last = last.previousElementSibling;
+
+			if (!last) break;
 		}
 
 		return last || null;
@@ -1941,12 +1952,13 @@
 			mouseOnOppAxis = axis === 'vertical' ? evt.clientX : evt.clientY,
 			targetS2 = axis === 'vertical' ? elRect.bottom : elRect.right,
 			targetS1Opp = axis === 'vertical' ? elRect.left : elRect.top,
-			targetS2Opp = axis === 'vertical' ? elRect.right : elRect.bottom;
+			targetS2Opp = axis === 'vertical' ? elRect.right : elRect.bottom,
+			spacer = 10;
 
 		return (
-			mouseOnOppAxis > targetS1Opp &&
-			mouseOnOppAxis < targetS2Opp &&
-			mouseOnAxis > targetS2
+			axis === 'vertical' ?
+				(mouseOnOppAxis > targetS2Opp + spacer || mouseOnOppAxis <= targetS2Opp && mouseOnAxis > targetS2 && mouseOnOppAxis >= targetS1Opp) :
+				(mouseOnAxis > targetS2 && mouseOnOppAxis > targetS1Opp || mouseOnAxis <= targetS2 && mouseOnOppAxis > targetS2Opp + spacer)
 		);
 	}
 
@@ -2332,6 +2344,6 @@
 
 
 	// Export
-	Sortable.version = '1.8.1';
+	Sortable.version = '1.8.2';
 	return Sortable;
 });
