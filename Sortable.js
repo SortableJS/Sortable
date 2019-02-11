@@ -650,7 +650,7 @@
 			}
 
 			// Get the index of the dragged element within its parent
-			startIndex = _index(target, options.draggable);
+			startIndex = _index(target);
 
 			// Check filter
 			if (typeof filter === 'function') {
@@ -1164,7 +1164,7 @@
 
 			// Call when dragEl has been inserted
 			function changed() {
-				_dispatchEvent(_this, rootEl, 'change', target, el, rootEl, oldIndex, _index(lastSwapEl || dragEl, options.draggable), evt);
+				_dispatchEvent(_this, rootEl, 'change', target, el, rootEl, oldIndex, _index(lastSwapEl || dragEl), evt);
 			}
 
 
@@ -1558,7 +1558,7 @@
 					_dispatchEvent(this, rootEl, 'unchoose', dragEl, parentEl, rootEl, oldIndex, null, evt);
 
 					if (rootEl !== parentEl) {
-						newIndex = _index(dragEl, options.draggable);
+						newIndex = _index(dragEl);
 
 						if (newIndex >= 0) {
 							// Add event
@@ -1576,7 +1576,7 @@
 					}
 					else {
 						// Get the index of the dragged element within its parent
-						newIndex = _index(dragEl, options.draggable);
+						newIndex = _index(dragEl);
 
 						if (dragEl.nextSibling !== nextEl) {
 							if (newIndex >= 0) {
