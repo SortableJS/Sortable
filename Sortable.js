@@ -1877,7 +1877,7 @@
 
 	function _globalDragOver(/**Event*/evt) {
 		if (evt.dataTransfer) {
-			evt.dataTransfer.dropEffect = 'none';
+			evt.dataTransfer.dropEffect = 'move';
 		}
 		evt.cancelable && evt.preventDefault();
 	}
@@ -2538,6 +2538,6 @@
 
 
 	// Export
-	Sortable.version = '1.8.2';
+	Sortable.version = '1.8.3';
 	return Sortable;
 });
