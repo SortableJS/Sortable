@@ -98,9 +98,11 @@ var sortable = new Sortable(el, {
 	ghostClass: "sortable-ghost",  // Class name for the drop placeholder
 	chosenClass: "sortable-chosen",  // Class name for the chosen item
 	dragClass: "sortable-drag",  // Class name for the dragging item
+	swapClass: "sortable-swap-highlight", // Class name for swap item (if swap mode is enabled)
 	selectedClass: "sortable-selected", // Class name for selected item (if multi-drag is enabled)
 
 	swap: false, // Enable swap mode
+	multiDrag: false, // Enable multi-dragging
 
 	swapThreshold: 1, // Threshold of the swap zone
 	invertSwap: false, // Will always use inverted swap zone if set to true
@@ -122,8 +124,6 @@ var sortable = new Sortable(el, {
 	dragoverBubble: false,
 	removeCloneOnHide: true, // Remove the clone element when it is not showing, rather than just hiding it
 	emptyInsertThreshold: 5, // px, distance mouse must be from empty sortable to insert drag element into it
-
-	multiDrag: false, // Enable multi-dragging
 
 
 	setData: function (/** DataTransfer */dataTransfer, /** HTMLElement*/dragEl) {
@@ -231,7 +231,7 @@ Demo:
 
 
 #### `sort` option
-Enable sorting or swapping inside list.
+Allow sorting inside list.
 
 Demo: https://jsbin.com/jayedig/edit?js,output
 
@@ -240,7 +240,7 @@ Demo: https://jsbin.com/jayedig/edit?js,output
 
 
 #### `swap` option
-Enable swapping mode rather than sorting mode.
+Enable swap mode.
 
 Demo: 
 
@@ -444,6 +444,26 @@ Demo: https://jsbin.com/hoqufox/edit?css,js,output
 Sortable.create(list, {
   delay: 500,
   chosenClass: "chosen"
+});
+```
+
+
+---
+
+
+#### `swapClass`
+Class name for the item to be swapped with, if swap mode is enabled. Defaults to `sortable-swap-highlight`.
+
+```css
+.highlighted {
+  background-color: #9AB6F1;
+}
+```
+
+```js
+Sortable.create(list, {
+  swap: true,
+  swapClass: "highlighted"
 });
 ```
 
