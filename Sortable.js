@@ -1727,7 +1727,7 @@
 
 	function _globalDragOver(/**Event*/evt) {
 		if (evt.dataTransfer) {
-			evt.dataTransfer.dropEffect = 'none';
+			evt.dataTransfer.dropEffect = 'move';
 		}
 		evt.cancelable && evt.preventDefault();
 	}
