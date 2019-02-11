@@ -33,6 +33,7 @@
 		rootEl,
 		nextEl,
 		lastDownEl,
+		lastSwapEl,
 
 		cloneEl,
 		multiDragClones = [],
@@ -491,6 +492,7 @@
 			sort: true,
 			disabled: false,
 			store: null,
+			swap: false,
 			handle: null,
 			scroll: true,
 			scrollSensitivity: 30,
@@ -507,6 +509,7 @@
 			ghostClass: 'sortable-ghost',
 			chosenClass: 'sortable-chosen',
 			dragClass: 'sortable-drag',
+			swapClass: "sortable-swap-highlight",
 			selectedClass: 'sortable-selected', // for multi-drag
 			ignore: 'a, img',
 			filter: null,
@@ -647,11 +650,11 @@
 			}
 
 			// Get the index of the dragged element within its parent
-			startIndex = _index(target, options.draggable);
+			startIndex = _index(target);
 
 			// Check filter
 			if (typeof filter === 'function') {
-				if (filter.call(this, evt, target, this)) {
+				if (filter.call(this, evt, originalTarget, this)) {
 					_dispatchEvent(_this, originalTarget, 'filter', target, el, el, startIndex);
 					preventOnFilter && evt.cancelable && evt.preventDefault();
 					return; // cancel dnd
@@ -1008,6 +1011,8 @@
 			var dataTransfer = evt.dataTransfer;
 			var options = _this.options;
 
+			lastSwapEl = dragEl;
+
 			if (!~multiDragElements.indexOf(dragEl) && multiDragSortable) {
 				multiDragSortable[expando]._deselectMultiDrag();
 			}
@@ -1159,7 +1164,7 @@
 
 			// Call when dragEl has been inserted
 			function changed() {
-				_dispatchEvent(_this, rootEl, 'change', target, el, rootEl, oldIndex, _index(dragEl, options.draggable), evt);
+				_dispatchEvent(_this, rootEl, 'change', target, el, rootEl, oldIndex, _index(lastSwapEl || dragEl), evt);
 			}
 
 
@@ -1194,6 +1199,25 @@
 				var axis = this._getDirection(evt, target);
 
 				dragRect = _getRect(dragEl);
+
+				if (options.swap) {
+					if (target && target !== el) {
+						var prevSwapEl = lastSwapEl;
+						if (_onMove(rootEl, el, dragEl, dragRect, target, _getRect(target), evt, false) !== false) {
+							_toggleClass(target, options.swapClass, true);
+							lastSwapEl = target;
+						} else {
+							lastSwapEl = null;
+						}
+
+						if (prevSwapEl && prevSwapEl !== lastSwapEl) {
+							_toggleClass(prevSwapEl, options.swapClass, false);
+						}
+					}
+					changed();
+
+					return completed();
+				}
 
 				if (revert) {
 					parentEl = rootEl; // actualization
@@ -1242,6 +1266,7 @@
 						side1 = axis === 'vertical' ? 'top' : 'left',
 						scrolledPastTop = _isScrolledPast(target, side1) || _isScrolledPast(dragEl, side1),
 						scrollBefore = scrolledPastTop && (scrolledPastTop ? _getScrollPosition(scrolledPastTop)[1] : void 0);
+
 
 
 					if (lastTarget !== target) {
@@ -1420,6 +1445,18 @@
 
 			this._offUpEvents();
 
+			lastSwapEl && _toggleClass(lastSwapEl, options.swapClass, false);
+			if (lastSwapEl && (options.swap || putSortable && putSortable.options.swap)) {
+				if (dragEl !== lastSwapEl) {
+					var dragRect = _getRect(dragEl),
+						lastRect = _getRect(lastSwapEl);
+
+					_swapNodes(dragEl, lastSwapEl);
+
+					this._animate(dragRect, dragEl);
+					this._animate(lastRect, lastSwapEl);
+				}
+			}
 
 			// Multi-drag selection
 			if (!moved && options.multiDrag) {
@@ -1521,7 +1558,7 @@
 					_dispatchEvent(this, rootEl, 'unchoose', dragEl, parentEl, rootEl, oldIndex, null, evt);
 
 					if (rootEl !== parentEl) {
-						newIndex = _index(dragEl, options.draggable);
+						newIndex = _index(dragEl);
 
 						if (newIndex >= 0) {
 							// Add event
@@ -1539,7 +1576,7 @@
 					}
 					else {
 						// Get the index of the dragged element within its parent
-						newIndex = _index(dragEl, options.draggable);
+						newIndex = _index(dragEl);
 
 						if (dragEl.nextSibling !== nextEl) {
 							if (newIndex >= 0) {
@@ -1556,7 +1593,14 @@
 							newIndex = oldIndex;
 						}
 
-						_dispatchEvent(this, rootEl, 'end', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+						if (options.swap && lastSwapEl)
+						{
+							_dispatchEvent(this, rootEl, 'end', dragEl, parentEl, rootEl, oldIndex, newIndex, evt, { swapItem: lastSwapEl });
+						}
+						else
+						{
+							_dispatchEvent(this, rootEl, 'end', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+						}
 
 						// Save sorting
 						this.save();
@@ -1575,6 +1619,7 @@
 			nextEl =
 			cloneEl =
 			lastDownEl =
+			lastSwapEl =
 
 			scrollEl =
 			scrollParentEl =
@@ -1924,7 +1969,7 @@
 
 
 
-	function _dispatchEvent(sortable, rootEl, name, targetEl, toEl, fromEl, startIndex, newIndex, originalEvt) {
+	function _dispatchEvent(sortable, rootEl, name, targetEl, toEl, fromEl, startIndex, newIndex, originalEvt, eventOptions) {
 		sortable = (sortable || rootEl[expando]);
 		var evt,
 			options = sortable.options,
@@ -1952,9 +1997,15 @@
 
 		evt.originalEvent = originalEvt;
 
+		if (eventOptions) {
+			for (var option in eventOptions) {
+				evt[option] = eventOptions[option];
+			}
+		}
+
 		if (rootEl) {
 			rootEl.dispatchEvent(evt);
-	        }
+		}
 
 		if (options[onName]) {
 			options[onName].call(sortable, evt);
@@ -2289,6 +2340,24 @@
 
 	function _cancelNextTick(id) {
 		return clearTimeout(id);
+	}
+
+	function _swapNodes(n1, n2) {
+
+		var p1 = n1.parentNode;
+		var p2 = n2.parentNode;
+		var i1, i2;
+
+		if (!p1 || !p2 || p1.isEqualNode(n2) || p2.isEqualNode(n1)) return;
+
+		i1 = _index(n1);
+		i2 = _index(n2);
+
+		if (p1.isEqualNode(p2) && i1 < i2) {
+			i2++;
+		}
+		p1.insertBefore(n2, p1.children[i1]);
+		p2.insertBefore(n1, p2.children[i2]);
 	}
 
 

@@ -92,12 +92,17 @@ var sortable = new Sortable(el, {
 	filter: ".ignore-elements",  // Selectors that do not lead to dragging (String or Function)
 	preventOnFilter: true, // Call `event.preventDefault()` when triggered `filter`
 	draggable: ".item",  // Specifies which items inside the element should be draggable
+
 	dataIdAttr: 'data-id',
-	
+
 	ghostClass: "sortable-ghost",  // Class name for the drop placeholder
 	chosenClass: "sortable-chosen",  // Class name for the chosen item
 	dragClass: "sortable-drag",  // Class name for the dragging item
+	swapClass: "sortable-swap-highlight", // Class name for swap item (if swap mode is enabled)
 	selectedClass: "sortable-selected", // Class name for selected item (if multi-drag is enabled)
+
+	swap: false, // Enable swap mode
+	multiDrag: false, // Enable multi-dragging
 
 	swapThreshold: 1, // Threshold of the swap zone
 	invertSwap: false, // Will always use inverted swap zone if set to true
@@ -119,8 +124,6 @@ var sortable = new Sortable(el, {
 	dragoverBubble: false,
 	removeCloneOnHide: true, // Remove the clone element when it is not showing, rather than just hiding it
 	emptyInsertThreshold: 5, // px, distance mouse must be from empty sortable to insert drag element into it
-
-	multiDrag: false, // Enable multi-dragging
 
 
 	setData: function (/** DataTransfer */dataTransfer, /** HTMLElement*/dragEl) {
@@ -228,13 +231,21 @@ Demo:
 
 
 #### `sort` option
-Sorting inside list.
+Allow sorting inside list.
 
 Demo: https://jsbin.com/jayedig/edit?js,output
 
 
 ---
 
+
+#### `swap` option
+Enable swap mode.
+
+Demo: 
+
+
+---
 
 #### `delay` option
 Time in milliseconds to define when the sorting should start.
@@ -246,7 +257,7 @@ Demo: https://jsbin.com/zosiwah/edit?js,output
 
 
 #### `swapThreshold` option
-Percentage of the target that the swap zone will take up, as a float between `0` and `1`.
+Percentage of the target that the swap zone will take up, as a float between `0` and `1`. This option has nothing to do with the `swap` option.
 
 Read more: https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction#swap-threshold
 
@@ -257,7 +268,7 @@ Demo: http://sortablejs.github.io/Sortable#thresholds
 
 
 #### `invertSwap` option
-Set to `true` to set the swap zone to the sides of the target, for the effect of sorting "in between" items.
+Set to `true` to set the swap zone to the sides of the target, for the effect of sorting "in between" items. This option has nothing to do with the `swap` option.
 
 Read more: https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction#forcing-inverted-swap-zone
 
@@ -268,7 +279,7 @@ Demo: http://sortablejs.github.io/Sortable#thresholds
 
 
 #### `invertedSwapThreshold` option
-Percentage of the target that the inverted swap zone will take up, as a float between `0` and `1`. If not given, will default to `swapThreshold`.
+Percentage of the target that the inverted swap zone will take up, as a float between `0` and `1`. If not given, will default to `swapThreshold`. This option has nothing to do with the `swap` option.
 
 Read more: https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction#dealing-with-swap-glitching
 
@@ -433,6 +444,26 @@ Demo: https://jsbin.com/hoqufox/edit?css,js,output
 Sortable.create(list, {
   delay: 500,
   chosenClass: "chosen"
+});
+```
+
+
+---
+
+
+#### `swapClass`
+Class name for the item to be swapped with, if swap mode is enabled. Defaults to `sortable-swap-highlight`.
+
+```css
+.highlighted {
+  background-color: #9AB6F1;
+}
+```
+
+```js
+Sortable.create(list, {
+  swap: true,
+  swapClass: "highlighted"
 });
 ```
 
