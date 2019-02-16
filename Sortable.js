@@ -1464,7 +1464,6 @@
 
 				if (!~multiDragElements.indexOf(dragEl)) {
 					multiDragElements.push(dragEl);
-					dragEl.sortableIndex = _index(dragEl);
 
 					// Modifier activated, select from last to dragEl
 					if (evt.shiftKey && lastMultiDragSelect && this.el.contains(lastMultiDragSelect)) {
@@ -1474,25 +1473,26 @@
 						if (~lastIndex && ~currentIndex && lastIndex !== currentIndex) {
 							var children = parentEl.children;
 
-
+							// Must include lastMultiDragSelect (select it), in case modified selection from no selection
+							// (but previous selection existed)
 							if (currentIndex > lastIndex) {
-								i = lastIndex + 1;
+								i = lastIndex;
 								n = currentIndex;
 							} else {
-								i = currentIndex + 1;
-								n = lastIndex;
+								i = currentIndex;
+								n = lastIndex + 1;
 							}
 
 							for (; i < n; i++) {
 								if (~multiDragElements.indexOf(children[i])) continue;
-								children[i].sortableIndex = _index(children[i]);
 								_toggleClass(children[i], options.selectedClass, true);
 								multiDragElements.push(children[i]);
 							}
 						}
+					} else {
+						lastMultiDragSelect = dragEl;
 					}
 
-					lastMultiDragSelect = dragEl;
 					multiDragSortable = parentEl;
 				} else {
 					multiDragElements.splice(multiDragElements.indexOf(dragEl), 1);
