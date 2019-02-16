@@ -582,7 +582,6 @@
 		}
 
 		sortables.push(this.el);
-
 		// Restore sorting
 		options.store && options.store.get && this.sort(options.store.get(this) || []);
 	}
@@ -1026,11 +1025,9 @@
 				return a.sortableIndex - b.sortableIndex;
 			});
 
-
-
 			// Setup clone(s)
 			if (multiDragElements.length) {
-				for (var i = 0; i < multiDragElements.length; i++) {
+				for (i = 0; i < multiDragElements.length; i++) {
 					multiDragClones.push(_clone(multiDragElements[i]));
 
 					multiDragClones[i].sortableIndex = multiDragElements[i].sortableIndex;
@@ -1125,25 +1122,33 @@
 				return;
 			}
 
-			// Return invocation when dragEl is inserted
-			function completed() {
-				if (isOwner) {
-					activeSortable._hideClone();
-				} else {
-					_removeMultiDragElements();
-					activeSortable._showClone(_this);
-				}
+			// Return invocation when dragEl is inserted (or completed)
+			function completed(insertion) {
+				if (insertion) {
+					if (isOwner) {
+						activeSortable._hideClone();
+					} else {
+						_removeMultiDragElements();
+						activeSortable._showClone(_this);
+					}
 
-				if (activeSortable) {
-					// Set ghost class to new sortable's ghost class
-					_toggleClass(dragEl, putSortable ? putSortable.options.ghostClass : activeSortable.options.ghostClass, false);
-					_toggleClass(dragEl, options.ghostClass, true);
-				}
+					if (activeSortable) {
+						// Set ghost class to new sortable's ghost class
+						_toggleClass(dragEl, putSortable ? putSortable.options.ghostClass : activeSortable.options.ghostClass, false);
+						_toggleClass(dragEl, options.ghostClass, true);
+					}
 
-				if (putSortable !== _this && _this !== Sortable.active) {
-					putSortable = _this;
-				} else if (_this === Sortable.active) {
-					putSortable = null;
+					if (putSortable !== _this && _this !== Sortable.active) {
+						putSortable = _this;
+					} else if (_this === Sortable.active) {
+						putSortable = null;
+					}
+
+					// Animation
+					if (!options.swap) {
+						dragRect && _this._animate(dragRect, dragEl);
+						target && targetRect && _this._animate(targetRect, target);
+					}
 				}
 
 
@@ -1177,7 +1182,7 @@
 
 			// target is dragEl or target is animated
 			if (!!_closest(evt.target, null, dragEl, true) || target.animated) {
-				return true; // not completed() because dragEl not inserted
+				return completed(false);
 			}
 
 			if (target !== dragEl) {
@@ -1216,7 +1221,7 @@
 					}
 					changed();
 
-					return completed();
+					return completed(true);
 				}
 
 				if (revert) {
@@ -1233,7 +1238,7 @@
 						}
 					}
 
-					return completed();
+					return completed(true);
 				}
 
 				if ((el.children.length === 0) || (el.children[0] === ghostEl) ||
@@ -1254,9 +1259,7 @@
 						realDragElRect = null;
 
 						changed();
-						this._animate(dragRect, dragEl);
-						target && this._animate(targetRect, target);
-						return completed();
+						return completed(true);
 					}
 				}
 				else if (target && target !== dragEl && target.parentNode === el) {
@@ -1283,7 +1286,7 @@
 						lastTarget === target
 					);
 
-					if (direction === 0) return completed();
+					if (direction === 0) return completed(false);
 
 					realDragElRect = null;
 					lastTarget = target;
@@ -1326,15 +1329,12 @@
 						}
 						changed();
 
-						!differentLevel && this._animate(targetRect, target);
-						this._animate(dragRect, dragEl);
-
-						return completed();
+						return completed(true);
 					}
 				}
 
 				if (el.contains(dragEl)) {
-					return completed();
+					return completed(false);
 				}
 			}
 
@@ -2175,7 +2175,6 @@
 					mouseOnAxis < targetS2 - (targetLength * (1 - swapThreshold) / 2)
 				) {
 					return _getInsertDirection(target);
-					// return ((mouseOnAxis > targetS1 + targetLength / 2) ? -1 : 1);
 				}
 			}
 		}
