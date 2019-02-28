@@ -1447,15 +1447,16 @@
 						newIndex = _index(dragEl, options.draggable);
 
 						if (newIndex >= 0) {
+							var lastPutMode = putSortable? putSortable.lastPutMode : undefined;
 							// Add event
-							_dispatchEvent(null, parentEl, 'add', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+							_dispatchEvent(null, parentEl, 'add', dragEl, parentEl, rootEl, oldIndex, newIndex, evt, lastPutMode);
 
 							// Remove event
-							_dispatchEvent(this, rootEl, 'remove', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+							_dispatchEvent(this, rootEl, 'remove', dragEl, parentEl, rootEl, oldIndex, newIndex, evt, lastPutMode);
 
 							// drag from one list and drop into another
-							_dispatchEvent(null, parentEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
-							_dispatchEvent(this, rootEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+							_dispatchEvent(null, parentEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt, lastPutMode);
+							_dispatchEvent(this, rootEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt, lastPutMode);
 						}
 
 						putSortable && putSortable.save();
@@ -1830,7 +1831,7 @@
 
 
 
-	function _dispatchEvent(sortable, rootEl, name, targetEl, toEl, fromEl, startIndex, newIndex, originalEvt) {
+	function _dispatchEvent(sortable, rootEl, name, targetEl, toEl, fromEl, startIndex, newIndex, originalEvt, lastPutMode) {
 		sortable = (sortable || rootEl[expando]);
 		var evt,
 			options = sortable.options,
@@ -1854,7 +1855,8 @@
 		evt.oldIndex = startIndex;
 		evt.newIndex = newIndex;
 
-		evt.originalEvent = originalEvt;
+		evt.originalEvent = originalEvt; 
+		evt.putMode = lastPutMode;
 
 		if (rootEl) {
 			rootEl.dispatchEvent(evt);
