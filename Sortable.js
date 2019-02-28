@@ -1860,7 +1860,7 @@
 
 		if (rootEl) {
 			rootEl.dispatchEvent(evt);
-	        }
+		}
 
 		if (options[onName]) {
 			options[onName].call(sortable, evt);
