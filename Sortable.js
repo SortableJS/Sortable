@@ -900,7 +900,7 @@
 			}
 		},
 
-		_dragStarted: function (fallback) {
+		_dragStarted: function (fallback, evt) {
 			awaitingDragStarted = false;
 			if (rootEl && dragEl) {
 				if (this.nativeDraggable) {
@@ -921,7 +921,7 @@
 				fallback && this._appendGhost();
 
 				// Drag start event
-				_dispatchEvent(this, rootEl, 'start', dragEl, rootEl, rootEl, oldIndex);
+				_dispatchEvent(this, rootEl, 'start', dragEl, rootEl, rootEl, oldIndex, undefined, evt);
 			} else {
 				this._nulling();
 			}
@@ -1091,7 +1091,7 @@
 
 			awaitingDragStarted = true;
 
-			_this._dragStartId = _nextTick(_this._dragStarted.bind(_this, fallback));
+			_this._dragStartId = _nextTick(_this._dragStarted.bind(_this, fallback, evt));
 			_on(document, 'selectstart', _this);
 		},
 
