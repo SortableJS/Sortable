@@ -1095,6 +1095,9 @@
 
 			_this._dragStartId = _nextTick(_this._dragStarted.bind(_this, fallback));
 			_on(document, 'selectstart', _this);
+			if (Safari) {
+				_css(document.body, 'user-select', 'none');
+			}
 		},
 
 		// Returns true - if no further action is needed (either inserted or another condition)
@@ -1413,6 +1416,10 @@
 				_off(el, 'dragstart', this._onDragStart);
 				_off(document, 'dragover', this._handleAutoScroll);
 				_off(document, 'dragover', _checkAlignment);
+			}
+
+			if (Safari) {
+				_css(document.body, 'user-select', '');
 			}
 
 			this._offUpEvents();
