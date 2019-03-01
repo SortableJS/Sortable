@@ -1385,7 +1385,8 @@
 
 		_onDrop: function (/**Event*/evt) {
 			var el = this.el,
-				options = this.options;
+				options = this.options,
+				lastPutMode;
 			awaitingDragStarted = false;
 			scrolling = false;
 			isCircumstantialInvert = false;
@@ -1447,7 +1448,7 @@
 						newIndex = _index(dragEl, options.draggable);
 
 						if (newIndex >= 0) {
-							var lastPutMode = putSortable? putSortable.lastPutMode : undefined;
+							lastPutMode = putSortable? putSortable.lastPutMode : undefined;
 							// Add event
 							_dispatchEvent(null, parentEl, 'add', dragEl, parentEl, rootEl, oldIndex, newIndex, evt, lastPutMode);
 
