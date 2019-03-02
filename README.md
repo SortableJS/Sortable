@@ -235,6 +235,7 @@ Demo: https://jsbin.com/jayedig/edit?js,output
 
 #### `delay` option
 Time in milliseconds to define when the sorting should start.
+Unfortunately, due to browser restrictions, delaying is not possible on IE or Edge with native drag & drop.
 
 Demo: https://jsbin.com/zosiwah/edit?js,output
 
