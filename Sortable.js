@@ -248,10 +248,6 @@
 			}
 		},
 
-		_getScrollPosition = function(el) {
-			return [ el.scrollLeft, el.scrollTop ];
-		},
-
 		_scrollBy = function(el, x, y) {
 			el.scrollLeft += x;
 			el.scrollTop += y;
@@ -1263,8 +1259,8 @@
 						aligned = target.sortableMouseAligned,
 						differentLevel = dragEl.parentNode !== el,
 						side1 = axis === 'vertical' ? 'top' : 'left',
-						scrolledPastTop = _isScrolledPast(target, side1) || _isScrolledPast(dragEl, side1),
-						scrollBefore = scrolledPastTop ? _getScrollPosition(scrolledPastTop)[1] : void 0;
+						scrolledPastTop = _isScrolledPast(target, 'top') || _isScrolledPast(dragEl, 'top'),
+						scrollBefore = scrolledPastTop ? scrolledPastTop.scrollTop : void 0;
 
 
 					if (lastTarget !== target) {
@@ -1337,7 +1333,7 @@
 
 						// Undo chrome's scroll adjustment
 						if (scrolledPastTop) {
-							_scrollBy(scrolledPastTop, 0, scrollBefore - _getScrollPosition(scrolledPastTop)[1]);
+							_scrollBy(scrolledPastTop, 0, scrollBefore - scrolledPastTop.scrollTop);
 						}
 
 						parentEl = dragEl.parentNode; // actualization
