@@ -1480,8 +1480,8 @@
 						if (newIndex == null || newIndex === -1) {
 							newIndex = oldIndex;
 						}
-
-						_dispatchEvent(this, rootEl, 'end', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+						lastPutMode = putSortable? putSortable.lastPutMode : undefined;
+						_dispatchEvent(this, rootEl, 'end', dragEl, parentEl, rootEl, oldIndex, newIndex, evt, lastPutMode);
 
 						// Save sorting
 						this.save();

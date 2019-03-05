@@ -146,6 +146,7 @@ var sortable = new Sortable(el, {
 		evt.from;  // previous list
 		evt.oldIndex;  // element's old index within old parent
 		evt.newIndex;  // element's new index within new parent
+		evt.putMode;  // put mode: "clone", when in a clone context
 	},
 
 	// Element is dropped into the list from another list
