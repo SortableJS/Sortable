@@ -146,13 +146,12 @@ var sortable = new Sortable(el, {
 		evt.from;  // previous list
 		evt.oldIndex;  // element's old index within old parent
 		evt.newIndex;  // element's new index within new parent
-		evt.putMode;  // put mode: "clone", when in a clone context
+		evt.pullMode;  // When item is in another sortable: `"clone"` if cloning, `true` if moving 
 	},
 
 	// Element is dropped into the list from another list
 	onAdd: function (/**Event*/evt) {
-		// all properties of onEnd event plus: 
-		var itemEl = evt.putMode;  // put mode: "clone", when in a clone context
+		// same properties as onEnd
 	},
 
 	// Changed sorting within list
@@ -162,12 +161,12 @@ var sortable = new Sortable(el, {
 
 	// Called by any change to the list (add / update / remove)
 	onSort: function (/**Event*/evt) {
-		// same properties as onAdd
+		// same properties as onEnd
 	},
 
 	// Element is removed from the list into another list
 	onRemove: function (/**Event*/evt) {
-		// same properties as onAdd
+		// same properties as onEnd
 	},
 
 	// Attempt to drag a filtered element
