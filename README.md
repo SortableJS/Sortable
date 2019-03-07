@@ -146,6 +146,8 @@ var sortable = new Sortable(el, {
 		evt.from;  // previous list
 		evt.oldIndex;  // element's old index within old parent
 		evt.newIndex;  // element's new index within new parent
+		evt.clone // the clone element
+		evt.pullMode;  // when item is in another sortable: `"clone"` if cloning, `true` if moving
 	},
 
 	// Element is dropped into the list from another list
@@ -529,6 +531,7 @@ Demo: https://jsbin.com/becavoj/edit?js,output
  - clone:`HTMLElement`
  - oldIndex:`Number|undefined` — old index within parent
  - newIndex:`Number|undefined` — new index within parent
+ - pullMode:`String|Boolean|undefined` — Pull mode if dragging into another sortable (`"clone"`, `true`, or `false`), otherwise undefined
 
 
 #### `move` event object
