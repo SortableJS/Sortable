@@ -301,7 +301,7 @@ new Sortable(example4Right, {
 
 		<div id="nested" class="row">
 			<h4 class="col-12">Nested Sortables Example</h4>
-			<p class="col-12">NOTE: When using nested Sortables with animation, it is recommended that the <code>fallbackOnBody</code> option is set to true.</p>
+			<p class="col-12">NOTE: When using nested Sortables with animation, it is recommended that the <code>fallbackOnBody</code> option is set to true. <br />It is also always recommended that either the <code>invertSwap</code> option is set to true, or the <code>swapThreshold</code> option is lower than the default value of 1 (eg <code>0.65</code>).</p>
 			<div id="nestedDemo" class="list-group col nested-sortable">
 				<div class="list-group-item nested-1">Item 1.1
 					<div class="list-group nested-sortable">
@@ -329,6 +329,17 @@ new Sortable(example4Right, {
 					</div>
 				</div>
 				<div class="list-group-item nested-1">Item 1.5</div>
+			</div>
+			<div style="padding: 0" class="col-12">
+<pre class="prettyprint">// Loop through each nested sortable element
+for (var i = 0; i < nestedSortables.length; i++) {
+	new Sortable(nestedSortables[i], {
+		group: 'nested',
+		animation: 150,
+		fallbackOnBody: true,
+		swapThreshold: 0.65
+	});
+}</pre>
 			</div>
 		</div>
 		<div class="mt-4"></div>

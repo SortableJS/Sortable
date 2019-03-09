@@ -122,7 +122,7 @@ code {
 	margin: 12px;
 }
 
-#nestedDemo div, .nested-1, .nested-2, .nested-3 {
+.nested-sortable, .nested-1, .nested-2, .nested-3 {
 	margin-top: 5px;
 }
 
