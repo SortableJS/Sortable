@@ -102,7 +102,7 @@
 		Safari = !!(navigator.userAgent.match(/safari/i) && !navigator.userAgent.match(/chrome/i) && !navigator.userAgent.match(/android/i)),
 		IOS = !!(navigator.userAgent.match(/iP(ad|od|hone)/i)),
 
-		PositionGhostAbsolutely = true||IOS,
+		PositionGhostAbsolutely = IOS,
 
 		CSSFloatProperty = Edge || IE11OrLess ? 'cssFloat' : 'float',
 
