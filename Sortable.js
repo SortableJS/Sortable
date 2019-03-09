@@ -1141,18 +1141,30 @@
 				return;
 			}
 
-			// Return invocation when no further action is needed in another sortable
-			function completed() {
-				if (activeSortable) {
-					// Set ghost class to new sortable's ghost class
-					_toggleClass(dragEl, putSortable ? putSortable.options.ghostClass : activeSortable.options.ghostClass, false);
-					_toggleClass(dragEl, options.ghostClass, true);
-				}
+			// Return invocation when dragEl is inserted (or completed)
+			function completed(insertion) {
+				if (insertion) {
+					if (isOwner) {
+						activeSortable._hideClone();
+					} else {
+						activeSortable._showClone(_this);
+					}
 
-				if (putSortable !== _this && _this !== Sortable.active) {
-					putSortable = _this;
-				} else if (_this === Sortable.active) {
-					putSortable = null;
+					if (activeSortable) {
+						// Set ghost class to new sortable's ghost class
+						_toggleClass(dragEl, putSortable ? putSortable.options.ghostClass : activeSortable.options.ghostClass, false);
+						_toggleClass(dragEl, options.ghostClass, true);
+					}
+
+					if (putSortable !== _this && _this !== Sortable.active) {
+						putSortable = _this;
+					} else if (_this === Sortable.active) {
+						putSortable = null;
+					}
+
+					// Animation
+					dragRect && _this._animate(dragRect, dragEl);
+					target && targetRect && _this._animate(targetRect, target);
 				}
 
 
@@ -1188,7 +1200,7 @@
 
 			// target is dragEl or target is animated
 			if (!!_closest(evt.target, null, dragEl, true) || target.animated) {
-				return completed();
+				return completed(false);
 			}
 
 			if (target !== dragEl) {
@@ -1221,7 +1233,7 @@
 						rootEl.appendChild(dragEl);
 					}
 
-					return completed();
+					return completed(true);
 				}
 
 				var elLastChild = _lastChild(el);
@@ -1248,9 +1260,7 @@
 						realDragElRect = null;
 
 						changed();
-						this._animate(dragRect, dragEl);
-						target && this._animate(targetRect, target);
-						return completed();
+						return completed(true);
 					}
 				}
 				else if (target && target !== dragEl && target.parentNode === el) {
@@ -1292,10 +1302,10 @@
 						lastMode = 'swap';
 					} else {
 						// Insert at position
-						direction = _getInsertDirection(target, options);
+						direction = _getInsertDirection(target);
 						lastMode = 'insert';
 					}
-					if (direction === 0) return completed();
+					if (direction === 0) return completed(false);
 
 					realDragElRect = null;
 					lastTarget = target;
@@ -1344,15 +1354,12 @@
 						}
 						changed();
 
-						!differentLevel && this._animate(targetRect, target);
-						this._animate(dragRect, dragEl);
-
-						return completed();
+						return completed(true);
 					}
 				}
 
 				if (el.contains(dragEl)) {
-					return completed();
+					return completed(false);
 				}
 			}
 
@@ -2063,7 +2070,7 @@
 					mouseOnAxis > targetS1 + (targetLength * (1 - swapThreshold) / 2) &&
 					mouseOnAxis < targetS2 - (targetLength * (1 - swapThreshold) / 2)
 				) {
-					return ((mouseOnAxis > targetS1 + targetLength / 2) ? -1 : 1);
+					return _getInsertDirection(target);
 				}
 			}
 		}
@@ -2088,12 +2095,11 @@
 	 * Gets the direction dragEl must be swapped relative to target in order to make it
 	 * seem that dragEl has been "inserted" into that element's position
 	 * @param  {HTMLElement} target       The target whose position dragEl is being inserted at
-	 * @param  {Object} options           options of the parent sortable
 	 * @return {Number}                   Direction dragEl must be swapped
 	 */
-	function _getInsertDirection(target, options) {
-		var dragElIndex = _index(dragEl, options.draggable),
-			targetIndex = _index(target, options.draggable);
+	function _getInsertDirection(target) {
+		var dragElIndex = _index(dragEl),
+			targetIndex = _index(target);
 
 		if (dragElIndex < targetIndex) {
 			return 1;
