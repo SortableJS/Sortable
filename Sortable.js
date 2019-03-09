@@ -102,7 +102,7 @@
 		Safari = !!(navigator.userAgent.match(/safari/i) && !navigator.userAgent.match(/chrome/i) && !navigator.userAgent.match(/android/i)),
 		IOS = !!(navigator.userAgent.match(/iP(ad|od|hone)/i)),
 
-		PositionGhostAbsolutely = IOS,
+		PositionGhostAbsolutely = true||IOS,
 
 		CSSFloatProperty = Edge || IE11OrLess ? 'cssFloat' : 'float',
 
@@ -1062,22 +1062,27 @@
 					while (
 						_css(ghostRelativeParent, 'position') === 'static' &&
 						_css(ghostRelativeParent, 'transform') === 'none' &&
-						ghostRelativeParent !== document.body
+						ghostRelativeParent !== document
 					) {
 						ghostRelativeParent = ghostRelativeParent.parentNode;
 					}
 
-					var ghostRelativeParentRect = _getRect(ghostRelativeParent, true);
+					if (ghostRelativeParent !== document) {
+						var ghostRelativeParentRect = _getRect(ghostRelativeParent, true);
 
-					rect.top -= ghostRelativeParentRect.top;
-					rect.left -= ghostRelativeParentRect.left;
+						rect.top -= ghostRelativeParentRect.top;
+						rect.left -= ghostRelativeParentRect.left;
+					}
 
-					if (ghostRelativeParent === document.body) ghostRelativeParent = _getWindowScrollingElement();
+					if (ghostRelativeParent !== document.body && ghostRelativeParent !== document.documentElement) {
+						if (ghostRelativeParent === document) ghostRelativeParent = _getWindowScrollingElement();
 
+						rect.top += ghostRelativeParent.scrollTop;
+						rect.left += ghostRelativeParent.scrollLeft;
+					} else {
+						ghostRelativeParent = _getWindowScrollingElement();
+					}
 					ghostRelativeParentInitialScroll = _getRelativeScrollOffset(ghostRelativeParent);
-
-					rect.top += ghostRelativeParent.scrollTop;
-					rect.left += ghostRelativeParent.scrollLeft;
 				}
 
 
@@ -2400,22 +2405,19 @@
 	 * @return {Array}             Offsets in the format of [left, top]
 	 */
 	function _getRelativeScrollOffset(el) {
-		var offsetLeft = 0, offsetTop = 0;
-		while (el && el.parentNode) {
-			var matrix = _matrix(el),
-				scaleX = matrix.a,
-				scaleY = matrix.d;
+		var offsetLeft = 0,
+			offsetTop = 0,
+			winScroller = _getWindowScrollingElement();
 
-			offsetLeft += el.scrollLeft * scaleX;
-			offsetTop += el.scrollTop * scaleY;
+		if (el) {
+			do {
+				var matrix = _matrix(el),
+					scaleX = matrix.a,
+					scaleY = matrix.d;
 
-			el = el.parentNode;
-
-			if (el === _getWindowScrollingElement()) {
-				offsetLeft += _getWindowScrollingElement().scrollLeft;
-				offsetTop += _getWindowScrollingElement().scrollTop;
-				break;
-			}
+				offsetLeft += el.scrollLeft * scaleX;
+				offsetTop += el.scrollTop * scaleY;
+			} while (el !== winScroller && (el = el.parentNode));
 		}
 
 		return [offsetLeft, offsetTop];
