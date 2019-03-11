@@ -8,7 +8,7 @@
     "RubaXa <ibnRubaXa@gmail.com>",
     "owenm <owen23355@gmail.com>"
   ],
-  "description": "Minimalist library for reorderable drag-and-drop lists on modern browsers and touch devices. No jQuery.",
+  "description": "JavaScript library for reorderable drag-and-drop lists on modern browsers and touch devices. No jQuery required. Supports Meteor, AngularJS, React, Polymer, Vue, Knockout and any CSS library, e.g. Bootstrap.",
   "keywords": [
     "sortable",
     "reorder",
