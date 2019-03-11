@@ -16,7 +16,7 @@
 		"http-server": "http-server -s ./",
 		"prepublish": "gulp build"
 	},
-	"contributors": [
+	"maintainers": [
 		"Konstantin Lebedev <ibnRubaXa@gmail.com>",
 		"Owen Mills <owen23355@gmail.com>"
 	],
