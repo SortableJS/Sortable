@@ -2468,6 +2468,6 @@
 
 
 	// Export
-	Sortable.version = '1.8.3';
+	Sortable.version = '1.8.4';
 	return Sortable;
 });
