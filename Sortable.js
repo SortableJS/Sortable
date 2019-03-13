@@ -70,6 +70,10 @@
 
 		targetMoveDistance,
 
+		// For positioning ghost absolutely
+		ghostRelativeParent,
+		ghostRelativeParentInitialScroll = [], // (left, top)
+
 
 		forRepaintDummy,
 		realDragElRect, // dragEl rect after current animation
@@ -94,7 +98,11 @@
 
 		IE11OrLess = !!navigator.userAgent.match(/(?:Trident.*rv[ :]?11\.|msie|iemobile)/i),
 		Edge = !!navigator.userAgent.match(/Edge/i),
-		// FireFox = !!navigator.userAgent.match(/firefox/i),
+		FireFox = !!navigator.userAgent.match(/firefox/i),
+		Safari = !!(navigator.userAgent.match(/safari/i) && !navigator.userAgent.match(/chrome/i) && !navigator.userAgent.match(/android/i)),
+		IOS = !!(navigator.userAgent.match(/iP(ad|od|hone)/i)),
+
+		PositionGhostAbsolutely = IOS,
 
 		CSSFloatProperty = Edge || IE11OrLess ? 'cssFloat' : 'float',
 
@@ -116,28 +124,40 @@
 
 		abs = Math.abs,
 		min = Math.min,
+		max = Math.max,
 
 		savedInputChecked = [],
 
 		_detectDirection = function(el, options) {
 			var elCSS = _css(el),
-				elWidth = parseInt(elCSS.width),
+				elWidth = parseInt(elCSS.width)
+					- parseInt(elCSS.paddingLeft)
+					- parseInt(elCSS.paddingRight)
+					- parseInt(elCSS.borderLeftWidth)
+					- parseInt(elCSS.borderRightWidth),
 				child1 = _getChild(el, 0, options),
 				child2 = _getChild(el, 1, options),
 				firstChildCSS = child1 && _css(child1),
 				secondChildCSS = child2 && _css(child2),
 				firstChildWidth = firstChildCSS && parseInt(firstChildCSS.marginLeft) + parseInt(firstChildCSS.marginRight) + _getRect(child1).width,
 				secondChildWidth = secondChildCSS && parseInt(secondChildCSS.marginLeft) + parseInt(secondChildCSS.marginRight) + _getRect(child2).width;
+
 			if (elCSS.display === 'flex') {
 				return elCSS.flexDirection === 'column' || elCSS.flexDirection === 'column-reverse'
 				? 'vertical' : 'horizontal';
 			}
+
+			if (elCSS.display === 'grid') {
+				return elCSS.gridTemplateColumns.split(' ').length <= 1 ? 'vertical' : 'horizontal';
+			}
+
 			if (child1 && firstChildCSS.float !== 'none') {
 				var touchingSideChild2 = firstChildCSS.float === 'left' ? 'left' : 'right';
 
 				return child2 && (secondChildCSS.clear === 'both' || secondChildCSS.clear === touchingSideChild2) ?
 					'vertical' : 'horizontal';
 			}
+
 			return (child1 &&
 				(
 					firstChildCSS.display === 'block' ||
@@ -162,7 +182,7 @@
 		 */
 		_detectNearestEmptySortable = function(x, y) {
 			for (var i = 0; i < sortables.length; i++) {
-				if (sortables[i].children.length) continue;
+				if (_lastChild(sortables[i])) continue;
 
 				var rect = _getRect(sortables[i]),
 					threshold = sortables[i][expando].options.emptyInsertThreshold,
@@ -203,7 +223,7 @@
 
 		_getParentAutoScrollElement = function(el, includeSelf) {
 			// skip to window
-			if (!el || !el.getBoundingClientRect) return win;
+			if (!el || !el.getBoundingClientRect) return _getWindowScrollingElement();
 
 			var elem = el;
 			var gotSelf = false;
@@ -215,7 +235,7 @@
 						elem.clientWidth < elem.scrollWidth && (elemCSS.overflowX == 'auto' || elemCSS.overflowX == 'scroll') ||
 						elem.clientHeight < elem.scrollHeight && (elemCSS.overflowY == 'auto' || elemCSS.overflowY == 'scroll')
 					) {
-						if (!elem || !elem.getBoundingClientRect || elem === document.body) return win;
+						if (!elem || !elem.getBoundingClientRect || elem === document.body) return _getWindowScrollingElement();
 
 						if (gotSelf || includeSelf) return elem;
 						gotSelf = true;
@@ -224,7 +244,20 @@
 			/* jshint boss:true */
 			} while (elem = elem.parentNode);
 
-			return win;
+			return _getWindowScrollingElement();
+		},
+
+		_getWindowScrollingElement = function() {
+			if (IE11OrLess) {
+				return document.documentElement;
+			} else {
+				return document.scrollingElement;
+			}
+		},
+
+		_scrollBy = function(el, x, y) {
+			el.scrollLeft += x;
+			el.scrollTop += y;
 		},
 
 		_autoScroll = _throttle(function (/**Event*/evt, /**Object*/options, /**HTMLElement*/rootEl, /**Boolean*/isFallback) {
@@ -237,8 +270,7 @@
 					x = evt.clientX,
 					y = evt.clientY,
 
-					winWidth = window.innerWidth,
-					winHeight = window.innerHeight,
+					winScroller = _getWindowScrollingElement(),
 
 					scrollThisInstance = false;
 
@@ -285,28 +317,20 @@
 						scrollPosY;
 
 
-					if (el !== win) {
-						scrollWidth = el.scrollWidth;
-						scrollHeight = el.scrollHeight;
+					scrollWidth = el.scrollWidth;
+					scrollHeight = el.scrollHeight;
 
-						css = _css(el);
+					css = _css(el);
 
-						canScrollX = width < scrollWidth && (css.overflowX === 'auto' || css.overflowX === 'scroll');
-						canScrollY = height < scrollHeight && (css.overflowY === 'auto' || css.overflowY === 'scroll');
+					scrollPosX = el.scrollLeft;
+					scrollPosY = el.scrollTop;
 
-						scrollPosX = el.scrollLeft;
-						scrollPosY = el.scrollTop;
-					} else {
-						scrollWidth = document.documentElement.scrollWidth;
-						scrollHeight = document.documentElement.scrollHeight;
-
-						css = _css(document.documentElement);
-
+					if (el === winScroller) {
 						canScrollX = width < scrollWidth && (css.overflowX === 'auto' || css.overflowX === 'scroll' || css.overflowX === 'visible');
 						canScrollY = height < scrollHeight && (css.overflowY === 'auto' || css.overflowY === 'scroll' || css.overflowY === 'visible');
-
-						scrollPosX = document.documentElement.scrollLeft;
-						scrollPosY = document.documentElement.scrollTop;
+					} else {
+						canScrollX = width < scrollWidth && (css.overflowX === 'auto' || css.overflowX === 'scroll');
+						canScrollY = height < scrollHeight && (css.overflowY === 'auto' || css.overflowY === 'scroll');
 					}
 
 					vx = canScrollX && (abs(right - x) <= sens && (scrollPosX + width) < scrollWidth) - (abs(left - x) <= sens && !!scrollPosX);
@@ -336,6 +360,7 @@
 								// emulate drag over during autoscroll (fallback), emulating native DnD behaviour
 								if (isFallback && this.layer === 0) {
 									Sortable.active._emulateDragOver(true);
+									Sortable.active._onTouchMove(touchEvt, true);
 								}
 								var scrollOffsetY = autoScrolls[this.layer].vy ? autoScrolls[this.layer].vy * speed : 0;
 								var scrollOffsetX = autoScrolls[this.layer].vx ? autoScrolls[this.layer].vx * speed : 0;
@@ -345,17 +370,13 @@
 										return;
 									}
 								}
-								if (autoScrolls[this.layer].el === win) {
-									win.scrollTo(win.pageXOffset + scrollOffsetX, win.pageYOffset + scrollOffsetY);
-								} else {
-									autoScrolls[this.layer].el.scrollTop += scrollOffsetY;
-									autoScrolls[this.layer].el.scrollLeft += scrollOffsetX;
-								}
+
+								_scrollBy(autoScrolls[this.layer].el, scrollOffsetX, scrollOffsetY);
 							}).bind({layer: layersOut}), 24);
 						}
 					}
 					layersOut++;
-				} while (options.bubbleScroll && currentParent !== win && (currentParent = _getParentAutoScrollElement(currentParent, false)));
+				} while (options.bubbleScroll && currentParent !== winScroller && (currentParent = _getParentAutoScrollElement(currentParent, false)));
 				scrolling = scrollThisInstance; // in case another function catches scrolling as false in between when it is not
 			}
 		}, 30),
@@ -563,6 +584,11 @@
 		// Setup drag mode
 		this.nativeDraggable = options.forceFallback ? false : supportDraggable;
 
+		if (this.nativeDraggable) {
+			// Touch start threshold cannot be greater than the native dragstart threshold
+			this.options.touchStartThreshold = 1;
+		}
+
 		// Bind events
 		if (options.supportPointer) {
 			_on(el, 'pointerdown', this._onTapStart);
@@ -719,8 +745,9 @@
 
 			// IE does not seem to have native autoscroll,
 			// Edge's autoscroll seems too conditional,
+			// MACOS Safari does not have autoscroll,
 			// Firefox and Chrome are good
-			if (fallback || Edge || IE11OrLess) {
+			if (fallback || Edge || IE11OrLess || Safari) {
 				_autoScroll(evt, _this.options, elem, fallback);
 
 				// Listener for pointer element change
@@ -752,7 +779,7 @@
 
 			} else {
 				// if DnD is enabled (and browser has good autoscrolling), first autoscroll will already scroll, so get parent autoscroll of first autoscroll
-				if (!_this.options.bubbleScroll || _getParentAutoScrollElement(elem, true) === window) {
+				if (!_this.options.bubbleScroll || _getParentAutoScrollElement(elem, true) === _getWindowScrollingElement()) {
 					_clearAutoScrolls();
 					return;
 				}
@@ -793,10 +820,11 @@
 				dragStartFn = function () {
 					// Delayed drag has been triggered
 					// we can re-enable the events: touchmove/mousemove
-					_this._disableDelayedDrag();
+					_this._disableDelayedDragEvents();
 
-					// Make the element draggable
-					dragEl.draggable = _this.nativeDraggable;
+					if (!FireFox && _this.nativeDraggable) {
+						dragEl.draggable = true;
+					}
 
 					// Bind the events: dragstart/dragend
 					_this._triggerDragStart(evt, touch);
@@ -821,7 +849,14 @@
 					_on(ownerDocument, 'touchcancel', _this._onDrop);
 				}
 
-				if (options.delay) {
+				// Make dragEl draggable (must be before delay for FireFox)
+				if (FireFox && this.nativeDraggable) {
+					this.options.touchStartThreshold = 4;
+					dragEl.draggable = true;
+				}
+
+				// Delay is impossible for native DnD in Edge or IE
+				if (options.delay && (!this.nativeDraggable || !(Edge || IE11OrLess))) {
 					// If the user moves the pointer or let go the click or touch
 					// before the delay has been reached:
 					// disable the delayed drag
@@ -841,17 +876,22 @@
 
 		_delayedDragTouchMoveHandler: function (/** TouchEvent|PointerEvent **/e) {
 			var touch = e.touches ? e.touches[0] : e;
-			if (min(abs(touch.clientX - this._lastX), abs(touch.clientY - this._lastY))
-					>= this.options.touchStartThreshold
+			if (max(abs(touch.clientX - this._lastX), abs(touch.clientY - this._lastY))
+					>= Math.floor(this.options.touchStartThreshold / (this.nativeDraggable && window.devicePixelRatio || 1))
 			) {
 				this._disableDelayedDrag();
 			}
 		},
 
 		_disableDelayedDrag: function () {
-			var ownerDocument = this.el.ownerDocument;
-
+			dragEl && _disableDraggable(dragEl);
 			clearTimeout(this._dragStartTimer);
+
+			this._disableDelayedDragEvents();
+		},
+
+		_disableDelayedDragEvents: function () {
+			var ownerDocument = this.el.ownerDocument;
 			_off(ownerDocument, 'mouseup', this._disableDelayedDrag);
 			_off(ownerDocument, 'touchend', this._disableDelayedDrag);
 			_off(ownerDocument, 'touchcancel', this._disableDelayedDrag);
@@ -889,7 +929,7 @@
 			}
 		},
 
-		_dragStarted: function (fallback) {
+		_dragStarted: function (fallback, evt) {
 			awaitingDragStarted = false;
 			if (rootEl && dragEl) {
 				if (this.nativeDraggable) {
@@ -910,15 +950,15 @@
 				fallback && this._appendGhost();
 
 				// Drag start event
-				_dispatchEvent(this, rootEl, 'start', dragEl, rootEl, rootEl, oldIndex);
+				_dispatchEvent(this, rootEl, 'start', dragEl, rootEl, rootEl, oldIndex, undefined, evt);
 			} else {
 				this._nulling();
 			}
 		},
 
-		_emulateDragOver: function (bypassLastTouchCheck) {
+		_emulateDragOver: function (forAutoScroll) {
 			if (touchEvt) {
-				if (this._lastX === touchEvt.clientX && this._lastY === touchEvt.clientY && !bypassLastTouchCheck) {
+				if (this._lastX === touchEvt.clientX && this._lastY === touchEvt.clientY && !forAutoScroll) {
 					return;
 				}
 				this._lastX = touchEvt.clientX;
@@ -963,7 +1003,7 @@
 		},
 
 
-		_onTouchMove: function (/**TouchEvent*/evt) {
+		_onTouchMove: function (/**TouchEvent*/evt, forAutoScroll) {
 			if (tapEvt) {
 				var	options = this.options,
 					fallbackTolerance = options.fallbackTolerance,
@@ -972,10 +1012,14 @@
 					matrix = ghostEl && _matrix(ghostEl),
 					scaleX = ghostEl && matrix && matrix.a,
 					scaleY = ghostEl && matrix && matrix.d,
-					dx = ((touch.clientX - tapEvt.clientX) + fallbackOffset.x) / (scaleX ? scaleX : 1),
-					dy = ((touch.clientY - tapEvt.clientY) + fallbackOffset.y) / (scaleY ? scaleY : 1),
+					relativeScrollOffset = PositionGhostAbsolutely && ghostRelativeParent && _getRelativeScrollOffset(ghostRelativeParent),
+					dx = ((touch.clientX - tapEvt.clientX)
+							+ fallbackOffset.x) / (scaleX || 1)
+							+ (relativeScrollOffset ? (relativeScrollOffset[0] - ghostRelativeParentInitialScroll[0]) : 0) / (scaleX || 1),
+					dy = ((touch.clientY - tapEvt.clientY)
+							+ fallbackOffset.y) / (scaleY || 1)
+							+ (relativeScrollOffset ? (relativeScrollOffset[1] - ghostRelativeParentInitialScroll[1]) : 0) / (scaleY || 1),
 					translate3d = evt.touches ? 'translate3d(' + dx + 'px,' + dy + 'px,0)' : 'translate(' + dx + 'px,' + dy + 'px)';
-
 
 				// only set the status to dragging, when we are actually dragging
 				if (!Sortable.active && !awaitingDragStarted) {
@@ -987,12 +1031,10 @@
 					this._onDragStart(evt, true);
 				}
 
-				this._handleAutoScroll(touch, true);
-
+				!forAutoScroll && this._handleAutoScroll(touch, true);
 
 				moved = true;
 				touchEvt = touch;
-
 
 				_css(ghostEl, 'webkitTransform', translate3d);
 				_css(ghostEl, 'mozTransform', translate3d);
@@ -1004,10 +1046,45 @@
 		},
 
 		_appendGhost: function () {
+			// Bug if using scale(): https://stackoverflow.com/questions/2637058
+			// Not being adjusted for
 			if (!ghostEl) {
-				var rect = _getRect(dragEl, this.options.fallbackOnBody ? document.body : rootEl, true),
+				var container = this.options.fallbackOnBody ? document.body : rootEl,
+					rect = _getRect(dragEl, true, container, !PositionGhostAbsolutely),
 					css = _css(dragEl),
 					options = this.options;
+
+				// Position absolutely
+				if (PositionGhostAbsolutely) {
+					// Get relatively positioned parent
+					ghostRelativeParent = container;
+
+					while (
+						_css(ghostRelativeParent, 'position') === 'static' &&
+						_css(ghostRelativeParent, 'transform') === 'none' &&
+						ghostRelativeParent !== document
+					) {
+						ghostRelativeParent = ghostRelativeParent.parentNode;
+					}
+
+					if (ghostRelativeParent !== document) {
+						var ghostRelativeParentRect = _getRect(ghostRelativeParent, true);
+
+						rect.top -= ghostRelativeParentRect.top;
+						rect.left -= ghostRelativeParentRect.left;
+					}
+
+					if (ghostRelativeParent !== document.body && ghostRelativeParent !== document.documentElement) {
+						if (ghostRelativeParent === document) ghostRelativeParent = _getWindowScrollingElement();
+
+						rect.top += ghostRelativeParent.scrollTop;
+						rect.left += ghostRelativeParent.scrollLeft;
+					} else {
+						ghostRelativeParent = _getWindowScrollingElement();
+					}
+					ghostRelativeParentInitialScroll = _getRelativeScrollOffset(ghostRelativeParent);
+				}
+
 
 				ghostEl = dragEl.cloneNode(true);
 
@@ -1022,11 +1099,11 @@
 				_css(ghostEl, 'width', rect.width);
 				_css(ghostEl, 'height', rect.height);
 				_css(ghostEl, 'opacity', '0.8');
-				_css(ghostEl, 'position', 'fixed');
+				_css(ghostEl, 'position', (PositionGhostAbsolutely ? 'absolute' : 'fixed'));
 				_css(ghostEl, 'zIndex', '100000');
 				_css(ghostEl, 'pointerEvents', 'none');
 
-				options.fallbackOnBody && document.body.appendChild(ghostEl) || rootEl.appendChild(ghostEl);
+				container.appendChild(ghostEl);
 			}
 		},
 
@@ -1080,9 +1157,13 @@
 
 			awaitingDragStarted = true;
 
-			_this._dragStartId = _nextTick(_this._dragStarted.bind(_this, fallback));
+			_this._dragStartId = _nextTick(_this._dragStarted.bind(_this, fallback, evt));
 			_on(document, 'selectstart', _this);
+			if (Safari) {
+				_css(document.body, 'user-select', 'none');
+			}
 		},
+
 
 		// Returns true - if no further action is needed (either inserted or another condition)
 		_onDragOver: function (/**Event*/evt) {
@@ -1105,18 +1186,30 @@
 				return;
 			}
 
-			// Return invocation when no further action is needed in another sortable
-			function completed() {
-				if (activeSortable) {
-					// Set ghost class to new sortable's ghost class
-					_toggleClass(dragEl, putSortable ? putSortable.options.ghostClass : activeSortable.options.ghostClass, false);
-					_toggleClass(dragEl, options.ghostClass, true);
-				}
+			// Return invocation when dragEl is inserted (or completed)
+			function completed(insertion) {
+				if (insertion) {
+					if (isOwner) {
+						activeSortable._hideClone();
+					} else {
+						activeSortable._showClone(_this);
+					}
 
-				if (putSortable !== _this && _this !== Sortable.active) {
-					putSortable = _this;
-				} else if (_this === Sortable.active) {
-					putSortable = null;
+					if (activeSortable) {
+						// Set ghost class to new sortable's ghost class
+						_toggleClass(dragEl, putSortable ? putSortable.options.ghostClass : activeSortable.options.ghostClass, false);
+						_toggleClass(dragEl, options.ghostClass, true);
+					}
+
+					if (putSortable !== _this && _this !== Sortable.active) {
+						putSortable = _this;
+					} else if (_this === Sortable.active) {
+						putSortable = null;
+					}
+
+					// Animation
+					dragRect && _this._animate(dragRect, dragEl);
+					target && targetRect && _this._animate(targetRect, target);
 				}
 
 
@@ -1152,7 +1245,7 @@
 
 			// target is dragEl or target is animated
 			if (!!_closest(evt.target, null, dragEl, true) || target.animated) {
-				return completed();
+				return completed(false);
 			}
 
 			if (target !== dragEl) {
@@ -1185,15 +1278,15 @@
 						rootEl.appendChild(dragEl);
 					}
 
-					return completed();
+					return completed(true);
 				}
 
-				if ((el.children.length === 0) || (el.children[0] === ghostEl) ||
-					_ghostIsLast(evt, axis, el) && !dragEl.animated
-				) {
-					//assign target only if condition is true
-					if (el.children.length !== 0 && el.children[0] !== ghostEl && el === evt.target) {
-						target = _lastChild(el);
+				var elLastChild = _lastChild(el);
+
+				if (!elLastChild || _ghostIsLast(evt, axis, el) && !elLastChild.animated) {
+					// assign target only if condition is true
+					if (elLastChild && el === evt.target) {
+						target = elLastChild;
 					}
 
 					if (target) {
@@ -1212,9 +1305,7 @@
 						realDragElRect = null;
 
 						changed();
-						this._animate(dragRect, dragEl);
-						target && this._animate(targetRect, target);
-						return completed();
+						return completed(true);
 					}
 				}
 				else if (target && target !== dragEl && target.parentNode === el) {
@@ -1222,11 +1313,14 @@
 						targetBeforeFirstSwap,
 						aligned = target.sortableMouseAligned,
 						differentLevel = dragEl.parentNode !== el,
-						scrolledPastTop = _isScrolledPast(target, axis === 'vertical' ? 'top' : 'left');
+						side1 = axis === 'vertical' ? 'top' : 'left',
+						scrolledPastTop = _isScrolledPast(target, 'top') || _isScrolledPast(dragEl, 'top'),
+						scrollBefore = scrolledPastTop ? scrolledPastTop.scrollTop : void 0;
+
 
 					if (lastTarget !== target) {
 						lastMode = null;
-						targetBeforeFirstSwap = _getRect(target)[axis === 'vertical' ? 'top' : 'left'];
+						targetBeforeFirstSwap = _getRect(target)[side1];
 						pastFirstInvertThresh = false;
 					}
 
@@ -1243,7 +1337,7 @@
 					) {
 						// New target that we will be inside
 						if (lastMode !== 'swap') {
-							isCircumstantialInvert = options.invertSwap || differentLevel || scrolling || scrolledPastTop;
+							isCircumstantialInvert = options.invertSwap || differentLevel;
 						}
 
 						direction = _getSwapDirection(evt, target, axis,
@@ -1253,10 +1347,10 @@
 						lastMode = 'swap';
 					} else {
 						// Insert at position
-						direction = _getInsertDirection(target, options);
+						direction = _getInsertDirection(target);
 						lastMode = 'insert';
 					}
-					if (direction === 0) return completed();
+					if (direction === 0) return completed(false);
 
 					realDragElRect = null;
 					lastTarget = target;
@@ -1292,22 +1386,25 @@
 							target.parentNode.insertBefore(dragEl, after ? nextSibling : target);
 						}
 
+						// Undo chrome's scroll adjustment
+						if (scrolledPastTop) {
+							_scrollBy(scrolledPastTop, 0, scrollBefore - scrolledPastTop.scrollTop);
+						}
+
 						parentEl = dragEl.parentNode; // actualization
 
 						// must be done before animation
 						if (targetBeforeFirstSwap !== undefined && !isCircumstantialInvert) {
-							targetMoveDistance = abs(targetBeforeFirstSwap - _getRect(target)[axis === 'vertical' ? 'top' : 'left']);
+							targetMoveDistance = abs(targetBeforeFirstSwap - _getRect(target)[side1]);
 						}
 						changed();
-						!differentLevel && this._animate(targetRect, target);
-						this._animate(dragRect, dragEl);
 
-						return completed();
+						return completed(true);
 					}
 				}
 
 				if (el.contains(dragEl)) {
-					return completed();
+					return completed(false);
 				}
 			}
 
@@ -1402,6 +1499,10 @@
 				_off(document, 'dragover', _checkAlignment);
 			}
 
+			if (Safari) {
+				_css(document.body, 'user-select', '');
+			}
+
 			this._offUpEvents();
 
 			if (evt) {
@@ -1467,7 +1568,6 @@
 						if (newIndex == null || newIndex === -1) {
 							newIndex = oldIndex;
 						}
-
 						_dispatchEvent(this, rootEl, 'end', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
 
 						// Save sorting
@@ -1844,10 +1944,11 @@
 		evt.newIndex = newIndex;
 
 		evt.originalEvent = originalEvt;
+		evt.pullMode = putSortable ? putSortable.lastPutMode : undefined;
 
 		if (rootEl) {
 			rootEl.dispatchEvent(evt);
-	        }
+		}
 
 		if (options[onName]) {
 			options[onName].call(sortable, evt);
@@ -1937,10 +2038,8 @@
 	function _lastChild(el) {
 		var last = el.lastElementChild;
 
-		while (last === ghostEl || last.style.display === 'none') {
+		while (last && (last === ghostEl || last.style.display === 'none')) {
 			last = last.previousElementSibling;
-
-			if (!last) break;
 		}
 
 		return last || null;
@@ -2016,7 +2115,7 @@
 					mouseOnAxis > targetS1 + (targetLength * (1 - swapThreshold) / 2) &&
 					mouseOnAxis < targetS2 - (targetLength * (1 - swapThreshold) / 2)
 				) {
-					return ((mouseOnAxis > targetS1 + targetLength / 2) ? -1 : 1);
+					return _getInsertDirection(target);
 				}
 			}
 		}
@@ -2041,12 +2140,11 @@
 	 * Gets the direction dragEl must be swapped relative to target in order to make it
 	 * seem that dragEl has been "inserted" into that element's position
 	 * @param  {HTMLElement} target       The target whose position dragEl is being inserted at
-	 * @param  {Object} options           options of the parent sortable
 	 * @return {Number}                   Direction dragEl must be swapped
 	 */
-	function _getInsertDirection(target, options) {
-		var dragElIndex = _index(dragEl, options.draggable),
-			targetIndex = _index(target, options.draggable);
+	function _getInsertDirection(target) {
+		var dragElIndex = _index(dragEl),
+			targetIndex = _index(target);
 
 		if (dragElIndex < targetIndex) {
 			return 1;
@@ -2190,10 +2288,9 @@
 	 * @param  {HTMLElement} el                The element whose boundingClientRect is wanted
 	 * @param  {[HTMLElement]} container       the parent the element will be placed in
 	 * @param  {[Boolean]} adjustForTransform  Whether the rect should compensate for parent's transform
-	 * (used for fixed positioning on el)
 	 * @return {Object}                        The boundingClientRect of el
 	 */
-	function _getRect(el, container, adjustForTransform) {
+	function _getRect(el, adjustForTransform, container, adjustForFixed) {
 		if (!el.getBoundingClientRect && el !== win) return;
 
 		var elRect,
@@ -2204,7 +2301,7 @@
 			height,
 			width;
 
-		if (el !== win) {
+		if (el !== win && el !== _getWindowScrollingElement()) {
 			elRect = el.getBoundingClientRect();
 			top = elRect.top;
 			left = elRect.left;
@@ -2221,7 +2318,7 @@
 			width = window.innerWidth;
 		}
 
-		if (adjustForTransform && el !== win) {
+		if (adjustForFixed && el !== win) {
 			// Adjust for translate()
 			container = container || el.parentNode;
 
@@ -2243,9 +2340,11 @@
 					/* jshint boss:true */
 				} while (container = container.parentNode);
 			}
+		}
 
+		if (adjustForTransform && el !== win) {
 			// Adjust for scale()
-			var matrix = _matrix(el),
+			var matrix = _matrix(container || el),
 				scaleX = matrix && matrix.a,
 				scaleY = matrix && matrix.d;
 
@@ -2276,10 +2375,10 @@
 	 * Checks if a side of an element is scrolled past a side of it's parents
 	 * @param  {HTMLElement}  el       The element who's side being scrolled out of view is in question
 	 * @param  {String}       side     Side of the element in question ('top', 'left', 'right', 'bottom')
-	 * @return {Boolean}               Whether the element is overflowing the viewport on the given side of it's parent
+	 * @return {HTMLElement}           The parent scroll element that the el's side is scrolled past, or null if there is no such element
 	 */
 	function _isScrolledPast(el, side) {
-		var parent = _getParentAutoScrollElement(parent, true),
+		var parent = _getParentAutoScrollElement(el, true),
 			elSide = _getRect(el)[side];
 
 		/* jshint boss:true */
@@ -2293,14 +2392,39 @@
 				visible = elSide <= parentSide;
 			}
 
-			if (!visible) return true;
+			if (!visible) return parent;
 
-			if (parent === win) break;
+			if (parent === _getWindowScrollingElement()) break;
 
 			parent = _getParentAutoScrollElement(parent, false);
 		}
 
 		return false;
+	}
+
+	/**
+	 * Returns the scroll offset of the given element, added with all the scroll offsets of parent elements.
+	 * The value is returned in real pixels.
+	 * @param  {HTMLElement} el
+	 * @return {Array}             Offsets in the format of [left, top]
+	 */
+	function _getRelativeScrollOffset(el) {
+		var offsetLeft = 0,
+			offsetTop = 0,
+			winScroller = _getWindowScrollingElement();
+
+		if (el) {
+			do {
+				var matrix = _matrix(el),
+					scaleX = matrix.a,
+					scaleY = matrix.d;
+
+				offsetLeft += el.scrollLeft * scaleX;
+				offsetTop += el.scrollTop * scaleY;
+			} while (el !== winScroller && (el = el.parentNode));
+		}
+
+		return [offsetLeft, offsetTop];
 	}
 
 	// Fixed #973:
@@ -2344,6 +2468,6 @@
 
 
 	// Export
-	Sortable.version = '1.8.3';
+	Sortable.version = '1.8.4';
 	return Sortable;
 });
