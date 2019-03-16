@@ -1479,6 +1479,9 @@
 			// Only deselect if target is not item in this sortable
 			if (evt && _closest(evt.target, this.options.draggable, this.el, false)) return;
 
+			// Only deselect if left click
+			if (evt && evt.button !== 0) return;
+
 			for (var i = 0; i < multiDragElements.length; i++) {
 				_toggleClass(multiDragElements[i], this.options.selectedClass, false);
 			}
@@ -1535,75 +1538,76 @@
 				}
 			}
 
-			// Multi-drag selection
-			if (!moved && options.multiDrag) {
-				_toggleClass(dragEl, options.selectedClass, !~multiDragElements.indexOf(dragEl));
 
-				if (!~multiDragElements.indexOf(dragEl)) {
-					multiDragElements.push(dragEl);
+			if (evt) {
+				// Multi-drag selection
+				if (!moved && options.multiDrag) {
+					_toggleClass(dragEl, options.selectedClass, !~multiDragElements.indexOf(dragEl));
 
-					// Modifier activated, select from last to dragEl
-					if (evt.shiftKey && lastMultiDragSelect && this.el.contains(lastMultiDragSelect)) {
-						var lastIndex = _index(lastMultiDragSelect),
-							currentIndex = _index(dragEl);
+					if (!~multiDragElements.indexOf(dragEl)) {
+						multiDragElements.push(dragEl);
 
-						if (~lastIndex && ~currentIndex && lastIndex !== currentIndex) {
-							var children = parentEl.children;
+						// Modifier activated, select from last to dragEl
+						if (evt.shiftKey && lastMultiDragSelect && this.el.contains(lastMultiDragSelect)) {
+							var lastIndex = _index(lastMultiDragSelect),
+								currentIndex = _index(dragEl);
 
-							// Must include lastMultiDragSelect (select it), in case modified selection from no selection
-							// (but previous selection existed)
-							if (currentIndex > lastIndex) {
-								i = lastIndex;
-								n = currentIndex;
-							} else {
-								i = currentIndex;
-								n = lastIndex + 1;
+							if (~lastIndex && ~currentIndex && lastIndex !== currentIndex) {
+								var children = parentEl.children;
+
+								// Must include lastMultiDragSelect (select it), in case modified selection from no selection
+								// (but previous selection existed)
+								if (currentIndex > lastIndex) {
+									i = lastIndex;
+									n = currentIndex;
+								} else {
+									i = currentIndex;
+									n = lastIndex + 1;
+								}
+
+								for (; i < n; i++) {
+									if (~multiDragElements.indexOf(children[i])) continue;
+									_toggleClass(children[i], options.selectedClass, true);
+									multiDragElements.push(children[i]);
+								}
 							}
-
-							for (; i < n; i++) {
-								if (~multiDragElements.indexOf(children[i])) continue;
-								_toggleClass(children[i], options.selectedClass, true);
-								multiDragElements.push(children[i]);
-							}
+						} else {
+							lastMultiDragSelect = dragEl;
 						}
+
+						multiDragSortable = parentEl;
 					} else {
-						lastMultiDragSelect = dragEl;
+						multiDragElements.splice(multiDragElements.indexOf(dragEl), 1);
+						lastMultiDragSelect = null;
+					}
+				}
+
+				// Multi-drag drop
+				if (moved && options.multiDrag && multiDragElements.length) {
+					// Do not "unfold" after around dragEl if sorting disabled (either reverted or never left it's sort:false root)
+					if (parentEl[expando].options.sort) {
+						var firstMultiDragElementIndex = _index(dragEl),
+							firstMultiDragRect = _getRect(dragEl);
+
+						// insert first multi drag at dragEl's position
+						parentEl.insertBefore(multiDragElements[0], dragEl);
+						multiDragElements[0] !== dragEl && parentEl.removeChild(dragEl);
+
+
+						for (i = 1; i < multiDragElements.length; i++) {
+							if (multiDragElements[i - 1].nextSibling) {
+								parentEl.insertBefore(multiDragElements[i], multiDragElements[i - 1].nextSibling);
+							} else {
+								parentEl.appendChild(multiDragElements[i]);
+							}
+
+							this._animate(firstMultiDragRect, multiDragElements[i]);
+						}
 					}
 
 					multiDragSortable = parentEl;
-				} else {
-					multiDragElements.splice(multiDragElements.indexOf(dragEl), 1);
-					lastMultiDragSelect = null;
-				}
-			}
-
-			// Multi-drag drop
-			if (moved && options.multiDrag && multiDragElements.length) {
-				// Do not "unfold" after around dragEl if sorting disabled (either reverted or never left it's sort:false root)
-				if (parentEl[expando].options.sort) {
-					var firstMultiDragElementIndex = _index(dragEl),
-						firstMultiDragRect = _getRect(dragEl);
-
-					// insert first multi drag at dragEl's position
-					parentEl.insertBefore(multiDragElements[0], dragEl);
-					multiDragElements[0] !== dragEl && parentEl.removeChild(dragEl);
-
-
-					for (i = 1; i < multiDragElements.length; i++) {
-						if (multiDragElements[i - 1].nextSibling) {
-							parentEl.insertBefore(multiDragElements[i], multiDragElements[i - 1].nextSibling);
-						} else {
-							parentEl.appendChild(multiDragElements[i]);
-						}
-
-						this._animate(firstMultiDragRect, multiDragElements[i]);
-					}
 				}
 
-				multiDragSortable = parentEl;
-			}
-
-			if (evt) {
 				if (moved) {
 					evt.cancelable && evt.preventDefault();
 					!options.dropBubble && evt.stopPropagation();
@@ -1865,6 +1869,9 @@
 			this._onDrop();
 
 			sortables.splice(sortables.indexOf(this.el), 1);
+
+			// Destroy multi-drag
+			this._deselectMultiDrag();
 
 			this.el = el = null;
 		},
