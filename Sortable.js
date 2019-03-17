@@ -189,7 +189,7 @@
 					insideHorizontally = x >= (rect.left - threshold) && x <= (rect.right + threshold),
 					insideVertically = y >= (rect.top - threshold) && y <= (rect.bottom + threshold);
 
-				if (insideHorizontally && insideVertically) {
+				if (threshold && insideHorizontally && insideVertically) {
 					return sortables[i];
 				}
 			}
@@ -488,12 +488,15 @@
 			var nearest = _detectNearestEmptySortable(evt.clientX, evt.clientY);
 
 			if (nearest) {
-				nearest[expando]._onDragOver({
-					clientX: evt.clientX,
-					clientY: evt.clientY,
-					target: nearest,
-					rootEl: nearest
-				});
+				// Create imitation event
+				var event = {};
+				for (var i in evt) {
+					event[i] = evt[i];
+				}
+				event.target = event.rootEl = nearest;
+				event.preventDefault = void 0;
+				event.stopPropagation = void 0;
+				nearest[expando]._onDragOver(event);
 			}
 		}
 	};
