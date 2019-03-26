@@ -2041,7 +2041,7 @@
 	function _lastChild(el) {
 		var last = el.lastElementChild;
 
-		while (last && (last === ghostEl || last.style.display === 'none')) {
+		while (last && (last === ghostEl || _css(last, 'display') === 'none')) {
 			last = last.previousElementSibling;
 		}
 
