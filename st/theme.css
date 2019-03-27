@@ -237,3 +237,8 @@ input[type=range]:focus::-ms-fill-upper {
 .blue-background-class {
 	background-color: #C8EBFB;
 }
+
+.col {
+	padding-right: 0;
+	margin-right: 15px;
+}
