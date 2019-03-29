@@ -535,10 +535,7 @@
 			fallbackOnBody: false,
 			fallbackTolerance: 0,
 			fallbackOffset: {x: 0, y: 0},
-			supportPointer: Sortable.supportPointer !== false && (
-				('PointerEvent' in window) ||
-				window.navigator && ('msPointerEnabled' in window.navigator) // microsoft
-			),
+			supportPointer: Sortable.supportPointer !== false && ('PointerEvent' in window),
 			emptyInsertThreshold: 5,
 			limitAxis: false
 		};
