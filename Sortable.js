@@ -435,29 +435,6 @@
 			dragEl.parentNode[expando] && dragEl.parentNode[expando]._computeIsAligned(evt);
 		},
 
-		_isTrueParentSortable = function(el, target) {
-			var trueParent = target;
-			while (!trueParent[expando]) {
-				trueParent = trueParent.parentNode;
-			}
-
-			return el === trueParent;
-		},
-
-		_artificalBubble = function(sortable, originalEvt, method) {
-			// Artificial IE bubbling
-			var nextParent = sortable.parentNode;
-			while (nextParent && !nextParent[expando]) {
-				nextParent = nextParent.parentNode;
-			}
-
-			if (nextParent) {
-				nextParent[expando][method](_extend(originalEvt, {
-					artificialBubble: true
-				}));
-			}
-		},
-
 		_hideGhostForTarget = function() {
 			if (!supportCssPointerEvents && ghostEl) {
 				_css(ghostEl, 'display', 'none');
@@ -664,13 +641,6 @@
 
 			_saveInputCheckedState(el);
 
-
-			// IE: Calls events in capture mode if event element is nested. This ensures only correct element's _onTapStart goes through.
-			// This process is also done in _onDragOver
-			if (IE11OrLess && !evt.artificialBubble && !_isTrueParentSortable(el, target)) {
-				return;
-			}
-
 			// Don't trigger start event when an element is been dragged, otherwise the evt.oldindex always wrong when set option.group.
 			if (dragEl) {
 				return;
@@ -687,12 +657,6 @@
 
 			target = _closest(target, options.draggable, el, false);
 
-			if (!target) {
-				if (IE11OrLess) {
-					_artificalBubble(el, evt, '_onTapStart');
-				}
-				return;
-			}
 
 			if (lastDownEl === target) {
 				// Ignoring duplicate `down`
@@ -1181,11 +1145,6 @@
 
 			if (_silent) return;
 
-			// IE event order fix
-			if (IE11OrLess && !evt.rootEl && !evt.artificialBubble && !_isTrueParentSortable(el, target)) {
-				return;
-			}
-
 			// Return invocation when dragEl is inserted (or completed)
 			function completed(insertion) {
 				if (insertion) {
@@ -1406,10 +1365,6 @@
 				if (el.contains(dragEl)) {
 					return completed(false);
 				}
-			}
-
-			if (IE11OrLess && !evt.rootEl) {
-				_artificalBubble(el, evt, '_onDragOver');
 			}
 
 			return false;
@@ -1834,12 +1789,12 @@
 
 
 	function _on(el, event, fn) {
-		el.addEventListener(event, fn, captureMode);
+		el.addEventListener(event, fn, IE11OrLess ? false : captureMode);
 	}
 
 
 	function _off(el, event, fn) {
-		el.removeEventListener(event, fn, captureMode);
+		el.removeEventListener(event, fn, IE11OrLess ? false : captureMode);
 	}
 
 
