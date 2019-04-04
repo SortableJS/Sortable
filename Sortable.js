@@ -1413,6 +1413,8 @@
 		},
 
 		_offMoveEvents: function() {
+			_off(document, 'touchmove', this._onTouchMove);
+			_off(document, 'pointermove', this._onTouchMove);
 			_off(document, 'dragover', nearestEmptyInsertDetectEvent);
 			_off(document, 'mousemove', nearestEmptyInsertDetectEvent);
 			_off(document, 'touchmove', nearestEmptyInsertDetectEvent);
@@ -1421,8 +1423,6 @@
 		_offUpEvents: function () {
 			var ownerDocument = this.el.ownerDocument;
 
-			_off(document, 'touchmove', this._onTouchMove);
-			_off(document, 'pointermove', this._onTouchMove);
 			_off(ownerDocument, 'mouseup', this._onDrop);
 			_off(ownerDocument, 'touchend', this._onDrop);
 			_off(ownerDocument, 'pointerup', this._onDrop);
