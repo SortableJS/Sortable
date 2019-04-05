@@ -2135,23 +2135,23 @@
 	 * @return {number}
 	 */
 	function _index(el, selector) {
-		var index = 0;
+	    var index = 0;
 
-		if (!el || !el.parentNode) {
-			return -1;
-		}
+	    if (!el || !el.parentNode) {
+	        return -1;
+	    }
 
-		while (el && (el = el.previousElementSibling)) {
-			if ((el.nodeName.toUpperCase() !== 'TEMPLATE') && el !== cloneEl) {
-				index++;
-			}
-		}
+	    while (el && (el = el.previousElementSibling)) {
+	        if ((el.nodeName.toUpperCase() !== 'TEMPLATE') && el !== cloneEl && (selector === '>*' || _matches(el, selector))) {
+	            index++;
+	        }
+	    }
 
-		return index;
+	    return index;
 	}
 
 	function _matches(/**HTMLElement*/el, /**String*/selector) {
-		if (el) {
+		if (el && selector) {
 			try {
 				if (el.matches) {
 					return el.matches(selector);
