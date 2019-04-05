@@ -2151,7 +2151,12 @@
 	}
 
 	function _matches(/**HTMLElement*/el, /**String*/selector) {
-		if (el && selector) {
+		
+		if (!selector) {
+			return true;
+		}
+
+		if (el) {
 			try {
 				if (el.matches) {
 					return el.matches(selector);
