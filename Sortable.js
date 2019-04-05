@@ -460,8 +460,8 @@
 	}, true);
 
 	var nearestEmptyInsertDetectEvent = function(evt) {
-		evt = evt.touches ? evt.touches[0] : evt;
 		if (dragEl) {
+			evt = evt.touches ? evt.touches[0] : evt;
 			var nearest = _detectNearestEmptySortable(evt.clientX, evt.clientY);
 
 			if (nearest) {
@@ -477,10 +477,6 @@
 			}
 		}
 	};
-	// We do not want this to be triggered if completed (bubbling canceled), so only define it here
-	_on(document, 'dragover', nearestEmptyInsertDetectEvent);
-	_on(document, 'mousemove', nearestEmptyInsertDetectEvent);
-	_on(document, 'touchmove', nearestEmptyInsertDetectEvent);
 
 	/**
 	 * @class  Sortable
@@ -805,6 +801,10 @@
 					_find(dragEl, criteria.trim(), _disableDraggable);
 				});
 
+				// We do not want this to be triggered if completed (bubbling canceled), so only define it here
+				_on(document, 'dragover', nearestEmptyInsertDetectEvent);
+				_on(document, 'mousemove', nearestEmptyInsertDetectEvent);
+				_on(document, 'touchmove', nearestEmptyInsertDetectEvent);
 				if (options.supportPointer) {
 					_on(ownerDocument, 'pointerup', _this._onDrop);
 				} else {
@@ -1412,11 +1412,17 @@
 			}
 		},
 
+		_offMoveEvents: function() {
+			_off(document, 'touchmove', this._onTouchMove);
+			_off(document, 'pointermove', this._onTouchMove);
+			_off(document, 'dragover', nearestEmptyInsertDetectEvent);
+			_off(document, 'mousemove', nearestEmptyInsertDetectEvent);
+			_off(document, 'touchmove', nearestEmptyInsertDetectEvent);
+		},
+
 		_offUpEvents: function () {
 			var ownerDocument = this.el.ownerDocument;
 
-			_off(document, 'touchmove', this._onTouchMove);
-			_off(document, 'pointermove', this._onTouchMove);
 			_off(ownerDocument, 'mouseup', this._onDrop);
 			_off(ownerDocument, 'touchend', this._onDrop);
 			_off(ownerDocument, 'pointerup', this._onDrop);
@@ -1458,6 +1464,7 @@
 				_css(document.body, 'user-select', '');
 			}
 
+			this._offMoveEvents();
 			this._offUpEvents();
 
 			if (evt) {
