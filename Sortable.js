@@ -1529,6 +1529,7 @@
 						/* jshint eqnull:true */
 						if (newIndex == null || newIndex === -1) {
 							newIndex = oldIndex;
+							newDraggableIndex = oldDraggableIndex;
 						}
 						_dispatchEvent(this, rootEl, 'end', dragEl, parentEl, rootEl, oldIndex, newIndex, oldDraggableIndex, newDraggableIndex, evt);
 
