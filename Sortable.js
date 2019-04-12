@@ -801,10 +801,10 @@
 					_find(dragEl, criteria.trim(), _disableDraggable);
 				});
 
-				// We do not want this to be triggered if completed (bubbling canceled), so only define it here
 				_on(document, 'dragover', nearestEmptyInsertDetectEvent);
 				_on(document, 'mousemove', nearestEmptyInsertDetectEvent);
 				_on(document, 'touchmove', nearestEmptyInsertDetectEvent);
+
 				if (options.supportPointer) {
 					_on(ownerDocument, 'pointerup', _this._onDrop);
 				} else {
@@ -1176,10 +1176,14 @@
 				if ((target === dragEl && !dragEl.animated) || (target === el && !target.animated)) {
 					lastTarget = null;
 				}
+
 				// no bubbling and not fallback
 				if (!options.dragoverBubble && !evt.rootEl && target !== document) {
 					_this._handleAutoScroll(evt);
 					dragEl.parentNode[expando]._computeIsAligned(evt);
+
+					// Do not detect for empty insert if already inserted
+					!insertion && nearestEmptyInsertDetectEvent(evt);
 				}
 
 				!options.dragoverBubble && evt.stopPropagation && evt.stopPropagation();
