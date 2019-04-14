@@ -1,4 +1,5 @@
 # Sortable
+### This branch is still under construction and may contain bugs. If you find any, please open an issue.
 Sortable is a JavaScript library for reorderable drag-and-drop lists.
 
 Demo: http://sortablejs.github.io/Sortable/
@@ -208,6 +209,16 @@ var sortable = new Sortable(el, {
 	onChange: function(/**Event*/evt) {
 		evt.newIndex // most likely why this event is used is to get the dragging element's current index
 		// same properties as onEnd
+	},
+
+	// Called when multi-drag item is selected
+	onSelect: function(/**Event*/evt) {
+		evt.item // The selected item
+	},
+
+	// Called when multi-drag item is deselected
+	onDeselect: function(/**Event*/evt) {
+		evt.item // The deselected item
 	}
 });
 ```
@@ -379,7 +390,7 @@ Sortable.create(el, {
 ---
 
 
-### `multiDrag` option
+#### `multiDrag` option
 This option will allow users to select multiple items within the sortable at once, and drag them as one item.
 Once placed, the items will unfold into their original order, but all beside eachother at the new position.
 
@@ -457,7 +468,7 @@ Sortable.create(list, {
 ---
 
 
-#### `swapClass`
+#### `swapClass` option
 Class name for the item to be swapped with, if swap mode is enabled. Defaults to `sortable-swap-highlight`.
 
 ```css
@@ -477,7 +488,7 @@ Sortable.create(list, {
 ---
 
 
-#### `selectedClass`
+#### `selectedClass` option
 Class name for the selected item(s) if multiDrag is enabled. Defaults to `sortable-selected`.
 
 ```css
@@ -760,6 +771,8 @@ Link to the active instance.
 * clone(el`:HTMLElement`)`:HTMLElement` — create a deep copy of the set of matched elements
 * toggleClass(el`:HTMLElement`, name`:String`, state`:Boolean`) — add or remove one classes from each element
 * detectDirection(el`:HTMLElement`)`:String` — automatically detect the [direction](https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction#direction) of the element as either `'vertical'` or `'horizontal'`
+* select(el`:HTMLElement`) — select the given multi-drag item
+* deselect(el`:HTMLElement`) — deselect the given multi-drag item
 
 
 ---

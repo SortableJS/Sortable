@@ -1456,6 +1456,7 @@
 
 			for (var i = 0; i < multiDragElements.length; i++) {
 				_toggleClass(multiDragElements[i], this.options.selectedClass, false);
+				_dispatchEvent(this, rootEl, 'deselect', multiDragElements[i], this.el, this.el, undefined, undefined, undefined, undefined, evt);
 			}
 			multiDragElements = [];
 		},
@@ -1519,6 +1520,7 @@
 
 					if (!~multiDragElements.indexOf(dragEl)) {
 						multiDragElements.push(dragEl);
+						_dispatchEvent(this, rootEl, 'select', dragEl, el, el, undefined, undefined, undefined, undefined, evt);
 
 						// Modifier activated, select from last to dragEl
 						if (evt.shiftKey && lastMultiDragSelect && this.el.contains(lastMultiDragSelect)) {
@@ -1542,6 +1544,8 @@
 									if (~multiDragElements.indexOf(children[i])) continue;
 									_toggleClass(children[i], options.selectedClass, true);
 									multiDragElements.push(children[i]);
+
+									_dispatchEvent(this, rootEl, 'select', children[i], el, el, undefined, undefined, undefined, undefined, evt);
 								}
 							}
 						} else {
@@ -1552,6 +1556,7 @@
 					} else {
 						multiDragElements.splice(multiDragElements.indexOf(dragEl), 1);
 						lastMultiDragSelect = null;
+						_dispatchEvent(this, rootEl, 'deselect', dragEl, el, el, undefined, undefined, undefined, undefined, evt);
 					}
 				}
 
@@ -2619,7 +2624,32 @@
 		nextTick: _nextTick,
 		cancelNextTick: _cancelNextTick,
 		detectDirection: _detectDirection,
-		getChild: _getChild
+		getChild: _getChild,
+		/**
+		 * Selects the provided multi-drag item
+		 * @param  {HTMLElement} el    The element to be selected
+		 */
+		select: function(el) {
+			var sortable = el.parentNode[expando];
+			if (!sortable || !sortable.options.multiDrag || ~multiDragElements.indexOf(el)) return;
+			if (multiDragSortable && multiDragSortable !== el.parentNode) {
+				multiDragSortable[expando]._deselectMultiDrag();
+				multiDragSortable = el.parentNode;
+			}
+			_toggleClass(el, sortable.options.selectedClass, true);
+			multiDragElements.push(el);
+		},
+		/**
+		 * Deselects the provided multi-drag item
+		 * @param  {HTMLElement} el    The element to be deselected
+		 */
+		deselect: function(el) {
+			var sortable = el.parentNode[expando],
+				index = multiDragElements.indexOf(el);
+			if (!sortable || !sortable.options.multiDrag || !~index) return;
+			_toggleClass(el, sortable.options.selectedClass, false);
+			multiDragElements.splice(index, 1);
+		}
 	};
 
 
