@@ -2301,9 +2301,10 @@
 	 * Returns the index of an element within its parent for a selected set of
 	 * elements
 	 * @param  {HTMLElement} el
+	 * @param  {selector} selector
 	 * @return {number}
 	 */
-	function _index(el) {
+	function _index(el, selector) {
 		var index = 0;
 
 		if (!el || !el.parentNode) {
