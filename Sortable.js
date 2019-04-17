@@ -65,6 +65,8 @@
 		multiDragElements = [],
 		lastMultiDragSelect, // for selection with modifier key down (SHIFT)
 		multiDragSortable,
+		initialFolding = false, // Initial multi-drag fold when drag started
+		folding = false, // Folding any other time
 
 		tapEvt,
 		touchEvt,
@@ -627,6 +629,10 @@
 			target = _closest(target, options.draggable, el, false);
 
 
+			if (target.animated) {
+				return;
+			}
+
 			if (lastDownEl === target) {
 				// Ignoring duplicate `down`
 				return;
@@ -748,9 +754,6 @@
 				this._lastY = (touch || evt).clientY;
 
 				dragEl.style['will-change'] = 'all';
-				// undo animation if needed
-				dragEl.style.transition = '';
-				dragEl.style.transform = '';
 
 				dragStartFn = function () {
 					// Delayed drag has been triggered
@@ -869,8 +872,54 @@
 		},
 
 		_dragStarted: function (fallback, evt) {
+			var _this = this;
 			awaitingDragStarted = false;
 			if (rootEl && dragEl) {
+				if (this.options.sort) {
+					// Capture rects,
+					// hide multi drag elements (by positioning them absolute),
+					// set multi drag elements rects to dragRect,
+					// show multi drag elements,
+					// animate to rects,
+					// unset rects & remove from DOM
+
+					this._captureAnimationState();
+
+					if (this.options.animation) {
+						for (i = 0; i < multiDragElements.length; i++) {
+							if (multiDragElements[i] === dragEl) continue;
+							_css(multiDragElements[i], 'position', 'absolute');
+						}
+
+						var dragRect = _getRect(dragEl, false, true, true);
+
+						for (var i = 0; i < multiDragElements.length; i++) {
+							if (multiDragElements[i] === dragEl) continue;
+							_setRect(multiDragElements[i], dragRect);
+						}
+
+						folding = true;
+						initialFolding = true;
+					}
+				}
+
+				this._animateAll(function() {
+					folding = false;
+					initialFolding = false;
+
+					if (_this.options.animation) {
+						for (var i in multiDragElements) {
+							_unsetRect(multiDragElements[i]);
+						}
+					}
+
+					// Remove all auxiliary multidrag items from el, if sorting enabled
+					if (_this.options.sort) {
+						_removeMultiDragElements();
+					}
+				});
+
+
 				if (this.nativeDraggable) {
 					_on(document, 'dragover', this._handleAutoScroll);
 					_on(document, 'dragover', _checkOutsideTargetEl);
@@ -880,9 +929,6 @@
 				// Apply effect
 				!fallback && _toggleClass(dragEl, options.dragClass, false);
 				_toggleClass(dragEl, options.ghostClass, true);
-
-				// In case dragging an animated element
-				_css(dragEl, 'transform', '');
 
 				Sortable.active = this;
 
@@ -989,7 +1035,7 @@
 			// Not being adjusted for
 			if (!ghostEl) {
 				var container = this.options.fallbackOnBody ? document.body : rootEl,
-					rect = _getRect(dragEl, true, container, !PositionGhostAbsolutely),
+					rect = _getRect(dragEl, true, PositionGhostAbsolutely, true, container),
 					css = _css(dragEl),
 					options = this.options;
 
@@ -1004,13 +1050,6 @@
 						ghostRelativeParent !== document
 					) {
 						ghostRelativeParent = ghostRelativeParent.parentNode;
-					}
-
-					if (ghostRelativeParent !== document) {
-						var ghostRelativeParentRect = _getRect(ghostRelativeParent, true);
-
-						rect.top -= ghostRelativeParentRect.top;
-						rect.left -= ghostRelativeParentRect.left;
 					}
 
 					if (ghostRelativeParent !== document.body && ghostRelativeParent !== document.documentElement) {
@@ -1030,6 +1069,9 @@
 				_toggleClass(ghostEl, options.ghostClass, false);
 				_toggleClass(ghostEl, options.fallbackClass, true);
 				_toggleClass(ghostEl, options.dragClass, true);
+
+				_css(ghostEl, 'transition', '');
+				_css(ghostEl, 'transform', '');
 
 				_css(ghostEl, 'box-sizing', 'border-box');
 				_css(ghostEl, 'margin', 0);
@@ -1066,8 +1108,9 @@
 				return a.sortableIndex - b.sortableIndex;
 			});
 
+			this._animationStates = [];
 			// Setup clone(s)
-			if (multiDragElements.length) {
+			if (multiDragElements.length && multiDragSortable === this.el) {
 				for (i = 0; i < multiDragElements.length; i++) {
 					multiDragClones.push(_clone(multiDragElements[i]));
 
@@ -1088,24 +1131,18 @@
 				_toggleClass(cloneEl, _this.options.chosenClass, false);
 			}
 
-			this._hideClone();
 
 
 			// #1143: IFrame support workaround
 			_this._cloneId = _nextTick(function() {
-				// Remove all auxiliary multidrag items from el, if sorting enabled
-				// (needs to be next tick, but before clone insert)
-				if (_this.options.sort) {
-					_removeMultiDragElements();
-				}
-
 				if (!_this.options.removeCloneOnHide) {
-					if (options.multiDrag) {
-						_insertMultiDrag(true);
+					if (multiDragElements.length && multiDragSortable === _this.el) {
+						_insertMultiDragClones(true);
 					} else {
 						rootEl.insertBefore(cloneEl, dragEl);
 					}
 				}
+				_this._hideClone();
 				_dispatchEvent(_this, rootEl, 'clone', dragEl);
 			});
 
@@ -1158,18 +1195,86 @@
 				activeSortable = Sortable.active,
 				isOwner = (activeGroup === group),
 				canSort = options.sort,
+				fromSortable = (putSortable || activeSortable),
+				axis,
+				clonesFromRect,
 				_this = this;
 
 			if (_silent) return;
 
+			// Capture animation state
+			function capture() {
+				for (i = 0; i < multiDragElements.length; i++) {
+					multiDragElements[i].thisAnimationDuration = null;
+				}
+
+				_this._captureAnimationState();
+				if (_this !== fromSortable) {
+					fromSortable._captureAnimationState();
+				}
+
+				if (activeSortable.options.animation && !isOwner && activeSortable.options.multiDrag) {
+					clonesFromRect = _extend({}, dragRect);
+					var dragMatrix = _matrix(dragEl, true);
+					clonesFromRect.top -= dragMatrix.f;
+					clonesFromRect.left -= dragMatrix.e;
+				}
+			}
+
 			// Return invocation when dragEl is inserted (or completed)
 			function completed(insertion) {
+				var i;
+
 				if (insertion) {
+					// Clones must be hidden before folding animation to capture dragRectAbsolute properly
 					if (isOwner) {
 						activeSortable._hideClone();
-					} else {
-						_removeMultiDragElements();
-						activeSortable._showClone(_this);
+					}
+
+					initialFolding = false;
+					// If leaving sort:false root: Fold
+					if (options.animation && multiDragElements.length > 1 && (folding || !isOwner && !activeSortable.options.sort && !putSortable)) {
+						// Fold: Set all multi drag elements's rects to dragEl's rect when multi-drag elements are invisible
+						var dragRectAbsolute = _getRect(dragEl, false, true, true);
+
+						for (i = 0; i < multiDragElements.length; i++) {
+							if (multiDragElements[i] === dragEl) continue;
+							_setRect(multiDragElements[i], dragRectAbsolute);
+
+							// Move element(s) to end of parentEl so that it does not interfere with multi-drag clones insertion if they are inserted
+							// while folding, and so that we can capture them again because old sortable will no longer be fromSortable
+							parentEl.appendChild(multiDragElements[i]);
+						}
+
+						folding = true;
+					}
+
+					// Clones must be shown (and check to remove multi drags) after folding when interfering multiDragElements are moved out
+					if (!isOwner) {
+						// Only remove if not folding (folding will remove them anyways)
+						if (!folding) {
+							_removeMultiDragElements();
+						}
+
+						if (multiDragElements.length > 1) {
+							var clonesHiddenBefore = cloneHidden;
+							activeSortable._showClone(_this);
+
+							// Unfold animation for clones if showing from hidden
+							if (activeSortable.options.animation && !cloneHidden && clonesHiddenBefore) {
+								for (i in multiDragClones) {
+									activeSortable._animationStates.push({
+										target: multiDragClones[i],
+										rect: clonesFromRect
+									});
+
+									multiDragClones[i].fromRect = clonesFromRect;
+									multiDragClones[i].thisAnimationDuration = null;
+								}
+							}
+						} else {
+							activeSortable._showClone(_this);
+						}
 					}
 
 					if (activeSortable) {
@@ -1180,14 +1285,24 @@
 
 					if (putSortable !== _this && _this !== Sortable.active) {
 						putSortable = _this;
-					} else if (_this === Sortable.active) {
+					} else if (_this === Sortable.active && putSortable) {
 						putSortable = null;
 					}
 
 					// Animation
 					if (!options.swap) {
-						dragRect && _this._animate(dragRect, dragEl);
-						target && targetRect && _this._animate(targetRect, target);
+						_this._ignoreWhileAnimating = target;
+						_this._animateAll(function() {
+							_this._ignoreWhileAnimating = null;
+
+							if (folding) {
+								folding = false;
+								_removeMultiDragElements();
+							}
+						});
+						if (_this !== fromSortable) {
+							fromSortable._animateAll();
+						}
 					}
 				}
 
@@ -1224,8 +1339,12 @@
 
 			target = _closest(target, options.draggable, el, true);
 
-			// target is dragEl or target is animated
-			if (dragEl.contains(evt.target) || target.animated) {
+			if (
+				dragEl.contains(evt.target) ||
+				(target.animated && target.animatingX && target.animatingY) ||
+				folding && ~multiDragElements.indexOf(target) ||
+				_this._ignoreWhileAnimating === target
+			) {
 				return completed(false);
 			}
 
@@ -1245,7 +1364,9 @@
 					)
 				)
 			) {
-				var axis = this._getDirection(evt, target);
+
+
+				axis = this._getDirection(evt, target);
 
 				dragRect = _getRect(dragEl);
 
@@ -1270,10 +1391,28 @@
 
 				if (revert) {
 					parentEl = rootEl; // actualization
+					capture();
+
 					this._hideClone();
 
 					if (multiDragElements.length) {
-						_insertMultiDrag();
+						// Setup unfold animation
+						for (var i in multiDragElements) {
+							this._animationStates.push({
+								target: multiDragElements[i],
+								rect: folding ? _getRect(multiDragElements[i]) : dragRect
+							});
+
+							_unsetRect(multiDragElements[i]);
+
+							multiDragElements[i].fromRect = dragRect;
+
+							fromSortable._animationStates.splice(
+								_indexOfObject(fromSortable._animationStates, { target: multiDragElements[i] }), 1
+							);
+						}
+						folding = false;
+						_insertMultiDragElements(!options.removeCloneOnHide);
 					} else {
 						if (nextEl) {
 							rootEl.insertBefore(dragEl, nextEl);
@@ -1298,6 +1437,7 @@
 					}
 
 					if (_onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt, !!target) !== false) {
+						capture();
 						el.appendChild(dragEl);
 						parentEl = el; // actualization
 						realDragElRect = null;
@@ -1311,7 +1451,7 @@
 						targetBeforeFirstSwap,
 						differentLevel = dragEl.parentNode !== el,
 						side1 = axis === 'vertical' ? 'top' : 'left',
-						scrolledPastTop = _isScrolledPast(target, 'top') || _isScrolledPast(dragEl, 'top'),
+						scrolledPastTop = _isScrolledPast(target, null, 'top', 'top') || _isScrolledPast(dragEl, null, 'top', 'top'),
 						scrollBefore = scrolledPastTop ? scrolledPastTop.scrollTop : void 0;
 
 
@@ -1329,7 +1469,24 @@
 						lastTarget === target
 					);
 
-					if (direction === 0) return completed(false);
+					var sibling;
+
+					if (direction !== 0) {
+						// Check if target is beside dragEl in respective direction (ignoring hidden elements)
+						var index = _index(dragEl);
+
+						do {
+							index -= direction;
+							sibling = parentEl.children[index];
+						} while (sibling && (_css(sibling, 'display') === 'none' || sibling === ghostEl));
+					}
+					// If dragEl is already beside target: Do not insert
+					if (
+						direction === 0 ||
+						sibling === target
+					) {
+						return completed(false);
+					}
 
 					realDragElRect = null;
 					lastTarget = target;
@@ -1352,6 +1509,8 @@
 
 						_silent = true;
 						setTimeout(_unsilent, 30);
+
+						capture();
 
 						if (after && !nextSibling) {
 							el.appendChild(dragEl);
@@ -1384,45 +1543,177 @@
 			return false;
 		},
 
-		_animate: function (prevRect, target) {
-			var ms = this.options.animation;
+		_animationStates: [],
+		_ignoreWhileAnimating: null, // target to ignore while animating
+		_animationCallbackId: null,
 
-			if (ms) {
+		_captureAnimationState: function () {
+			this._animationStates = [];
+			if (!this.options.animation) return;
+			var children = [].slice.call(this.el.children);
+
+			for (var i = 0; i < children.length; i++) {
+				if (_css(children[i], 'display') === 'none') continue;
+				this._animationStates.push({
+					target: children[i],
+					rect: _getRect(children[i])
+				});
+				var fromRect = _getRect(children[i]);
+
+				// If animating: compensate for current animation
+				if (children[i].thisAnimationDuration) {
+					var matrix = _matrix(children[i], true);
+					fromRect.top -= matrix.f;
+					fromRect.left -= matrix.e;
+				}
+
+				children[i].fromRect = fromRect;
+			}
+		},
+
+		_animateAll: function (callback) {
+			if (!this.options.animation) {
+				clearTimeout(_this._animationCallbackId);
+				if (typeof(callback) === 'function') callback();
+				return;
+			}
+
+			var states = this._animationStates,
+				animating = false,
+				animationTime = 0,
+				_this = this;
+
+			for (var i in states) {
+				var time = 0,
+					animatingThis = false,
+					target = states[i].target,
+					fromRect = target.fromRect,
+					toRect = _getRect(target),
+					prevFromRect = target.prevFromRect,
+					prevToRect = target.prevToRect,
+					animatingRect = states[i].rect,
+					targetMatrix = _matrix(target, true);
+
+
+				// Compensate for current animation
+				toRect.top -= targetMatrix.f;
+				toRect.left -= targetMatrix.e;
+
+				target.toRect = toRect;
+
+				// If element is scrolled out of view: Do not animate
+				if (
+					(
+						_isScrolledPast(target, toRect, 'bottom', 'top') ||
+						_isScrolledPast(target, toRect, 'top', 'bottom') ||
+						_isScrolledPast(target, toRect, 'right', 'left') ||
+						_isScrolledPast(target, toRect, 'left', 'right')
+					) &&
+					(
+						_isScrolledPast(target, animatingRect, 'bottom', 'top') ||
+						_isScrolledPast(target, animatingRect, 'top', 'bottom') ||
+						_isScrolledPast(target, animatingRect, 'right', 'left') ||
+						_isScrolledPast(target, animatingRect, 'left', 'right')
+					) &&
+					(
+						_isScrolledPast(target, fromRect, 'bottom', 'top') ||
+						_isScrolledPast(target, fromRect, 'top', 'bottom') ||
+						_isScrolledPast(target, fromRect, 'right', 'left') ||
+						_isScrolledPast(target, fromRect, 'left', 'right')
+					)
+				) continue;
+
+
+				if (target.thisAnimationDuration) {
+					// Could also check if animatingRect is between fromRect and toRect
+					if (
+						_isRectEqual(prevFromRect, toRect) &&
+						!_isRectEqual(fromRect, toRect) &&
+						// Make sure animatingRect is on line between toRect & fromRect
+						(animatingRect.top - toRect.top) /
+						(animatingRect.left - toRect.left) ===
+						(fromRect.top - toRect.top) /
+						(fromRect.left - toRect.left)
+					) {
+						// If returning to same place as started from animation and on same axis
+						time = _calculateRealTime(animatingRect, prevFromRect, prevToRect, this.options);
+					}
+				}
+
+				// if fromRect != toRect and not animating to same position as already animating: animate
+				if (!_isRectEqual(toRect, fromRect)) {
+					target.prevFromRect = fromRect;
+					target.prevToRect = toRect;
+
+					if (!time) {
+						time = this.options.animation;
+					}
+					this._animate(
+						target,
+						animatingRect,
+						time
+					);
+				}
+
+				if (time) {
+					animating = true;
+					animationTime = Math.max(animationTime, time);
+					clearTimeout(target.animationResetTimer);
+					target.animationResetTimer = setTimeout((function() {
+						this.states[this.i].target.animationTime = 0;
+						this.states[this.i].target.prevFromRect = null;
+						this.states[this.i].target.fromRect = null;
+						this.states[this.i].target.prevToRect = null;
+						this.states[this.i].target.thisAnimationDuration = null;
+					}).bind({ states: states, i: i}), time);
+					target.thisAnimationDuration = time;
+				}
+			}
+
+			clearTimeout(_this._animationCallbackId);
+			if (!animating) {
+				if (typeof(callback) === 'function') callback();
+			} else {
+				_this._animationCallbackId = setTimeout(function() {
+					if (typeof(callback) === 'function') callback();
+				}, animationTime);
+			}
+		},
+
+		_animate: function (target, prev, duration) {
+			if (duration) {
+				_css(target, 'transition', '');
+				_css(target, 'transform', '');
 				var currentRect = _getRect(target);
 
 				if (target === dragEl) {
 					realDragElRect = currentRect;
 				}
 
-				if (prevRect.nodeType === 1) {
-					prevRect = _getRect(prevRect);
-				}
+				var matrix = _matrix(this.el),
+					scaleX = matrix && matrix.a,
+					scaleY = matrix && matrix.d,
+					translateX = (prev.left - currentRect.left) / (scaleX || 1),
+					translateY = (prev.top - currentRect.top) / (scaleY || 1);
 
-				// Check if actually moving position
-				if ((prevRect.left + prevRect.width / 2) !== (currentRect.left + currentRect.width / 2)
-					|| (prevRect.top + prevRect.height / 2) !== (currentRect.top + currentRect.height / 2)
-				) {
-					var matrix = _matrix(this.el),
-						scaleX = matrix && matrix.a,
-						scaleY = matrix && matrix.d;
+				target.animatingX = !!translateX;
+				target.animatingY = !!translateY;
 
-					_css(target, 'transition', 'none');
-					_css(target, 'transform', 'translate3d('
-						+ (prevRect.left - currentRect.left) / (scaleX ? scaleX : 1) + 'px,'
-						+ (prevRect.top - currentRect.top) / (scaleY ? scaleY : 1) + 'px,0)'
-					);
+				_css(target, 'transform', 'translate3d(' + translateX + 'px,' + translateY + 'px,0)');
 
-					forRepaintDummy = target.offsetWidth; // repaint
-					_css(target, 'transition', 'transform ' + ms + 'ms' + (this.options.easing ? ' ' + this.options.easing : ''));
-					_css(target, 'transform', 'translate3d(0,0,0)');
-				}
+				forRepaintDummy = target.offsetWidth; // repaint
 
+				_css(target, 'transition', 'transform ' + duration + 'ms' + (this.options.easing ? ' ' + this.options.easing : ''));
+				_css(target, 'transform', 'translate3d(0,0,0)');
 				(typeof target.animated === 'number') && clearTimeout(target.animated);
 				target.animated = setTimeout(function () {
 					_css(target, 'transition', '');
 					_css(target, 'transform', '');
 					target.animated = false;
-				}, ms);
+
+					target.animatingX = false;
+					target.animatingY = false;
+				}, duration);
 			}
 		},
 
@@ -1445,6 +1736,8 @@
 		},
 
 		_deselectMultiDrag: function(evt) {
+			if (moved) return;
+
 			// Only deselect if selection is in this sortable
 			if (multiDragSortable !== this.el) return;
 
@@ -1464,7 +1757,9 @@
 		_onDrop: function (/**Event*/evt) {
 			var el = this.el,
 				options = this.options,
-				i, n;
+				toSortable = (putSortable || this),
+				i, n,
+				children = parentEl.children;
 
 			awaitingDragStarted = false;
 			scrolling = false;
@@ -1502,13 +1797,10 @@
 			lastSwapEl && _toggleClass(lastSwapEl, options.swapClass, false);
 			if (lastSwapEl && (options.swap || putSortable && putSortable.options.swap)) {
 				if (dragEl !== lastSwapEl) {
-					var dragRect = _getRect(dragEl),
-						lastRect = _getRect(lastSwapEl);
-
+					toSortable._captureAnimationState();
 					_swapNodes(dragEl, lastSwapEl);
 
-					this._animate(dragRect, dragEl);
-					this._animate(lastRect, lastSwapEl);
+					toSortable._animateAll();
 				}
 			}
 
@@ -1528,8 +1820,6 @@
 								currentIndex = _index(dragEl);
 
 							if (~lastIndex && ~currentIndex && lastIndex !== currentIndex) {
-								var children = parentEl.children;
-
 								// Must include lastMultiDragSelect (select it), in case modified selection from no selection
 								// (but previous selection existed)
 								if (currentIndex > lastIndex) {
@@ -1562,25 +1852,53 @@
 
 				// Multi-drag drop
 				if (moved && options.multiDrag && multiDragElements.length) {
-					// Do not "unfold" after around dragEl if sorting disabled (either reverted or never left it's sort:false root)
-					if (parentEl[expando].options.sort) {
-						var firstMultiDragElementIndex = _index(dragEl),
-							firstMultiDragRect = _getRect(dragEl);
+					// Do not "unfold" after around dragEl if reverted
+					if ((parentEl[expando].options.sort || parentEl !== rootEl) && multiDragElements.length > 1) {
+						var dragRect = _getRect(dragEl),
+							multiDragIndex = _index(dragEl, ':not(.' + Sortable.active.options.selectedClass + ')');
 
-						// insert first multi drag at dragEl's position
-						parentEl.insertBefore(multiDragElements[0], dragEl);
-						multiDragElements[0] !== dragEl && parentEl.removeChild(dragEl);
+						if (!initialFolding && options.animation) dragEl.thisAnimationDuration = null;
 
+						toSortable._captureAnimationState();
 
-						for (i = 1; i < multiDragElements.length; i++) {
-							if (multiDragElements[i - 1].nextSibling) {
-								parentEl.insertBefore(multiDragElements[i], multiDragElements[i - 1].nextSibling);
-							} else {
-								parentEl.appendChild(multiDragElements[i]);
+						if (!initialFolding) {
+							if (options.animation) {
+								dragEl.fromRect = dragRect;
+								for (i in multiDragElements) {
+									multiDragElements[i].thisAnimationDuration = null;
+									if (multiDragElements[i] !== dragEl) {
+										var rect = folding ? _getRect(multiDragElements[i]) : dragRect;
+										multiDragElements[i].fromRect = rect;
+
+										// Prepare unfold animation
+										toSortable._animationStates.push({
+											target: multiDragElements[i],
+											rect: rect
+										});
+									}
+								}
 							}
 
-							this._animate(firstMultiDragRect, multiDragElements[i]);
+							// Multi drag elements are not necessarily removed from the DOM on drop, so to reinsert
+							// properly they must all be removed
+							_removeMultiDragElements();
+
+							for (i in multiDragElements) {
+								if (children[multiDragIndex]) {
+									parentEl.insertBefore(multiDragElements[i], children[multiDragIndex]);
+								} else {
+									parentEl.appendChild(multiDragElements[i]);
+								}
+								multiDragIndex++;
+							}
 						}
+
+						// Must be done after capturing individual rects (scroll bar)
+						for (i in multiDragElements) {
+							_unsetRect(multiDragElements[i]);
+						}
+
+						toSortable._animateAll();
 					}
 
 					multiDragSortable = parentEl;
@@ -1594,8 +1912,12 @@
 				ghostEl && ghostEl.parentNode && ghostEl.parentNode.removeChild(ghostEl);
 
 				if (rootEl === parentEl || (putSortable && putSortable.lastPutMode !== 'clone')) {
-					// Remove clone
+					// Remove clone(s)
 					cloneEl && cloneEl.parentNode && cloneEl.parentNode.removeChild(cloneEl);
+
+					for (i in multiDragClones) {
+						multiDragClones[i].parentNode && multiDragClones[i].parentNode.removeChild(multiDragClones[i]);
+					}
 				}
 
 				if (dragEl) {
@@ -1679,6 +2001,7 @@
 			cloneEl =
 			lastDownEl =
 			lastSwapEl =
+			cloneHidden =
 
 			scrollEl =
 			scrollParentEl =
@@ -1880,7 +2203,7 @@
 
 			if (cloneHidden) {
 				if (multiDragClones.length) {
-					_insertMultiDrag(true);
+					_insertMultiDragClones(false);
 					for (var i = 0; i < multiDragClones.length; i++) {
 						_css(multiDragClones[i], 'display', '');
 					}
@@ -1993,7 +2316,7 @@
 		}
 	}
 
-	function _matrix(el) {
+	function _matrix(el, selfOnly) {
 		var appliedTransforms = '';
 		do {
 			var transform = _css(el, 'transform');
@@ -2002,7 +2325,7 @@
 				appliedTransforms = transform + ' ' + appliedTransforms;
 			}
 			/* jshint boss:true */
-		} while (el = el.parentNode);
+		} while (!selfOnly && (el = el.parentNode));
 
 		if (window.DOMMatrix) {
 			return new DOMMatrix(appliedTransforms);
@@ -2417,10 +2740,9 @@
 	}
 
 	function _swapNodes(n1, n2) {
-
-		var p1 = n1.parentNode;
-		var p2 = n2.parentNode;
-		var i1, i2;
+		var p1 = n1.parentNode,
+			p2 = n2.parentNode,
+			i1, i2;
 
 		if (!p1 || !p2 || p1.isEqualNode(n2) || p2.isEqualNode(n1)) return;
 
@@ -2437,12 +2759,14 @@
 
 	/**
 	 * Returns the "bounding client rect" of given element
-	 * @param  {HTMLElement} el                The element whose boundingClientRect is wanted
-	 * @param  {[HTMLElement]} container       the parent the element will be placed in
-	 * @param  {[Boolean]} adjustForTransform  Whether the rect should compensate for parent's transform
-	 * @return {Object}                        The boundingClientRect of el
+	 * @param  {HTMLElement} el                       The element whose boundingClientRect is wanted
+	 * @param  {[Boolean]} relativeToContainingBlock  Whether the rect should be relative to the containing block of (including) the container
+	 * @param  {[Boolean]} relativeToNonStaticParent  Whether the rect should be relative to the relative parent of (including) the contaienr
+	 * @param  {[Boolean]} undoScale                  Whether the container's scale() should be undone
+	 * @param  {[HTMLElement]} container              The parent the element will be placed in
+	 * @return {Object}                               The boundingClientRect of el, with specified adjustments
 	 */
-	function _getRect(el, adjustForTransform, container, adjustForFixed) {
+	function _getRect(el, relativeToContainingBlock, relativeToNonStaticParent, undoScale, container) {
 		if (!el.getBoundingClientRect && el !== win) return;
 
 		var elRect,
@@ -2470,7 +2794,7 @@
 			width = window.innerWidth;
 		}
 
-		if (adjustForFixed && el !== win) {
+		if ((relativeToContainingBlock || relativeToNonStaticParent) && el !== win) {
 			// Adjust for translate()
 			container = container || el.parentNode;
 
@@ -2478,7 +2802,15 @@
 			// Not needed on <= IE11
 			if (!IE11OrLess) {
 				do {
-					if (container && container.getBoundingClientRect && _css(container, 'transform') !== 'none') {
+					if (
+						container &&
+						container.getBoundingClientRect &&
+						(
+							_css(container, 'transform') !== 'none' ||
+							relativeToNonStaticParent &&
+							_css(container, 'position') !== 'static'
+						)
+					) {
 						var containerRect = container.getBoundingClientRect();
 
 						// Set relative to edges of padding box of container
@@ -2494,7 +2826,7 @@
 			}
 		}
 
-		if (adjustForTransform && el !== win) {
+		if (undoScale && el !== win) {
 			// Adjust for scale()
 			var matrix = _matrix(container || el),
 				scaleX = matrix && matrix.a,
@@ -2524,24 +2856,26 @@
 
 
 	/**
-	 * Checks if a side of an element is scrolled past a side of it's parents
-	 * @param  {HTMLElement}  el       The element who's side being scrolled out of view is in question
-	 * @param  {String}       side     Side of the element in question ('top', 'left', 'right', 'bottom')
-	 * @return {HTMLElement}           The parent scroll element that the el's side is scrolled past, or null if there is no such element
+	 * Checks if a side of an element is scrolled past a side of its parents
+	 * @param  {HTMLElement}  el           The element who's side being scrolled out of view is in question
+	 * @param  {[DOMRect]}    rect         Optional rect of `el` to use
+	 * @param  {String}       elSide       Side of the element in question ('top', 'left', 'right', 'bottom')
+	 * @param  {String}       parentSide   Side of the parent in question ('top', 'left', 'right', 'bottom')
+	 * @return {HTMLElement}               The parent scroll element that the el's side is scrolled past, or null if there is no such element
 	 */
-	function _isScrolledPast(el, side) {
+	function _isScrolledPast(el, rect, elSide, parentSide) {
 		var parent = _getParentAutoScrollElement(el, true),
-			elSide = _getRect(el)[side];
+			elSideVal = (rect ? rect : _getRect(el))[elSide];
 
 		/* jshint boss:true */
 		while (parent) {
-			var parentSide = _getRect(parent)[side],
+			var parentSideVal = _getRect(parent)[parentSide],
 				visible;
 
-			if (side === 'top' || side === 'left') {
-				visible = elSide >= parentSide;
+			if (parentSide === 'top' || parentSide === 'left') {
+				visible = elSideVal >= parentSideVal;
 			} else {
-				visible = elSide <= parentSide;
+				visible = elSideVal <= parentSideVal;
 			}
 
 			if (!visible) return parent;
@@ -2554,14 +2888,28 @@
 		return false;
 	}
 
-	function _insertMultiDrag(clones) {
-		var multiDrags = clones ? multiDragClones : multiDragElements;
-		for (var i = 0; i < multiDrags.length; i++) {
-			var target = rootEl.children[multiDrags[i].sortableIndex];
+	function _insertMultiDragElements(clonesInserted) {
+		for (var i in multiDragElements) {
+			var target = rootEl.children[multiDragElements[i].sortableIndex + (clonesInserted ? Number(i) : 0)];
 			if (target) {
-				rootEl.insertBefore(multiDrags[i], target);
+				rootEl.insertBefore(multiDragElements[i], target);
 			} else {
-				rootEl.appendChild(multiDrags[i]);
+				rootEl.appendChild(multiDragElements[i]);
+			}
+		}
+	}
+
+	/**
+	 * Insert multi-drag clones
+	 * @param  {[Boolean]} elementsInserted  Whether the multi-drag elements are inserted
+	 */
+	function _insertMultiDragClones(elementsInserted) {
+		for (var i in multiDragClones) {
+			var target = rootEl.children[multiDragClones[i].sortableIndex + (elementsInserted ? Number(i) : 0)];
+			if (target) {
+				rootEl.insertBefore(multiDragClones[i], target);
+			} else {
+				rootEl.appendChild(multiDragClones[i]);
 			}
 		}
 	}
@@ -2597,6 +2945,52 @@
 
 		return [offsetLeft, offsetTop];
 	}
+
+	/**
+	 * Returns the index of the object within the given array
+	 * @param  {Array} arr   Array that may or may not hold the object
+	 * @param  {Object} obj  An object that has a key-value pair unique to and identical to a key-value pair in the object you want to find
+	 * @return {Number}      The index of the object in the array, or -1
+	 */
+	function _indexOfObject(arr, obj) {
+		for (var i in arr) {
+			for (var key in obj) {
+				if (obj[key] === arr[i][key]) return Number(i);
+			}
+		}
+		return -1;
+	}
+
+	function _isRectEqual(rect1, rect2) {
+		return Math.round(rect1.top) === Math.round(rect2.top) &&
+			Math.round(rect1.left) === Math.round(rect2.left) &&
+			Math.round(rect1.height) === Math.round(rect2.height) &&
+			Math.round(rect1.width) === Math.round(rect2.width);
+	}
+
+	function _setRect(el, rect) {
+		_css(el, 'position', 'absolute');
+		_css(el, 'top', rect.top);
+		_css(el, 'left', rect.left);
+		_css(el, 'width', rect.width);
+		_css(el, 'height', rect.height);
+	}
+
+	function _unsetRect(el) {
+		_css(el, 'position', '');
+		_css(el, 'top', '');
+		_css(el, 'left', '');
+		_css(el, 'width', '');
+		_css(el, 'height', '');
+	}
+
+	function _calculateRealTime(animatingRect, fromRect, toRect, options) {
+		return (
+			Math.sqrt(Math.pow(fromRect.top - animatingRect.top, 2) + Math.pow(fromRect.left - animatingRect.left, 2)) /
+			Math.sqrt(Math.pow(fromRect.top - toRect.top, 2) + Math.pow(fromRect.left - toRect.left, 2))
+		) * options.animation;
+	}
+
 
 	// Fixed #973:
 	_on(document, 'touchmove', function(evt) {
