@@ -1573,7 +1573,7 @@
 
 		_animateAll: function (callback) {
 			if (!this.options.animation) {
-				clearTimeout(_this._animationCallbackId);
+				clearTimeout(this._animationCallbackId);
 				if (typeof(callback) === 'function') callback();
 				return;
 			}
