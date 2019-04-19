@@ -3,18 +3,17 @@
 	"exportName": "Sortable",
 	"version": "1.9.0",
 	"devDependencies": {
-		"gulp": "^4.0.0",
-		"gulp-each": "^0.5.0",
-		"gulp-rename": "^1.4.0",
-		"gulp-uglify": "^3.0.1",
-		"http-server": "^0.9.0",
-		"pump": "^3.0.0"
+		"rollup": "^1.10.1",
+		"uglify-js": "^3.5.5"
 	},
 	"description": "JavaScript library for reorderable drag-and-drop lists on modern browsers and touch devices. No jQuery required. Supports Meteor, AngularJS, React, Polymer, Vue, Knockout and any CSS library, e.g. Bootstrap.",
 	"main": "Sortable.js",
+	"module": "index-es.js",
 	"scripts": {
-		"http-server": "http-server -s ./",
-		"prepublish": "gulp build"
+		"prepublish": "npm run build",
+		"build": "rollup -c rollup.config.js && npm run min",
+		"min": "uglifyjs -mangle --comments=/@license/ -o dist/sortable.min.js -- dist/sortable.js",
+		"watch": "npm run build -- --watch"
 	},
 	"maintainers": [
 		"Konstantin Lebedev <ibnRubaXa@gmail.com>",

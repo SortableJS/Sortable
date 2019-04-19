@@ -5,26 +5,12 @@
  * @license MIT
  */
 
-(function sortableModule(factory) {
-	"use strict";
+"use strict";
 
-	if (typeof define === "function" && define.amd) {
-		define(factory);
-	}
-	else if (typeof module != "undefined" && typeof module.exports != "undefined") {
-		module.exports = factory();
-	}
-	else {
-		/* jshint sub:true */
-		window["Sortable"] = factory();
-	}
-})(function sortableFactory() {
-	"use strict";
+import { version } from './package.json';
 
 	if (typeof window === "undefined" || !window.document) {
-		return function sortableError() {
-			throw new Error("Sortable.js requires a window with a document");
-		};
+		throw new Error("Sortable.js requires a window with a document");
 	}
 
 	var dragEl,
@@ -2455,6 +2441,6 @@
 
 
 	// Export
-	Sortable.version = '1.9.0';
-	return Sortable;
-});
+	Sortable.version = version;
+
+	export default Sortable;
