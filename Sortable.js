@@ -804,17 +804,13 @@
 					_find(dragEl, criteria.trim(), _disableDraggable);
 				});
 
-				_on(document, 'dragover', nearestEmptyInsertDetectEvent);
-				_on(document, 'mousemove', nearestEmptyInsertDetectEvent);
-				_on(document, 'touchmove', nearestEmptyInsertDetectEvent);
+				_on(ownerDocument, 'dragover', nearestEmptyInsertDetectEvent);
+				_on(ownerDocument, 'mousemove', nearestEmptyInsertDetectEvent);
+				_on(ownerDocument, 'touchmove', nearestEmptyInsertDetectEvent);
 
-				if (options.supportPointer) {
-					_on(ownerDocument, 'pointerup', _this._onDrop);
-				} else {
-					_on(ownerDocument, 'mouseup', _this._onDrop);
-					_on(ownerDocument, 'touchend', _this._onDrop);
-					_on(ownerDocument, 'touchcancel', _this._onDrop);
-				}
+				_on(ownerDocument, 'mouseup', _this._onDrop);
+				_on(ownerDocument, 'touchend', _this._onDrop);
+				_on(ownerDocument, 'touchcancel', _this._onDrop);
 
 				// Make dragEl draggable (must be before delay for FireFox)
 				if (FireFox && this.nativeDraggable) {
