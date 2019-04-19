@@ -76,8 +76,6 @@
 		ghostRelativeParent,
 		ghostRelativeParentInitialScroll = [], // (left, top)
 
-
-		forRepaintDummy,
 		realDragElRect, // dragEl rect after current animation
 
 		/** @const */
@@ -1408,7 +1406,7 @@
 						+ (prevRect.top - currentRect.top) / (scaleY ? scaleY : 1) + 'px,0)'
 					);
 
-					forRepaintDummy = target.offsetWidth; // repaint
+					this._repaint(target);
 					_css(target, 'transition', 'transform ' + ms + 'ms' + (this.options.easing ? ' ' + this.options.easing : ''));
 					_css(target, 'transform', 'translate3d(0,0,0)');
 				}
@@ -1420,6 +1418,10 @@
 					target.animated = false;
 				}, ms);
 			}
+		},
+
+		_repaint: function(target) {
+			return target.offsetWidth;
 		},
 
 		_offMoveEvents: function() {
@@ -1581,7 +1583,6 @@
 			lastTarget =
 			lastDirection =
 
-			forRepaintDummy =
 			realDragElRect =
 
 			putSortable =
