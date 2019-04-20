@@ -2455,6 +2455,6 @@
 
 
 	// Export
-	Sortable.version = '1.8.4';
+	Sortable.version = '1.9.0';
 	return Sortable;
 });
