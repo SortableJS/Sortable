@@ -84,6 +84,7 @@ var sortable = new Sortable(el, {
 	group: "name",  // or { name: "...", pull: [true, false, 'clone', array], put: [true, false, array] }
 	sort: true,  // sorting inside list
 	delay: 0, // time in milliseconds to define when the sorting should start
+	delayOnTouchOnly: false, // only delay if user is using touch
 	touchStartThreshold: 0, // px, how many pixels the point should move before cancelling a delayed drag event
 	disabled: false, // Disables the sortable if set to true.
 	store: null,  // @see Store
@@ -240,6 +241,13 @@ Time in milliseconds to define when the sorting should start.
 Unfortunately, due to browser restrictions, delaying is not possible on IE or Edge with native drag & drop.
 
 Demo: https://jsbin.com/zosiwah/edit?js,output
+
+
+---
+
+
+#### `delayOnTouchOnly` option
+Whether or not the delay should be applied only if the user is using touch (eg. on a mobile device). No delay will be applied in any other case. Defaults to `false`.
 
 
 ---
