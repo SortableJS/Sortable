@@ -158,33 +158,20 @@
 				elCSS.display === 'flex' ?
 					/column/.test(elCSS.flexDirection) : // column or column-reverse
 				// else if
-								
-	
 				elCSS.display === 'grid' ?
 					elCSS.gridTemplateColumns.split(' ').length <= 1 :
 				// else if
-	
 				child1 && firstChildCSS.float !== 'none' ?
-												  
-																			   
 					child2 && (secondChildCSS.clear === 'both' || secondChildCSS.clear === (firstChildCSS.float === 'left' ? 'left' : 'right')) :
 				// else
 					child1 && (
-	
-
-					
-	 
-										 
-										
 						/^(block|flex|table|grid)$/.test(firstChildCSS.display) ||
-										
 						elCSS[CSSFloatProperty] === 'none' &&
 						(firstChildWidth >= elWidth ||
 						child2 &&
 						firstChildWidth + secondChildWidth > elWidth)
 					)
 			) ? 'vertical' : 'horizontal';
-							 
 		},
 
 		/**
@@ -327,31 +314,6 @@
 
 						vx = (width < scrollWidth && (autoOrScroll.test(css.overflowX) || el === winScroller && css.overflowX === 'visible')) && (abs(right - x) <= sens && (scrollPosX + width) < scrollWidth) - (abs(left - x) <= sens && !!scrollPosX),
 						vy = (height < scrollHeight && (autoOrScroll.test(css.overflowY) || el === winScroller && css.overflowY === 'visible')) && (abs(bottom - y) <= sens && (scrollPosY + height) < scrollHeight) - (abs(top - y) <= sens && !!scrollPosY);
-				 
-
-				 
-				 
-
-
-								  
-									
-
-					
-
-								
-							   
-
-							  
-																																											 
-																																												
-			 
-																																												
-																																												  
-	  
-
-
-
-																																											  
 
 					if (!autoScrolls[layersOut]) {
 						for (var i = 0; i <= layersOut; i++) {
@@ -412,7 +374,6 @@
 							from.options.group.name &&
 							to.options.group.name === from.options.group.name
 						) ||
-
 						// Default pull value
 						// Default pull and put value if same group
 						// return true;
@@ -426,15 +387,11 @@
 						typeof value === 'function' ?
 							toFn(value(to, from, dragEl, evt), pull)(to, from, dragEl, evt) :
 						// else
-			 
-																						   
 							value === true ||
 							(typeof value === 'string' && value === (pull ? to : from).options.group.name) ||
 							(value.join && value.indexOf(otherGroup) > -1);
-																				 
 				};
 			}
-
 
 			var originalGroup = options.group;
 
@@ -448,7 +405,6 @@
 				checkPut: toFn(originalGroup.put),
 				revertClone: originalGroup.revertClone
 			};
-
 		},
 
 		_checkAlignment = function(evt) {
@@ -579,7 +535,6 @@
 		}
 
 		
-					
 
 		if (// Setup drag mode
 			_this.nativeDraggable = (options.forceFallback ? false : ('draggable' in document.createElement('div')))) {
@@ -898,12 +853,7 @@
 
 			if (!_this.nativeDraggable || touch) {
 				_on(document, (_this.options.supportPointer ? 'pointer' :
-									  
-													 
-					   
-												   
 						touch ? 'touch' : 'mouse') + 'move', _this._onTouchMove);
-												   
 			} else {
 				_on(dragEl, 'dragend', _this);
 				_on(rootEl, 'dragstart', _this._onDragStart);
@@ -1014,7 +964,6 @@
 					dxdy = (((touch.clientX - tapEvt.clientX)
 							+ fallbackOffset.x) / (scaleX || 1)
 							+ (+relativeScrollOffset && (relativeScrollOffset[0] - ghostRelativeParentInitialScroll[0])) / (scaleX || 1)) + 'px,' + (((touch.clientY - tapEvt.clientY)
-																																																							
 							+ fallbackOffset.y) / (scaleY || 1)
 							+ (+relativeScrollOffset && (relativeScrollOffset[1] - ghostRelativeParentInitialScroll[1])) / (scaleY || 1)),
 					translate3d = 'translate' + (evt.touches ? '3d(' + dxdy + 'px,0)' : '(' + dxdy + 'px)');
@@ -1176,7 +1125,6 @@
 				activeSortable = Sortable.active,
 				isOwner = (activeGroup === group),
 				canSort = options.sort;
-						   
 
 			if (_silent) return;
 
@@ -1211,7 +1159,6 @@
 				if ((target === dragEl && !dragEl.animated) || (target === el && !target.animated)) {
 					lastTarget = _null;
 				}
-	 
 				// no bubbling and not fallback
 				if (!options.dragoverBubble && !evt.rootEl && target !== document) {
 					_this._handleAutoScroll(evt);
@@ -1909,12 +1856,6 @@
 		} while (el = el.parentNode);
 
 		return new (DOMMatrix || WebKitCSSMatrix || CSSMatrix)(appliedTransforms);
-						 
-										   
-									  
-												 
-								
-										   
 	}
 
 
@@ -2169,10 +2110,7 @@
 	 * @return {Number}                   Direction dragEl must be swapped
 	 */
 	function _getInsertDirection(target) {
-									   
 		if (_index(dragEl) < _index(target)) {
-								
-
 			return 1;
 		} else {
 			return -1;
@@ -2229,18 +2167,8 @@
 		if (el) {
 			try {
 				return (el.matches || el.msMatchesSelector || el.webkitMatchesSelector)(selector);
-					 
-								 
-									  
-										   
-										  
-											   
 			} catch(_) {}
-			   
-				 
 		}
-   
-
 	}
 
 	var _throttleTimeout;
@@ -2303,15 +2231,6 @@
 			el.checked && savedInputChecked.push(el);
 		}
 	}
-  
-
-						 
-						   
-  
-
-							   
-						  
-
 
 	/**
 	 * Returns the "bounding client rect" of given element
@@ -2480,8 +2399,6 @@
 		toggleClass: _toggleClass,
 		clone: _clone,
 		index: _index,
-				
-					  
 		detectDirection: _detectDirection,
 		getChild: _getChild
 	};

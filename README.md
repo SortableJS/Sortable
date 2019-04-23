@@ -84,6 +84,7 @@ var sortable = new Sortable(el, {
 	group: "name",  // or { name: "...", pull: [true, false, 'clone', array], put: [true, false, array] }
 	sort: true,  // sorting inside list
 	delay: 0, // time in milliseconds to define when the sorting should start
+	delayOnTouchOnly: false, // only delay if user is using touch
 	touchStartThreshold: 0, // px, how many pixels the point should move before cancelling a delayed drag event
 	disabled: false, // Disables the sortable if set to true.
 	store: null,  // @see Store
@@ -146,6 +147,8 @@ var sortable = new Sortable(el, {
 		evt.from;  // previous list
 		evt.oldIndex;  // element's old index within old parent
 		evt.newIndex;  // element's new index within new parent
+		evt.oldDraggableIndex; // element's old index within old parent, only counting draggable elements
+		evt.newDraggableIndex; // element's new index within new parent, only counting draggable elements
 		evt.clone // the clone element
 		evt.pullMode;  // when item is in another sortable: `"clone"` if cloning, `true` if moving
 	},
@@ -240,6 +243,13 @@ Time in milliseconds to define when the sorting should start.
 Unfortunately, due to browser restrictions, delaying is not possible on IE or Edge with native drag & drop.
 
 Demo: https://jsbin.com/zosiwah/edit?js,output
+
+
+---
+
+
+#### `delayOnTouchOnly` option
+Whether or not the delay should be applied only if the user is using touch (eg. on a mobile device). No delay will be applied in any other case. Defaults to `false`.
 
 
 ---
@@ -531,6 +541,8 @@ Demo: https://jsbin.com/becavoj/edit?js,output
  - clone:`HTMLElement`
  - oldIndex:`Number|undefined` — old index within parent
  - newIndex:`Number|undefined` — new index within parent
+ - oldDraggableIndex: `Number|undefined` — old index within parent, only counting draggable elements
+ - newDraggableIndex: `Number|undefined` — new index within parent, only counting draggable elements
  - pullMode:`String|Boolean|undefined` — Pull mode if dragging into another sortable (`"clone"`, `true`, or `false`), otherwise undefined
 
 
