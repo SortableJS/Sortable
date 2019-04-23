@@ -41,6 +41,8 @@
 
 		oldIndex,
 		newIndex,
+		oldDraggableIndex,
+		newDraggableIndex,
 
 		activeGroup,
 		putSortable,
@@ -75,8 +77,6 @@
 		ghostRelativeParent,
 		ghostRelativeParentInitialScroll = [], // (left, top)
 
-
-		forRepaintDummy,
 		realDragElRect, // dragEl rect after current animation
 
 		/** @const */
@@ -84,7 +84,6 @@
 
 		expando = 'Sortable' + new Date().getTime(),
 
-		window = window,
 		document = window.document,
 		parseInt = window.parseInt,
 		setTimeout = window.setTimeout,
@@ -159,20 +158,33 @@
 				elCSS.display === 'flex' ?
 					/column/.test(elCSS.flexDirection) : // column or column-reverse
 				// else if
+								
+	
 				elCSS.display === 'grid' ?
 					elCSS.gridTemplateColumns.split(' ').length <= 1 :
 				// else if
+	
 				child1 && firstChildCSS.float !== 'none' ?
+												  
+																			   
 					child2 && (secondChildCSS.clear === 'both' || secondChildCSS.clear === (firstChildCSS.float === 'left' ? 'left' : 'right')) :
 				// else
 					child1 && (
+	
+
+					
+	 
+										 
+										
 						/^(block|flex|table|grid)$/.test(firstChildCSS.display) ||
+										
 						elCSS[CSSFloatProperty] === 'none' &&
 						(firstChildWidth >= elWidth ||
 						child2 &&
 						firstChildWidth + secondChildWidth > elWidth)
 					)
 			) ? 'vertical' : 'horizontal';
+							 
 		},
 
 		/**
@@ -315,6 +327,31 @@
 
 						vx = (width < scrollWidth && (autoOrScroll.test(css.overflowX) || el === winScroller && css.overflowX === 'visible')) && (abs(right - x) <= sens && (scrollPosX + width) < scrollWidth) - (abs(left - x) <= sens && !!scrollPosX),
 						vy = (height < scrollHeight && (autoOrScroll.test(css.overflowY) || el === winScroller && css.overflowY === 'visible')) && (abs(bottom - y) <= sens && (scrollPosY + height) < scrollHeight) - (abs(top - y) <= sens && !!scrollPosY);
+				 
+
+				 
+				 
+
+
+								  
+									
+
+					
+
+								
+							   
+
+							  
+																																											 
+																																												
+			 
+																																												
+																																												  
+	  
+
+
+
+																																											  
 
 					if (!autoScrolls[layersOut]) {
 						for (var i = 0; i <= layersOut; i++) {
@@ -375,6 +412,7 @@
 							from.options.group.name &&
 							to.options.group.name === from.options.group.name
 						) ||
+
 						// Default pull value
 						// Default pull and put value if same group
 						// return true;
@@ -388,11 +426,15 @@
 						typeof value === 'function' ?
 							toFn(value(to, from, dragEl, evt), pull)(to, from, dragEl, evt) :
 						// else
+			 
+																						   
 							value === true ||
 							(typeof value === 'string' && value === (pull ? to : from).options.group.name) ||
 							(value.join && value.indexOf(otherGroup) > -1);
+																				 
 				};
 			}
+
 
 			var originalGroup = options.group;
 
@@ -406,34 +448,12 @@
 				checkPut: toFn(originalGroup.put),
 				revertClone: originalGroup.revertClone
 			};
+
 		},
 
 		_checkAlignment = function(evt) {
 			if (!dragEl || !dragEl.parentNode) return;
 			dragEl.parentNode[expando] && dragEl.parentNode[expando]._computeIsAligned(evt);
-		},
-
-		_isTrueParentSortable = function(el, target) {
-			var trueParent = target;
-			while (!trueParent[expando]) {
-				trueParent = trueParent.parentNode;
-			}
-
-			return el === trueParent;
-		},
-
-		_artificalBubble = function(sortable, originalEvt, method) {
-			// Artificial IE bubbling
-			var nextParent = sortable.parentNode;
-			while (nextParent && !nextParent[expando]) {
-				nextParent = nextParent.parentNode;
-			}
-
-			if (nextParent) {
-				nextParent[expando][method](_extend(originalEvt, {
-					artificialBubble: true
-				}));
-			}
 		},
 
 		_hideGhostForTarget = function() {
@@ -461,8 +481,8 @@
 	}, true);
 
 	var nearestEmptyInsertDetectEvent = function(evt) {
-		evt = evt.touches ? evt.touches[0] : evt;
 		if (dragEl) {
+			evt = evt.touches ? evt.touches[0] : evt;
 			var nearest = _detectNearestEmptySortable(evt.clientX, evt.clientY);
 
 			if (nearest) {
@@ -478,10 +498,6 @@
 			}
 		}
 	};
-	// We do not want this to be triggered if completed (bubbling canceled), so only define it here
-	_on(document, 'dragover', nearestEmptyInsertDetectEvent);
-	_on(document, 'mousemove', nearestEmptyInsertDetectEvent);
-	_on(document, 'touchmove', nearestEmptyInsertDetectEvent);
 
 	/**
 	 * @class  Sortable
@@ -536,6 +552,7 @@
 			dragoverBubble: false,
 			dataIdAttr: 'data-id',
 			delay: 0,
+			delayOnTouchOnly: false,
 			touchStartThreshold: parseInt(window.devicePixelRatio, 10) || 1,
 			forceFallback: false,
 			fallbackClass: 'sortable-fallback',
@@ -544,7 +561,6 @@
 			fallbackOffset: {x: 0, y: 0},
 			supportPointer: Sortable.supportPointer !== false && ('PointerEvent' in window),
 			emptyInsertThreshold: 5
-			// limitAxis: false
 		};
 
 
@@ -563,6 +579,7 @@
 		}
 
 		
+					
 
 		if (// Setup drag mode
 			_this.nativeDraggable = (options.forceFallback ? false : ('draggable' in document.createElement('div')))) {
@@ -642,16 +659,10 @@
 				target = (touch || evt).target,
 				originalTarget = evt.target.shadowRoot && ((evt.path && evt.path[0]) || (evt.composedPath && evt.composedPath()[0])) || target,
 				filter = options.filter,
-				startIndex;
+				startIndex,
+				startDraggableIndex;
 
 			_saveInputCheckedState(el);
-
-
-			// IE: Calls events in capture mode if event element is nested. This ensures only correct element's _onTapStart goes through.
-			// This process is also done in _onDragOver
-			if (IE11OrLess && !evt.artificialBubble && !_isTrueParentSortable(el, target)) {
-				return;
-			}
 
 			// Don't trigger start event when an element is been dragged, otherwise the evt.oldindex always wrong when set option.group.
 			if (dragEl) {
@@ -669,12 +680,6 @@
 
 			target = _closest(target, options.draggable, el, false);
 
-			if (!target) {
-				if (IE11OrLess) {
-					_artificalBubble(el, evt, '_onTapStart');
-				}
-				return;
-			}
 
 			if (lastDownEl === target) {
 				// Ignoring duplicate `down`
@@ -682,12 +687,13 @@
 			}
 
 			// Get the index of the dragged element within its parent
-			startIndex = _index(target, options.draggable);
+			startIndex = _index(target);
+			startDraggableIndex = _index(target, options.draggable);
 
 			// Check filter
 			if (typeof filter === 'function') {
 				if (filter.call(_this, evt, target, _this)) {
-					_dispatchEvent(_this, originalTarget, 'filter', target, el, el, startIndex);
+					_dispatchEvent(_this, originalTarget, 'filter', target, el, el, startIndex, undefined, startDraggableIndex);
 					preventOnFilter && evt.cancelable && evt.preventDefault();
 					return; // cancel dnd
 				}
@@ -697,7 +703,7 @@
 					criteria = _closest(originalTarget, criteria.trim(), el, false);
 
 					if (criteria) {
-						_dispatchEvent(_this, criteria, 'filter', target, el, el, startIndex);
+						_dispatchEvent(_this, criteria, 'filter', target, el, el, startIndex, undefined, startDraggableIndex);
 						return true;
 					}
 				});
@@ -713,7 +719,7 @@
 			}
 
 			// Prepare `dragstart`
-			_this._prepareDragStart(evt, touch, target, startIndex);
+			_this._prepareDragStart(evt, touch, target, startIndex, startDraggableIndex);
 		},
 
 
@@ -769,7 +775,7 @@
 			}
 		},
 
-		_prepareDragStart: function (/** Event */evt, /** Touch */touch, /** HTMLElement */target, /** Number */startIndex) {
+		_prepareDragStart: function (/** Event */evt, /** Touch */touch, /** HTMLElement */target, /** Number */startIndex, /** Number */startDraggableIndex) {
 			var _this = this,
 				el = _this.el,
 				options = _this.options,
@@ -785,6 +791,7 @@
 				lastDownEl = target;
 				activeGroup = options.group;
 				oldIndex = startIndex;
+				oldDraggableIndex = startDraggableIndex;
 
 				tapEvt = {
 					target: dragEl,
@@ -813,7 +820,7 @@
 					_this._triggerDragStart(evt, touch);
 
 					// Drag start event
-					_dispatchEvent(_this, rootEl, 'choose', dragEl, rootEl, rootEl, oldIndex);
+					_dispatchEvent(_this, rootEl, 'choose', dragEl, rootEl, rootEl, oldIndex, undefined, oldDraggableIndex);
 
 					// Chosen item
 					_toggleClass(dragEl, options.chosenClass, true);
@@ -824,13 +831,13 @@
 					_find(dragEl, criteria.trim(), _disableDraggable);
 				});
 
-				if (options.supportPointer) {
-					_on(ownerDocument, 'pointerup', _this._onDrop);
-				} else {
-					_on(ownerDocument, 'mouseup', _this._onDrop);
-					_on(ownerDocument, 'touchend', _this._onDrop);
-					_on(ownerDocument, 'touchcancel', _this._onDrop);
-				}
+				_on(ownerDocument, 'dragover', nearestEmptyInsertDetectEvent);
+				_on(ownerDocument, 'mousemove', nearestEmptyInsertDetectEvent);
+				_on(ownerDocument, 'touchmove', nearestEmptyInsertDetectEvent);
+
+				_on(ownerDocument, 'mouseup', _this._onDrop);
+				_on(ownerDocument, 'touchend', _this._onDrop);
+				_on(ownerDocument, 'touchcancel', _this._onDrop);
 
 				// Make dragEl draggable (must be before delay for FireFox)
 				if (FireFox && _this.nativeDraggable) {
@@ -839,7 +846,7 @@
 				}
 
 				// Delay is impossible for native DnD in Edge or IE
-				if (options.delay && (!_this.nativeDraggable || !(Edge || IE11OrLess))) {
+				if (options.delay && (!options.delayOnTouchOnly || touch) && (!_this.nativeDraggable || !(Edge || IE11OrLess))) {
 					// If the user moves the pointer or let go the click or touch
 					// before the delay has been reached:
 					// disable the delayed drag
@@ -891,15 +898,15 @@
 
 			if (!_this.nativeDraggable || touch) {
 				_on(document, (_this.options.supportPointer ? 'pointer' :
+									  
+													 
+					   
+												   
 						touch ? 'touch' : 'mouse') + 'move', _this._onTouchMove);
+												   
 			} else {
 				_on(dragEl, 'dragend', _this);
 				_on(rootEl, 'dragstart', _this._onDragStart);
-				/*
-				if (_this.options.limitAxis) {
-					_on(document, 'mousemove', _this._onMouseMove);
-				}
-				*/
 			}
 
 			try {
@@ -914,16 +921,6 @@
 			} catch (err) {
 			}
 		},
-
-		/*
-		_onMouseMove: function(evt) {
-			if (this._getDirection(evt, _null)) {
-				_css(this, 'left', tapEvt.clientX - evt.clientX);
-			} else {
-				_css(this, 'top', tapEvt.clientY - evt.clientY);
-			}
-		},
-		*/
 
 		_dragStarted: function (fallback, evt) {
 			var _this = this;
@@ -947,7 +944,7 @@
 				fallback && _this._appendGhost();
 
 				// Drag start event
-				_dispatchEvent(_this, rootEl, 'start', dragEl, rootEl, rootEl, oldIndex, undefined, evt);
+				_dispatchEvent(_this, rootEl, 'start', dragEl, rootEl, rootEl, oldIndex, undefined, oldDraggableIndex, undefined, evt);
 			} else {
 				_this._nulling();
 			}
@@ -969,6 +966,7 @@
 
 				while (target && target.shadowRoot) {
 					target = target.shadowRoot.elementFromPoint(touchEvt.clientX, touchEvt.clientY);
+					if (target === parent) break;
 					parent = target;
 				}
 
@@ -1013,13 +1011,13 @@
 					scaleY = ghostEl && matrix && matrix.d,
 					relativeScrollOffset = IOS /*PositionGhostAbsolutely*/ && ghostRelativeParent && _getRelativeScrollOffset(ghostRelativeParent),
 					axis = _this._getDirection(evt, _null),
-					dx = /* +(axis || !options.limitAxis) && */ (((touch.clientX - tapEvt.clientX)
+					dxdy = (((touch.clientX - tapEvt.clientX)
 							+ fallbackOffset.x) / (scaleX || 1)
-							+ (+relativeScrollOffset && (relativeScrollOffset[0] - ghostRelativeParentInitialScroll[0])) / (scaleX || 1)),
-					dy = /* +(!axis || !options.limitAxis) && */ ((touch.clientY - tapEvt.clientY)
+							+ (+relativeScrollOffset && (relativeScrollOffset[0] - ghostRelativeParentInitialScroll[0])) / (scaleX || 1)) + 'px,' + (((touch.clientY - tapEvt.clientY)
+																																																							
 							+ fallbackOffset.y) / (scaleY || 1)
-							+ (+relativeScrollOffset && (relativeScrollOffset[1] - ghostRelativeParentInitialScroll[1])) / (scaleY || 1),
-					translate3d = 'translate' + (evt.touches ? '3d' : '') + '(' + dx + 'px,' + dy + 'px,0)';
+							+ (+relativeScrollOffset && (relativeScrollOffset[1] - ghostRelativeParentInitialScroll[1])) / (scaleY || 1)),
+					translate3d = 'translate' + (evt.touches ? '3d(' + dxdy + 'px,0)' : '(' + dxdy + 'px)');
 
 				// only set the status to dragging, when we are actually dragging
 				if (!Sortable.active && !awaitingDragStarted) {
@@ -1178,13 +1176,9 @@
 				activeSortable = Sortable.active,
 				isOwner = (activeGroup === group),
 				canSort = options.sort;
+						   
 
 			if (_silent) return;
-
-			// IE event order fix
-			if (IE11OrLess && !evt.rootEl && !evt.artificialBubble && !_isTrueParentSortable(el, target)) {
-				return;
-			}
 
 			// Return invocation when dragEl is inserted (or completed)
 			function completed(insertion) {
@@ -1217,10 +1211,14 @@
 				if ((target === dragEl && !dragEl.animated) || (target === el && !target.animated)) {
 					lastTarget = _null;
 				}
+	 
 				// no bubbling and not fallback
 				if (!options.dragoverBubble && !evt.rootEl && target !== document) {
 					_this._handleAutoScroll(evt);
 					dragEl.parentNode[expando]._computeIsAligned(evt);
+
+					// Do not detect for empty insert if already inserted
+					!insertion && nearestEmptyInsertDetectEvent(evt);
 				}
 
 				!options.dragoverBubble && evt.stopPropagation && evt.stopPropagation();
@@ -1230,7 +1228,7 @@
 
 			// Call when dragEl has been inserted
 			function changed() {
-				_dispatchEvent(_this, rootEl, 'change', target, el, rootEl, oldIndex, _index(dragEl, options.draggable), evt);
+				_dispatchEvent(_this, rootEl, 'change', target, el, rootEl, oldIndex, _index(dragEl), oldDraggableIndex, _index(dragEl, options.draggable), evt);
 			}
 
 
@@ -1244,7 +1242,7 @@
 			target = _closest(target, options.draggable, el, true);
 
 			// target is dragEl or target is animated
-			if (!!_closest(evt.target, _null, dragEl, true) || target.animated) {
+			if (dragEl.contains(evt.target) || target.animated) {
 				return completed(false);
 			}
 
@@ -1409,10 +1407,6 @@
 				}
 			}
 
-			if (IE11OrLess && !evt.rootEl) {
-				_artificalBubble(el, evt, '_onDragOver');
-			}
-
 			return false;
 		},
 
@@ -1459,12 +1453,22 @@
 			}
 		},
 
+		_repaint: function(target) {
+			return target.offsetWidth;
+		},
+
+		_offMoveEvents: function() {
+			_off(document, 'touchmove', this._onTouchMove);
+			_off(document, 'pointermove', this._onTouchMove);
+			_off(document, 'dragover', nearestEmptyInsertDetectEvent);
+			_off(document, 'mousemove', nearestEmptyInsertDetectEvent);
+			_off(document, 'touchmove', nearestEmptyInsertDetectEvent);
+		},
+
 		_offUpEvents: function () {
 			var _this = this,
 				ownerDocument = _this.el.ownerDocument;
 
-			_off(document, 'touchmove', _this._onTouchMove);
-			_off(document, 'pointermove', _this._onTouchMove);
 			_off(ownerDocument, 'mouseup', _this._onDrop);
 			_off(ownerDocument, 'touchend', _this._onDrop);
 			_off(ownerDocument, 'pointerup', _this._onDrop);
@@ -1507,6 +1511,7 @@
 				_css(document.body, 'user-select', '');
 			}
 
+			_this._offMoveEvents();
 			_this._offUpEvents();
 
 			if (evt) {
@@ -1535,20 +1540,22 @@
 					_toggleClass(dragEl, _this.options.chosenClass, false);
 
 					// Drag stop event
-					_dispatchEvent(_this, rootEl, 'unchoose', dragEl, parentEl, rootEl, oldIndex, _null, evt);
+					_dispatchEvent(_this, rootEl, 'unchoose', dragEl, parentEl, rootEl, oldIndex, _null, oldDraggableIndex, _null, evt);
 
 					if (rootEl !== parentEl) {
+						newIndex = _index(dragEl);
+						newDraggableIndex = _index(dragEl, options.draggable);
 
-						if ((newIndex = _index(dragEl, options.draggable)) >= 0) {
+						if (newIndex >= 0) {
 							// Add event
-							_dispatchEvent(_null, parentEl, 'add', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+							_dispatchEvent(_null, parentEl, 'add', dragEl, parentEl, rootEl, oldIndex, newIndex, oldDraggableIndex, newDraggableIndex, evt);
 
 							// Remove event
-							_dispatchEvent(_this, rootEl, 'remove', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+							_dispatchEvent(_this, rootEl, 'remove', dragEl, parentEl, rootEl, oldIndex, newIndex, oldDraggableIndex, newDraggableIndex, evt);
 
 							// drag from one list and drop into another
-							_dispatchEvent(_null, parentEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
-							_dispatchEvent(_this, rootEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+							_dispatchEvent(_null, parentEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, oldDraggableIndex, newDraggableIndex, evt);
+							_dispatchEvent(_this, rootEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, oldDraggableIndex, newDraggableIndex, evt);
 						}
 
 						putSortable && putSortable.save();
@@ -1556,10 +1563,13 @@
 					else {
 						if (dragEl.nextSibling !== nextEl) {
 							// Get the index of the dragged element within its parent
-							if ((newIndex = _index(dragEl, options.draggable)) >= 0) {
+							newIndex = _index(dragEl);
+							newDraggableIndex = _index(dragEl, options.draggable);
+
+							if (newIndex >= 0) {
 								// drag & drop within the same list
-								_dispatchEvent(_this, rootEl, 'update', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
-								_dispatchEvent(_this, rootEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+								_dispatchEvent(_this, rootEl, 'update', dragEl, parentEl, rootEl, oldIndex, newIndex, oldDraggableIndex, newDraggableIndex, evt);
+								_dispatchEvent(_this, rootEl, 'sort', dragEl, parentEl, rootEl, oldIndex, newIndex, oldDraggableIndex, newDraggableIndex, evt);
 							}
 						}
 					}
@@ -1568,8 +1578,9 @@
 						/* jshint eqnull:true */
 						if (newIndex == _null || newIndex === -1) {
 							newIndex = oldIndex;
+							newDraggableIndex = oldDraggableIndex;
 						}
-						_dispatchEvent(_this, rootEl, 'end', dragEl, parentEl, rootEl, oldIndex, newIndex, evt);
+						_dispatchEvent(_this, rootEl, 'end', dragEl, parentEl, rootEl, oldIndex, newIndex, oldDraggableIndex, newDraggableIndex, evt);
 
 						// Save sorting
 						_this.save();
@@ -1607,7 +1618,6 @@
 			lastTarget =
 			lastDirection =
 
-			forRepaintDummy =
 			realDragElRect =
 
 			putSortable =
@@ -1807,7 +1817,8 @@
 				if (
 					selector != _null &&
 					(
-						selector[0] === '>' && el.parentNode === ctx && _matches(el, selector.substring(1)) ||
+						selector[0] === '>' ?
+						el.parentNode === ctx && _matches(el, selector) :
 						_matches(el, selector)
 					) ||
 					includeCTX && el === ctx
@@ -1840,12 +1851,12 @@
 
 
 	function _on(el, event, fn) {
-		el.addEventListener(event, fn, captureMode);
+		el.addEventListener(event, fn, !IE11OrLess && captureMode);
 	}
 
 
 	function _off(el, event, fn) {
-		el.removeEventListener(event, fn, captureMode);
+		el.removeEventListener(event, fn, !IE11OrLess && captureMode);
 	}
 
 
@@ -1898,6 +1909,12 @@
 		} while (el = el.parentNode);
 
 		return new (DOMMatrix || WebKitCSSMatrix || CSSMatrix)(appliedTransforms);
+						 
+										   
+									  
+												 
+								
+										   
 	}
 
 
@@ -1919,7 +1936,13 @@
 
 
 
-	function _dispatchEvent(sortable, rootEl, name, targetEl, toEl, fromEl, startIndex, newIndex, originalEvt) {
+	function _dispatchEvent(
+		sortable, rootEl, name,
+		targetEl, toEl, fromEl,
+		startIndex, newIndex,
+		startDraggableIndex, newDraggableIndex,
+		originalEvt
+	) {
 		sortable = (sortable || rootEl[expando]);
 		var evt,
 			options = sortable.options,
@@ -1942,6 +1965,9 @@
 
 		evt.oldIndex = startIndex;
 		evt.newIndex = newIndex;
+
+		evt.oldDraggableIndex = startDraggableIndex;
+		evt.newDraggableIndex = newDraggableIndex;
 
 		evt.originalEvent = originalEvt;
 		evt.pullMode = putSortable ? putSortable.lastPutMode : undefined;
@@ -2143,7 +2169,10 @@
 	 * @return {Number}                   Direction dragEl must be swapped
 	 */
 	function _getInsertDirection(target) {
+									   
 		if (_index(dragEl) < _index(target)) {
+								
+
 			return 1;
 		} else {
 			return -1;
@@ -2184,7 +2213,7 @@
 		}
 
 		while (el && (el = el.previousElementSibling)) {
-			if ((el.nodeName.toUpperCase() !== 'TEMPLATE') && el !== cloneEl) {
+			if ((el.nodeName.toUpperCase() !== 'TEMPLATE') && el !== cloneEl && (!selector || _matches(el, selector))) {
 				index++;
 			}
 		}
@@ -2193,15 +2222,25 @@
 	}
 
 	function _matches(/**HTMLElement*/el, /**String*/selector) {
+		if (!selector) return;
+
+		selector[0] === '>' && (selector = selector.substring(1));
+
 		if (el) {
 			try {
-				(el.matches || el.msMatchesSelector || el.webkitMatchesSelector)(selector);
-			} catch(_) {
-				return false;
-			}
+				return (el.matches || el.msMatchesSelector || el.webkitMatchesSelector)(selector);
+					 
+								 
+									  
+										   
+										  
+											   
+			} catch(_) {}
+			   
+				 
 		}
+   
 
-		return false;
 	}
 
 	var _throttleTimeout;
@@ -2264,6 +2303,15 @@
 			el.checked && savedInputChecked.push(el);
 		}
 	}
+  
+
+						 
+						   
+  
+
+							   
+						  
+
 
 	/**
 	 * Returns the "bounding client rect" of given element
@@ -2432,6 +2480,8 @@
 		toggleClass: _toggleClass,
 		clone: _clone,
 		index: _index,
+				
+					  
 		detectDirection: _detectDirection,
 		getChild: _getChild
 	};
@@ -2448,6 +2498,6 @@
 
 
 	// Export
-	Sortable.version = '1.8.4';
+	Sortable.version = '1.9.0';
 	return Sortable;
 });
