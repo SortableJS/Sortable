@@ -84,7 +84,6 @@
 		ghostRelativeParent,
 		ghostRelativeParentInitialScroll = [], // (left, top)
 
-		forRepaintDummy,
 		realDragElRect, // dragEl rect after current animation
 
 		/** @const */
@@ -525,6 +524,7 @@
 			dragoverBubble: false,
 			dataIdAttr: 'data-id',
 			delay: 0,
+			delayOnTouchOnly: false,
 			touchStartThreshold: parseInt(window.devicePixelRatio, 10) || 1,
 			forceFallback: false,
 			fallbackClass: 'sortable-fallback',
@@ -779,17 +779,13 @@
 					_find(dragEl, criteria.trim(), _disableDraggable);
 				});
 
-				_on(document, 'dragover', nearestEmptyInsertDetectEvent);
-				_on(document, 'mousemove', nearestEmptyInsertDetectEvent);
-				_on(document, 'touchmove', nearestEmptyInsertDetectEvent);
+				_on(ownerDocument, 'dragover', nearestEmptyInsertDetectEvent);
+				_on(ownerDocument, 'mousemove', nearestEmptyInsertDetectEvent);
+				_on(ownerDocument, 'touchmove', nearestEmptyInsertDetectEvent);
 
-				if (options.supportPointer) {
-					_on(ownerDocument, 'pointerup', _this._onDrop);
-				} else {
-					_on(ownerDocument, 'mouseup', _this._onDrop);
-					_on(ownerDocument, 'touchend', _this._onDrop);
-					_on(ownerDocument, 'touchcancel', _this._onDrop);
-				}
+				_on(ownerDocument, 'mouseup', _this._onDrop);
+				_on(ownerDocument, 'touchend', _this._onDrop);
+				_on(ownerDocument, 'touchcancel', _this._onDrop);
 
 				// Make dragEl draggable (must be before delay for FireFox)
 				if (FireFox && this.nativeDraggable) {
@@ -798,7 +794,7 @@
 				}
 
 				// Delay is impossible for native DnD in Edge or IE
-				if (options.delay && (!this.nativeDraggable || !(Edge || IE11OrLess))) {
+				if (options.delay && (options.delayOnTouchOnly ? touch : true) && (!this.nativeDraggable || !(Edge || IE11OrLess))) {
 					// If the user moves the pointer or let go the click or touch
 					// before the delay has been reached:
 					// disable the delayed drag
@@ -956,6 +952,7 @@
 
 				while (target && target.shadowRoot) {
 					target = target.shadowRoot.elementFromPoint(touchEvt.clientX, touchEvt.clientY);
+					if (target === parent) break;
 					parent = target;
 				}
 
@@ -1701,7 +1698,7 @@
 
 				_css(target, 'transform', 'translate3d(' + translateX + 'px,' + translateY + 'px,0)');
 
-				forRepaintDummy = target.offsetWidth; // repaint
+				this._repaint(target); // repaint
 
 				_css(target, 'transition', 'transform ' + duration + 'ms' + (this.options.easing ? ' ' + this.options.easing : ''));
 				_css(target, 'transform', 'translate3d(0,0,0)');
@@ -1715,6 +1712,10 @@
 					target.animatingY = false;
 				}, duration);
 			}
+		},
+
+		_repaint: function(target) {
+			return target.offsetWidth;
 		},
 
 		_offMoveEvents: function() {
@@ -2021,7 +2022,6 @@
 			lastTarget =
 			lastDirection =
 
-			forRepaintDummy =
 			realDragElRect =
 
 			putSortable =
@@ -3058,6 +3058,6 @@
 
 
 	// Export
-	Sortable.version = '1.8.4';
+	Sortable.version = '1.9.0';
 	return Sortable;
 });
