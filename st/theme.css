@@ -242,3 +242,7 @@ input[type=range]:focus::-ms-fill-upper {
 	padding-right: 0;
 	margin-right: 15px;
 }
+
+.ad-container {
+	margin: auto;
+}
