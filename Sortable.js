@@ -85,7 +85,7 @@
 
 		win = window,
 		document = win.document,
-		parseInt = win.parseInt,
+		parseInt = win.parseInt || global.parseInt,
 		setTimeout = win.setTimeout,
 
 		$ = win.jQuery || win.Zepto,
