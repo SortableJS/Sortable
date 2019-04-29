@@ -8,14 +8,13 @@
 (function sortableModule(factory) {
 	"use strict";
 
-	if (typeof define === "function" && define.amd) {
+	if (typeof define == "function" && define.amd) {
 		define(factory);
 	}
 	else if (typeof module != "undefined" && typeof module.exports != "undefined") {
 		module.exports = factory();
 	}
 	else {
-		/* jshint sub:true */
 		window["Sortable"] = factory();
 	}
 })(function sortableFactory() {
@@ -142,32 +141,32 @@
 				firstChildWidth = firstChildCSS && parseInt(firstChildCSS.marginLeft) + parseInt(firstChildCSS.marginRight) + _getRect(child1).width,
 				secondChildWidth = secondChildCSS && parseInt(secondChildCSS.marginLeft) + parseInt(secondChildCSS.marginRight) + _getRect(child2).width;
 
-			if (elCSS.display === 'flex') {
-				return elCSS.flexDirection === 'column' || elCSS.flexDirection === 'column-reverse'
+			if (elCSS.display == 'flex') {
+				return elCSS.flexDirection == 'column' || elCSS.flexDirection === 'column-reverse'
 				? 'vertical' : 'horizontal';
 			}
 
-			if (elCSS.display === 'grid') {
+			if (elCSS.display == 'grid') {
 				return elCSS.gridTemplateColumns.split(' ').length <= 1 ? 'vertical' : 'horizontal';
 			}
 
-			if (child1 && firstChildCSS.float !== 'none') {
+			if (child1 && firstChildCSS.float != 'none') {
 				var touchingSideChild2 = firstChildCSS.float === 'left' ? 'left' : 'right';
 
-				return child2 && (secondChildCSS.clear === 'both' || secondChildCSS.clear === touchingSideChild2) ?
+				return child2 && (secondChildCSS.clear == 'both' || secondChildCSS.clear == touchingSideChild2) ?
 					'vertical' : 'horizontal';
 			}
 
 			return (child1 &&
 				(
-					firstChildCSS.display === 'block' ||
-					firstChildCSS.display === 'flex' ||
-					firstChildCSS.display === 'table' ||
-					firstChildCSS.display === 'grid' ||
+					firstChildCSS.display == 'block' ||
+					firstChildCSS.display == 'flex' ||
+					firstChildCSS.display == 'table' ||
+					firstChildCSS.display == 'grid' ||
 					firstChildWidth >= elWidth &&
-					elCSS[CSSFloatProperty] === 'none' ||
+					elCSS[CSSFloatProperty] == 'none' ||
 					child2 &&
-					elCSS[CSSFloatProperty] === 'none' &&
+					elCSS[CSSFloatProperty] == 'none' &&
 					firstChildWidth + secondChildWidth > elWidth
 				) ?
 				'vertical' : 'horizontal'
@@ -235,7 +234,7 @@
 						elem.clientWidth < elem.scrollWidth && (elemCSS.overflowX == 'auto' || elemCSS.overflowX == 'scroll') ||
 						elem.clientHeight < elem.scrollHeight && (elemCSS.overflowY == 'auto' || elemCSS.overflowY == 'scroll')
 					) {
-						if (!elem || !elem.getBoundingClientRect || elem === document.body) return _getWindowScrollingElement();
+						if (!elem || !elem.getBoundingClientRect || elem == document.body) return _getWindowScrollingElement();
 
 						if (gotSelf || includeSelf) return elem;
 						gotSelf = true;
@@ -275,13 +274,13 @@
 					scrollThisInstance = false;
 
 				// Detect scrollEl
-				if (scrollParentEl !== rootEl) {
+				if (scrollParentEl != rootEl) {
 					_clearAutoScrolls();
 
 					scrollEl = options.scroll;
 					scrollCustomFn = options.scrollFn;
 
-					if (scrollEl === true) {
+					if (scrollEl == true) {
 						scrollEl = _getParentAutoScrollElement(rootEl, true);
 						scrollParentEl = scrollEl;
 					}
