@@ -80,6 +80,7 @@ Properties:
 `putSortable: Sortable|undefined` — The element that dragEl is dragged into from it's root, otherwise undefined 
 
 Methods:
+
 `cloneNowHidden()` — Function to be called if your plugin has hidden the clone
 
 `cloneNowShown()` — Function to be called if your plugin has shown the clone
