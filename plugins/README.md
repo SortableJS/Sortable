@@ -4,6 +4,7 @@ Sortable plugins are plugins that can be directly mounted to the Sortable class.
 ## Constructor Parameters
 
 `sortable: Sortable` — The sortable that the plugin is being initialized on
+
 `el: HTMLElement` — The element that the sortable is being initialized on
 
 ## Static Properties
