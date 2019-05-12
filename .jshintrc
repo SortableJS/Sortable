@@ -1,10 +1,11 @@
 {
-	"strict": true,
+	"strict": false,
 	"newcap": false,
 	"node": true,
 	"expr": true,
 	"supernew": true,
 	"laxbreak": true,
+	"esversion": 9,
 	"white": true,
 	"globals": {
 		"define": true,
