@@ -59,7 +59,7 @@ The following table contains details on the events that your plugin may handle i
 ### Event Object
 An object with the following properties is passed as an argument to each plugin event when it is fired.
 
-Properties:
+#### Properties:
 
 `dragEl: HTMLElement` — The element being dragged
 
@@ -79,7 +79,7 @@ Properties:
 
 `putSortable: Sortable|undefined` — The element that dragEl is dragged into from it's root, otherwise undefined 
 
-Methods:
+#### Methods:
 
 `cloneNowHidden()` — Function to be called if your plugin has hidden the clone
 
@@ -90,7 +90,7 @@ Methods:
 
 ### DragOverEvent Object
 
-Properties:
+#### Properties:
 
 `isOwner: Boolean` — Whether or not the dragged over sortable currently contains the dragged element
 
@@ -111,7 +111,7 @@ Properties:
 `target: HTMLElement` — The sortable item that is being dragged over
 
 
-Methods:
+#### Methods:
 
 `onMove(target: HTMLElement, after: Boolean): Boolean|Number` — Calls the `onMove` function the user specified in the options
 
