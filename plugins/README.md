@@ -89,6 +89,7 @@ An object with the following properties is passed as an argument to each plugin 
 
 
 ### DragOverEvent Object
+This event is passed to dragover events, and extends the normal event object.
 
 #### Properties:
 
