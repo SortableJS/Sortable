@@ -1900,7 +1900,8 @@
 		startDraggableIndex, newDraggableIndex,
 		originalEvt
 	) {
-		sortable = (sortable || rootEl[expando]);
+		sortable = (sortable || (rootEl && rootEl[expando]));
+		if(!sortable) return
 		var evt,
 			options = sortable.options,
 			onName = 'on' + name.charAt(0).toUpperCase() + name.substr(1);
