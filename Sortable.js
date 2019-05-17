@@ -629,7 +629,7 @@
 			target = _closest(target, options.draggable, el, false);
 
 
-			if (target.animated) {
+			if (target && target.animated) {
 				return;
 			}
 
