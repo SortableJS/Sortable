@@ -1550,7 +1550,7 @@
 			var children = [].slice.call(this.el.children);
 
 			for (var i = 0; i < children.length; i++) {
-				if (_css(children[i], 'display') === 'none') continue;
+				if (_css(children[i], 'display') === 'none' || children[i] === ghostEl) continue;
 				this._animationStates.push({
 					target: children[i],
 					rect: _getRect(children[i])
