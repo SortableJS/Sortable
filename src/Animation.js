@@ -1,4 +1,5 @@
-import { _getRect, _css, _isScrolledPast, _matrix, _isRectEqual, _indexOfObject } from './utils.js';
+import { getRect, css, isScrolledPast, matrix, isRectEqual, indexOfObject } from './utils.js';
+import Sortable from './Sortable.js';
 
 export default function AnimationStateManager() {
 	let animationStates = [],
@@ -10,19 +11,19 @@ export default function AnimationStateManager() {
 			if (!this.options.animation) return;
 			let children = [].slice.call(this.el.children);
 
-			for (let i = 0; i < children.length; i++) {
-				if (_css(children[i], 'display') === 'none') continue;
+			for (let i in children) {
+				if (css(children[i], 'display') === 'none' || children[i] === Sortable.ghost) continue;
 				animationStates.push({
 					target: children[i],
-					rect: _getRect(children[i])
+					rect: getRect(children[i])
 				});
-				let fromRect = _getRect(children[i]);
+				let fromRect = getRect(children[i]);
 
 				// If animating: compensate for current animation
 				if (children[i].thisAnimationDuration) {
-					let matrix = _matrix(children[i], true);
-					fromRect.top -= matrix.f;
-					fromRect.left -= matrix.e;
+					let childMatrix = matrix(children[i], true);
+					fromRect.top -= childMatrix.f;
+					fromRect.left -= childMatrix.e;
 				}
 
 				children[i].fromRect = fromRect;
@@ -34,7 +35,7 @@ export default function AnimationStateManager() {
 		},
 
 		removeAnimationState(target) {
-			animationStates.splice(_indexOfObject(animationStates, { target }), 1);
+			animationStates.splice(indexOfObject(animationStates, { target }), 1);
 		},
 
 		animateAll(callback) {
@@ -47,16 +48,16 @@ export default function AnimationStateManager() {
 			let animating = false,
 				animationTime = 0;
 
-			for (var i in animationStates) {
-				var time = 0,
+			for (let i in animationStates) {
+				let time = 0,
 					animatingThis = false,
 					target = animationStates[i].target,
 					fromRect = target.fromRect,
-					toRect = _getRect(target),
+					toRect = getRect(target),
 					prevFromRect = target.prevFromRect,
 					prevToRect = target.prevToRect,
 					animatingRect = animationStates[i].rect,
-					targetMatrix = _matrix(target, true);
+					targetMatrix = matrix(target, true);
 
 
 				// Compensate for current animation
@@ -68,22 +69,22 @@ export default function AnimationStateManager() {
 				// If element is scrolled out of view: Do not animate
 				if (
 					(
-						_isScrolledPast(target, toRect, 'bottom', 'top') ||
-						_isScrolledPast(target, toRect, 'top', 'bottom') ||
-						_isScrolledPast(target, toRect, 'right', 'left') ||
-						_isScrolledPast(target, toRect, 'left', 'right')
+						isScrolledPast(target, toRect, 'bottom', 'top') ||
+						isScrolledPast(target, toRect, 'top', 'bottom') ||
+						isScrolledPast(target, toRect, 'right', 'left') ||
+						isScrolledPast(target, toRect, 'left', 'right')
 					) &&
 					(
-						_isScrolledPast(target, animatingRect, 'bottom', 'top') ||
-						_isScrolledPast(target, animatingRect, 'top', 'bottom') ||
-						_isScrolledPast(target, animatingRect, 'right', 'left') ||
-						_isScrolledPast(target, animatingRect, 'left', 'right')
+						isScrolledPast(target, animatingRect, 'bottom', 'top') ||
+						isScrolledPast(target, animatingRect, 'top', 'bottom') ||
+						isScrolledPast(target, animatingRect, 'right', 'left') ||
+						isScrolledPast(target, animatingRect, 'left', 'right')
 					) &&
 					(
-						_isScrolledPast(target, fromRect, 'bottom', 'top') ||
-						_isScrolledPast(target, fromRect, 'top', 'bottom') ||
-						_isScrolledPast(target, fromRect, 'right', 'left') ||
-						_isScrolledPast(target, fromRect, 'left', 'right')
+						isScrolledPast(target, fromRect, 'bottom', 'top') ||
+						isScrolledPast(target, fromRect, 'top', 'bottom') ||
+						isScrolledPast(target, fromRect, 'right', 'left') ||
+						isScrolledPast(target, fromRect, 'left', 'right')
 					)
 				) continue;
 
@@ -91,8 +92,8 @@ export default function AnimationStateManager() {
 				if (target.thisAnimationDuration) {
 					// Could also check if animatingRect is between fromRect and toRect
 					if (
-						_isRectEqual(prevFromRect, toRect) &&
-						!_isRectEqual(fromRect, toRect) &&
+						isRectEqual(prevFromRect, toRect) &&
+						!isRectEqual(fromRect, toRect) &&
 						// Make sure animatingRect is on line between toRect & fromRect
 						(animatingRect.top - toRect.top) /
 						(animatingRect.left - toRect.left) ===
@@ -105,7 +106,7 @@ export default function AnimationStateManager() {
 				}
 
 				// if fromRect != toRect and not animating to same position as already animating: animate
-				if (!_isRectEqual(toRect, fromRect)) {
+				if (!isRectEqual(toRect, fromRect)) {
 					target.prevFromRect = fromRect;
 					target.prevToRect = toRect;
 
@@ -148,28 +149,28 @@ export default function AnimationStateManager() {
 
 		animate(target, prev, duration) {
 			if (duration) {
-				_css(target, 'transition', '');
-				_css(target, 'transform', '');
-				var currentRect = _getRect(target),
-					matrix = _matrix(this.el),
-					scaleX = matrix && matrix.a,
-					scaleY = matrix && matrix.d,
+				css(target, 'transition', '');
+				css(target, 'transform', '');
+				let currentRect = getRect(target),
+					elMatrix = matrix(this.el),
+					scaleX = elMatrix && elMatrix.a,
+					scaleY = elMatrix && elMatrix.d,
 					translateX = (prev.left - currentRect.left) / (scaleX || 1),
 					translateY = (prev.top - currentRect.top) / (scaleY || 1);
 
 				target.animatingX = !!translateX;
 				target.animatingY = !!translateY;
 
-				_css(target, 'transform', 'translate3d(' + translateX + 'px,' + translateY + 'px,0)');
+				css(target, 'transform', 'translate3d(' + translateX + 'px,' + translateY + 'px,0)');
 
 				repaint(target); // repaint
 
-				_css(target, 'transition', 'transform ' + duration + 'ms' + (this.options.easing ? ' ' + this.options.easing : ''));
-				_css(target, 'transform', 'translate3d(0,0,0)');
+				css(target, 'transition', 'transform ' + duration + 'ms' + (this.options.easing ? ' ' + this.options.easing : ''));
+				css(target, 'transform', 'translate3d(0,0,0)');
 				(typeof target.animated === 'number') && clearTimeout(target.animated);
 				target.animated = setTimeout(function () {
-					_css(target, 'transition', '');
-					_css(target, 'transform', '');
+					css(target, 'transition', '');
+					css(target, 'transform', '');
 					target.animated = false;
 
 					target.animatingX = false;

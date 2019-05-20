@@ -1,19 +1,18 @@
 import {
-	_toggleClass,
-	_getRect,
-	_index,
-	_extend,
-	_closest,
-	_on,
-	_clone,
-	_css,
-	_setRect,
-	_unsetRect,
-	_matrix,
+	toggleClass,
+	getRect,
+	index,
+	closest,
+	on,
+	clone,
+	css,
+	setRect,
+	unsetRect,
+	matrix,
 	expando
-} from '../src/utils.js';
+} from '../../src/utils.js';
 
-import dispatchEvent from '../src/EventDispatcher.js';
+import dispatchEvent from '../../src/EventDispatcher.js';
 
 let multiDragElements = [],
 	multiDragClones = [],
@@ -36,10 +35,10 @@ function MultiDragPlugin() {
 		}
 
 		if (sortable.options.supportPointer) {
-			_on(document, 'pointerup', this._deselectMultiDrag);
+			on(document, 'pointerup', this._deselectMultiDrag);
 		} else {
-			_on(document, 'mouseup', this._deselectMultiDrag);
-			_on(document, 'touchend', this._deselectMultiDrag);
+			on(document, 'mouseup', this._deselectMultiDrag);
+			on(document, 'touchend', this._deselectMultiDrag);
 		}
 
 		this.options = {
@@ -62,15 +61,15 @@ function MultiDragPlugin() {
 		setupClone({ sortable }) {
 			if (multiDragElements.length && multiDragSortable === sortable.el) {
 				for (let i in multiDragElements) {
-					multiDragClones.push(_clone(multiDragElements[i]));
+					multiDragClones.push(clone(multiDragElements[i]));
 
 					multiDragClones[i].sortableIndex = multiDragElements[i].sortableIndex;
 
 					multiDragClones[i].draggable = false;
 					multiDragClones[i].style['will-change'] = '';
 
-					_toggleClass(multiDragClones[i], sortable.options.selectedClass, false);
-					multiDragElements[i] === dragEl && _toggleClass(multiDragClones[i], sortable.options.chosenClass, false);
+					toggleClass(multiDragClones[i], sortable.options.selectedClass, false);
+					multiDragElements[i] === dragEl && toggleClass(multiDragClones[i], sortable.options.chosenClass, false);
 				}
 
 				sortable._hideClone();
@@ -81,7 +80,7 @@ function MultiDragPlugin() {
 		clone({ sortable, rootEl, dispatchSortableEvent }) {
 			if (!sortable.options.removeCloneOnHide) {
 				if (multiDragElements.length && multiDragSortable === sortable.el) {
-					_insertMultiDragClones(true, rootEl);
+					insertMultiDragClones(true, rootEl);
 					dispatchSortableEvent('clone');
 
 					return true;
@@ -90,9 +89,9 @@ function MultiDragPlugin() {
 		},
 
 		showClone({ cloneNowShown, rootEl}) {
-			_insertMultiDragClones(false, rootEl);
+			insertMultiDragClones(false, rootEl);
 			for (let i = 0; i < multiDragClones.length; i++) {
-				_css(multiDragClones[i], 'display', '');
+				css(multiDragClones[i], 'display', '');
 			}
 
 			cloneNowShown();
@@ -102,7 +101,7 @@ function MultiDragPlugin() {
 
 		hideClone({ sortable, cloneNowHidden }) {
 			for (let i in multiDragClones) {
-				_css(multiDragClones[i], 'display', 'none');
+				css(multiDragClones[i], 'display', 'none');
 				if (sortable.options.removeCloneOnHide && multiDragClones[i].parentNode) {
 					multiDragClones[i].parentNode.removeChild(multiDragClones[i]);
 				}
@@ -122,7 +121,7 @@ function MultiDragPlugin() {
 			}
 
 			for (let i in multiDragElements) {
-				multiDragElements[i].sortableIndex = _index(multiDragElements[i]);
+				multiDragElements[i].sortableIndex = index(multiDragElements[i]);
 			}
 
 			// Sort multi-drag elements
@@ -146,14 +145,14 @@ function MultiDragPlugin() {
 				if (sortable.options.animation) {
 					for (let i in multiDragElements) {
 						if (multiDragElements[i] === dragEl) continue;
-						_css(multiDragElements[i], 'position', 'absolute');
+						css(multiDragElements[i], 'position', 'absolute');
 					}
 
-					let dragRect = _getRect(dragEl, false, true, true);
+					let dragRect = getRect(dragEl, false, true, true);
 
 					for (let i in multiDragElements) {
 						if (multiDragElements[i] === dragEl) continue;
-						_setRect(multiDragElements[i], dragRect);
+						setRect(multiDragElements[i], dragRect);
 					}
 
 					folding = true;
@@ -167,13 +166,13 @@ function MultiDragPlugin() {
 
 				if (sortable.options.animation) {
 					for (let i in multiDragElements) {
-						_unsetRect(multiDragElements[i]);
+						unsetRect(multiDragElements[i]);
 					}
 				}
 
 				// Remove all auxiliary multidrag items from el, if sorting enabled
 				if (sortable.options.sort) {
-					_removeMultiDragElements();
+					removeMultiDragElements();
 				}
 			});
 		},
@@ -190,17 +189,17 @@ function MultiDragPlugin() {
 				for (let i in multiDragElements) {
 					sortable.addAnimationState({
 						target: multiDragElements[i],
-						rect: folding ? _getRect(multiDragElements[i]) : dragRect
+						rect: folding ? getRect(multiDragElements[i]) : dragRect
 					});
 
-					_unsetRect(multiDragElements[i]);
+					unsetRect(multiDragElements[i]);
 
 					multiDragElements[i].fromRect = dragRect;
 
 					fromSortable.removeAnimationState(multiDragElements[i]);
 				}
 				folding = false;
-				_insertMultiDragElements(!sortable.options.removeCloneOnHide, rootEl);
+				insertMultiDragElements(!sortable.options.removeCloneOnHide, rootEl);
 			}
 		},
 
@@ -216,11 +215,11 @@ function MultiDragPlugin() {
 				// If leaving sort:false root, or already folding - Fold to new location
 				if (options.animation && multiDragElements.length > 1 && (folding || !isOwner && !activeSortable.options.sort && !putSortable)) {
 					// Fold: Set all multi drag elements's rects to dragEl's rect when multi-drag elements are invisible
-					let dragRectAbsolute = _getRect(dragEl, false, true, true);
+					let dragRectAbsolute = getRect(dragEl, false, true, true);
 
 					for (let i in multiDragElements) {
 						if (multiDragElements[i] === dragEl) continue;
-						_setRect(multiDragElements[i], dragRectAbsolute);
+						setRect(multiDragElements[i], dragRectAbsolute);
 
 						// Move element(s) to end of parentEl so that it does not interfere with multi-drag clones insertion if they are inserted
 						// while folding, and so that we can capture them again because old sortable will no longer be fromSortable
@@ -234,7 +233,7 @@ function MultiDragPlugin() {
 				if (!isOwner) {
 					// Only remove if not folding (folding will remove them anyways)
 					if (!folding) {
-						_removeMultiDragElements();
+						removeMultiDragElements();
 					}
 
 					if (multiDragElements.length > 1) {
@@ -266,8 +265,8 @@ function MultiDragPlugin() {
 			}
 
 			if (activeSortable.options.animation && !isOwner && activeSortable.options.multiDrag) {
-				clonesFromRect = _extend({}, dragRect);
-				let dragMatrix = _matrix(dragEl, true);
+				clonesFromRect = Object.assign({}, dragRect);
+				let dragMatrix = matrix(dragEl, true);
 				clonesFromRect.top -= dragMatrix.f;
 				clonesFromRect.left -= dragMatrix.e;
 			}
@@ -276,7 +275,7 @@ function MultiDragPlugin() {
 		dragOverAnimationComplete() {
 			if (folding) {
 				folding = false;
-				_removeMultiDragElements();
+				removeMultiDragElements();
 			}
 		},
 
@@ -291,7 +290,7 @@ function MultiDragPlugin() {
 
 			// Multi-drag selection
 			if (!dragStarted && options.multiDrag) {
-				_toggleClass(dragEl, options.selectedClass, !~multiDragElements.indexOf(dragEl));
+				toggleClass(dragEl, options.selectedClass, !~multiDragElements.indexOf(dragEl));
 
 				if (!~multiDragElements.indexOf(dragEl)) {
 					multiDragElements.push(dragEl);
@@ -309,8 +308,8 @@ function MultiDragPlugin() {
 
 					// Modifier activated, select from last to dragEl
 					if (evt.shiftKey && lastMultiDragSelect && sortable.el.contains(lastMultiDragSelect)) {
-						let lastIndex = _index(lastMultiDragSelect),
-							currentIndex = _index(dragEl);
+						let lastIndex = index(lastMultiDragSelect),
+							currentIndex = index(dragEl);
 
 						if (~lastIndex && ~currentIndex && lastIndex !== currentIndex) {
 							// Must include lastMultiDragSelect (select it), in case modified selection from no selection
@@ -326,7 +325,7 @@ function MultiDragPlugin() {
 
 							for (; i < n; i++) {
 								if (~multiDragElements.indexOf(children[i])) continue;
-								_toggleClass(children[i], options.selectedClass, true);
+								toggleClass(children[i], options.selectedClass, true);
 								multiDragElements.push(children[i]);
 
 								dispatchEvent({
@@ -368,8 +367,8 @@ function MultiDragPlugin() {
 			if (dragStarted && options.multiDrag && multiDragElements.length) {
 				// Do not "unfold" after around dragEl if reverted
 				if ((parentEl[expando].options.sort || parentEl !== rootEl) && multiDragElements.length > 1) {
-					let dragRect = _getRect(dragEl),
-						multiDragIndex = _index(dragEl, ':not(.' + Sortable.active.options.selectedClass + ')');
+					let dragRect = getRect(dragEl),
+						multiDragIndex = index(dragEl, ':not(.' + Sortable.active.options.selectedClass + ')');
 
 					if (!initialFolding && options.animation) dragEl.thisAnimationDuration = null;
 
@@ -381,7 +380,7 @@ function MultiDragPlugin() {
 							for (let i in multiDragElements) {
 								multiDragElements[i].thisAnimationDuration = null;
 								if (multiDragElements[i] !== dragEl) {
-									let rect = folding ? _getRect(multiDragElements[i]) : dragRect;
+									let rect = folding ? getRect(multiDragElements[i]) : dragRect;
 									multiDragElements[i].fromRect = rect;
 
 									// Prepare unfold animation
@@ -395,7 +394,7 @@ function MultiDragPlugin() {
 
 						// Multi drag elements are not necessarily removed from the DOM on drop, so to reinsert
 						// properly they must all be removed
-						_removeMultiDragElements();
+						removeMultiDragElements();
 
 						for (let i in multiDragElements) {
 							if (children[multiDragIndex]) {
@@ -409,7 +408,7 @@ function MultiDragPlugin() {
 
 					// Must be done after capturing individual rects (scroll bar)
 					for (let i in multiDragElements) {
-						_unsetRect(multiDragElements[i]);
+						unsetRect(multiDragElements[i]);
 					}
 
 					toSortable.animateAll();
@@ -445,13 +444,13 @@ function MultiDragPlugin() {
 			if (multiDragSortable !== this.sortable.el) return;
 
 			// Only deselect if target is not item in this sortable
-			if (evt && _closest(evt.target, this.sortable.options.draggable, this.sortable.el, false)) return;
+			if (evt && closest(evt.target, this.sortable.options.draggable, this.sortable.el, false)) return;
 
 			// Only deselect if left click
 			if (evt && evt.button !== 0) return;
 
 			for (let i = 0; i < multiDragElements.length; i++) {
-				_toggleClass(multiDragElements[i], this.sortable.options.selectedClass, false);
+				toggleClass(multiDragElements[i], this.sortable.options.selectedClass, false);
 				dispatchEvent({
 					sortable: this.sortable,
 					rootEl: this.sortable.el,
@@ -468,7 +467,7 @@ function MultiDragPlugin() {
 		}
 	};
 
-	return _extend(MultiDrag, {
+	return Object.assign(MultiDrag, {
 		// Static methods & properties
 		pluginName: 'multiDrag',
 		utils: {
@@ -483,7 +482,7 @@ function MultiDragPlugin() {
 					multiDragSortable[expando].multiDrag._deselectMultiDrag();
 					multiDragSortable = el.parentNode;
 				}
-				_toggleClass(el, sortable.options.selectedClass, true);
+				toggleClass(el, sortable.options.selectedClass, true);
 				multiDragElements.push(el);
 			},
 			/**
@@ -494,7 +493,7 @@ function MultiDragPlugin() {
 				let sortable = el.parentNode[expando],
 					index = multiDragElements.indexOf(el);
 				if (!sortable || !sortable.options.multiDrag || !~index) return;
-				_toggleClass(el, sortable.options.selectedClass, false);
+				toggleClass(el, sortable.options.selectedClass, false);
 				multiDragElements.splice(index, 1);
 			}
 		},
@@ -507,7 +506,7 @@ function MultiDragPlugin() {
 	});
 }
 
-function _insertMultiDragElements(clonesInserted, rootEl) {
+function insertMultiDragElements(clonesInserted, rootEl) {
 	for (let i in multiDragElements) {
 		let target = rootEl.children[multiDragElements[i].sortableIndex + (clonesInserted ? Number(i) : 0)];
 		if (target) {
@@ -522,7 +521,7 @@ function _insertMultiDragElements(clonesInserted, rootEl) {
  * Insert multi-drag clones
  * @param  {[Boolean]} elementsInserted  Whether the multi-drag elements are inserted
  */
-function _insertMultiDragClones(elementsInserted, rootEl) {
+function insertMultiDragClones(elementsInserted, rootEl) {
 	for (let i in multiDragClones) {
 		let target = rootEl.children[multiDragClones[i].sortableIndex + (elementsInserted ? Number(i) : 0)];
 		if (target) {
@@ -533,7 +532,7 @@ function _insertMultiDragClones(elementsInserted, rootEl) {
 	}
 }
 
-function _removeMultiDragElements() {
+function removeMultiDragElements() {
 	for (let i = 0; i < multiDragElements.length; i++) {
 		if (multiDragElements[i] === dragEl) continue;
 		multiDragElements[i].parentNode && multiDragElements[i].parentNode.removeChild(multiDragElements[i]);

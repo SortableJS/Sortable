@@ -14,7 +14,7 @@ Supported by [<img width="100px" src="https://user-images.githubusercontent.com/
  * Supports drag handles *and selectable text* (better than voidberg's html5sortable)
  * Smart auto-scrolling
  * Advanced swap detection
- * Advanced animation system
+ * Seamless animations
  * [Multi-drag]() support
  * Built using native HTML5 drag and drop API
  * Supports
@@ -45,19 +45,46 @@ Supported by [<img width="100px" src="https://user-images.githubusercontent.com/
 
 <br/>
 
-### Install
+### Getting Started
 
 Via npm
 
+Install with NPM:
 ```bash
 $ npm install sortablejs --save
 ```
 
-Via bower:
-
+Install with Bower:
 ```bash
 $ bower install --save sortablejs
 ```
+
+Import into your project:
+```js
+// Default SortableJS
+import Sortable from 'sortablejs';
+
+// Core SortableJS (without default plugins)
+import Sortable from 'sortablejs/modular/sortable.modular.esm.js';
+
+// Complete SortableJS (with all plugins)
+import Sortable from 'sortablejs/modular/sortable.complete.esm.js';
+```
+
+Cherrypick plugins:
+```js
+// Cherrypick extra plugins
+import Sortable, { MultiDrag, Swap } from 'sortablejs';
+
+Sortable.mount(MultiDrag, Swap);
+
+
+// Cherrypick default plugins
+import Sortable, { AutoScroll } from 'sortablejs/modular/sortable.complete.esm.js';
+
+Sortable.mount(AutoScroll);
+```
+
 
 <br/>
 
@@ -76,6 +103,20 @@ var sortable = Sortable.create(el);
 ```
 
 You can use any element for the list and its elements, not just `ul`/`li`. Here is an [example with `div`s](https://jsbin.com/visimub/edit?html,js,output).
+
+
+---
+
+
+### Using Plugins
+Sortable has several plugins that extend the library beyond it's default capabilities.
+To see a list of these plugins, open the `plugins/` directory.
+
+Some of these plugins are "default" plugins, while others are "extra" plugins. Default plugins add optional features to Sortable (eg. AutoScroll), while extra plugins siginificantly modify the behaviour of Sortable (eg. MultiDrag).
+
+Plugins are mounted using `Sortable.mount()` (see example above).
+
+Once a plugin is mounted, it must be enabled in the options of the sortable in order for it to be enabled. The name of the option is the plugin's pluginName, and can be found in the plugin's README, along with other options the plugin specifies.
 
 
 ---
@@ -103,11 +144,6 @@ var sortable = new Sortable(el, {
 	ghostClass: "sortable-ghost",  // Class name for the drop placeholder
 	chosenClass: "sortable-chosen",  // Class name for the chosen item
 	dragClass: "sortable-drag",  // Class name for the dragging item
-	swapClass: "sortable-swap-highlight", // Class name for swap item (if swap mode is enabled)
-	selectedClass: "sortable-selected", // Class name for selected item (if multi-drag is enabled)
-
-	swap: false, // Enable swap mode
-	multiDrag: false, // Enable multi-dragging
 
 	swapThreshold: 1, // Threshold of the swap zone
 	invertSwap: false, // Will always use inverted swap zone if set to true
@@ -212,16 +248,6 @@ var sortable = new Sortable(el, {
 	onChange: function(/**Event*/evt) {
 		evt.newIndex // most likely why this event is used is to get the dragging element's current index
 		// same properties as onEnd
-	},
-
-	// Called when multi-drag item is selected
-	onSelect: function(/**Event*/evt) {
-		evt.item // The selected item
-	},
-
-	// Called when multi-drag item is deselected
-	onDeselect: function(/**Event*/evt) {
-		evt.item // The deselected item
 	}
 });
 ```
@@ -253,15 +279,6 @@ Demo:
 Allow sorting inside list.
 
 Demo: https://jsbin.com/jayedig/edit?js,output
-
-
----
-
-
-#### `swap` option
-Enable swap mode.
-
-Demo: 
 
 
 ---
@@ -401,17 +418,6 @@ Sortable.create(el, {
 ---
 
 
-#### `multiDrag` option
-This option allows users to select multiple items within the sortable at once, and drag them as one item.
-Once placed, the items will unfold into their original order, but all beside eachother at the new position.
-[Read More]()
-
-Demo: https://jsbin.com/wopavom/edit?js,output
-
-
----
-
-
 #### `filter` option
 
 
@@ -473,47 +479,6 @@ Demo: https://jsbin.com/hoqufox/edit?css,js,output
 Sortable.create(list, {
   delay: 500,
   chosenClass: "chosen"
-});
-```
-
-
----
-
-
-#### `swapClass` option
-Class name for the item to be swapped with, if swap mode is enabled. Defaults to `sortable-swap-highlight`.
-
-```css
-.highlighted {
-  background-color: #9AB6F1;
-}
-```
-
-```js
-Sortable.create(list, {
-  swap: true,
-  swapClass: "highlighted"
-});
-```
-
-
----
-
-
-#### `selectedClass` option
-Class name for the selected item(s) if multiDrag is enabled. Defaults to `sortable-selected`.
-
-```css
-.selected {
-  background-color: #f9c7c8;
-  border: solid red 1px;
-}
-```
-
-```js
-Sortable.create(list, {
-  multiDrag: true,
-  selectedClass: "selected"
 });
 ```
 
@@ -618,9 +583,7 @@ Demo: https://jsbin.com/becavoj/edit?js,output
  - to:`HTMLElement` — list, in which moved element
  - from:`HTMLElement` — previous list
  - item:`HTMLElement` — dragged element
- - items:`HTMLElement[]` - Array of selected items (if multi-drag is enabled), otherwise empty
  - clone:`HTMLElement`
- - clones:`HTMLElement[]` - Array of clones (if multi-drag is enabled), otherwise empty
  - oldIndex:`Number|undefined` — old index within parent
  - newIndex:`Number|undefined` — new index within parent
  - oldDraggableIndex: `Number|undefined` — old index within parent, only counting draggable elements
@@ -783,8 +746,6 @@ Link to the active instance.
 * clone(el`:HTMLElement`)`:HTMLElement` — create a deep copy of the set of matched elements
 * toggleClass(el`:HTMLElement`, name`:String`, state`:Boolean`) — add or remove one classes from each element
 * detectDirection(el`:HTMLElement`)`:String` — automatically detect the [direction](https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction#direction) of the element as either `'vertical'` or `'horizontal'`
-* select(el`:HTMLElement`) — select the given multi-drag item
-* deselect(el`:HTMLElement`) — deselect the given multi-drag item
 
 
 ---

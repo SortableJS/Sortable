@@ -1,20 +1,21 @@
 import { IE11OrLess } from './BrowserInfo.js';
+import Sortable from './Sortable.js';
 
-var captureMode = {
+const captureMode = {
 	capture: false,
 	passive: false
 };
 
-export function _on(el, event, fn) {
+function on(el, event, fn) {
 	el.addEventListener(event, fn, IE11OrLess ? false : captureMode);
 }
 
 
-export function _off(el, event, fn) {
+function off(el, event, fn) {
 	el.removeEventListener(event, fn, IE11OrLess ? false : captureMode);
 }
 
-export function _matches(/**HTMLElement*/el, /**String*/selector) {
+function matches(/**HTMLElement*/el, /**String*/selector) {
 	if (!selector) return;
 
 	selector[0] === '>' && (selector = selector.substring(1));
@@ -36,13 +37,13 @@ export function _matches(/**HTMLElement*/el, /**String*/selector) {
 	return false;
 }
 
-export function _getParentOrHost(el) {
+function getParentOrHost(el) {
 	return (el.host && el !== document && el.host.nodeType)
 		? el.host
 		: el.parentNode;
 }
 
-export function _closest(/**HTMLElement*/el, /**String*/selector, /**HTMLElement*/ctx, includeCTX) {
+function closest(/**HTMLElement*/el, /**String*/selector, /**HTMLElement*/ctx, includeCTX) {
 	if (el) {
 		ctx = ctx || document;
 
@@ -51,8 +52,8 @@ export function _closest(/**HTMLElement*/el, /**String*/selector, /**HTMLElement
 				selector != null &&
 				(
 					selector[0] === '>' ?
-					el.parentNode === ctx && _matches(el, selector) :
-					_matches(el, selector)
+					el.parentNode === ctx && matches(el, selector) :
+					matches(el, selector)
 				) ||
 				includeCTX && el === ctx
 			) {
@@ -61,28 +62,28 @@ export function _closest(/**HTMLElement*/el, /**String*/selector, /**HTMLElement
 
 			if (el === ctx) break;
 			/* jshint boss:true */
-		} while (el = _getParentOrHost(el));
+		} while (el = getParentOrHost(el));
 	}
 
 	return null;
 }
 
 
-export function _toggleClass(el, name, state) {
+function toggleClass(el, name, state) {
 	if (el && name) {
 		if (el.classList) {
 			el.classList[state ? 'add' : 'remove'](name);
 		}
 		else {
-			var className = (' ' + el.className + ' ').replace(R_SPACE, ' ').replace(' ' + name + ' ', ' ');
+			let className = (' ' + el.className + ' ').replace(R_SPACE, ' ').replace(' ' + name + ' ', ' ');
 			el.className = (className + (state ? ' ' + name : '')).replace(R_SPACE, ' ');
 		}
 	}
 }
 
 
-export function _css(el, prop, val) {
-	var style = el && el.style;
+function css(el, prop, val) {
+	let style = el && el.style;
 
 	if (style) {
 		if (val === void 0) {
@@ -105,10 +106,10 @@ export function _css(el, prop, val) {
 	}
 }
 
-export function _matrix(el, selfOnly) {
-	var appliedTransforms = '';
+function matrix(el, selfOnly) {
+	let appliedTransforms = '';
 	do {
-		var transform = _css(el, 'transform');
+		let transform = css(el, 'transform');
 
 		if (transform && transform !== 'none') {
 			appliedTransforms = transform + ' ' + appliedTransforms;
@@ -126,9 +127,9 @@ export function _matrix(el, selfOnly) {
 }
 
 
-export function _find(ctx, tagName, iterator) {
+function find(ctx, tagName, iterator) {
 	if (ctx) {
-		var list = ctx.getElementsByTagName(tagName), i = 0, n = list.length;
+		let list = ctx.getElementsByTagName(tagName), i = 0, n = list.length;
 
 		if (iterator) {
 			for (; i < n; i++) {
@@ -144,7 +145,7 @@ export function _find(ctx, tagName, iterator) {
 
 
 
-export function _getWindowScrollingElement() {
+function getWindowScrollingElement() {
 	if (IE11OrLess) {
 		return document.documentElement;
 	} else {
@@ -162,10 +163,10 @@ export function _getWindowScrollingElement() {
  * @param  {[HTMLElement]} container              The parent the element will be placed in
  * @return {Object}                               The boundingClientRect of el, with specified adjustments
  */
-export function _getRect(el, relativeToContainingBlock, relativeToNonStaticParent, undoScale, container) {
+function getRect(el, relativeToContainingBlock, relativeToNonStaticParent, undoScale, container) {
 	if (!el.getBoundingClientRect && el !== window) return;
 
-	var elRect,
+	let elRect,
 		top,
 		left,
 		bottom,
@@ -173,7 +174,7 @@ export function _getRect(el, relativeToContainingBlock, relativeToNonStaticParen
 		height,
 		width;
 
-	if (el !== window && el !== _getWindowScrollingElement()) {
+	if (el !== window && el !== getWindowScrollingElement()) {
 		elRect = el.getBoundingClientRect();
 		top = elRect.top;
 		left = elRect.left;
@@ -202,16 +203,16 @@ export function _getRect(el, relativeToContainingBlock, relativeToNonStaticParen
 					container &&
 					container.getBoundingClientRect &&
 					(
-						_css(container, 'transform') !== 'none' ||
+						css(container, 'transform') !== 'none' ||
 						relativeToNonStaticParent &&
-						_css(container, 'position') !== 'static'
+						css(container, 'position') !== 'static'
 					)
 				) {
-					var containerRect = container.getBoundingClientRect();
+					let containerRect = container.getBoundingClientRect();
 
 					// Set relative to edges of padding box of container
-					top -= containerRect.top + parseInt(_css(container, 'border-top-width'));
-					left -= containerRect.left + parseInt(_css(container, 'border-left-width'));
+					top -= containerRect.top + parseInt(css(container, 'border-top-width'));
+					left -= containerRect.left + parseInt(css(container, 'border-left-width'));
 					bottom = top + elRect.height;
 					right = left + elRect.width;
 
@@ -224,11 +225,11 @@ export function _getRect(el, relativeToContainingBlock, relativeToNonStaticParen
 
 	if (undoScale && el !== window) {
 		// Adjust for scale()
-		var matrix = _matrix(container || el),
-			scaleX = matrix && matrix.a,
-			scaleY = matrix && matrix.d;
+		let elMatrix = matrix(container || el),
+			scaleX = elMatrix && elMatrix.a,
+			scaleY = elMatrix && elMatrix.d;
 
-		if (matrix) {
+		if (elMatrix) {
 			top /= scaleY;
 			left /= scaleX;
 
@@ -258,13 +259,13 @@ export function _getRect(el, relativeToContainingBlock, relativeToNonStaticParen
  * @param  {String}       parentSide   Side of the parent in question ('top', 'left', 'right', 'bottom')
  * @return {HTMLElement}               The parent scroll element that the el's side is scrolled past, or null if there is no such element
  */
-export function _isScrolledPast(el, rect, elSide, parentSide) {
-	var parent = _getParentAutoScrollElement(el, true),
-		elSideVal = (rect ? rect : _getRect(el))[elSide];
+function isScrolledPast(el, rect, elSide, parentSide) {
+	let parent = getParentAutoScrollElement(el, true),
+		elSideVal = (rect ? rect : getRect(el))[elSide];
 
 	/* jshint boss:true */
 	while (parent) {
-		var parentSideVal = _getRect(parent)[parentSide],
+		let parentSideVal = getRect(parent)[parentSide],
 			visible;
 
 		if (parentSide === 'top' || parentSide === 'left') {
@@ -275,9 +276,9 @@ export function _isScrolledPast(el, rect, elSide, parentSide) {
 
 		if (!visible) return parent;
 
-		if (parent === _getWindowScrollingElement()) break;
+		if (parent === getWindowScrollingElement()) break;
 
-		parent = _getParentAutoScrollElement(parent, false);
+		parent = getParentAutoScrollElement(parent, false);
 	}
 
 	return false;
@@ -293,17 +294,17 @@ export function _isScrolledPast(el, rect, elSide, parentSide) {
  * @param  {Object} options       Parent Sortable's options
  * @return {HTMLElement}          The child at index childNum, or null if not found
  */
-export function _getChild(el, childNum, options, dragEl, ghostEl) {
-	var currentChild = 0,
+function getChild(el, childNum, options) {
+	let currentChild = 0,
 		i = 0,
 		children = el.children;
 
 	while (i < children.length) {
 		if (
 			children[i].style.display !== 'none' &&
-			children[i] !== ghostEl &&
-			children[i] !== dragEl &&
-			_closest(children[i], options.draggable, el, false)
+			children[i] !== Sortable.ghost &&
+			children[i] !== Sortable.dragged &&
+			closest(children[i], options.draggable, el, false)
 		) {
 			if (currentChild === childNum) {
 				return children[i];
@@ -321,10 +322,10 @@ export function _getChild(el, childNum, options, dragEl, ghostEl) {
  * @param  {HTMLElement} el       Parent element
  * @return {HTMLElement}          The last child, ignoring ghostEl
  */
-export function _lastChild(el, ghostEl) {
-	var last = el.lastElementChild;
+function lastChild(el) {
+	let last = el.lastElementChild;
 
-	while (last && (last === ghostEl || _css(last, 'display') === 'none')) {
+	while (last && (last === Sortable.ghost || css(last, 'display') === 'none')) {
 		last = last.previousElementSibling;
 	}
 
@@ -339,15 +340,15 @@ export function _lastChild(el, ghostEl) {
  * @param  {selector} selector
  * @return {number}
  */
-export function _index(el, selector) {
-	var index = 0;
+function index(el, selector) {
+	let index = 0;
 
 	if (!el || !el.parentNode) {
 		return -1;
 	}
 
 	while (el && (el = el.previousElementSibling)) {
-		if ((el.nodeName.toUpperCase() !== 'TEMPLATE') /*&& el !== cloneEl*/ && (!selector || _matches(el, selector))) {
+		if ((el.nodeName.toUpperCase() !== 'TEMPLATE') /*&& el !== cloneEl*/ && (!selector || matches(el, selector))) {
 			index++;
 		}
 	}
@@ -361,16 +362,16 @@ export function _index(el, selector) {
  * @param  {HTMLElement} el
  * @return {Array}             Offsets in the format of [left, top]
  */
-export function _getRelativeScrollOffset(el) {
-	var offsetLeft = 0,
+function getRelativeScrollOffset(el) {
+	let offsetLeft = 0,
 		offsetTop = 0,
-		winScroller = _getWindowScrollingElement();
+		winScroller = getWindowScrollingElement();
 
 	if (el) {
 		do {
-			var matrix = _matrix(el),
-				scaleX = matrix.a,
-				scaleY = matrix.d;
+			let elMatrix = matrix(el),
+				scaleX = elMatrix.a,
+				scaleY = elMatrix.d;
 
 			offsetLeft += el.scrollLeft * scaleX;
 			offsetTop += el.scrollTop * scaleY;
@@ -386,9 +387,9 @@ export function _getRelativeScrollOffset(el) {
  * @param  {Object} obj  An object that has a key-value pair unique to and identical to a key-value pair in the object you want to find
  * @return {Number}      The index of the object in the array, or -1
  */
-export function _indexOfObject(arr, obj) {
-	for (var i in arr) {
-		for (var key in obj) {
+function indexOfObject(arr, obj) {
+	for (let i in arr) {
+		for (let key in obj) {
 			if (obj[key] === arr[i][key]) return Number(i);
 		}
 	}
@@ -396,21 +397,21 @@ export function _indexOfObject(arr, obj) {
 }
 
 
-export function _getParentAutoScrollElement(el, includeSelf) {
+function getParentAutoScrollElement(el, includeSelf) {
 	// skip to window
-	if (!el || !el.getBoundingClientRect) return _getWindowScrollingElement();
+	if (!el || !el.getBoundingClientRect) return getWindowScrollingElement();
 
-	var elem = el;
-	var gotSelf = false;
+	let elem = el;
+	let gotSelf = false;
 	do {
 		// we don't need to get elem css if it isn't even overflowing in the first place (performance)
 		if (elem.clientWidth < elem.scrollWidth || elem.clientHeight < elem.scrollHeight) {
-			var elemCSS = _css(elem);
+			let elemCSS = css(elem);
 			if (
 				elem.clientWidth < elem.scrollWidth && (elemCSS.overflowX == 'auto' || elemCSS.overflowX == 'scroll') ||
 				elem.clientHeight < elem.scrollHeight && (elemCSS.overflowY == 'auto' || elemCSS.overflowY == 'scroll')
 			) {
-				if (!elem || !elem.getBoundingClientRect || elem === document.body) return _getWindowScrollingElement();
+				if (!elem || !elem.getBoundingClientRect || elem === document.body) return getWindowScrollingElement();
 
 				if (gotSelf || includeSelf) return elem;
 				gotSelf = true;
@@ -419,12 +420,12 @@ export function _getParentAutoScrollElement(el, includeSelf) {
 	/* jshint boss:true */
 	} while (elem = elem.parentNode);
 
-	return _getWindowScrollingElement();
+	return getWindowScrollingElement();
 }
 
-export function _extend(dst, src) {
+function extend(dst, src) {
 	if (dst && src) {
-		for (var key in src) {
+		for (let key in src) {
 			if (src.hasOwnProperty(key)) {
 				dst[key] = src[key];
 			}
@@ -435,7 +436,7 @@ export function _extend(dst, src) {
 }
 
 
-export function _isRectEqual(rect1, rect2) {
+function isRectEqual(rect1, rect2) {
 	return Math.round(rect1.top) === Math.round(rect2.top) &&
 		Math.round(rect1.left) === Math.round(rect2.left) &&
 		Math.round(rect1.height) === Math.round(rect2.height) &&
@@ -443,20 +444,20 @@ export function _isRectEqual(rect1, rect2) {
 }
 
 
-var _throttleTimeout;
-export function _throttle(callback, ms) {
+let _throttleTimeout;
+function throttle(callback, ms) {
 	return function () {
 		if (!_throttleTimeout) {
-			var args = arguments,
+			let args = arguments,
 				_this = this;
 
-			_throttleTimeout = setTimeout(function () {
-				if (args.length === 1) {
-					callback.call(_this, args[0]);
-				} else {
-					callback.apply(_this, args);
-				}
+			if (args.length === 1) {
+				callback.call(_this, args[0]);
+			} else {
+				callback.apply(_this, args);
+			}
 
+			_throttleTimeout = setTimeout(function () {
 				_throttleTimeout = void 0;
 			}, ms);
 		}
@@ -464,19 +465,19 @@ export function _throttle(callback, ms) {
 }
 
 
-export function _cancelThrottle() {
+function cancelThrottle() {
 	clearTimeout(_throttleTimeout);
 	_throttleTimeout = void 0;
 }
 
 
-export function _scrollBy(el, x, y) {
+function scrollBy(el, x, y) {
 	el.scrollLeft += x;
 	el.scrollTop += y;
 }
 
 
-export function _clone(el) {
+function clone(el) {
 	let Polymer = window.Polymer;
 	let $ = window.jQuery || window.Zepto;
 
@@ -492,21 +493,52 @@ export function _clone(el) {
 }
 
 
-export function _setRect(el, rect) {
-	_css(el, 'position', 'absolute');
-	_css(el, 'top', rect.top);
-	_css(el, 'left', rect.left);
-	_css(el, 'width', rect.width);
-	_css(el, 'height', rect.height);
+function setRect(el, rect) {
+	css(el, 'position', 'absolute');
+	css(el, 'top', rect.top);
+	css(el, 'left', rect.left);
+	css(el, 'width', rect.width);
+	css(el, 'height', rect.height);
 }
 
-export function _unsetRect(el) {
-	_css(el, 'position', '');
-	_css(el, 'top', '');
-	_css(el, 'left', '');
-	_css(el, 'width', '');
-	_css(el, 'height', '');
+function unsetRect(el) {
+	css(el, 'position', '');
+	css(el, 'top', '');
+	css(el, 'left', '');
+	css(el, 'width', '');
+	css(el, 'height', '');
 }
 
 
-export let expando = 'Sortable' + (new Date).getTime();
+const expando = 'Sortable' + (new Date).getTime();
+
+
+export {
+	on,
+	off,
+	matches,
+	getParentOrHost,
+	closest,
+	toggleClass,
+	css,
+	matrix,
+	find,
+	getWindowScrollingElement,
+	getRect,
+	isScrolledPast,
+	getChild,
+	lastChild,
+	index,
+	getRelativeScrollOffset,
+	indexOfObject,
+	getParentAutoScrollElement,
+	extend,
+	isRectEqual,
+	throttle,
+	cancelThrottle,
+	scrollBy,
+	clone,
+	setRect,
+	unsetRect,
+	expando
+};

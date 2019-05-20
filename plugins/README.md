@@ -12,15 +12,19 @@ Sortable plugins are plugins that can be directly mounted to the Sortable class.
 ## Static Properties
 The constructor function passed to `Sortable.mount` may contain several static properties and methods. The following static properties may be defined:
 
-`pluginName: String` (Required) — The name of the option that the user will use in their sortable's options to enable your plugin. Should start with a lower case and be camel-cased. For example: `'multiDrag'`.
+`pluginName: String` (Required)
+The name of the option that the user will use in their sortable's options to enable the plugin. Should start with a lower case and be camel-cased. For example: `'multiDrag'`. This is also the property name that the plugin's instance will be under in a sortable instance (ex. `sortableInstance.multiDrag`).
 
 `utils: Object` — Object containing functions that will be added to the `Sortable.utils` default object on the Sortable class.
 
 `eventOptions(eventName: String, sortable: Sortable): Function` — A function that is called whenever Sortable fires an event. This function should return an object to be combined with the event object that Sortable will emit.
 
+`initializeByDefault: Boolean`
+Determines whether or not the plugin will always be initialized on every new Sortable instance. If this option is enabled, it does not mean that by default the plugin will be enabled on the Sortable - this must still be done in the options via the plugin's `pluginName`, or it can be enabled by default if your plugin specifies it's pluginName as a default option that is truthy. Since the plugin will already be initialized on every Sortable instance, it can also be enabled dynamically via `sortableInstance.option('pluginName', true)`.
+This option defaults to `false`.
 
 ## Plugin Options
-Your plugin may have custom options or override the defaults of certain options. In order to do this, there must be an `options` object on the initialized plugin. This can be set in the plugin's prototype, or during the initialization of the plugin (when the `el` is available). For example:
+Plugins may have custom options or override the defaults of certain options. In order to do this, there must be an `options` object on the initialized plugin. This can be set in the plugin's prototype, or during the initialization of the plugin (when the `el` is available). For example:
 
 ```js
 function myPlugin(el) {
@@ -35,8 +39,11 @@ Sortable.mount(myPlugin);
 
 ## Plugin Events
 
+### Context
+The events will be fired in the context of their own parent object, however the plugin instance's Sortable instance is available under `this.sortable`.
+
 ### Event List
-The following table contains details on the events that your plugin may handle in the prototype of the plugin's constructor function.
+The following table contains details on the events that a plugin may handle in the prototype of the plugin's constructor function.
 
 | Event Name                | Description                                                                                                      | Cancelable? | Cancel Behaviour                                   | Event Type | Custom Event Object Properties                                          |
 |---------------------------|------------------------------------------------------------------------------------------------------------------|-------------|----------------------------------------------------|------------|-------------------------------------------------------------------------|
@@ -79,11 +86,12 @@ An object with the following properties is passed as an argument to each plugin 
 
 `putSortable: Sortable|undefined` — The element that dragEl is dragged into from it's root, otherwise undefined 
 
+
 #### Methods:
 
-`cloneNowHidden()` — Function to be called if your plugin has hidden the clone
+`cloneNowHidden()` — Function to be called if the plugin has hidden the clone
 
-`cloneNowShown()` — Function to be called if your plugin has shown the clone
+`cloneNowShown()` — Function to be called if the plugin has shown the clone
 
 `dispatchSortableEvent(eventName: String)` — Function that can be used to emit an event on the current sortable while sorting, with all usual event properties set
 

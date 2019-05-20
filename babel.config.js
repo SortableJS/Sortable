@@ -15,12 +15,16 @@ module.exports = function(api) {
 	} else if (process.env.NODE_ENV === 'umd') {
 		presets = [
 			[
-				"@babel/preset-env"
+				"@babel/preset-env",
+				{
+					"modules": false
+				}
 			]
 		];
 	}
 
 	return {
+		plugins: ['@babel/plugin-transform-object-assign'],
 		presets
 	};
 };

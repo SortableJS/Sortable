@@ -3,16 +3,18 @@
 	"exportName": "Sortable",
 	"version": "1.9.0",
 	"devDependencies": {
-		"@babel/core": "^7.4.3",
-		"@babel/preset-env": "^7.4.3",
-		"rollup": "^1.10.1",
+		"@babel/core": "^7.4.4",
+		"@babel/plugin-transform-object-assign": "^7.2.0",
+		"@babel/preset-env": "^7.4.4",
+		"rollup": "^1.11.3",
 		"rollup-plugin-babel": "^4.3.2",
 		"rollup-plugin-json": "^4.0.0",
-		"uglify-js": "^3.5.9"
+		"rollup-plugin-node-resolve": "^5.0.0",
+		"uglify-js": "^3.5.12"
 	},
 	"description": "JavaScript library for reorderable drag-and-drop lists on modern browsers and touch devices. No jQuery required. Supports Meteor, AngularJS, React, Polymer, Vue, Knockout and any CSS library, e.g. Bootstrap.",
-	"main": "dist/sortable.umd.js",
-	"module": "dist/sortable.esm.js",
+	"main": "./Sortable.js",
+	"module": "modular/sortable.esm.js",
 	"scripts": {
 		"http-server": "http-server -s ./",
 		"build:umd": "set NODE_ENV=umd&& rollup -c build/umd-build.js",

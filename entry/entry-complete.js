@@ -1,6 +1,6 @@
-import Sortable from '../src/Sortable.js';
-import Swap from '../plugins/Swap.js';
-import MultiDrag from '../plugins/MultiDrag.js';
+import Sortable from './entry-defaults.js';
+import Swap from '../plugins/Swap';
+import MultiDrag from '../plugins/MultiDrag';
 
 Sortable.mount(new Swap());
 Sortable.mount(new MultiDrag());
