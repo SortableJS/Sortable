@@ -1,7 +1,15 @@
 let plugins = [];
 
+const defaults = {
+	initializeByDefault: true
+};
+
 export default {
 	mount(plugin) {
+		// Set default static properties
+		for (let option in defaults) {
+			!(option in plugin) && (plugin[option] = defaults[option]);
+		}
 		plugins.push(plugin);
 	},
 	pluginEvent(eventName, sortable, evt) {
@@ -32,7 +40,7 @@ export default {
 	getEventOptions(name, sortable) {
 		let eventOptions = {};
 		for (let i in plugins) {
-			if (!plugins[i].eventOptions) continue;
+			if (typeof(plugins[i].eventOptions) !== 'function') continue;
 			eventOptions = {
 				...eventOptions,
 				...plugins[i].eventOptions(name, sortable)

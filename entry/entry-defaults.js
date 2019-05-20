@@ -16,4 +16,4 @@ export {
 	// Extra
 	Swap,
 	MultiDrag
-}
+};

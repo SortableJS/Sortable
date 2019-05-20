@@ -115,8 +115,16 @@
   var version = "1.9.0";
 
   var plugins = [];
+  var defaults = {
+    initializeByDefault: true
+  };
   var PluginManager = {
     mount: function mount(plugin) {
+      // Set default static properties
+      for (var option in defaults) {
+        !(option in plugin) && (plugin[option] = defaults[option]);
+      }
+
       plugins.push(plugin);
     },
     pluginEvent: function pluginEvent(eventName, sortable, evt) {
@@ -150,7 +158,7 @@
       var eventOptions = {};
 
       for (var i in plugins) {
-        if (!plugins[i].eventOptions) continue;
+        if (typeof plugins[i].eventOptions !== 'function') continue;
         eventOptions = _objectSpread({}, eventOptions, plugins[i].eventOptions(name, sortable));
       }
 

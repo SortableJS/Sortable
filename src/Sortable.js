@@ -395,7 +395,7 @@ function Sortable(el, options) {
 	}
 
 	// Set default options
-	for (var name in defaults) {
+	for (let name in defaults) {
 		!(name in options) && (options[name] = defaults[name]);
 	}
 
