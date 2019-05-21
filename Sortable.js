@@ -2803,62 +2803,65 @@
     scrolling = scrollThisInstance; // in case another function catches scrolling as false in between when it is not
   }, 30);
 
-  function SpillPlugin() {
-    var drop = function drop(_ref) {
-      var originalEvent = _ref.originalEvent,
-          putSortable = _ref.putSortable,
-          dragEl = _ref.dragEl,
-          activeSortable = _ref.activeSortable,
-          dispatchSortableEvent = _ref.dispatchSortableEvent,
-          hideGhostForTarget = _ref.hideGhostForTarget,
-          unhideGhostForTarget = _ref.unhideGhostForTarget;
-      hideGhostForTarget();
-      var target = document.elementFromPoint(originalEvent.clientX, originalEvent.clientY);
-      unhideGhostForTarget();
+  var drop = function drop(_ref) {
+    var originalEvent = _ref.originalEvent,
+        putSortable = _ref.putSortable,
+        dragEl = _ref.dragEl,
+        activeSortable = _ref.activeSortable,
+        dispatchSortableEvent = _ref.dispatchSortableEvent,
+        hideGhostForTarget = _ref.hideGhostForTarget,
+        unhideGhostForTarget = _ref.unhideGhostForTarget;
+    hideGhostForTarget();
+    var target = document.elementFromPoint(originalEvent.clientX, originalEvent.clientY);
+    unhideGhostForTarget();
 
-      if (!(putSortable || activeSortable).el.contains(target)) {
-        dispatchSortableEvent('spill');
-        this.onSpill(dragEl);
+    if (!(putSortable || activeSortable).el.contains(target)) {
+      dispatchSortableEvent('spill');
+      this.onSpill(dragEl);
+    }
+  };
+
+  function Revert() {}
+
+  Revert.prototype = {
+    startIndex: null,
+    dragStart: function dragStart(_ref2) {
+      var oldDraggableIndex = _ref2.oldDraggableIndex;
+      this.startIndex = oldDraggableIndex;
+    },
+    onSpill: function onSpill(dragEl) {
+      this.sortable.captureAnimationState();
+      var nextSibling = getChild(this.sortable.el, this.startIndex, this.sortable.options);
+
+      if (nextSibling) {
+        this.sortable.el.insertBefore(dragEl, nextSibling);
+      } else {
+        this.sortable.el.appendChild(dragEl);
       }
-    };
 
-    function Revert() {}
+      this.sortable.animateAll();
+    },
+    drop: drop
+  };
 
-    Revert.prototype = {
-      startIndex: null,
-      dragStart: function dragStart(_ref2) {
-        var oldDraggableIndex = _ref2.oldDraggableIndex;
-        this.startIndex = oldDraggableIndex;
-      },
-      onSpill: function onSpill(dragEl) {
-        this.sortable.captureAnimationState();
-        var nextSibling = getChild(this.sortable.el, this.startIndex, this.sortable.options);
+  _extends(Revert, {
+    pluginName: 'revertOnSpill'
+  });
 
-        if (nextSibling) {
-          this.sortable.el.insertBefore(dragEl, nextSibling);
-        } else {
-          this.sortable.el.appendChild(dragEl);
-        }
+  function Remove() {}
 
-        this.sortable.animateAll();
-      },
-      drop: drop
-    };
+  Remove.prototype = {
+    onSpill: function onSpill(dragEl) {
+      this.sortable.captureAnimationState();
+      dragEl.parentNode && dragEl.parentNode.removeChild(dragEl);
+      this.sortable.animateAll();
+    },
+    drop: drop
+  };
 
-    function Remove() {}
-
-    Remove.prototype = {
-      onSpill: function onSpill(dragEl) {
-        dragEl.parentNode && dragEl.parentNode.removeChild(dragEl);
-      },
-      drop: drop
-    };
-    return [_extends(Revert, {
-      pluginName: 'revertOnSpill'
-    }), _extends(Remove, {
-      pluginName: 'removeOnSpill'
-    })];
-  }
+  _extends(Remove, {
+    pluginName: 'removeOnSpill'
+  });
 
   var lastSwapEl;
 
@@ -3497,7 +3500,7 @@
   }
 
   Sortable$1.mount(new AutoScrollPlugin());
-  Sortable$1.mount(new SpillPlugin());
+  Sortable$1.mount(Remove, Revert);
 
   Sortable$1.mount(new SwapPlugin());
   Sortable$1.mount(new MultiDragPlugin());

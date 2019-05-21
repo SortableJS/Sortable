@@ -1,1 +1,1 @@
-export { default } from './OnSpill.js';
+export { default, RemoveOnSpill, RevertOnSpill } from './OnSpill.js';

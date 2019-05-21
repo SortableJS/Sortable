@@ -21,7 +21,8 @@ The name of the option that the user will use in their sortable's options to ena
 
 `initializeByDefault: Boolean`
 Determines whether or not the plugin will always be initialized on every new Sortable instance. If this option is enabled, it does not mean that by default the plugin will be enabled on the Sortable - this must still be done in the options via the plugin's `pluginName`, or it can be enabled by default if your plugin specifies it's pluginName as a default option that is truthy. Since the plugin will already be initialized on every Sortable instance, it can also be enabled dynamically via `sortableInstance.option('pluginName', true)`.
-This option defaults to `false`.
+It is a good idea to have this option set to `false` if the plugin modifies the behaviour of Sortable in such a way that enabling or disabling the plugin dynamically could cause it to break. Likewise, this option should be disabled if the plugin should only be instantiated on Sortables in which that plugin is enabled.
+This option defaults to `true`.
 
 ## Plugin Options
 Plugins may have custom options or override the defaults of certain options. In order to do this, there must be an `options` object on the initialized plugin. This can be set in the plugin's prototype, or during the initialization of the plugin (when the `el` is available). For example:
