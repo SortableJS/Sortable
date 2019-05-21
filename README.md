@@ -14,8 +14,8 @@ Supported by [<img width="100px" src="https://user-images.githubusercontent.com/
  * Supports drag handles *and selectable text* (better than voidberg's html5sortable)
  * Smart auto-scrolling
  * Advanced swap detection
- * Seamless animations
- * [Multi-drag]() support
+ * Smooth animations
+ * [Multi-drag](https://github.com/SortableJS/Sortable/wiki/Dragging-Multiple-Items-in-Sortable) support
  * Built using native HTML5 drag and drop API
  * Supports
    * [Meteor](https://github.com/SortableJS/meteor-sortablejs)
@@ -39,6 +39,7 @@ Supported by [<img width="100px" src="https://user-images.githubusercontent.com/
 
 ### Articles
 
+ * [Dragging Multiple Items in Sortable](https://github.com/SortableJS/Sortable/wiki/Dragging-Multiple-Items-in-Sortable) (April 26, 2019)
  * [Swap Thresholds and Direction](https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction) (December 2, 2018)
  * [Sortable v1.0 — New capabilities](https://github.com/SortableJS/Sortable/wiki/Sortable-v1.0-—-New-capabilities/) (December 22, 2014)
  * [Sorting with the help of HTML5 Drag'n'Drop API](https://github.com/SortableJS/Sortable/wiki/Sorting-with-the-help-of-HTML5-Drag'n'Drop-API/) (December 23, 2013)
@@ -414,6 +415,7 @@ Sortable.create(el, {
 	cursor: -webkit-grabbing;
 }
 ```
+
 
 ---
 
