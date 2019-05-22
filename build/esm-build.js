@@ -5,9 +5,9 @@ import build from './build.js';
 
 export default ([
 	{
-		input: 'entry/entry-modular.js',
+		input: 'entry/entry-core.js',
 		output: Object.assign({}, build.output, {
-			file: 'modular/sortable.modular.esm.js',
+			file: 'modular/sortable.core.esm.js',
 			format: 'esm'
 		})
 	},

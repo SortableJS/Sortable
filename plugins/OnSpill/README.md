@@ -1,6 +1,7 @@
 # OnSpill Plugins
 This file contains two seperate plugins, RemoveOnSpill and RevertOnSpill. They can be imported individually, or the default export (an array of both plugins) can be passed to `Sortable.mount` as well.
 
+**These plugins are default plugins, and are included in the default UMD and ESM builds of Sortable**
 
 ---
 

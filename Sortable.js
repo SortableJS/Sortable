@@ -112,6 +112,26 @@
     return target;
   }
 
+  function _toConsumableArray(arr) {
+    return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread();
+  }
+
+  function _arrayWithoutHoles(arr) {
+    if (Array.isArray(arr)) {
+      for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
+
+      return arr2;
+    }
+  }
+
+  function _iterableToArray(iter) {
+    if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter);
+  }
+
+  function _nonIterableSpread() {
+    throw new TypeError("Invalid attempt to spread non-iterable instance");
+  }
+
   var version = "1.9.0";
 
   var plugins = [];
@@ -671,7 +691,8 @@
         oldDraggableIndex = _ref.oldDraggableIndex,
         newDraggableIndex = _ref.newDraggableIndex,
         originalEvt = _ref.originalEvt,
-        putSortable = _ref.putSortable;
+        putSortable = _ref.putSortable,
+        eventOptions = _ref.eventOptions;
     sortable = sortable || rootEl[expando];
     var evt,
         options = sortable.options,
@@ -697,10 +718,11 @@
     evt.newDraggableIndex = newDraggableIndex;
     evt.originalEvent = originalEvt;
     evt.pullMode = putSortable ? putSortable.lastPutMode : undefined;
-    var eventOptions = PluginManager.getEventOptions(name, sortable);
 
-    for (var option in eventOptions) {
-      evt[option] = eventOptions[option];
+    var allEventOptions = _objectSpread({}, eventOptions, PluginManager.getEventOptions(name, sortable));
+
+    for (var option in allEventOptions) {
+      evt[option] = allEventOptions[option];
     }
 
     if (rootEl) {
@@ -1001,7 +1023,7 @@
    * @return {HTMLElement}   Element of the first found nearest Sortable
    */
   _detectNearestEmptySortable = function _detectNearestEmptySortable(x, y) {
-    for (var i = 0; i < sortables.length; i++) {
+    for (var i in sortables) {
       if (lastChild(sortables[i])) continue;
       var rect = getRect(sortables[i]),
           threshold = sortables[i][expando].options.emptyInsertThreshold,
@@ -2060,6 +2082,8 @@
             sortable: this,
             name: 'unchoose',
             toEl: parentEl,
+            newIndex: null,
+            newDraggableIndex: null,
             originalEvt: evt
           });
 
@@ -2590,7 +2614,6 @@
         scroll: true,
         scrollSensitivity: 30,
         scrollSpeed: 10,
-        scrollElement: null,
         bubbleScroll: true
       }; // Bind all private methods
 
@@ -2811,11 +2834,12 @@
         dispatchSortableEvent = _ref.dispatchSortableEvent,
         hideGhostForTarget = _ref.hideGhostForTarget,
         unhideGhostForTarget = _ref.unhideGhostForTarget;
+    var fromSortable = putSortable || activeSortable;
     hideGhostForTarget();
     var target = document.elementFromPoint(originalEvent.clientX, originalEvent.clientY);
     unhideGhostForTarget();
 
-    if (!(putSortable || activeSortable).el.contains(target)) {
+    if (fromSortable && !fromSortable.el.contains(target)) {
       dispatchSortableEvent('spill');
       this.onSpill(dragEl);
     }
@@ -2964,7 +2988,7 @@
       clonesHidden;
 
   function MultiDragPlugin() {
-    function MultiDrag(sortable) {
+    function MultiDrag(sortable, el) {
       // Bind all private methods
       for (var fn in this) {
         if (fn.charAt(0) === '_' && typeof this[fn] === 'function') {
@@ -2984,8 +3008,8 @@
         setData: function setData(dataTransfer, dragEl) {
           var data = '';
 
-          if (multiDragElements.length) {
-            for (var i = 0; i < multiDragElements.length; i++) {
+          if (multiDragElements.length && multiDragSortable === el) {
+            for (var i in multiDragElements) {
               data += (!i ? '' : ', ') + multiDragElements[i].textContent;
             }
           } else {
@@ -3034,7 +3058,7 @@
             rootEl = _ref3.rootEl;
         insertMultiDragClones(false, rootEl);
 
-        for (var i = 0; i < multiDragClones.length; i++) {
+        for (var i in multiDragClones) {
           css(multiDragClones[i], 'display', '');
         }
 
@@ -3402,7 +3426,7 @@
 
         if (evt && evt.button !== 0) return;
 
-        for (var i = 0; i < multiDragElements.length; i++) {
+        for (var i in multiDragElements) {
           toggleClass(multiDragElements[i], this.sortable.options.selectedClass, false);
           dispatchEvent({
             sortable: this.sortable,
@@ -3456,8 +3480,8 @@
       },
       eventOptions: function eventOptions() {
         return {
-          items: multiDragElements,
-          clones: multiDragClones
+          items: _toConsumableArray(multiDragElements),
+          clones: [].concat(multiDragClones)
         };
       }
     });
@@ -3493,7 +3517,7 @@
   }
 
   function removeMultiDragElements() {
-    for (var i = 0; i < multiDragElements.length; i++) {
+    for (var i in multiDragElements) {
       if (multiDragElements[i] === dragEl$1) continue;
       multiDragElements[i].parentNode && multiDragElements[i].parentNode.removeChild(multiDragElements[i]);
     }

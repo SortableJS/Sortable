@@ -4,7 +4,7 @@ Demo:
  - `window`: https://jsbin.com/dosilir/edit?js,output
  - `overflow: hidden`: https://jsbin.com/xecihez/edit?html,js,output
 
-**INFO: This plugin is a default plugin, and is included in the default UMD and ESM builds of Sortable**
+**This plugin is a default plugin, and is included in the default UMD and ESM builds of Sortable**
 
 
 ---
@@ -14,7 +14,7 @@ Demo:
 
 ```js
 new Sortable(el, {
-	scroll: true, // or HTMLElement
+	scroll: true, // Enable the plugin. Can be HTMLElement.
 	scrollFn: function(offsetX, offsetY, originalEvent, touchEvt, hoverTargetEl) { ... }, // if you have custom scrollbar scrollFn may be used for autoscrolling
 	scrollSensitivity: 30, // px, how near the mouse must be to an edge to start scrolling.
 	scrollSpeed: 10, // px, speed of the scrolling
@@ -26,9 +26,21 @@ new Sortable(el, {
 ---
 
 
+#### `scroll` option
+Enables the plugin. Defaults to `true`. May also be set to an HTMLElement which will be where autoscrolling is rooted.
+
+Demo:
+ - `window`: https://jsbin.com/dosilir/edit?js,output
+ - `overflow: hidden`: https://jsbin.com/xecihez/edit?html,js,output
+
+
+---
+
+
 #### `scrollFn` option
 Defines function that will be used for autoscrolling. el.scrollTop/el.scrollLeft is used by default.
 Useful when you have custom scrollbar with dedicated scroll function.
+This function should return `'continue'` if it wishes to allow Sortable's native autoscrolling.
 
 
 ---

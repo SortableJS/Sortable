@@ -48,8 +48,6 @@ Supported by [<img width="100px" src="https://user-images.githubusercontent.com/
 
 ### Getting Started
 
-Via npm
-
 Install with NPM:
 ```bash
 $ npm install sortablejs --save
@@ -66,7 +64,7 @@ Import into your project:
 import Sortable from 'sortablejs';
 
 // Core SortableJS (without default plugins)
-import Sortable from 'sortablejs/modular/sortable.modular.esm.js';
+import Sortable from 'sortablejs/modular/sortable.core.esm.js';
 
 // Complete SortableJS (with all plugins)
 import Sortable from 'sortablejs/modular/sortable.complete.esm.js';
@@ -81,13 +79,14 @@ Sortable.mount(MultiDrag, Swap);
 
 
 // Cherrypick default plugins
-import Sortable, { AutoScroll } from 'sortablejs/modular/sortable.complete.esm.js';
+import Sortable, { AutoScroll } from 'sortablejs/modular/sortable.core.esm.js';
 
 Sortable.mount(AutoScroll);
 ```
 
 
-<br/>
+---
+
 
 ### Usage
 ```html
@@ -104,20 +103,6 @@ var sortable = Sortable.create(el);
 ```
 
 You can use any element for the list and its elements, not just `ul`/`li`. Here is an [example with `div`s](https://jsbin.com/visimub/edit?html,js,output).
-
-
----
-
-
-### Using Plugins
-Sortable has several plugins that extend the library beyond it's default capabilities.
-To see a list of these plugins, open the `plugins/` directory.
-
-Some of these plugins are "default" plugins, while others are "extra" plugins. Default plugins add optional features to Sortable (eg. AutoScroll), while extra plugins siginificantly modify the behaviour of Sortable (eg. MultiDrag).
-
-Plugins are mounted using `Sortable.mount()` (see example above).
-
-Once a plugin is mounted, it must be enabled in the options of the sortable in order for it to be enabled. The name of the option is the plugin's pluginName, and can be found in the plugin's README, along with other options the plugin specifies.
 
 
 ---
@@ -513,17 +498,6 @@ Dragging only starts if you move the pointer past a certain tolerance, so that y
 ---
 
 
-#### `scroll` option
-If set to `true`, the page (or sortable-area) scrolls when coming to an edge.
-
-Demo:
- - `window`: https://jsbin.com/dosilir/edit?js,output
- - `overflow: hidden`: https://jsbin.com/xecihez/edit?html,js,output
-
-
----
-
-
 #### `scrollFn` option
 Defines function that will be used for autoscrolling. el.scrollTop/el.scrollLeft is used by default.
 Useful when you have custom scrollbar with dedicated scroll function.
@@ -728,7 +702,28 @@ Create new instance.
 
 
 ##### Sortable.active:`Sortable`
-Link to the active instance.
+The active Sortable instance.
+
+
+---
+
+
+##### Sortable.dragged:`HTMLElement`
+The element being dragged.
+
+
+---
+
+
+##### Sortable.ghost:`HTMLElement`
+The ghost element.
+
+
+---
+
+
+##### Sortable.mount(plugin:`...SortablePlugin|...SortablePlugin[]`)
+Mounts a plugin to Sortable.
 
 
 ---

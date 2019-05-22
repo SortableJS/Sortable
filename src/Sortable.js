@@ -221,7 +221,7 @@ let dragEl,
 	 * @return {HTMLElement}   Element of the first found nearest Sortable
 	 */
 	_detectNearestEmptySortable = function(x, y) {
-		for (let i = 0; i < sortables.length; i++) {
+		for (let i in sortables) {
 			if (lastChild(sortables[i])) continue;
 
 			let rect = getRect(sortables[i]),
@@ -1338,6 +1338,8 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 					sortable: this,
 					name: 'unchoose',
 					toEl: parentEl,
+					newIndex: null,
+					newDraggableIndex: null,
 					originalEvt: evt
 				});
 

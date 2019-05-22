@@ -8,7 +8,7 @@ export default function dispatchEvent(
 		targetEl, cloneEl, toEl, fromEl,
 		oldIndex, newIndex,
 		oldDraggableIndex, newDraggableIndex,
-		originalEvt, putSortable
+		originalEvt, putSortable, eventOptions
 	}
 ) {
 	sortable = (sortable || rootEl[expando]);
@@ -40,9 +40,9 @@ export default function dispatchEvent(
 	evt.originalEvent = originalEvt;
 	evt.pullMode = putSortable ? putSortable.lastPutMode : undefined;
 
-	let eventOptions = PluginManager.getEventOptions(name, sortable);
-	for (let option in eventOptions) {
-		evt[option] = eventOptions[option];
+	let allEventOptions = { ...eventOptions, ...PluginManager.getEventOptions(name, sortable) };
+	for (let option in allEventOptions) {
+		evt[option] = allEventOptions[option];
 	}
 
 	if (rootEl) {

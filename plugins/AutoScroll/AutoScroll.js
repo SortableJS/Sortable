@@ -29,7 +29,6 @@ function AutoScrollPlugin() {
 			scroll: true,
 			scrollSensitivity: 30,
 			scrollSpeed: 10,
-			scrollElement: null,
 			bubbleScroll: true
 		};
 

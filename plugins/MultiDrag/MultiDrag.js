@@ -26,7 +26,7 @@ let multiDragElements = [],
 	clonesHidden;
 
 function MultiDragPlugin() {
-	function MultiDrag(sortable) {
+	function MultiDrag(sortable, el) {
 		// Bind all private methods
 		for (let fn in this) {
 			if (fn.charAt(0) === '_' && typeof this[fn] === 'function') {
@@ -45,8 +45,8 @@ function MultiDragPlugin() {
 			selectedClass: 'sortable-selected',
 			setData(dataTransfer, dragEl) {
 				let data = '';
-				if (multiDragElements.length) {
-					for (let i = 0; i < multiDragElements.length; i++) {
+				if (multiDragElements.length && multiDragSortable === el) {
+					for (let i in multiDragElements) {
 						data += (!i ? '' : ', ') + multiDragElements[i].textContent;
 					}
 				} else {
@@ -90,7 +90,7 @@ function MultiDragPlugin() {
 
 		showClone({ cloneNowShown, rootEl}) {
 			insertMultiDragClones(false, rootEl);
-			for (let i = 0; i < multiDragClones.length; i++) {
+			for (let i in multiDragClones) {
 				css(multiDragClones[i], 'display', '');
 			}
 
@@ -449,7 +449,7 @@ function MultiDragPlugin() {
 			// Only deselect if left click
 			if (evt && evt.button !== 0) return;
 
-			for (let i = 0; i < multiDragElements.length; i++) {
+			for (let i in multiDragElements) {
 				toggleClass(multiDragElements[i], this.sortable.options.selectedClass, false);
 				dispatchEvent({
 					sortable: this.sortable,
@@ -499,8 +499,8 @@ function MultiDragPlugin() {
 		},
 		eventOptions() {
 			return {
-				items: multiDragElements,
-				clones: multiDragClones
+				items: [...multiDragElements],
+				clones: [...multiDragClones]
 			};
 		}
 	});
@@ -533,7 +533,7 @@ function insertMultiDragClones(elementsInserted, rootEl) {
 }
 
 function removeMultiDragElements() {
-	for (let i = 0; i < multiDragElements.length; i++) {
+	for (let i in multiDragElements) {
 		if (multiDragElements[i] === dragEl) continue;
 		multiDragElements[i].parentNode && multiDragElements[i].parentNode.removeChild(multiDragElements[i]);
 	}
