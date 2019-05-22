@@ -3,18 +3,25 @@
 	"exportName": "Sortable",
 	"version": "1.9.0",
 	"devDependencies": {
-		"gulp": "^4.0.0",
-		"gulp-each": "^0.5.0",
-		"gulp-rename": "^1.4.0",
-		"gulp-uglify": "^3.0.1",
-		"http-server": "^0.9.0",
-		"pump": "^3.0.0"
+		"@babel/core": "^7.4.4",
+		"@babel/plugin-transform-object-assign": "^7.2.0",
+		"@babel/preset-env": "^7.4.4",
+		"rollup": "^1.11.3",
+		"rollup-plugin-babel": "^4.3.2",
+		"rollup-plugin-json": "^4.0.0",
+		"rollup-plugin-node-resolve": "^5.0.0",
+		"uglify-js": "^3.5.12"
 	},
 	"description": "JavaScript library for reorderable drag-and-drop lists on modern browsers and touch devices. No jQuery required. Supports Meteor, AngularJS, React, Polymer, Vue, Knockout and any CSS library, e.g. Bootstrap.",
-	"main": "Sortable.js",
+	"main": "./Sortable.js",
+	"module": "modular/sortable.esm.js",
 	"scripts": {
 		"http-server": "http-server -s ./",
-		"prepublish": "gulp build"
+		"build:umd": "set NODE_ENV=umd&& rollup -c build/umd-build.js",
+		"build:umd:watch": "set NODE_ENV=umd&& rollup -w -c build/umd-build.js",
+		"build:es": "set NODE_ENV=es&& rollup -c build/esm-build.js",
+		"minify": "node build/minify.js",
+		"build": "npm run build:es && npm run build:umd && npm run minify"
 	},
 	"maintainers": [
 		"Konstantin Lebedev <ibnRubaXa@gmail.com>",
