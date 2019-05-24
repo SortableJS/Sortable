@@ -620,9 +620,10 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 				dragEl.draggable = true;
 			}
 
+			pluginEvent('delayStart', this, { evt });
+
 			// Delay is impossible for native DnD in Edge or IE
 			if (options.delay && (options.delayOnTouchOnly ? touch : true) && (!this.nativeDraggable || !(Edge || IE11OrLess))) {
-				pluginEvent('delayStart', this, { evt });
 				if (Sortable.eventCanceled) {
 					this._onDrop();
 					return;

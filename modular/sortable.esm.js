@@ -143,18 +143,28 @@ var PluginManager = {
   },
   pluginEvent: function pluginEvent(eventName, sortable, evt) {
     this.eventCanceled = false;
+    var eventNameGlobal = eventName + 'Global';
 
     for (var i in plugins) {
-      // Only fire plugin event if plugin is enabled in this sortable,
-      // and plugin has event defined
-      if (sortable.options[plugins[i].pluginName] && sortable[plugins[i].pluginName] && sortable[plugins[i].pluginName][eventName]) {
-        var canceled = sortable[plugins[i].pluginName][eventName](_objectSpread({
+      if (!sortable[plugins[i].pluginName]) continue;
+      var canceled = false; // Fire global events if it exists in this sortable
+
+      if (sortable[plugins[i].pluginName][eventNameGlobal]) {
+        canceled = canceled || sortable[plugins[i].pluginName][eventNameGlobal](_objectSpread({
           sortable: sortable
         }, evt));
+      } // Only fire plugin event if plugin is enabled in this sortable,
+      // and plugin has event defined
 
-        if (canceled) {
-          this.eventCanceled = true;
-        }
+
+      if (sortable.options[plugins[i].pluginName] && sortable[plugins[i].pluginName][eventName]) {
+        canceled = canceled || sortable[plugins[i].pluginName][eventName](_objectSpread({
+          sortable: sortable
+        }, evt));
+      }
+
+      if (canceled) {
+        this.eventCanceled = true;
       }
     }
   },
@@ -1412,14 +1422,13 @@ Sortable$1.prototype =
       if (FireFox && this.nativeDraggable) {
         this.options.touchStartThreshold = 4;
         dragEl.draggable = true;
-      } // Delay is impossible for native DnD in Edge or IE
+      }
 
+      pluginEvent('delayStart', this, {
+        evt: evt
+      }); // Delay is impossible for native DnD in Edge or IE
 
       if (options.delay && (options.delayOnTouchOnly ? touch : true) && (!this.nativeDraggable || !(Edge || IE11OrLess))) {
-        pluginEvent('delayStart', this, {
-          evt: evt
-        });
-
         if (Sortable$1.eventCanceled) {
           this._onDrop();
 
@@ -2982,7 +2991,7 @@ dragStarted = false,
     clonesHidden;
 
 function MultiDragPlugin() {
-  function MultiDrag(sortable, el) {
+  function MultiDrag(sortable) {
     // Bind all private methods
     for (var fn in this) {
       if (fn.charAt(0) === '_' && typeof this[fn] === 'function') {
@@ -3002,7 +3011,7 @@ function MultiDragPlugin() {
       setData: function setData(dataTransfer, dragEl) {
         var data = '';
 
-        if (multiDragElements.length && multiDragSortable === el) {
+        if (multiDragElements.length && multiDragSortable === sortable) {
           for (var i in multiDragElements) {
             data += (!i ? '' : ', ') + multiDragElements[i].textContent;
           }
@@ -3016,10 +3025,14 @@ function MultiDragPlugin() {
   }
 
   MultiDrag.prototype = {
-    setupClone: function setupClone(_ref) {
-      var sortable = _ref.sortable;
+    delayStartGlobal: function delayStartGlobal(_ref) {
+      var dragged = _ref.dragEl;
+      dragEl$1 = dragged;
+    },
+    setupClone: function setupClone(_ref2) {
+      var sortable = _ref2.sortable;
 
-      if (multiDragElements.length && multiDragSortable === sortable.el) {
+      if (multiDragElements.length && multiDragSortable === sortable) {
         for (var i in multiDragElements) {
           multiDragClones.push(clone(multiDragElements[i]));
           multiDragClones[i].sortableIndex = multiDragElements[i].sortableIndex;
@@ -3034,22 +3047,22 @@ function MultiDragPlugin() {
         return true;
       }
     },
-    clone: function clone(_ref2) {
-      var sortable = _ref2.sortable,
-          rootEl = _ref2.rootEl,
-          dispatchSortableEvent = _ref2.dispatchSortableEvent;
+    clone: function clone(_ref3) {
+      var sortable = _ref3.sortable,
+          rootEl = _ref3.rootEl,
+          dispatchSortableEvent = _ref3.dispatchSortableEvent;
 
       if (!sortable.options.removeCloneOnHide) {
-        if (multiDragElements.length && multiDragSortable === sortable.el) {
+        if (multiDragElements.length && multiDragSortable === sortable) {
           insertMultiDragClones(true, rootEl);
           dispatchSortableEvent('clone');
           return true;
         }
       }
     },
-    showClone: function showClone(_ref3) {
-      var cloneNowShown = _ref3.cloneNowShown,
-          rootEl = _ref3.rootEl;
+    showClone: function showClone(_ref4) {
+      var cloneNowShown = _ref4.cloneNowShown,
+          rootEl = _ref4.rootEl;
       insertMultiDragClones(false, rootEl);
 
       for (var i in multiDragClones) {
@@ -3060,9 +3073,9 @@ function MultiDragPlugin() {
       clonesHidden = false;
       return true;
     },
-    hideClone: function hideClone(_ref4) {
-      var sortable = _ref4.sortable,
-          cloneNowHidden = _ref4.cloneNowHidden;
+    hideClone: function hideClone(_ref5) {
+      var sortable = _ref5.sortable,
+          cloneNowHidden = _ref5.cloneNowHidden;
 
       for (var i in multiDragClones) {
         css(multiDragClones[i], 'display', 'none');
@@ -3076,15 +3089,11 @@ function MultiDragPlugin() {
       clonesHidden = true;
       return true;
     },
-    delayEnded: function delayEnded(_ref5) {
-      var dragged = _ref5.dragEl;
-      dragEl$1 = dragged;
-    },
-    dragStart: function dragStart(_ref6) {
+    dragStartGlobal: function dragStartGlobal(_ref6) {
       var sortable = _ref6.sortable;
 
       if (!~multiDragElements.indexOf(dragEl$1) && multiDragSortable) {
-        multiDragSortable[expando].multiDrag._deselectMultiDrag();
+        multiDragSortable.multiDrag._deselectMultiDrag();
       }
 
       for (var i in multiDragElements) {
@@ -3323,7 +3332,7 @@ function MultiDragPlugin() {
             lastMultiDragSelect = dragEl$1;
           }
 
-          multiDragSortable = parentEl;
+          multiDragSortable = toSortable;
         } else {
           multiDragElements.splice(multiDragElements.indexOf(dragEl$1), 1);
           lastMultiDragSelect = null;
@@ -3392,7 +3401,7 @@ function MultiDragPlugin() {
           toSortable.animateAll();
         }
 
-        multiDragSortable = parentEl;
+        multiDragSortable = toSortable;
       } // Remove clones if necessary
 
 
@@ -3404,7 +3413,7 @@ function MultiDragPlugin() {
 
       multiDragClones.length = 0;
     },
-    nulling: function nulling() {
+    nullingGlobal: function nullingGlobal() {
       dragStarted = false;
       multiDragClones.length = 0;
     },
@@ -3414,7 +3423,7 @@ function MultiDragPlugin() {
     _deselectMultiDrag: function _deselectMultiDrag(evt) {
       if (dragStarted) return; // Only deselect if selection is in this sortable
 
-      if (multiDragSortable !== this.sortable.el) return; // Only deselect if target is not item in this sortable
+      if (multiDragSortable !== this.sortable) return; // Only deselect if target is not item in this sortable
 
       if (evt && closest(evt.target, this.sortable.options.draggable, this.sortable.el, false)) return; // Only deselect if left click
 
@@ -3450,10 +3459,10 @@ function MultiDragPlugin() {
         var sortable = el.parentNode[expando];
         if (!sortable || !sortable.options.multiDrag || ~multiDragElements.indexOf(el)) return;
 
-        if (multiDragSortable && multiDragSortable !== el.parentNode) {
-          multiDragSortable[expando].multiDrag._deselectMultiDrag();
+        if (multiDragSortable && multiDragSortable !== sortable) {
+          multiDragSortable.multiDrag._deselectMultiDrag();
 
-          multiDragSortable = el.parentNode;
+          multiDragSortable = sortable;
         }
 
         toggleClass(el, sortable.options.selectedClass, true);

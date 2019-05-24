@@ -58,6 +58,10 @@ function MultiDragPlugin() {
 	}
 
 	MultiDrag.prototype = {
+		delayStartGlobal({ dragEl: dragged }) {
+			dragEl = dragged;
+		},
+
 		setupClone({ sortable }) {
 			if (multiDragElements.length && multiDragSortable === sortable) {
 				for (let i in multiDragElements) {
@@ -111,11 +115,7 @@ function MultiDragPlugin() {
 			return true;
 		},
 
-		delayEnded({ dragEl: dragged }) {
-			dragEl = dragged;
-		},
-
-		dragStart({ sortable }) {
+		dragStartGlobal({ sortable }) {
 			if (!~multiDragElements.indexOf(dragEl) && multiDragSortable) {
 				multiDragSortable.multiDrag._deselectMultiDrag();
 			}
@@ -427,8 +427,7 @@ function MultiDragPlugin() {
 			multiDragClones.length = 0;
 		},
 
-
-		nulling() {
+		nullingGlobal() {
 			dragStarted = false;
 			multiDragClones.length = 0;
 		},
