@@ -1141,7 +1141,7 @@
 
   function Sortable$1(el, options) {
     if (!(el && el.nodeType && el.nodeType === 1)) {
-      throw 'Sortable: `el` must be HTMLElement, not ' + {}.toString.call(el);
+      throw "Sortable: `el` must be an HTMLElement, not ".concat({}.toString.call(el));
     }
 
     this.el = el; // root element
@@ -1317,6 +1317,9 @@
             fromEl: el
           });
 
+          pluginEvent('filter', _this, {
+            evt: evt
+          });
           preventOnFilter && evt.cancelable && evt.preventDefault();
           return; // cancel dnd
         }
@@ -1334,6 +1337,9 @@
               toEl: el
             });
 
+            pluginEvent('filter', _this, {
+              evt: evt
+            });
             return true;
           }
         });
@@ -2537,8 +2543,8 @@
     var idx = inputs.length;
 
     while (idx--) {
-      var el = inputs[idx];
-      el.checked && savedInputChecked.push(el);
+      var _el = inputs[idx];
+      _el.checked && savedInputChecked.push(_el);
     }
   }
 
@@ -2590,6 +2596,11 @@
 
     for (var i in plugins) {
       var plugin = plugins[i];
+
+      if (!plugin.prototype || !plugin.prototype.constructor) {
+        throw "Sortable: Mounted plugin must be a constructor function, not ".concat({}.toString.call(el));
+      }
+
       if (plugin.utils) Sortable$1.utils = _objectSpread({}, Sortable$1.utils, plugin.utils);
       PluginManager.mount(plugin);
     }

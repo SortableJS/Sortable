@@ -335,7 +335,7 @@ let _checkOutsideTargetEl = function(evt) {
  */
 function Sortable(el, options) {
 	if (!(el && el.nodeType && el.nodeType === 1)) {
-		throw 'Sortable: `el` must be HTMLElement, not ' + {}.toString.call(el);
+		throw `Sortable: \`el\` must be an HTMLElement, not ${ {}.toString.call(el) }`;
 	}
 
 	this.el = el; // root element
@@ -1904,6 +1904,9 @@ Sortable.mount = function(...plugins) {
 
 		for (let i in plugins) {
 			let plugin = plugins[i];
+			if (!plugin.prototype || !plugin.prototype.constructor) {
+				throw `Sortable: Mounted plugin must be a constructor function, not ${ {}.toString.call(el) }`;
+			}
 			if (plugin.utils) Sortable.utils = { ...Sortable.utils, ...plugin.utils };
 
 			PluginManager.mount(plugin);
