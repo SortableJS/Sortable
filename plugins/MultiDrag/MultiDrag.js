@@ -26,7 +26,7 @@ let multiDragElements = [],
 	clonesHidden;
 
 function MultiDragPlugin() {
-	function MultiDrag(sortable, el) {
+	function MultiDrag(sortable) {
 		// Bind all private methods
 		for (let fn in this) {
 			if (fn.charAt(0) === '_' && typeof this[fn] === 'function') {
@@ -45,7 +45,7 @@ function MultiDragPlugin() {
 			selectedClass: 'sortable-selected',
 			setData(dataTransfer, dragEl) {
 				let data = '';
-				if (multiDragElements.length && multiDragSortable === el) {
+				if (multiDragElements.length && multiDragSortable === sortable) {
 					for (let i in multiDragElements) {
 						data += (!i ? '' : ', ') + multiDragElements[i].textContent;
 					}
@@ -59,7 +59,7 @@ function MultiDragPlugin() {
 
 	MultiDrag.prototype = {
 		setupClone({ sortable }) {
-			if (multiDragElements.length && multiDragSortable === sortable.el) {
+			if (multiDragElements.length && multiDragSortable === sortable) {
 				for (let i in multiDragElements) {
 					multiDragClones.push(clone(multiDragElements[i]));
 
@@ -79,7 +79,7 @@ function MultiDragPlugin() {
 
 		clone({ sortable, rootEl, dispatchSortableEvent }) {
 			if (!sortable.options.removeCloneOnHide) {
-				if (multiDragElements.length && multiDragSortable === sortable.el) {
+				if (multiDragElements.length && multiDragSortable === sortable) {
 					insertMultiDragClones(true, rootEl);
 					dispatchSortableEvent('clone');
 
@@ -117,7 +117,7 @@ function MultiDragPlugin() {
 
 		dragStart({ sortable }) {
 			if (!~multiDragElements.indexOf(dragEl) && multiDragSortable) {
-				multiDragSortable[expando].multiDrag._deselectMultiDrag();
+				multiDragSortable.multiDrag._deselectMultiDrag();
 			}
 
 			for (let i in multiDragElements) {
@@ -345,7 +345,7 @@ function MultiDragPlugin() {
 						lastMultiDragSelect = dragEl;
 					}
 
-					multiDragSortable = parentEl;
+					multiDragSortable = toSortable;
 				} else {
 					multiDragElements.splice(multiDragElements.indexOf(dragEl), 1);
 					lastMultiDragSelect = null;
@@ -414,7 +414,7 @@ function MultiDragPlugin() {
 					toSortable.animateAll();
 				}
 
-				multiDragSortable = parentEl;
+				multiDragSortable = toSortable;
 			}
 
 			// Remove clones if necessary
@@ -441,7 +441,7 @@ function MultiDragPlugin() {
 			if (dragStarted) return;
 
 			// Only deselect if selection is in this sortable
-			if (multiDragSortable !== this.sortable.el) return;
+			if (multiDragSortable !== this.sortable) return;
 
 			// Only deselect if target is not item in this sortable
 			if (evt && closest(evt.target, this.sortable.options.draggable, this.sortable.el, false)) return;
@@ -478,9 +478,9 @@ function MultiDragPlugin() {
 			select(el) {
 				let sortable = el.parentNode[expando];
 				if (!sortable || !sortable.options.multiDrag || ~multiDragElements.indexOf(el)) return;
-				if (multiDragSortable && multiDragSortable !== el.parentNode) {
-					multiDragSortable[expando].multiDrag._deselectMultiDrag();
-					multiDragSortable = el.parentNode;
+				if (multiDragSortable && multiDragSortable !== sortable) {
+					multiDragSortable.multiDrag._deselectMultiDrag();
+					multiDragSortable = sortable;
 				}
 				toggleClass(el, sortable.options.selectedClass, true);
 				multiDragElements.push(el);
