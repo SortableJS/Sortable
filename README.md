@@ -142,12 +142,6 @@ var sortable = new Sortable(el, {
 	fallbackOnBody: false,  // Appends the cloned DOM Element into the Document's Body
 	fallbackTolerance: 0, // Specify in pixels how far the mouse should move before it's considered as a drag.
 
-	scroll: true, // or HTMLElement
-	scrollFn: function(offsetX, offsetY, originalEvent, touchEvt, hoverTargetEl) { ... }, // if you have custom scrollbar scrollFn may be used for autoscrolling
-	scrollSensitivity: 30, // px, how near the mouse must be to an edge to start scrolling.
-	scrollSpeed: 10, // px
-	bubbleScroll: true, // apply autoscroll to all parent elements, allowing for easier movement
-
 	dragoverBubble: false,
 	removeCloneOnHide: true, // Remove the clone element when it is not showing, rather than just hiding it
 	emptyInsertThreshold: 5, // px, distance mouse must be from empty sortable to insert drag element into it
@@ -493,37 +487,6 @@ When the user clicks inside a sortable element, it's not uncommon for your hand 
 Dragging only starts if you move the pointer past a certain tolerance, so that you don't accidentally start dragging every time you click.
 
 3 to 5 are probably good values.
-
-
----
-
-
-#### `scrollFn` option
-Defines function that will be used for autoscrolling. el.scrollTop/el.scrollLeft is used by default.
-Useful when you have custom scrollbar with dedicated scroll function.
-
-
----
-
-
-#### `scrollSensitivity` option
-Defines how near the mouse must be to an edge to start scrolling.
-
-
----
-
-
-#### `scrollSpeed` option
-The speed at which the window should scroll once the mouse pointer gets within the `scrollSensitivity` distance.
-
-
----
-
-
-#### `bubbleScroll` option
-If set to `true`, the normal `autoscroll` function will also be applied to all parent elements of the element the user is dragging over.
-
-Demo: https://jsbin.com/kesewor/edit?html,js,output
 
 
 ---
