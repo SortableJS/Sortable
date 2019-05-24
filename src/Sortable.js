@@ -510,6 +510,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 					toEl: el,
 					fromEl: el
 				});
+				pluginEvent('filter', _this, { evt });
 				preventOnFilter && evt.cancelable && evt.preventDefault();
 				return; // cancel dnd
 			}
@@ -527,6 +528,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 						fromEl: el,
 						toEl: el
 					});
+					pluginEvent('filter', _this, { evt });
 					return true;
 				}
 			});
