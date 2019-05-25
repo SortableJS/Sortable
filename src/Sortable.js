@@ -73,7 +73,6 @@ import AnimationStateManager from './Animation.js';
 import {
 	on,
 	off,
-	matches,
 	closest,
 	toggleClass,
 	css,
@@ -88,7 +87,6 @@ import {
 	getRelativeScrollOffset,
 	extend,
 	throttle,
-	cancelThrottle,
 	scrollBy,
 	clone,
 	expando
@@ -121,10 +119,6 @@ let dragEl,
 	ignoreNextClick = false,
 	sortables = [],
 
-	pointerElemChangedInterval,
-	lastPointerElemX,
-	lastPointerElemY,
-
 	tapEvt,
 	touchEvt,
 
@@ -145,13 +139,7 @@ let dragEl,
 	savedInputChecked = [];
 
 	/** @const */
-	const R_SPACE = /\s+/g,
-
-
-	$ = window.jQuery || window.Zepto,
-	Polymer = window.Polymer,
-
-	PositionGhostAbsolutely = IOS,
+	const PositionGhostAbsolutely = IOS,
 
 	CSSFloatProperty = Edge || IE11OrLess ? 'cssFloat' : 'float',
 
@@ -897,6 +885,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			this._hideClone();
 
 			toggleClass(cloneEl, this.options.chosenClass, false);
+			Sortable.clone = cloneEl;
 		}
 
 
@@ -1015,11 +1004,9 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 					activeSortable._showClone(_this);
 				}
 
-				if (activeSortable) {
-					// Set ghost class to new sortable's ghost class
-					toggleClass(dragEl, putSortable ? putSortable.options.ghostClass : activeSortable.options.ghostClass, false);
-					toggleClass(dragEl, options.ghostClass, true);
-				}
+				// Set ghost class to new sortable's ghost class
+				toggleClass(dragEl, putSortable ? putSortable.options.ghostClass : activeSortable.options.ghostClass, false);
+				toggleClass(dragEl, options.ghostClass, true);
 
 				if (putSortable !== _this && _this !== Sortable.active) {
 					putSortable = _this;
@@ -1082,15 +1069,13 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 
 		if (
 			dragEl.contains(evt.target) ||
-			(target.animated && target.animatingX && target.animatingY) ||
+			target.animated && target.animatingX && target.animatingY ||
 			_this._ignoreWhileAnimating === target
 		) {
 			return completed(false);
 		}
 
-		if (target !== dragEl) {
-			ignoreNextClick = false;
-		}
+		ignoreNextClick = false;
 
 		if (activeSortable && !options.disabled &&
 			(isOwner
@@ -1153,7 +1138,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 					return completed(true);
 				}
 			}
-			else if (target && target !== dragEl && target.parentNode === el) {
+			else if (target.parentNode === el) {
 				let direction = 0,
 					targetBeforeFirstSwap,
 					differentLevel = dragEl.parentNode !== el,
@@ -1475,6 +1460,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		activeGroup =
 		Sortable.dragged =
 		Sortable.ghost =
+		Sortable.clone =
 		Sortable.active = null;
 
 		savedInputChecked.forEach(function (el) {
@@ -1740,7 +1726,6 @@ function _getSwapDirection(evt, target, axis, swapThreshold, invertedSwapThresho
 		targetLength = axis === 'vertical' ? targetRect.height : targetRect.width,
 		targetS1 = axis === 'vertical' ? targetRect.top : targetRect.left,
 		targetS2 = axis === 'vertical' ? targetRect.bottom : targetRect.right,
-		dragRect = getRect(dragEl),
 		invert = false;
 
 
@@ -1764,8 +1749,6 @@ function _getSwapDirection(evt, target, axis, swapThreshold, invertedSwapThresho
 			}
 
 			if (!pastFirstInvertThresh) {
-				let dragS1 = axis === 'vertical' ? dragRect.top : dragRect.left,
-					dragS2 = axis === 'vertical' ? dragRect.bottom : dragRect.right;
 				// dragEl shadow (target move distance shadow)
 				if (
 					lastDirection === 1 ?

@@ -237,7 +237,7 @@ const autoScroll = throttle(function(evt, options, rootEl, isFallback) {
 
 			clearInterval(autoScrolls[layersOut].pid);
 
-			if (el && (vx != 0 || vy != 0)) {
+			if (vx != 0 || vy != 0) {
 				scrollThisInstance = true;
 				/* jshint loopfunc:true */
 				autoScrolls[layersOut].pid = setInterval((function () {

@@ -1,4 +1,5 @@
-# Sortable
+# Sortable &nbsp; [![DeepScan grade](https://deepscan.io/api/teams/3901/projects/5666/branches/43978/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=3901&pid=5666&bid=43978) [![](https://data.jsdelivr.com/v1/package/npm/sortablejs/badge)](https://www.jsdelivr.com/package/npm/sortablejs) [![npm](https://img.shields.io/npm/v/sortablejs.svg)](https://www.npmjs.com/package/sortablejs)
+
 ### This branch is still under construction and may contain bugs. If you find any, please open an issue.
 Sortable is a JavaScript library for reorderable drag-and-drop lists.
 
@@ -680,6 +681,13 @@ The element being dragged.
 
 ##### Sortable.ghost:`HTMLElement`
 The ghost element.
+
+
+---
+
+
+##### Sortable.clone:`HTMLElement`
+The clone element.
 
 
 ---

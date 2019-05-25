@@ -284,8 +284,7 @@ function MultiDragPlugin() {
 
 			if (!evt) return;
 
-			let el = sortable.el,
-				options = sortable.options,
+			let options = sortable.options,
 				children = parentEl.children;
 
 			// Multi-drag selection

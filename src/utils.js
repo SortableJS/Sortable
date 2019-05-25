@@ -68,6 +68,7 @@ function closest(/**HTMLElement*/el, /**String*/selector, /**HTMLElement*/ctx, i
 	return null;
 }
 
+const R_SPACE = /\s+/g;
 
 function toggleClass(el, name, state) {
 	if (el && name) {
@@ -348,7 +349,7 @@ function index(el, selector) {
 	}
 
 	while (el && (el = el.previousElementSibling)) {
-		if ((el.nodeName.toUpperCase() !== 'TEMPLATE') /*&& el !== cloneEl*/ && (!selector || matches(el, selector))) {
+		if ((el.nodeName.toUpperCase() !== 'TEMPLATE') && el !== Sortable.clone && (!selector || matches(el, selector))) {
 			index++;
 		}
 	}
@@ -411,7 +412,7 @@ function getParentAutoScrollElement(el, includeSelf) {
 				elem.clientWidth < elem.scrollWidth && (elemCSS.overflowX == 'auto' || elemCSS.overflowX == 'scroll') ||
 				elem.clientHeight < elem.scrollHeight && (elemCSS.overflowY == 'auto' || elemCSS.overflowY == 'scroll')
 			) {
-				if (!elem || !elem.getBoundingClientRect || elem === document.body) return getWindowScrollingElement();
+				if (!elem.getBoundingClientRect || elem === document.body) return getWindowScrollingElement();
 
 				if (gotSelf || includeSelf) return elem;
 				gotSelf = true;
