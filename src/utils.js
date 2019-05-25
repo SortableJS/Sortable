@@ -348,7 +348,8 @@ function index(el, selector) {
 		return -1;
 	}
 
-	while (el && (el = el.previousElementSibling)) {
+	/* jshint boss:true */
+	while (el = el.previousElementSibling) {
 		if ((el.nodeName.toUpperCase() !== 'TEMPLATE') && el !== Sortable.clone && (!selector || matches(el, selector))) {
 			index++;
 		}

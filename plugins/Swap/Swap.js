@@ -1,6 +1,5 @@
 import {
 	toggleClass,
-	getRect,
 	index
 } from '../../src/utils.js';
 
