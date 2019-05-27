@@ -35,7 +35,7 @@ new Sortable(el, {
 
 #### `multiDragKey` option
 The key that must be down for multiple items to be selected. The default is `null`, meaning no key must be down.
-For special keys, such as the `CTRL` key, simply specify the option as `'CTRL'` (casing does not matter).
+For special keys, such as the <kbd>CTRL</kbd> key, simply specify the option as `'CTRL'` (casing does not matter).
 
 
 ---
