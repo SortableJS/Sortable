@@ -15,6 +15,7 @@ Demo: https://jsbin.com/wopavom/edit?js,output
 new Sortable(el, {
 	multiDrag: false, // Enable the plugin
 	selectedClass: "sortable-selected", // Class name for selected item
+	multiDragKey: null, // Key that must be down for items to be selected
 
 	// Called when an item is selected
 	onSelect: function(/**Event*/evt) {
@@ -27,6 +28,14 @@ new Sortable(el, {
 	}
 });
 ```
+
+
+---
+
+
+#### `multiDragKey` option
+The key that must be down for multiple items to be selected. The default is `null`, meaning no key must be down.
+For special keys, such as the `CTRL` key, simply specify the option as `'CTRL'` (casing does not matter).
 
 
 ---

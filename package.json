@@ -16,7 +16,6 @@
 	"main": "./Sortable.js",
 	"module": "modular/sortable.esm.js",
 	"scripts": {
-		"http-server": "http-server -s ./",
 		"build:umd": "set NODE_ENV=umd&& rollup -c build/umd-build.js",
 		"build:umd:watch": "set NODE_ENV=umd&& rollup -w -c build/umd-build.js",
 		"build:es": "set NODE_ENV=es&& rollup -c build/esm-build.js",
@@ -46,12 +45,5 @@
 		"vue",
 		"mixin"
 	],
-	"license": "MIT",
-	"spm": {
-		"main": "Sortable.js",
-		"ignore": [
-			"meteor",
-			"st"
-		]
-	}
+	"license": "MIT"
 }

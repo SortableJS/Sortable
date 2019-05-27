@@ -15,14 +15,40 @@ The constructor function passed to `Sortable.mount` may contain several static p
 `pluginName: String` (Required)
 The name of the option that the user will use in their sortable's options to enable the plugin. Should start with a lower case and be camel-cased. For example: `'multiDrag'`. This is also the property name that the plugin's instance will be under in a sortable instance (ex. `sortableInstance.multiDrag`).
 
-`utils: Object` — Object containing functions that will be added to the `Sortable.utils` default object on the Sortable class.
+`utils: Object`
+Object containing functions that will be added to the `Sortable.utils` default object on the Sortable class.
 
-`eventOptions(eventName: String, sortable: Sortable): Function` — A function that is called whenever Sortable fires an event. This function should return an object to be combined with the event object that Sortable will emit.
+`eventOptions(eventName: String, sortable: Sortable): Function`
+A function that is called whenever Sortable fires an event. This function should return an object to be combined with the event object that Sortable will emit.
 
 `initializeByDefault: Boolean`
 Determines whether or not the plugin will always be initialized on every new Sortable instance. If this option is enabled, it does not mean that by default the plugin will be enabled on the Sortable - this must still be done in the options via the plugin's `pluginName`, or it can be enabled by default if your plugin specifies it's pluginName as a default option that is truthy. Since the plugin will already be initialized on every Sortable instance, it can also be enabled dynamically via `sortableInstance.option('pluginName', true)`.
 It is a good idea to have this option set to `false` if the plugin modifies the behaviour of Sortable in such a way that enabling or disabling the plugin dynamically could cause it to break. Likewise, this option should be disabled if the plugin should only be instantiated on Sortables in which that plugin is enabled.
 This option defaults to `true`.
+
+`optionListeners: Object`
+An object that may contain event listeners that are fired when a specific option is updated.
+These listeners are useful because the user's provided options are not necessarily unchanging once the plugin is initialized, and could be changed dynamically via the `option()` method.
+The listener will be fired in the context of the instance of the plugin that it is being changed in (ie. the `this` keyword will be the instance of your plugin).
+The name of the method should match the name of the option it listens for. The new value of the option will be passed in as an argument, and any returned value will be what the option is stored as. If no value is returned, the option will be stored as the value the user provided.
+
+Example:
+
+```js
+Plugin.name = 'generateTitle';
+Plugin.optionModifiers = {
+	// Listen for option 'generateTitle'
+	generateTitle: function(title) {
+		// Store the option in all caps
+		return title.toUpperCase();
+
+		// OR save it to this instance of your plugin as a private field.
+		// This way it can be accessed in events, but will not modify the user's options.
+		this.titleAllCaps = title.toUpperCase();
+	}
+};
+
+``` 
 
 ## Plugin Options
 Plugins may have custom options or override the defaults of certain options. In order to do this, there must be an `options` object on the initialized plugin. This can be set in the plugin's prototype, or during the initialization of the plugin (when the `el` is available). For example:
@@ -63,6 +89,7 @@ The following table contains details on the events that a plugin may handle in t
 | dragOverAnimationComplete | Fired after the animation is completed after a dragOver insertion                                                | No          | -                                                  | DragOver   | None                                                                    |
 | drop                      | Fired on drop                                                                                                    | Yes         | Cancels normal drop behavior                       | Normal     | None                                                                    |
 | nulling                   | Fired when the plugin should preform cleanups, once all drop events have fired                                   | No          | -                                                  | Normal     | None                                                                    |
+| destroy                   | Fired when Sortable is destroyed                                                                                 | No          | -                                                  | Normal     | None                                                                    |
 
 ### Global Events
 Normally, an event will only be fired in a plugin if the plugin is enabled on the Sortable from which the event is being fired. However, it sometimes may be desirable for a plugin to listen in on an event from Sortables in which it is not enabled on. This is possible with global events. For an event to be global, simply add the suffix 'Global' to the event's name (casing matters) (eg. `dragStartGlobal`).

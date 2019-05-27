@@ -15,10 +15,7 @@ module.exports = function(api) {
 	} else if (process.env.NODE_ENV === 'umd') {
 		presets = [
 			[
-				"@babel/preset-env",
-				{
-					"modules": false
-				}
+				"@babel/preset-env"
 			]
 		];
 	}

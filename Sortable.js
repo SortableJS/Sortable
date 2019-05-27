@@ -174,15 +174,24 @@
         }
       }
     },
-    initializePlugins: function initializePlugins(sortable, el) {
-      var initializedPlugins = {};
-
+    initializePlugins: function initializePlugins(sortable, el, defaults) {
       for (var i in plugins) {
-        if (!sortable.options[plugins[i].pluginName] && !plugins[i].initializeByDefault) continue;
-        initializedPlugins[plugins[i].pluginName] = new plugins[i](sortable, el);
+        var pluginName = plugins[i].pluginName;
+        if (!sortable.options[pluginName] && !plugins[i].initializeByDefault) continue;
+        var initialized = new plugins[i](sortable, el);
+        initialized.sortable = sortable;
+        sortable[pluginName] = initialized; // Add default options from plugin
+
+        _extends(defaults, initialized.options);
       }
 
-      return initializedPlugins;
+      for (var option in sortable.options) {
+        var modified = this.modifyOption(sortable, option, sortable.options[option]);
+
+        if (typeof modified !== 'undefined') {
+          sortable.options[option] = modified;
+        }
+      }
     },
     getEventOptions: function getEventOptions(name, sortable) {
       var eventOptions = {};
@@ -193,6 +202,20 @@
       }
 
       return eventOptions;
+    },
+    modifyOption: function modifyOption(sortable, name, value) {
+      var modifiedValue;
+
+      for (var i in plugins) {
+        // Plugin must exist on the Sortable
+        if (!sortable[plugins[i].pluginName]) continue; // If static option listener exists for this option, call in the context of the Sortable's instance of this plugin
+
+        if (plugins[i].optionListeners && typeof plugins[i].optionListeners[name] === 'function') {
+          modifiedValue = plugins[i].optionListeners[name].call(sortable[plugins[i].pluginName], value);
+        }
+      }
+
+      return modifiedValue;
     }
   };
 
@@ -280,6 +303,8 @@
 
     return null;
   }
+
+  var R_SPACE = /\s+/g;
 
   function toggleClass(el, name, state) {
     if (el && name) {
@@ -532,11 +557,11 @@
     if (!el || !el.parentNode) {
       return -1;
     }
+    /* jshint boss:true */
 
-    while (el && (el = el.previousElementSibling)) {
-      if (el.nodeName.toUpperCase() !== 'TEMPLATE' && (
-      /*&& el !== cloneEl*/
-      !selector || matches(el, selector))) {
+
+    while (el = el.previousElementSibling) {
+      if (el.nodeName.toUpperCase() !== 'TEMPLATE' && el !== Sortable$1.clone && (!selector || matches(el, selector))) {
         index++;
       }
     }
@@ -598,7 +623,7 @@
         var elemCSS = css(elem);
 
         if (elem.clientWidth < elem.scrollWidth && (elemCSS.overflowX == 'auto' || elemCSS.overflowX == 'scroll') || elem.clientHeight < elem.scrollHeight && (elemCSS.overflowY == 'auto' || elemCSS.overflowY == 'scroll')) {
-          if (!elem || !elem.getBoundingClientRect || elem === document.body) return getWindowScrollingElement();
+          if (!elem.getBoundingClientRect || elem === document.body) return getWindowScrollingElement();
           if (gotSelf || includeSelf) return elem;
           gotSelf = true;
         }
@@ -984,9 +1009,7 @@
       savedInputChecked = [];
   /** @const */
 
-  var $ = window.jQuery || window.Zepto,
-      Polymer = window.Polymer,
-      PositionGhostAbsolutely = IOS,
+  var PositionGhostAbsolutely = IOS,
       CSSFloatProperty = Edge || IE11OrLess ? 'cssFloat' : 'float',
       // This will not pass for IE9, because IE9 DnD only works on anchors
   supportDraggable = 'draggable' in document.createElement('div'),
@@ -1194,22 +1217,11 @@
       supportPointer: Sortable$1.supportPointer !== false && 'PointerEvent' in window,
       emptyInsertThreshold: 5
     };
-    var initializedPlugins = PluginManager.initializePlugins(this, el);
-
-    for (var pluginName in initializedPlugins) {
-      initializedPlugins[pluginName].sortable = this;
-      this[pluginName] = initializedPlugins[pluginName]; // Add default options from plugin
-
-      _extends(defaults, initializedPlugins[pluginName].options);
-    } // Set default options
-
+    PluginManager.initializePlugins(this, el, defaults); // Set default options
 
     for (var name in defaults) {
       !(name in options) && (options[name] = defaults[name]);
-    } // Add plugins
-
-
-    _extends(this, initializedPlugins);
+    }
 
     _prepareGroup(options); // Bind all private methods
 
@@ -1697,6 +1709,7 @@
         this._hideClone();
 
         toggleClass(cloneEl, this.options.chosenClass, false);
+        Sortable$1.clone = cloneEl;
       } // #1143: IFrame support workaround
 
 
@@ -1809,13 +1822,11 @@
             activeSortable._hideClone();
           } else {
             activeSortable._showClone(_this);
-          }
+          } // Set ghost class to new sortable's ghost class
 
-          if (activeSortable) {
-            // Set ghost class to new sortable's ghost class
-            toggleClass(dragEl, putSortable ? putSortable.options.ghostClass : activeSortable.options.ghostClass, false);
-            toggleClass(dragEl, options.ghostClass, true);
-          }
+
+          toggleClass(dragEl, putSortable ? putSortable.options.ghostClass : activeSortable.options.ghostClass, false);
+          toggleClass(dragEl, options.ghostClass, true);
 
           if (putSortable !== _this && _this !== Sortable$1.active) {
             putSortable = _this;
@@ -1877,9 +1888,7 @@
         return completed(false);
       }
 
-      if (target !== dragEl) {
-        ignoreNextClick = false;
-      }
+      ignoreNextClick = false;
 
       if (activeSortable && !options.disabled && (isOwner ? canSort || (revert = !rootEl.contains(dragEl)) // Reverting item into the original list
       : putSortable === this || (this.lastPutMode = activeGroup.checkPull(this, activeSortable, dragEl, evt)) && group.checkPut(this, activeSortable, dragEl, evt))) {
@@ -1928,7 +1937,7 @@
             changed();
             return completed(true);
           }
-        } else if (target && target !== dragEl && target.parentNode === el) {
+        } else if (target.parentNode === el) {
           var direction = 0,
               targetBeforeFirstSwap,
               differentLevel = dragEl.parentNode !== el,
@@ -2205,7 +2214,7 @@
     },
     _nulling: function _nulling() {
       pluginEvent('nulling', this);
-      rootEl = dragEl = parentEl = ghostEl = nextEl = cloneEl = lastDownEl = cloneHidden = tapEvt = touchEvt = moved = newIndex = oldIndex = lastTarget = lastDirection = putSortable = activeGroup = Sortable$1.dragged = Sortable$1.ghost = Sortable$1.active = null;
+      rootEl = dragEl = parentEl = ghostEl = nextEl = cloneEl = lastDownEl = cloneHidden = tapEvt = touchEvt = moved = newIndex = oldIndex = lastTarget = lastDirection = putSortable = activeGroup = Sortable$1.dragged = Sortable$1.ghost = Sortable$1.clone = Sortable$1.active = null;
       savedInputChecked.forEach(function (el) {
         el.checked = true;
       });
@@ -2312,7 +2321,13 @@
       if (value === void 0) {
         return options[name];
       } else {
-        options[name] = value;
+        var modifiedValue = PluginManager.modifyOption(this, name, value);
+
+        if (typeof modifiedValue !== 'undefined') {
+          options[name] = modifiedValue;
+        } else {
+          options[name] = value;
+        }
 
         if (name === 'group') {
           _prepareGroup(options);
@@ -2456,7 +2471,6 @@
         targetLength = axis === 'vertical' ? targetRect.height : targetRect.width,
         targetS1 = axis === 'vertical' ? targetRect.top : targetRect.left,
         targetS2 = axis === 'vertical' ? targetRect.bottom : targetRect.right,
-        dragRect = getRect(dragEl),
         invert = false;
 
     if (!invertSwap) {
@@ -2470,9 +2484,7 @@
         }
 
         if (!pastFirstInvertThresh) {
-          var dragS1 = axis === 'vertical' ? dragRect.top : dragRect.left,
-              dragS2 = axis === 'vertical' ? dragRect.bottom : dragRect.right; // dragEl shadow (target move distance shadow)
-
+          // dragEl shadow (target move distance shadow)
           if (lastDirection === 1 ? mouseOnAxis < targetS1 + targetMoveDistance // over dragEl shadow
           : mouseOnAxis > targetS2 - targetMoveDistance) {
             return lastDirection * -1;
@@ -2584,7 +2596,7 @@
   };
   /**
    * Mount a plugin to Sortable
-   * @param  {...SortablePlugin|...SortablePlugin[]} plugins       Plugins being mounted
+   * @param  {...SortablePlugin|SortablePlugin[]} plugins       Plugins being mounted
    */
 
   Sortable$1.mount = function () {
@@ -2813,7 +2825,7 @@
         autoScrolls[layersOut].vy = vy;
         clearInterval(autoScrolls[layersOut].pid);
 
-        if (el && (vx != 0 || vy != 0)) {
+        if (vx != 0 || vy != 0) {
           scrollThisInstance = true;
           /* jshint loopfunc:true */
 
@@ -3023,8 +3035,11 @@
         on(document, 'touchend', this._deselectMultiDrag);
       }
 
+      on(document, 'keydown', this._checkKeyDown);
+      on(document, 'keyup', this._checkKeyUp);
       this.options = {
         selectedClass: 'sortable-selected',
+        multiDragKey: null,
         setData: function setData(dataTransfer, dragEl) {
           var data = '';
 
@@ -3042,6 +3057,7 @@
     }
 
     MultiDrag.prototype = {
+      multiDragKeyDown: false,
       delayStartGlobal: function delayStartGlobal(_ref) {
         var dragged = _ref.dragEl;
         dragEl$1 = dragged;
@@ -3290,11 +3306,14 @@
             putSortable = _ref12.putSortable;
         var toSortable = putSortable || this.sortable;
         if (!evt) return;
-        var el = sortable.el,
-            options = sortable.options,
+        var options = sortable.options,
             children = parentEl.children; // Multi-drag selection
 
-        if (!dragStarted && options.multiDrag) {
+        if (!dragStarted) {
+          if (options.multiDragKey && !this.multiDragKeyDown) {
+            this._deselectMultiDrag();
+          }
+
           toggleClass(dragEl$1, options.selectedClass, !~multiDragElements.indexOf(dragEl$1));
 
           if (!~multiDragElements.indexOf(dragEl$1)) {
@@ -3311,7 +3330,7 @@
               }
             }); // Modifier activated, select from last to dragEl
 
-            if (evt.shiftKey && lastMultiDragSelect && sortable.el.contains(lastMultiDragSelect)) {
+            if ((options.multiDragKey ? this.multiDragKeyDown : true) && evt.shiftKey && lastMultiDragSelect && sortable.el.contains(lastMultiDragSelect)) {
               var lastIndex = index(lastMultiDragSelect),
                   currentIndex = index(dragEl$1);
 
@@ -3368,7 +3387,7 @@
         } // Multi-drag drop
 
 
-        if (dragStarted && options.multiDrag && multiDragElements.length) {
+        if (dragStarted && multiDragElements.length) {
           // Do not "unfold" after around dragEl if reverted
           if ((parentEl[expando].options.sort || parentEl !== rootEl) && multiDragElements.length > 1) {
             var dragRect = getRect(dragEl$1),
@@ -3436,6 +3455,12 @@
       },
       destroy: function destroy() {
         this._deselectMultiDrag();
+
+        off(document, 'pointerup', this._deselectMultiDrag);
+        off(document, 'mouseup', this._deselectMultiDrag);
+        off(document, 'touchend', this._deselectMultiDrag);
+        off(document, 'keydown', this._checkKeyDown);
+        off(document, 'keyup', this._checkKeyUp);
       },
       _deselectMultiDrag: function _deselectMultiDrag(evt) {
         if (dragStarted) return; // Only deselect if selection is in this sortable
@@ -3462,6 +3487,16 @@
         }
 
         multiDragElements = [];
+      },
+      _checkKeyDown: function _checkKeyDown(evt) {
+        if (evt.key === this.sortable.options.multiDragKey) {
+          this.multiDragKeyDown = true;
+        }
+      },
+      _checkKeyUp: function _checkKeyUp(evt) {
+        if (evt.key === this.sortable.options.multiDragKey) {
+          this.multiDragKeyDown = false;
+        }
       }
     };
     return _extends(MultiDrag, {
@@ -3503,6 +3538,19 @@
           items: _toConsumableArray(multiDragElements),
           clones: [].concat(multiDragClones)
         };
+      },
+      optionListeners: {
+        multiDragKey: function multiDragKey(key) {
+          key = key.toLowerCase();
+
+          if (key === 'ctrl') {
+            key = 'Control';
+          } else if (key.length > 1) {
+            key = key.charAt(0).toUpperCase() + key.substr(1);
+          }
+
+          return key;
+        }
       }
     });
   }

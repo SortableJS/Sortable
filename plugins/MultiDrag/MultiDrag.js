@@ -4,6 +4,7 @@ import {
 	index,
 	closest,
 	on,
+	off,
 	clone,
 	css,
 	setRect,
@@ -41,8 +42,12 @@ function MultiDragPlugin() {
 			on(document, 'touchend', this._deselectMultiDrag);
 		}
 
+		on(document, 'keydown', this._checkKeyDown);
+		on(document, 'keyup', this._checkKeyUp);
+
 		this.options = {
 			selectedClass: 'sortable-selected',
+			multiDragKey: null,
 			setData(dataTransfer, dragEl) {
 				let data = '';
 				if (multiDragElements.length && multiDragSortable === sortable) {
@@ -58,6 +63,8 @@ function MultiDragPlugin() {
 	}
 
 	MultiDrag.prototype = {
+		multiDragKeyDown: false,
+
 		delayStartGlobal({ dragEl: dragged }) {
 			dragEl = dragged;
 		},
@@ -288,7 +295,10 @@ function MultiDragPlugin() {
 				children = parentEl.children;
 
 			// Multi-drag selection
-			if (!dragStarted && options.multiDrag) {
+			if (!dragStarted) {
+				if (options.multiDragKey && !this.multiDragKeyDown) {
+					this._deselectMultiDrag();
+				}
 				toggleClass(dragEl, options.selectedClass, !~multiDragElements.indexOf(dragEl));
 
 				if (!~multiDragElements.indexOf(dragEl)) {
@@ -306,7 +316,7 @@ function MultiDragPlugin() {
 					});
 
 					// Modifier activated, select from last to dragEl
-					if (evt.shiftKey && lastMultiDragSelect && sortable.el.contains(lastMultiDragSelect)) {
+					if ((options.multiDragKey ? this.multiDragKeyDown : true) && evt.shiftKey && lastMultiDragSelect && sortable.el.contains(lastMultiDragSelect)) {
 						let lastIndex = index(lastMultiDragSelect),
 							currentIndex = index(dragEl);
 
@@ -363,7 +373,7 @@ function MultiDragPlugin() {
 			}
 
 			// Multi-drag drop
-			if (dragStarted && options.multiDrag && multiDragElements.length) {
+			if (dragStarted && multiDragElements.length) {
 				// Do not "unfold" after around dragEl if reverted
 				if ((parentEl[expando].options.sort || parentEl !== rootEl) && multiDragElements.length > 1) {
 					let dragRect = getRect(dragEl),
@@ -433,6 +443,12 @@ function MultiDragPlugin() {
 
 		destroy() {
 			this._deselectMultiDrag();
+			off(document, 'pointerup', this._deselectMultiDrag);
+			off(document, 'mouseup', this._deselectMultiDrag);
+			off(document, 'touchend', this._deselectMultiDrag);
+
+			off(document, 'keydown', this._checkKeyDown);
+			off(document, 'keyup', this._checkKeyUp);
 		},
 
 		_deselectMultiDrag(evt) {
@@ -462,6 +478,18 @@ function MultiDragPlugin() {
 				});
 			}
 			multiDragElements = [];
+		},
+
+		_checkKeyDown(evt) {
+			if (evt.key === this.sortable.options.multiDragKey) {
+				this.multiDragKeyDown = true;
+			}
+		},
+
+		_checkKeyUp(evt) {
+			if (evt.key === this.sortable.options.multiDragKey) {
+				this.multiDragKeyDown = false;
+			}
 		}
 	};
 
@@ -500,6 +528,17 @@ function MultiDragPlugin() {
 				items: [...multiDragElements],
 				clones: [...multiDragClones]
 			};
+		},
+		optionListeners: {
+			multiDragKey(key) {
+				key = key.toLowerCase();
+				if (key === 'ctrl') {
+					key = 'Control';
+				} else if (key.length > 1) {
+					key = key.charAt(0).toUpperCase() + key.substr(1);
+				}
+				return key;
+			}
 		}
 	});
 }

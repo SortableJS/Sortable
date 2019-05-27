@@ -39,13 +39,25 @@ export default {
 			}
 		}
 	},
-	initializePlugins(sortable, el) {
-		let initializedPlugins = {};
+	initializePlugins(sortable, el, defaults) {
 		for (let i in plugins) {
-			if (!sortable.options[plugins[i].pluginName] && !plugins[i].initializeByDefault) continue;
-			initializedPlugins[plugins[i].pluginName] = new plugins[i](sortable, el);
+			const pluginName = plugins[i].pluginName;
+			if (!sortable.options[pluginName] && !plugins[i].initializeByDefault) continue;
+
+			let initialized = new plugins[i](sortable, el);
+			initialized.sortable = sortable;
+			sortable[pluginName] = initialized;
+
+			// Add default options from plugin
+			Object.assign(defaults, initialized.options);
 		}
-		return initializedPlugins;
+
+		for (let option in sortable.options) {
+			let modified = this.modifyOption(sortable, option, sortable.options[option]);
+			if (typeof(modified) !== 'undefined') {
+				sortable.options[option] = modified;
+			}
+		}
 	},
 	getEventOptions(name, sortable) {
 		let eventOptions = {};
@@ -57,5 +69,18 @@ export default {
 			};
 		}
 		return eventOptions;
+	},
+	modifyOption(sortable, name, value) {
+		let modifiedValue;
+		for (let i in plugins) {
+			// Plugin must exist on the Sortable
+			if (!sortable[plugins[i].pluginName]) continue;
+
+			// If static option listener exists for this option, call in the context of the Sortable's instance of this plugin
+			if (plugins[i].optionListeners && typeof(plugins[i].optionListeners[name]) === 'function') {
+				modifiedValue = plugins[i].optionListeners[name].call(sortable[plugins[i].pluginName], value);
+			}
+		}
+		return modifiedValue;
 	}
 };

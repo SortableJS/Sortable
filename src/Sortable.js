@@ -373,22 +373,12 @@ function Sortable(el, options) {
 		emptyInsertThreshold: 5
 	};
 
-	let initializedPlugins = PluginManager.initializePlugins(this, el);
-	for (let pluginName in initializedPlugins) {
-		initializedPlugins[pluginName].sortable = this;
-		this[pluginName] = initializedPlugins[pluginName];
-
-		// Add default options from plugin
-		Object.assign(defaults, initializedPlugins[pluginName].options);
-	}
+	PluginManager.initializePlugins(this, el, defaults);
 
 	// Set default options
 	for (let name in defaults) {
 		!(name in options) && (options[name] = defaults[name]);
 	}
-
-	// Add plugins
-	Object.assign(this, initializedPlugins);
 
 	_prepareGroup(options);
 
@@ -1571,7 +1561,12 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		if (value === void 0) {
 			return options[name];
 		} else {
-			options[name] = value;
+			let modifiedValue = PluginManager.modifyOption(this, name, value);
+			if (typeof(modifiedValue) !== 'undefined') {
+				options[name] = modifiedValue;
+			} else {
+				options[name] = value;
+			}
 
 			if (name === 'group') {
 				_prepareGroup(options);
@@ -1880,7 +1875,7 @@ Sortable.utils = {
 
 /**
  * Mount a plugin to Sortable
- * @param  {...SortablePlugin|...SortablePlugin[]} plugins       Plugins being mounted
+ * @param  {...SortablePlugin|SortablePlugin[]} plugins       Plugins being mounted
  */
 Sortable.mount = function(...plugins) {
 		if (plugins[0].constructor === Array) plugins = plugins[0];
