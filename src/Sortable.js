@@ -1081,8 +1081,6 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 				)
 			)
 		) {
-
-
 			axis = this._getDirection(evt, target);
 
 			dragRect = getRect(dragEl);
@@ -1112,6 +1110,11 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			let elLastChild = lastChild(el);
 
 			if (!elLastChild || _ghostIsLast(evt, axis, el) && !elLastChild.animated) {
+				// If already at end of list: Do not insert
+				if (elLastChild === dragEl) {
+					return completed(false);
+				}
+
 				// assign target only if condition is true
 				if (elLastChild && el === evt.target) {
 					target = elLastChild;
