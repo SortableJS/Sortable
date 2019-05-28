@@ -994,9 +994,11 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 					activeSortable._showClone(_this);
 				}
 
-				// Set ghost class to new sortable's ghost class
-				toggleClass(dragEl, putSortable ? putSortable.options.ghostClass : activeSortable.options.ghostClass, false);
-				toggleClass(dragEl, options.ghostClass, true);
+				if (_this !== fromSortable) {
+					// Set ghost class to new sortable's ghost class
+					toggleClass(dragEl, putSortable ? putSortable.options.ghostClass : activeSortable.options.ghostClass, false);
+					toggleClass(dragEl, options.ghostClass, true);
+				}
 
 				if (putSortable !== _this && _this !== Sortable.active) {
 					putSortable = _this;
