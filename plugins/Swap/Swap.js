@@ -17,7 +17,8 @@ function SwapPlugin() {
 		dragStart({ dragEl }) {
 			lastSwapEl = dragEl;
 		},
-		dragOverValid({ completed, target, onMove, changed }) {
+		dragOverValid({ completed, target, onMove, activeSortable, changed }) {
+			if (!activeSortable.options.swap) return;
 			let el = this.sortable.el,
 				options = this.sortable.options;
 			if (target && target !== el) {
@@ -37,16 +38,18 @@ function SwapPlugin() {
 
 			return completed(true);
 		},
-		drop({ putSortable, dragEl }) {
+		drop({ activeSortable, putSortable, dragEl }) {
 			let toSortable = (putSortable || this.sortable);
 			let options = this.sortable.options;
 			lastSwapEl && toggleClass(lastSwapEl, options.swapClass, false);
 			if (lastSwapEl && (options.swap || putSortable && putSortable.options.swap)) {
 				if (dragEl !== lastSwapEl) {
 					toSortable.captureAnimationState();
+					if (toSortable !== activeSortable) activeSortable.captureAnimationState();
 					swapNodes(dragEl, lastSwapEl);
 
 					toSortable.animateAll();
+					if (toSortable !== activeSortable) activeSortable.animateAll();
 				}
 			}
 		},

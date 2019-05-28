@@ -2937,7 +2937,9 @@
         var completed = _ref2.completed,
             target = _ref2.target,
             onMove = _ref2.onMove,
+            activeSortable = _ref2.activeSortable,
             changed = _ref2.changed;
+        if (!activeSortable.options.swap) return;
         var el = this.sortable.el,
             options = this.sortable.options;
 
@@ -2960,7 +2962,8 @@
         return completed(true);
       },
       drop: function drop(_ref3) {
-        var putSortable = _ref3.putSortable,
+        var activeSortable = _ref3.activeSortable,
+            putSortable = _ref3.putSortable,
             dragEl = _ref3.dragEl;
         var toSortable = putSortable || this.sortable;
         var options = this.sortable.options;
@@ -2969,8 +2972,10 @@
         if (lastSwapEl && (options.swap || putSortable && putSortable.options.swap)) {
           if (dragEl !== lastSwapEl) {
             toSortable.captureAnimationState();
+            if (toSortable !== activeSortable) activeSortable.captureAnimationState();
             swapNodes(dragEl, lastSwapEl);
             toSortable.animateAll();
+            if (toSortable !== activeSortable) activeSortable.animateAll();
           }
         }
       },
