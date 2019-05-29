@@ -25,6 +25,7 @@ Supported by [<img width="100px" src="https://user-images.githubusercontent.com/
    * [Knockout](https://github.com/SortableJS/knockout-sortablejs)
    * [Polymer](https://github.com/SortableJS/polymer-sortablejs)
    * [Vue](https://github.com/SortableJS/Vue.Draggable)
+   * [Ember](https://github.com/SortableJS/ember-sortablejs)
  * Supports any CSS library, e.g. [Bootstrap](#bs)
  * Simple API
  * [CDN](#cdn)
