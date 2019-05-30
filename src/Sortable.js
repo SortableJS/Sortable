@@ -1329,9 +1329,11 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 					originalEvt: evt
 				});
 
+				// Get the index of the dragged element within its parent
+				newIndex = index(dragEl);
+				newDraggableIndex = index(dragEl, options.draggable);
+
 				if (rootEl !== parentEl) {
-					newIndex = index(dragEl);
-					newDraggableIndex = index(dragEl, options.draggable);
 
 					if (newIndex >= 0) {
 						// Add event
@@ -1377,13 +1379,8 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 					}
 
 					putSortable && putSortable.save();
-				}
-				else {
-					if (dragEl.nextSibling !== nextEl) {
-						// Get the index of the dragged element within its parent
-						newIndex = index(dragEl);
-						newDraggableIndex = index(dragEl, options.draggable);
-
+				} else {
+					if (newIndex !== oldIndex) {
 						if (newIndex >= 0) {
 							// drag & drop within the same list
 							_dispatchEvent({
