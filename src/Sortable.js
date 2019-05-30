@@ -1110,9 +1110,9 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 				return completed(true);
 			}
 
-			let elLastChild = lastChild(el);
+			let elLastChild = lastChild(el, options.draggable);
 
-			if (!elLastChild || _ghostIsLast(evt, axis, el) && !elLastChild.animated) {
+			if (!elLastChild || _ghostIsLast(evt, axis, this) && !elLastChild.animated) {
 				// If already at end of list: Do not insert
 				if (elLastChild === dragEl) {
 					return completed(false);
@@ -1704,8 +1704,8 @@ function _unsilent() {
 }
 
 
-function _ghostIsLast(evt, axis, el) {
-	let elRect = getRect(lastChild(el)),
+function _ghostIsLast(evt, axis, sortable) {
+	let elRect = getRect(lastChild(sortable.el, sortable.options.draggable)),
 		mouseOnAxis = axis === 'vertical' ? evt.clientY : evt.clientX,
 		mouseOnOppAxis = axis === 'vertical' ? evt.clientX : evt.clientY,
 		targetS2 = axis === 'vertical' ? elRect.bottom : elRect.right,

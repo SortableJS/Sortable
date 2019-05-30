@@ -321,12 +321,20 @@ function getChild(el, childNum, options) {
 /**
  * Gets the last child in the el, ignoring ghostEl or invisible elements (clones)
  * @param  {HTMLElement} el       Parent element
+ * @param  {selector} selector    Any other elements that should be ignored
  * @return {HTMLElement}          The last child, ignoring ghostEl
  */
-function lastChild(el) {
+function lastChild(el, selector) {
 	let last = el.lastElementChild;
 
-	while (last && (last === Sortable.ghost || css(last, 'display') === 'none')) {
+	while (
+		last &&
+		(
+			last === Sortable.ghost ||
+			css(last, 'display') === 'none' ||
+			selector && !matches(last, selector)
+		)
+	) {
 		last = last.previousElementSibling;
 	}
 

@@ -524,14 +524,15 @@
   /**
    * Gets the last child in the el, ignoring ghostEl or invisible elements (clones)
    * @param  {HTMLElement} el       Parent element
+   * @param  {selector} selector    Any other elements that should be ignored
    * @return {HTMLElement}          The last child, ignoring ghostEl
    */
 
 
-  function lastChild(el) {
+  function lastChild(el, selector) {
     var last = el.lastElementChild;
 
-    while (last && (last === Sortable$1.ghost || css(last, 'display') === 'none')) {
+    while (last && (last === Sortable$1.ghost || css(last, 'display') === 'none' || selector && !matches(last, selector))) {
       last = last.previousElementSibling;
     }
 
@@ -1917,9 +1918,9 @@
           return completed(true);
         }
 
-        var elLastChild = lastChild(el);
+        var elLastChild = lastChild(el, options.draggable);
 
-        if (!elLastChild || _ghostIsLast(evt, axis, el) && !elLastChild.animated) {
+        if (!elLastChild || _ghostIsLast(evt, axis, this) && !elLastChild.animated) {
           // If already at end of list: Do not insert
           if (elLastChild === dragEl) {
             return completed(false);
@@ -2456,8 +2457,8 @@
     _silent = false;
   }
 
-  function _ghostIsLast(evt, axis, el) {
-    var elRect = getRect(lastChild(el)),
+  function _ghostIsLast(evt, axis, sortable) {
+    var elRect = getRect(lastChild(sortable.el, sortable.options.draggable)),
         mouseOnAxis = axis === 'vertical' ? evt.clientY : evt.clientX,
         mouseOnOppAxis = axis === 'vertical' ? evt.clientX : evt.clientY,
         targetS2 = axis === 'vertical' ? elRect.bottom : elRect.right,
