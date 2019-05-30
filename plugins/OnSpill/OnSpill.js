@@ -10,12 +10,12 @@ const drop = function({
 	hideGhostForTarget,
 	unhideGhostForTarget
 }) {
-	let fromSortable = putSortable || activeSortable;
+	let toSortable = putSortable || activeSortable;
 	hideGhostForTarget();
 	let target = document.elementFromPoint(originalEvent.clientX, originalEvent.clientY);
 	unhideGhostForTarget();
 
-	if (fromSortable && !fromSortable.el.contains(target)) {
+	if (toSortable && !toSortable.el.contains(target)) {
 		dispatchSortableEvent('spill');
 		this.onSpill(dragEl);
 	}

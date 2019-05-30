@@ -64,31 +64,37 @@ function MultiDragPlugin() {
 
 	MultiDrag.prototype = {
 		multiDragKeyDown: false,
+		isMultiDrag: false,
+
 
 		delayStartGlobal({ dragEl: dragged }) {
 			dragEl = dragged;
 		},
 
+		delayEnded() {
+			this.isMultiDrag = ~multiDragElements.indexOf(dragEl);
+		},
+
 		setupClone({ sortable }) {
-			if (multiDragElements.length && multiDragSortable === sortable) {
-				for (let i in multiDragElements) {
-					multiDragClones.push(clone(multiDragElements[i]));
+			if (!this.isMultiDrag) return;
+			for (let i in multiDragElements) {
+				multiDragClones.push(clone(multiDragElements[i]));
 
-					multiDragClones[i].sortableIndex = multiDragElements[i].sortableIndex;
+				multiDragClones[i].sortableIndex = multiDragElements[i].sortableIndex;
 
-					multiDragClones[i].draggable = false;
-					multiDragClones[i].style['will-change'] = '';
+				multiDragClones[i].draggable = false;
+				multiDragClones[i].style['will-change'] = '';
 
-					toggleClass(multiDragClones[i], sortable.options.selectedClass, false);
-					multiDragElements[i] === dragEl && toggleClass(multiDragClones[i], sortable.options.chosenClass, false);
-				}
-
-				sortable._hideClone();
-				return true;
+				toggleClass(multiDragClones[i], sortable.options.selectedClass, false);
+				multiDragElements[i] === dragEl && toggleClass(multiDragClones[i], sortable.options.chosenClass, false);
 			}
+
+			sortable._hideClone();
+			return true;
 		},
 
 		clone({ sortable, rootEl, dispatchSortableEvent }) {
+			if (!this.isMultiDrag) return;
 			if (!sortable.options.removeCloneOnHide) {
 				if (multiDragElements.length && multiDragSortable === sortable) {
 					insertMultiDragClones(true, rootEl);
@@ -99,7 +105,8 @@ function MultiDragPlugin() {
 			}
 		},
 
-		showClone({ cloneNowShown, rootEl}) {
+		showClone({ cloneNowShown, rootEl }) {
+			if (!this.isMultiDrag) return;
 			insertMultiDragClones(false, rootEl);
 			for (let i in multiDragClones) {
 				css(multiDragClones[i], 'display', '');
@@ -111,6 +118,7 @@ function MultiDragPlugin() {
 		},
 
 		hideClone({ sortable, cloneNowHidden }) {
+			if (!this.isMultiDrag) return;
 			for (let i in multiDragClones) {
 				css(multiDragClones[i], 'display', 'none');
 				if (sortable.options.removeCloneOnHide && multiDragClones[i].parentNode) {
@@ -123,7 +131,7 @@ function MultiDragPlugin() {
 		},
 
 		dragStartGlobal({ sortable }) {
-			if (!~multiDragElements.indexOf(dragEl) && multiDragSortable) {
+			if (!this.isMultiDrag && multiDragSortable) {
 				multiDragSortable.multiDrag._deselectMultiDrag();
 			}
 
@@ -139,6 +147,7 @@ function MultiDragPlugin() {
 		},
 
 		dragStarted({ sortable }) {
+			if (!this.isMultiDrag) return;
 			if (sortable.options.sort) {
 				// Capture rects,
 				// hide multi drag elements (by positioning them absolute),
@@ -271,7 +280,7 @@ function MultiDragPlugin() {
 				multiDragElements[i].thisAnimationDuration = null;
 			}
 
-			if (activeSortable.options.animation && !isOwner && activeSortable.options.multiDrag) {
+			if (activeSortable.options.animation && !isOwner && activeSortable.multiDrag.isMultiDrag) {
 				clonesFromRect = Object.assign({}, dragRect);
 				let dragMatrix = matrix(dragEl, true);
 				clonesFromRect.top -= dragMatrix.f;
@@ -373,7 +382,7 @@ function MultiDragPlugin() {
 			}
 
 			// Multi-drag drop
-			if (dragStarted && multiDragElements.length) {
+			if (dragStarted && this.isMultiDrag) {
 				// Do not "unfold" after around dragEl if reverted
 				if ((parentEl[expando].options.sort || parentEl !== rootEl) && multiDragElements.length > 1) {
 					let dragRect = getRect(dragEl),
@@ -437,6 +446,7 @@ function MultiDragPlugin() {
 		},
 
 		nullingGlobal() {
+			this.isMultiDrag =
 			dragStarted = false;
 			multiDragClones.length = 0;
 		},
@@ -557,6 +567,7 @@ function insertMultiDragElements(clonesInserted, rootEl) {
 /**
  * Insert multi-drag clones
  * @param  {[Boolean]} elementsInserted  Whether the multi-drag elements are inserted
+ * @param  {HTMLElement} rootEl
  */
 function insertMultiDragClones(elementsInserted, rootEl) {
 	for (let i in multiDragClones) {

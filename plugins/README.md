@@ -126,6 +126,10 @@ An object with the following properties is passed as an argument to each plugin 
 
 `cloneNowShown()` — Function to be called if the plugin has shown the clone
 
+`hideGhostForTarget()` — Hides the fallback ghost element if CSS pointer-events are not available. Call this before using document.elementFromPoint at the mouse position.
+
+`unhideGhostForTarget()` — Unhides the ghost element. To be called after `hideGhostForTarget()`.
+
 `dispatchSortableEvent(eventName: String)` — Function that can be used to emit an event on the current sortable while sorting, with all usual event properties set
 
 

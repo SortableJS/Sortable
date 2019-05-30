@@ -146,11 +146,10 @@ var PluginManager = {
     var eventNameGlobal = eventName + 'Global';
 
     for (var i in plugins) {
-      if (!sortable[plugins[i].pluginName]) continue;
-      var canceled = false; // Fire global events if it exists in this sortable
+      if (!sortable[plugins[i].pluginName]) continue; // Fire global events if it exists in this sortable
 
       if (sortable[plugins[i].pluginName][eventNameGlobal]) {
-        canceled = canceled || sortable[plugins[i].pluginName][eventNameGlobal](_objectSpread({
+        this.eventCanceled = !!sortable[plugins[i].pluginName][eventNameGlobal](_objectSpread({
           sortable: sortable
         }, evt));
       } // Only fire plugin event if plugin is enabled in this sortable,
@@ -158,13 +157,9 @@ var PluginManager = {
 
 
       if (sortable.options[plugins[i].pluginName] && sortable[plugins[i].pluginName][eventName]) {
-        canceled = canceled || sortable[plugins[i].pluginName][eventName](_objectSpread({
+        this.eventCanceled = this.eventCanceled || !!sortable[plugins[i].pluginName][eventName](_objectSpread({
           sortable: sortable
         }, evt));
-      }
-
-      if (canceled) {
-        this.eventCanceled = true;
       }
     }
   },
@@ -1816,11 +1811,13 @@ Sortable$1.prototype =
           activeSortable._hideClone();
         } else {
           activeSortable._showClone(_this);
-        } // Set ghost class to new sortable's ghost class
+        }
 
-
-        toggleClass(dragEl, putSortable ? putSortable.options.ghostClass : activeSortable.options.ghostClass, false);
-        toggleClass(dragEl, options.ghostClass, true);
+        if (_this !== fromSortable) {
+          // Set ghost class to new sortable's ghost class
+          toggleClass(dragEl, putSortable ? putSortable.options.ghostClass : activeSortable.options.ghostClass, false);
+          toggleClass(dragEl, options.ghostClass, true);
+        }
 
         if (putSortable !== _this && _this !== Sortable$1.active) {
           putSortable = _this;
@@ -1829,7 +1826,9 @@ Sortable$1.prototype =
         } // Animation
 
 
-        _this._ignoreWhileAnimating = target;
+        if (fromSortable === _this) {
+          _this._ignoreWhileAnimating = target;
+        }
 
         _this.animateAll(function () {
           dragOverEvent('dragOverAnimationComplete');
@@ -1838,6 +1837,7 @@ Sortable$1.prototype =
 
         if (_this !== fromSortable) {
           fromSortable.animateAll();
+          fromSortable._ignoreWhileAnimating = null;
         }
       } // Null lastTarget if it is not inside a previously swapped element
 
@@ -1914,7 +1914,12 @@ Sortable$1.prototype =
       var elLastChild = lastChild(el);
 
       if (!elLastChild || _ghostIsLast(evt, axis, el) && !elLastChild.animated) {
-        // assign target only if condition is true
+        // If already at end of list: Do not insert
+        if (elLastChild === dragEl) {
+          return completed(false);
+        } // assign target only if condition is true
+
+
         if (elLastChild && el === evt.target) {
           target = elLastChild;
         }
@@ -2996,32 +3001,36 @@ function MultiDragPlugin() {
 
   MultiDrag.prototype = {
     multiDragKeyDown: false,
+    isMultiDrag: false,
     delayStartGlobal: function delayStartGlobal(_ref) {
       var dragged = _ref.dragEl;
       dragEl$1 = dragged;
     },
+    delayEnded: function delayEnded() {
+      this.isMultiDrag = ~multiDragElements.indexOf(dragEl$1);
+    },
     setupClone: function setupClone(_ref2) {
       var sortable = _ref2.sortable;
+      if (!this.isMultiDrag) return;
 
-      if (multiDragElements.length && multiDragSortable === sortable) {
-        for (var i in multiDragElements) {
-          multiDragClones.push(clone(multiDragElements[i]));
-          multiDragClones[i].sortableIndex = multiDragElements[i].sortableIndex;
-          multiDragClones[i].draggable = false;
-          multiDragClones[i].style['will-change'] = '';
-          toggleClass(multiDragClones[i], sortable.options.selectedClass, false);
-          multiDragElements[i] === dragEl$1 && toggleClass(multiDragClones[i], sortable.options.chosenClass, false);
-        }
-
-        sortable._hideClone();
-
-        return true;
+      for (var i in multiDragElements) {
+        multiDragClones.push(clone(multiDragElements[i]));
+        multiDragClones[i].sortableIndex = multiDragElements[i].sortableIndex;
+        multiDragClones[i].draggable = false;
+        multiDragClones[i].style['will-change'] = '';
+        toggleClass(multiDragClones[i], sortable.options.selectedClass, false);
+        multiDragElements[i] === dragEl$1 && toggleClass(multiDragClones[i], sortable.options.chosenClass, false);
       }
+
+      sortable._hideClone();
+
+      return true;
     },
     clone: function clone(_ref3) {
       var sortable = _ref3.sortable,
           rootEl = _ref3.rootEl,
           dispatchSortableEvent = _ref3.dispatchSortableEvent;
+      if (!this.isMultiDrag) return;
 
       if (!sortable.options.removeCloneOnHide) {
         if (multiDragElements.length && multiDragSortable === sortable) {
@@ -3034,6 +3043,7 @@ function MultiDragPlugin() {
     showClone: function showClone(_ref4) {
       var cloneNowShown = _ref4.cloneNowShown,
           rootEl = _ref4.rootEl;
+      if (!this.isMultiDrag) return;
       insertMultiDragClones(false, rootEl);
 
       for (var i in multiDragClones) {
@@ -3047,6 +3057,7 @@ function MultiDragPlugin() {
     hideClone: function hideClone(_ref5) {
       var sortable = _ref5.sortable,
           cloneNowHidden = _ref5.cloneNowHidden;
+      if (!this.isMultiDrag) return;
 
       for (var i in multiDragClones) {
         css(multiDragClones[i], 'display', 'none');
@@ -3063,7 +3074,7 @@ function MultiDragPlugin() {
     dragStartGlobal: function dragStartGlobal(_ref6) {
       var sortable = _ref6.sortable;
 
-      if (!~multiDragElements.indexOf(dragEl$1) && multiDragSortable) {
+      if (!this.isMultiDrag && multiDragSortable) {
         multiDragSortable.multiDrag._deselectMultiDrag();
       }
 
@@ -3079,6 +3090,7 @@ function MultiDragPlugin() {
     },
     dragStarted: function dragStarted(_ref7) {
       var sortable = _ref7.sortable;
+      if (!this.isMultiDrag) return;
 
       if (sortable.options.sort) {
         // Capture rects,
@@ -3223,7 +3235,7 @@ function MultiDragPlugin() {
         multiDragElements[i].thisAnimationDuration = null;
       }
 
-      if (activeSortable.options.animation && !isOwner && activeSortable.options.multiDrag) {
+      if (activeSortable.options.animation && !isOwner && activeSortable.multiDrag.isMultiDrag) {
         clonesFromRect = _extends({}, dragRect);
         var dragMatrix = matrix(dragEl$1, true);
         clonesFromRect.top -= dragMatrix.f;
@@ -3325,7 +3337,7 @@ function MultiDragPlugin() {
       } // Multi-drag drop
 
 
-      if (dragStarted && multiDragElements.length) {
+      if (dragStarted && this.isMultiDrag) {
         // Do not "unfold" after around dragEl if reverted
         if ((parentEl[expando].options.sort || parentEl !== rootEl) && multiDragElements.length > 1) {
           var dragRect = getRect(dragEl$1),
@@ -3388,7 +3400,7 @@ function MultiDragPlugin() {
       multiDragClones.length = 0;
     },
     nullingGlobal: function nullingGlobal() {
-      dragStarted = false;
+      this.isMultiDrag = dragStarted = false;
       multiDragClones.length = 0;
     },
     destroy: function destroy() {
@@ -3507,6 +3519,7 @@ function insertMultiDragElements(clonesInserted, rootEl) {
 /**
  * Insert multi-drag clones
  * @param  {[Boolean]} elementsInserted  Whether the multi-drag elements are inserted
+ * @param  {HTMLElement} rootEl
  */
 
 

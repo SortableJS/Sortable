@@ -17,13 +17,11 @@ export default {
 		const eventNameGlobal = eventName + 'Global';
 		for (let i in plugins) {
 			if (!sortable[plugins[i].pluginName]) continue;
-			let canceled = false;
-
 			// Fire global events if it exists in this sortable
 			if (
 				sortable[plugins[i].pluginName][eventNameGlobal]
 			) {
-				canceled = canceled || sortable[plugins[i].pluginName][eventNameGlobal]({ sortable, ...evt });
+				this.eventCanceled = !!sortable[plugins[i].pluginName][eventNameGlobal]({ sortable, ...evt });
 			}
 
 			// Only fire plugin event if plugin is enabled in this sortable,
@@ -32,10 +30,7 @@ export default {
 				sortable.options[plugins[i].pluginName] &&
 				sortable[plugins[i].pluginName][eventName]
 			) {
-				canceled = canceled || sortable[plugins[i].pluginName][eventName]({ sortable, ...evt });
-			}
-			if (canceled) {
-				this.eventCanceled = true;
+				this.eventCanceled = this.eventCanceled || !!sortable[plugins[i].pluginName][eventName]({ sortable, ...evt });
 			}
 		}
 	},

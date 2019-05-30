@@ -1007,13 +1007,16 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 				}
 
 				// Animation
-				_this._ignoreWhileAnimating = target;
+				if (fromSortable === _this) {
+					_this._ignoreWhileAnimating = target;
+				}
 				_this.animateAll(function() {
 					dragOverEvent('dragOverAnimationComplete');
 					_this._ignoreWhileAnimating = null;
 				});
 				if (_this !== fromSortable) {
 					fromSortable.animateAll();
+					fromSortable._ignoreWhileAnimating = null;
 				}
 			}
 
