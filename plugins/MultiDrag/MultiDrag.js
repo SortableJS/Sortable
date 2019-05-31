@@ -295,7 +295,7 @@ function MultiDragPlugin() {
 			}
 		},
 
-		drop({ originalEvent: evt, rootEl, parentEl, sortable, putSortable }) {
+		drop({ originalEvent: evt, rootEl, parentEl, sortable, dispatchSortableEvent, oldIndex, putSortable }) {
 			let toSortable = (putSortable || this.sortable);
 
 			if (!evt) return;
@@ -317,11 +317,7 @@ function MultiDragPlugin() {
 						rootEl,
 						name: 'select',
 						targetEl: dragEl,
-						originalEvt: evt,
-						eventOptions: {
-							items: multiDragElements,
-							clones: multiDragClones
-						}
+						originalEvt: evt
 					});
 
 					// Modifier activated, select from last to dragEl
@@ -351,11 +347,7 @@ function MultiDragPlugin() {
 									rootEl,
 									name: 'select',
 									targetEl: children[i],
-									originalEvt: evt,
-									eventOptions: {
-										items: multiDragElements,
-										clones: multiDragClones
-									}
+									originalEvt: evt
 								});
 							}
 						}
@@ -372,11 +364,7 @@ function MultiDragPlugin() {
 						rootEl,
 						name: 'deselect',
 						targetEl: dragEl,
-						originalEvt: evt,
-						eventOptions: {
-							items: multiDragElements,
-							clones: multiDragClones
-						}
+						originalEvt: evt
 					});
 				}
 			}
@@ -422,6 +410,23 @@ function MultiDragPlugin() {
 							}
 							multiDragIndex++;
 						}
+
+						// If initial folding is done, the elements may have changed position because they are now
+						// unfolding around dragEl, even though dragEl may not have his index changed, so update event
+						// must be fired here as Sortable will not.
+						if (oldIndex === index(dragEl)) {
+							let update = false;
+							for (let i in multiDragElements) {
+								if (multiDragElements[i].sortableIndex !== index(multiDragElements[i])) {
+									update = true;
+									break;
+								}
+							}
+
+							if (update) {
+								dispatchSortableEvent('update');
+							}
+						}
 					}
 
 					// Must be done after capturing individual rects (scroll bar)
@@ -441,8 +446,6 @@ function MultiDragPlugin() {
 					multiDragClones[i].parentNode && multiDragClones[i].parentNode.removeChild(multiDragClones[i]);
 				}
 			}
-
-			multiDragClones.length = 0;
 		},
 
 		nullingGlobal() {
@@ -473,21 +476,18 @@ function MultiDragPlugin() {
 			// Only deselect if left click
 			if (evt && evt.button !== 0) return;
 
-			for (let i in multiDragElements) {
-				toggleClass(multiDragElements[i], this.sortable.options.selectedClass, false);
+			while (multiDragElements.length) {
+				let el = multiDragElements[0];
+				toggleClass(el, this.sortable.options.selectedClass, false);
+				multiDragElements.shift();
 				dispatchEvent({
 					sortable: this.sortable,
 					rootEl: this.sortable.el,
 					name: 'deselect',
-					targetEl: multiDragElements[i],
-					originalEvt: evt,
-					eventOptions: {
-						items: multiDragElements,
-						clones: multiDragClones
-					}
+					targetEl: el,
+					originalEvt: evt
 				});
 			}
-			multiDragElements = [];
 		},
 
 		_checkKeyDown(evt) {

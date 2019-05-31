@@ -7,68 +7,13 @@
 
 import { version } from '../package.json';
 
-import PluginManager from './PluginManager.js';
-
-let pluginEvent = function(eventName, sortable, { evt: originalEvent, ...data } = {}) {
-	function cloneNowHidden() {
-		cloneHidden = true;
-	}
-	function cloneNowShown() {
-		cloneHidden = false;
-	}
-	PluginManager.pluginEvent.bind(Sortable)(eventName, sortable, {
-		dragEl,
-		parentEl,
-		ghostEl,
-		rootEl,
-		nextEl,
-		lastDownEl,
-		cloneEl,
-		cloneHidden,
-		dragStarted: moved,
-		putSortable,
-		activeSortable: Sortable.active,
-		originalEvent,
-
-		oldIndex,
-		newIndex,
-		oldDraggableIndex,
-		newDraggableIndex,
-
-		hideGhostForTarget: _hideGhostForTarget,
-		unhideGhostForTarget: _unhideGhostForTarget,
-
-
-		cloneNowHidden,
-		cloneNowShown,
-
-		dispatchSortableEvent(name) {
-			_dispatchEvent({ sortable, name });
-		},
-
-		...data
-	});
-};
-
-
-import dispatchEvent from './EventDispatcher.js';
-
-function _dispatchEvent(info) {
-	dispatchEvent({
-		putSortable,
-		cloneEl,
-		targetEl: dragEl,
-		rootEl,
-		oldIndex,
-		oldDraggableIndex,
-		...info
-	});
-}
-
-
 import { IE11OrLess, Edge, FireFox, Safari, IOS } from './BrowserInfo.js';
 
 import AnimationStateManager from './Animation.js';
+
+import PluginManager from './PluginManager.js';
+
+import dispatchEvent from './EventDispatcher.js';
 
 import {
 	on,
@@ -91,6 +36,60 @@ import {
 	clone,
 	expando
 } from './utils.js';
+
+
+let pluginEvent = function(eventName, sortable, { evt: originalEvent, ...data } = {}) {
+	PluginManager.pluginEvent.bind(Sortable)(eventName, sortable, {
+		dragEl,
+		parentEl,
+		ghostEl,
+		rootEl,
+		nextEl,
+		lastDownEl,
+		cloneEl,
+		cloneHidden,
+		dragStarted: moved,
+		putSortable,
+		activeSortable: Sortable.active,
+		originalEvent,
+
+		oldIndex,
+		oldDraggableIndex,
+		newIndex,
+		newDraggableIndex,
+
+		hideGhostForTarget: _hideGhostForTarget,
+		unhideGhostForTarget: _unhideGhostForTarget,
+
+
+		cloneNowHidden() {
+			cloneHidden = true;
+		},
+		cloneNowShown() {
+			cloneHidden = false;
+		},
+
+		dispatchSortableEvent(name) {
+			_dispatchEvent({ sortable, name, originalEvent });
+		},
+
+		...data
+	});
+};
+
+function _dispatchEvent(info) {
+	dispatchEvent({
+		putSortable,
+		cloneEl,
+		targetEl: dragEl,
+		rootEl,
+		oldIndex,
+		oldDraggableIndex,
+		newIndex,
+		newDraggableIndex,
+		...info
+	});
+}
 
 
 if (typeof window === "undefined" || !window.document) {
@@ -574,7 +573,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 				_dispatchEvent({
 					sortable: _this,
 					name: 'choose',
-					originalEvt: evt
+					originalEvent: evt
 				});
 
 				// Chosen item
@@ -703,7 +702,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			_dispatchEvent({
 				sortable: this,
 				name: 'start',
-				originalEvt: evt
+				originalEvent: evt
 			});
 		} else {
 			this._nulling();
@@ -945,7 +944,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			isOwner = (activeGroup === group),
 			canSort = options.sort,
 			fromSortable = (putSortable || activeSortable),
-			axis,
+			vertical,
 			_this = this,
 			completedFired = false;
 
@@ -955,13 +954,12 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			pluginEvent(name, _this, {
 				evt,
 				isOwner,
-				axis,
+				axis: vertical ? 'vertical' : 'horizontal',
 				revert,
 				dragRect,
 				targetRect,
 				canSort,
 				fromSortable,
-				activeSortable,
 				target,
 				completed,
 				onMove(target, after) {
@@ -1041,13 +1039,15 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 
 		// Call when dragEl has been inserted
 		function changed() {
+			newIndex = index(dragEl);
+			newDraggableIndex = index(dragEl, options.draggable);
 			_dispatchEvent({
 				sortable: _this,
 				name: 'change',
 				toEl: el,
-				newIndex: index(dragEl),
-				newDraggableIndex: index(dragEl, options.draggable),
-				originalEvt: evt
+				newIndex,
+				newDraggableIndex,
+				originalEvent: evt
 			});
 		}
 
@@ -1084,7 +1084,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 				)
 			)
 		) {
-			axis = this._getDirection(evt, target);
+			vertical = this._getDirection(evt, target) === 'vertical';
 
 			dragRect = getRect(dragEl);
 
@@ -1112,7 +1112,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 
 			let elLastChild = lastChild(el, options.draggable);
 
-			if (!elLastChild || _ghostIsLast(evt, axis, this) && !elLastChild.animated) {
+			if (!elLastChild || _ghostIsLast(evt, vertical, this) && !elLastChild.animated) {
 				// If already at end of list: Do not insert
 				if (elLastChild === dragEl) {
 					return completed(false);
@@ -1140,7 +1140,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 				let direction = 0,
 					targetBeforeFirstSwap,
 					differentLevel = dragEl.parentNode !== el,
-					side1 = axis === 'vertical' ? 'top' : 'left',
+					side1 = vertical ? 'top' : 'left',
 					scrolledPastTop = isScrolledPast(target, null, 'top', 'top') || isScrolledPast(dragEl, null, 'top', 'top'),
 					scrollBefore = scrolledPastTop ? scrolledPastTop.scrollTop : void 0;
 
@@ -1152,7 +1152,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 				}
 
 				direction = _getSwapDirection(
-					evt, target, axis,
+					evt, target, vertical,
 					options.swapThreshold,
 					options.invertedSwapThreshold == null ? options.swapThreshold : options.invertedSwapThreshold,
 					isCircumstantialInvert,
@@ -1257,9 +1257,17 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		let el = this.el,
 			options = this.options;
 
+		// Get the index of the dragged element within its parent
+		newIndex = index(dragEl);
+		newDraggableIndex = index(dragEl, options.draggable);
+
 		pluginEvent('drop', this, {
 			evt
 		});
+
+		// Get again after plugin event
+		newIndex = index(dragEl);
+		newDraggableIndex = index(dragEl, options.draggable);
 
 		if (Sortable.eventCanceled) {
 			this._nulling();
@@ -1326,12 +1334,9 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 					toEl: parentEl,
 					newIndex: null,
 					newDraggableIndex: null,
-					originalEvt: evt
+					originalEvent: evt
 				});
 
-				// Get the index of the dragged element within its parent
-				newIndex = index(dragEl);
-				newDraggableIndex = index(dragEl, options.draggable);
 
 				if (rootEl !== parentEl) {
 
@@ -1342,9 +1347,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 							name: 'add',
 							toEl: parentEl,
 							fromEl: rootEl,
-							newIndex,
-							newDraggableIndex,
-							originalEvt: evt
+							originalEvent: evt
 						});
 
 						// Remove event
@@ -1352,9 +1355,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 							sortable: this,
 							name: 'remove',
 							toEl: parentEl,
-							newIndex,
-							newDraggableIndex,
-							originalEvt: evt
+							originalEvent: evt
 						});
 
 						// drag from one list and drop into another
@@ -1363,18 +1364,14 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 							name: 'sort',
 							toEl: parentEl,
 							fromEl: rootEl,
-							newIndex,
-							newDraggableIndex,
-							originalEvt: evt
+							originalEvent: evt
 						});
 
 						_dispatchEvent({
 							sortable: this,
 							name: 'sort',
 							toEl: parentEl,
-							newIndex,
-							newDraggableIndex,
-							originalEvt: evt
+							originalEvent: evt
 						});
 					}
 
@@ -1387,18 +1384,14 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 								sortable: this,
 								name: 'update',
 								toEl: parentEl,
-								newIndex,
-								newDraggableIndex,
-								originalEvt: evt
+								originalEvent: evt
 							});
 
 							_dispatchEvent({
 								sortable: this,
 								name: 'sort',
 								toEl: parentEl,
-								newIndex,
-								newDraggableIndex,
-								originalEvt: evt
+								originalEvent: evt
 							});
 						}
 					}
@@ -1415,9 +1408,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 						sortable: this,
 						name: 'end',
 						toEl: parentEl,
-						newIndex,
-						newDraggableIndex,
-						originalEvt: evt
+						originalEvent: evt
 					});
 
 					// Save sorting
@@ -1446,7 +1437,9 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 
 		moved =
 		newIndex =
+		newDraggableIndex =
 		oldIndex =
+		oldDraggableIndex =
 
 		lastTarget =
 		lastDirection =
@@ -1660,7 +1653,7 @@ function _globalDragOver(/**Event*/evt) {
 	evt.cancelable && evt.preventDefault();
 }
 
-function onMove(fromEl, toEl, dragEl, dragRect, targetEl, targetRect, originalEvt, willInsertAfter) {
+function onMove(fromEl, toEl, dragEl, dragRect, targetEl, targetRect, originalEvent, willInsertAfter) {
 	let evt,
 		sortable = fromEl[expando],
 		onMoveFn = sortable.options.onMove,
@@ -1684,12 +1677,12 @@ function onMove(fromEl, toEl, dragEl, dragRect, targetEl, targetRect, originalEv
 	evt.relatedRect = targetRect || getRect(toEl);
 	evt.willInsertAfter = willInsertAfter;
 
-	evt.originalEvent = originalEvt;
+	evt.originalEvent = originalEvent;
 
 	fromEl.dispatchEvent(evt);
 
 	if (onMoveFn) {
-		retVal = onMoveFn.call(sortable, evt, originalEvt);
+		retVal = onMoveFn.call(sortable, evt, originalEvent);
 	}
 
 	return retVal;
@@ -1704,28 +1697,28 @@ function _unsilent() {
 }
 
 
-function _ghostIsLast(evt, axis, sortable) {
+function _ghostIsLast(evt, vertical, sortable) {
 	let elRect = getRect(lastChild(sortable.el, sortable.options.draggable)),
-		mouseOnAxis = axis === 'vertical' ? evt.clientY : evt.clientX,
-		mouseOnOppAxis = axis === 'vertical' ? evt.clientX : evt.clientY,
-		targetS2 = axis === 'vertical' ? elRect.bottom : elRect.right,
-		targetS1Opp = axis === 'vertical' ? elRect.left : elRect.top,
-		targetS2Opp = axis === 'vertical' ? elRect.right : elRect.bottom,
+		mouseOnAxis = vertical ? evt.clientY : evt.clientX,
+		mouseOnOppAxis = vertical ? evt.clientX : evt.clientY,
+		targetS2 = vertical ? elRect.bottom : elRect.right,
+		targetS1Opp = vertical ? elRect.left : elRect.top,
+		targetS2Opp = vertical ? elRect.right : elRect.bottom,
 		spacer = 10;
 
 	return (
-		axis === 'vertical' ?
+		vertical ?
 			(mouseOnOppAxis > targetS2Opp + spacer || mouseOnOppAxis <= targetS2Opp && mouseOnAxis > targetS2 && mouseOnOppAxis >= targetS1Opp) :
 			(mouseOnAxis > targetS2 && mouseOnOppAxis > targetS1Opp || mouseOnAxis <= targetS2 && mouseOnOppAxis > targetS2Opp + spacer)
 	);
 }
 
-function _getSwapDirection(evt, target, axis, swapThreshold, invertedSwapThreshold, invertSwap, isLastTarget) {
+function _getSwapDirection(evt, target, vertical, swapThreshold, invertedSwapThreshold, invertSwap, isLastTarget) {
 	let targetRect = getRect(target),
-		mouseOnAxis = axis === 'vertical' ? evt.clientY : evt.clientX,
-		targetLength = axis === 'vertical' ? targetRect.height : targetRect.width,
-		targetS1 = axis === 'vertical' ? targetRect.top : targetRect.left,
-		targetS2 = axis === 'vertical' ? targetRect.bottom : targetRect.right,
+		mouseOnAxis = vertical ? evt.clientY : evt.clientX,
+		targetLength = vertical ? targetRect.height : targetRect.width,
+		targetS1 = vertical ? targetRect.top : targetRect.left,
+		targetS2 = vertical ? targetRect.bottom : targetRect.right,
 		invert = false;
 
 
@@ -1760,7 +1753,7 @@ function _getSwapDirection(evt, target, axis, swapThreshold, invertedSwapThresho
 					)
 				)
 				{
-					return lastDirection * -1;
+					return -lastDirection;
 				}
 			} else {
 				invert = true;

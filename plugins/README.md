@@ -109,7 +109,7 @@ An object with the following properties is passed as an argument to each plugin 
 
 `rootEl: HTMLElement` — The element that the dragged element originated from
 
-`nextEl: HTMLElement` — The original next sibling of dragEl before 
+`nextEl: HTMLElement` — The original next sibling of dragEl
 
 `cloneEl: HTMLElement|undefined` — The clone element (undefined until after `setupClone` plugin event)
 
@@ -118,6 +118,18 @@ An object with the following properties is passed as an argument to each plugin 
 `dragStarted: Boolean` — Boolean indicating whether or not the dragStart event has fired
 
 `putSortable: Sortable|undefined` — The element that dragEl is dragged into from it's root, otherwise undefined 
+
+`activeSortable: Sortable` — The active Sortable instance
+
+`originalEvent: Event` — The original HTML event corresponding to the Sortable event
+
+`oldIndex: Number` — The old index of dragEl
+
+`oldDraggableIndex: Number` — The old index of dragEl, only counting draggable elements
+
+`newIndex: Number` — The new index of dragEl
+
+`newDraggableIndex: Number` — The new index of dragEl, only counting draggable elements
 
 
 #### Methods:
@@ -130,7 +142,7 @@ An object with the following properties is passed as an argument to each plugin 
 
 `unhideGhostForTarget()` — Unhides the ghost element. To be called after `hideGhostForTarget()`.
 
-`dispatchSortableEvent(eventName: String)` — Function that can be used to emit an event on the current sortable while sorting, with all usual event properties set
+`dispatchSortableEvent(eventName: String)` — Function that can be used to emit an event on the current sortable while sorting, with all usual event properties set (eg. indexes, rootEl, cloneEl, originalEvent, etc.).
 
 
 ### DragOverEvent Object
@@ -151,8 +163,6 @@ This event is passed to dragover events, and extends the normal event object.
 `canSort: Boolean` — Whether or not sorting is enabled in the dragged over sortable
 
 `fromSortable: Sortable` — The sortable that the dragged element is coming from
-
-`activeSortable: Sortable` — The active Sortable instance
 
 `target: HTMLElement` — The sortable item that is being dragged over
 
