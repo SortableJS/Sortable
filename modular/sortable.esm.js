@@ -154,11 +154,11 @@ var captureMode = {
 };
 
 function on(el, event, fn) {
-  el.addEventListener(event, fn, IE11OrLess ? false : captureMode);
+  el.addEventListener(event, fn, !IE11OrLess && captureMode);
 }
 
 function off(el, event, fn) {
-  el.removeEventListener(event, fn, IE11OrLess ? false : captureMode);
+  el.removeEventListener(event, fn, !IE11OrLess && captureMode);
 }
 
 function matches(
@@ -260,14 +260,10 @@ function matrix(el, selfOnly) {
     /* jshint boss:true */
 
   } while (!selfOnly && (el = el.parentNode));
+  /*jshint -W056 */
 
-  if (window.DOMMatrix) {
-    return new DOMMatrix(appliedTransforms);
-  } else if (window.WebKitCSSMatrix) {
-    return new WebKitCSSMatrix(appliedTransforms);
-  } else if (window.CSSMatrix) {
-    return new CSSMatrix(appliedTransforms);
-  }
+
+  return new (window.DOMMatrix || window.WebKitCSSMatrix || window.CSSMatrix)(appliedTransforms);
 }
 
 function find(ctx, tagName, iterator) {
@@ -1167,7 +1163,7 @@ function Sortable$1(el, options) {
     disabled: false,
     store: null,
     handle: null,
-    draggable: /[uo]l/i.test(el.nodeName) ? '>li' : '>*',
+    draggable: /^[uo]l$/i.test(el.nodeName) ? '>li' : '>*',
     swapThreshold: 1,
     // percentage; 0 <= x <= 1
     invertSwap: false,
@@ -1441,7 +1437,7 @@ Sortable$1.prototype =
         evt: evt
       }); // Delay is impossible for native DnD in Edge or IE
 
-      if (options.delay && (options.delayOnTouchOnly ? touch : true) && (!this.nativeDraggable || !(Edge || IE11OrLess))) {
+      if (options.delay && (!options.delayOnTouchOnly || touch) && (!this.nativeDraggable || !(Edge || IE11OrLess))) {
         if (Sortable$1.eventCanceled) {
           this._onDrop();
 
@@ -2446,9 +2442,8 @@ function _ghostIsLast(evt, vertical, sortable) {
       mouseOnOppAxis = vertical ? evt.clientX : evt.clientY,
       targetS2 = vertical ? elRect.bottom : elRect.right,
       targetS1Opp = vertical ? elRect.left : elRect.top,
-      targetS2Opp = vertical ? elRect.right : elRect.bottom,
-      spacer = 10;
-  return vertical ? mouseOnOppAxis > targetS2Opp + spacer || mouseOnOppAxis <= targetS2Opp && mouseOnAxis > targetS2 && mouseOnOppAxis >= targetS1Opp : mouseOnAxis > targetS2 && mouseOnOppAxis > targetS1Opp || mouseOnAxis <= targetS2 && mouseOnOppAxis > targetS2Opp + spacer;
+      targetS2Opp = vertical ? elRect.right : elRect.bottom;
+  return mouseOnAxis > targetS2 && mouseOnOppAxis > targetS1Opp && mouseOnOppAxis < targetS2Opp;
 }
 
 function _getSwapDirection(evt, target, vertical, swapThreshold, invertedSwapThreshold, invertSwap, isLastTarget) {
@@ -2506,10 +2501,7 @@ function _getSwapDirection(evt, target, vertical, swapThreshold, invertedSwapThr
 
 
 function _getInsertDirection(target) {
-  var dragElIndex = index(dragEl),
-      targetIndex = index(target);
-
-  if (dragElIndex < targetIndex) {
+  if (index(dragEl) < index(target)) {
     return 1;
   } else {
     return -1;
@@ -3326,7 +3318,7 @@ function MultiDragPlugin() {
             originalEvt: evt
           }); // Modifier activated, select from last to dragEl
 
-          if ((options.multiDragKey ? this.multiDragKeyDown : true) && evt.shiftKey && lastMultiDragSelect && sortable.el.contains(lastMultiDragSelect)) {
+          if ((!options.multiDragKey || this.multiDragKeyDown) && evt.shiftKey && lastMultiDragSelect && sortable.el.contains(lastMultiDragSelect)) {
             var lastIndex = index(lastMultiDragSelect),
                 currentIndex = index(dragEl$1);
 

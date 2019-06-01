@@ -1703,14 +1703,9 @@ function _ghostIsLast(evt, vertical, sortable) {
 		mouseOnOppAxis = vertical ? evt.clientX : evt.clientY,
 		targetS2 = vertical ? elRect.bottom : elRect.right,
 		targetS1Opp = vertical ? elRect.left : elRect.top,
-		targetS2Opp = vertical ? elRect.right : elRect.bottom,
-		spacer = 10;
+		targetS2Opp = vertical ? elRect.right : elRect.bottom;
 
-	return (
-		vertical ?
-			(mouseOnOppAxis > targetS2Opp + spacer || mouseOnOppAxis <= targetS2Opp && mouseOnAxis > targetS2 && mouseOnOppAxis >= targetS1Opp) :
-			(mouseOnAxis > targetS2 && mouseOnOppAxis > targetS1Opp || mouseOnAxis <= targetS2 && mouseOnOppAxis > targetS2Opp + spacer)
-	);
+	return (mouseOnAxis > targetS2 && mouseOnOppAxis > targetS1Opp && mouseOnOppAxis < targetS2Opp);
 }
 
 function _getSwapDirection(evt, target, vertical, swapThreshold, invertedSwapThreshold, invertSwap, isLastTarget) {
