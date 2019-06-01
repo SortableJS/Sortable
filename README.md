@@ -20,7 +20,7 @@ Supported by [<img width="100px" src="https://user-images.githubusercontent.com/
  * Built using native HTML5 drag and drop API
  * Supports
    * [Meteor](https://github.com/SortableJS/meteor-sortablejs)
-   * AngularJS
+   * Angular
      * [2.0+](https://github.com/SortableJS/angular-sortablejs)
      * [1.*](https://github.com/SortableJS/angular-legacy-sortablejs)
    * React
@@ -29,6 +29,7 @@ Supported by [<img width="100px" src="https://user-images.githubusercontent.com/
    * [Knockout](https://github.com/SortableJS/knockout-sortablejs)
    * [Polymer](https://github.com/SortableJS/polymer-sortablejs)
    * [Vue](https://github.com/SortableJS/Vue.Draggable)
+   * [Ember](https://github.com/SortableJS/ember-sortablejs)
  * Supports any CSS library, e.g. [Bootstrap](#bs)
  * Simple API
  * [CDN](#cdn)
