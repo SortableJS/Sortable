@@ -22,8 +22,10 @@ export default function AnimationStateManager() {
 				// If animating: compensate for current animation
 				if (children[i].thisAnimationDuration) {
 					let childMatrix = matrix(children[i], true);
-					fromRect.top -= childMatrix.f;
-					fromRect.left -= childMatrix.e;
+					if (childMatrix) {
+						fromRect.top -= childMatrix.f;
+						fromRect.left -= childMatrix.e;
+					}
 				}
 
 				children[i].fromRect = fromRect;
@@ -60,9 +62,11 @@ export default function AnimationStateManager() {
 					targetMatrix = matrix(target, true);
 
 
-				// Compensate for current animation
-				toRect.top -= targetMatrix.f;
-				toRect.left -= targetMatrix.e;
+				if (targetMatrix) {
+					// Compensate for current animation
+					toRect.top -= targetMatrix.f;
+					toRect.left -= targetMatrix.e;
+				}
 
 				target.toRect = toRect;
 
@@ -105,7 +109,7 @@ export default function AnimationStateManager() {
 					}
 				}
 
-				// if fromRect != toRect and not animating to same position as already animating: animate
+				// if fromRect != toRect: animate
 				if (!isRectEqual(toRect, fromRect)) {
 					target.prevFromRect = fromRect;
 					target.prevToRect = toRect;

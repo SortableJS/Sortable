@@ -118,8 +118,9 @@ function matrix(el, selfOnly) {
 		/* jshint boss:true */
 	} while (!selfOnly && (el = el.parentNode));
 
+	const matrixFn = window.DOMMatrix || window.WebKitCSSMatrix || window.CSSMatrix;
 	/*jshint -W056 */
-	return new (window.DOMMatrix || window.WebKitCSSMatrix || window.CSSMatrix)(appliedTransforms);
+	return matrixFn && (new matrixFn(appliedTransforms));
 }
 
 

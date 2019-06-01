@@ -266,10 +266,11 @@
       /* jshint boss:true */
 
     } while (!selfOnly && (el = el.parentNode));
+
+    var matrixFn = window.DOMMatrix || window.WebKitCSSMatrix || window.CSSMatrix;
     /*jshint -W056 */
 
-
-    return new (window.DOMMatrix || window.WebKitCSSMatrix || window.CSSMatrix)(appliedTransforms);
+    return matrixFn && new matrixFn(appliedTransforms);
   }
 
   function find(ctx, tagName, iterator) {
@@ -644,8 +645,11 @@
 
           if (children[i].thisAnimationDuration) {
             var childMatrix = matrix(children[i], true);
-            fromRect.top -= childMatrix.f;
-            fromRect.left -= childMatrix.e;
+
+            if (childMatrix) {
+              fromRect.top -= childMatrix.f;
+              fromRect.left -= childMatrix.e;
+            }
           }
 
           children[i].fromRect = fromRect;
@@ -677,10 +681,14 @@
               prevFromRect = target.prevFromRect,
               prevToRect = target.prevToRect,
               animatingRect = animationStates[i].rect,
-              targetMatrix = matrix(target, true); // Compensate for current animation
+              targetMatrix = matrix(target, true);
 
-          toRect.top -= targetMatrix.f;
-          toRect.left -= targetMatrix.e;
+          if (targetMatrix) {
+            // Compensate for current animation
+            toRect.top -= targetMatrix.f;
+            toRect.left -= targetMatrix.e;
+          }
+
           target.toRect = toRect; // If element is scrolled out of view: Do not animate
 
           if ((isScrolledPast(target, toRect, 'bottom', 'top') || isScrolledPast(target, toRect, 'top', 'bottom') || isScrolledPast(target, toRect, 'right', 'left') || isScrolledPast(target, toRect, 'left', 'right')) && (isScrolledPast(target, animatingRect, 'bottom', 'top') || isScrolledPast(target, animatingRect, 'top', 'bottom') || isScrolledPast(target, animatingRect, 'right', 'left') || isScrolledPast(target, animatingRect, 'left', 'right')) && (isScrolledPast(target, fromRect, 'bottom', 'top') || isScrolledPast(target, fromRect, 'top', 'bottom') || isScrolledPast(target, fromRect, 'right', 'left') || isScrolledPast(target, fromRect, 'left', 'right'))) continue;
@@ -692,7 +700,7 @@
               // If returning to same place as started from animation and on same axis
               time = calculateRealTime(animatingRect, prevFromRect, prevToRect, this.options);
             }
-          } // if fromRect != toRect and not animating to same position as already animating: animate
+          } // if fromRect != toRect: animate
 
 
           if (!isRectEqual(toRect, fromRect)) {
