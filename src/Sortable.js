@@ -338,7 +338,7 @@ function Sortable(el, options) {
 		disabled: false,
 		store: null,
 		handle: null,
-		draggable: /[uo]l/i.test(el.nodeName) ? '>li' : '>*',
+		draggable: /^[uo]l$/i.test(el.nodeName) ? '>li' : '>*',
 		swapThreshold: 1, // percentage; 0 <= x <= 1
 		invertSwap: false, // invert always
 		invertedSwapThreshold: null, // will be set to same as swapThreshold if default
@@ -602,7 +602,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			pluginEvent('delayStart', this, { evt });
 
 			// Delay is impossible for native DnD in Edge or IE
-			if (options.delay && (options.delayOnTouchOnly ? touch : true) && (!this.nativeDraggable || !(Edge || IE11OrLess))) {
+			if (options.delay && (!options.delayOnTouchOnly || touch) && (!this.nativeDraggable || !(Edge || IE11OrLess))) {
 				if (Sortable.eventCanceled) {
 					this._onDrop();
 					return;
@@ -1792,10 +1792,7 @@ function _getSwapDirection(evt, target, vertical, swapThreshold, invertedSwapThr
  * @return {Number}                   Direction dragEl must be swapped
  */
 function _getInsertDirection(target) {
-	let dragElIndex = index(dragEl),
-		targetIndex = index(target);
-
-	if (dragElIndex < targetIndex) {
+	if (index(dragEl) < index(target)) {
 		return 1;
 	} else {
 		return -1;

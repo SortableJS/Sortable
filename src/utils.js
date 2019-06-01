@@ -7,12 +7,12 @@ const captureMode = {
 };
 
 function on(el, event, fn) {
-	el.addEventListener(event, fn, IE11OrLess ? false : captureMode);
+	el.addEventListener(event, fn, !IE11OrLess && captureMode);
 }
 
 
 function off(el, event, fn) {
-	el.removeEventListener(event, fn, IE11OrLess ? false : captureMode);
+	el.removeEventListener(event, fn, !IE11OrLess && captureMode);
 }
 
 function matches(/**HTMLElement*/el, /**String*/selector) {
@@ -118,13 +118,8 @@ function matrix(el, selfOnly) {
 		/* jshint boss:true */
 	} while (!selfOnly && (el = el.parentNode));
 
-	if (window.DOMMatrix) {
-		return new DOMMatrix(appliedTransforms);
-	} else if (window.WebKitCSSMatrix) {
-		return new WebKitCSSMatrix(appliedTransforms);
-	} else if (window.CSSMatrix) {
-		return new CSSMatrix(appliedTransforms);
-	}
+	/*jshint -W056 */
+	return new (window.DOMMatrix || window.WebKitCSSMatrix || window.CSSMatrix)(appliedTransforms);
 }
 
 
