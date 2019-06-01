@@ -1,4 +1,5 @@
-# Sortable
+# Sortable &nbsp; [![DeepScan grade](https://deepscan.io/api/teams/3901/projects/5666/branches/43977/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=3901&pid=5666&bid=43977) [![](https://data.jsdelivr.com/v1/package/npm/sortablejs/badge)](https://www.jsdelivr.com/package/npm/sortablejs) [![npm](https://img.shields.io/npm/v/sortablejs.svg)](https://www.npmjs.com/package/sortablejs)
+
 Sortable is a JavaScript library for reorderable drag-and-drop lists.
 
 Demo: http://sortablejs.github.io/Sortable/
@@ -13,6 +14,8 @@ Supported by [<img width="100px" src="https://user-images.githubusercontent.com/
  * Supports drag handles *and selectable text* (better than voidberg's html5sortable)
  * Smart auto-scrolling
  * Advanced swap detection
+ * Smooth animations
+ * [Multi-drag](https://github.com/SortableJS/Sortable/wiki/Dragging-Multiple-Items-in-Sortable) support
  * Built using native HTML5 drag and drop API
  * Supports
    * [Meteor](https://github.com/SortableJS/meteor-sortablejs)
@@ -37,27 +40,54 @@ Supported by [<img width="100px" src="https://user-images.githubusercontent.com/
 
 ### Articles
 
+ * [Dragging Multiple Items in Sortable](https://github.com/SortableJS/Sortable/wiki/Dragging-Multiple-Items-in-Sortable) (April 26, 2019)
  * [Swap Thresholds and Direction](https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction) (December 2, 2018)
  * [Sortable v1.0 — New capabilities](https://github.com/SortableJS/Sortable/wiki/Sortable-v1.0-—-New-capabilities/) (December 22, 2014)
  * [Sorting with the help of HTML5 Drag'n'Drop API](https://github.com/SortableJS/Sortable/wiki/Sorting-with-the-help-of-HTML5-Drag'n'Drop-API/) (December 23, 2013)
 
 <br/>
 
-### Install
+### Getting Started
 
-Via npm
-
+Install with NPM:
 ```bash
 $ npm install sortablejs --save
 ```
 
-Via bower:
-
+Install with Bower:
 ```bash
 $ bower install --save sortablejs
 ```
 
-<br/>
+Import into your project:
+```js
+// Default SortableJS
+import Sortable from 'sortablejs';
+
+// Core SortableJS (without default plugins)
+import Sortable from 'sortablejs/modular/sortable.core.esm.js';
+
+// Complete SortableJS (with all plugins)
+import Sortable from 'sortablejs/modular/sortable.complete.esm.js';
+```
+
+Cherrypick plugins:
+```js
+// Cherrypick extra plugins
+import Sortable, { MultiDrag, Swap } from 'sortablejs';
+
+Sortable.mount(MultiDrag, Swap);
+
+
+// Cherrypick default plugins
+import Sortable, { AutoScroll } from 'sortablejs/modular/sortable.core.esm.js';
+
+Sortable.mount(AutoScroll);
+```
+
+
+---
+
 
 ### Usage
 ```html
@@ -95,10 +125,12 @@ var sortable = new Sortable(el, {
 	filter: ".ignore-elements",  // Selectors that do not lead to dragging (String or Function)
 	preventOnFilter: true, // Call `event.preventDefault()` when triggered `filter`
 	draggable: ".item",  // Specifies which items inside the element should be draggable
+
+	dataIdAttr: 'data-id',
+
 	ghostClass: "sortable-ghost",  // Class name for the drop placeholder
 	chosenClass: "sortable-chosen",  // Class name for the chosen item
 	dragClass: "sortable-drag",  // Class name for the dragging item
-	dataIdAttr: 'data-id',
 
 	swapThreshold: 1, // Threshold of the swap zone
 	invertSwap: false, // Will always use inverted swap zone if set to true
@@ -110,12 +142,6 @@ var sortable = new Sortable(el, {
 	fallbackClass: "sortable-fallback",  // Class name for the cloned DOM Element when using forceFallback
 	fallbackOnBody: false,  // Appends the cloned DOM Element into the Document's Body
 	fallbackTolerance: 0, // Specify in pixels how far the mouse should move before it's considered as a drag.
-
-	scroll: true, // or HTMLElement
-	scrollFn: function(offsetX, offsetY, originalEvent, touchEvt, hoverTargetEl) { ... }, // if you have custom scrollbar scrollFn may be used for autoscrolling
-	scrollSensitivity: 30, // px, how near the mouse must be to an edge to start scrolling.
-	scrollSpeed: 10, // px
-	bubbleScroll: true, // apply autoscroll to all parent elements, allowing for easier movement
 
 	dragoverBubble: false,
 	removeCloneOnHide: true, // Remove the clone element when it is not showing, rather than just hiding it
@@ -231,7 +257,7 @@ Demo:
 
 
 #### `sort` option
-Sorting inside list.
+Allow sorting inside list.
 
 Demo: https://jsbin.com/jayedig/edit?js,output
 
@@ -257,9 +283,9 @@ Whether or not the delay should be applied only if the user is using touch (eg. 
 
 
 #### `swapThreshold` option
-Percentage of the target that the swap zone will take up, as a float between `0` and `1`.
+Percentage of the target that the swap zone will take up, as a float between `0` and `1`. This option has nothing to do with the `swap` option.
 
-Read more: https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction#swap-threshold
+[Read more](https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction#swap-threshold)
 
 Demo: http://sortablejs.github.io/Sortable#thresholds
 
@@ -268,9 +294,9 @@ Demo: http://sortablejs.github.io/Sortable#thresholds
 
 
 #### `invertSwap` option
-Set to `true` to set the swap zone to the sides of the target, for the effect of sorting "in between" items.
+Set to `true` to set the swap zone to the sides of the target, for the effect of sorting "in between" items. This option has nothing to do with the `swap` option.
 
-Read more: https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction#forcing-inverted-swap-zone
+[Read more](https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction#forcing-inverted-swap-zone)
 
 Demo: http://sortablejs.github.io/Sortable#thresholds
 
@@ -279,9 +305,9 @@ Demo: http://sortablejs.github.io/Sortable#thresholds
 
 
 #### `invertedSwapThreshold` option
-Percentage of the target that the inverted swap zone will take up, as a float between `0` and `1`. If not given, will default to `swapThreshold`.
+Percentage of the target that the inverted swap zone will take up, as a float between `0` and `1`. If not given, will default to `swapThreshold`. This option has nothing to do with the `swap` option.
 
-Read more: https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction#dealing-with-swap-glitching
+[Read more](https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction#dealing-with-swap-glitching)
 
 
 ---
@@ -290,7 +316,7 @@ Read more: https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direc
 #### `direction` option
 Direction that the Sortable should sort in. Can be set to `'vertical'`, `'horizontal'`, or a function, which will be called whenever a target is dragged over. Must return `'vertical'` or `'horizontal'`.
 
-Read more: https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction#direction
+[Read more](https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction#direction)
 
 
 Example of direction detection for vertical list that includes full column and half column elements:
@@ -462,48 +488,6 @@ When the user clicks inside a sortable element, it's not uncommon for your hand 
 Dragging only starts if you move the pointer past a certain tolerance, so that you don't accidentally start dragging every time you click.
 
 3 to 5 are probably good values.
-
-
----
-
-
-#### `scroll` option
-If set to `true`, the page (or sortable-area) scrolls when coming to an edge.
-
-Demo:
- - `window`: https://jsbin.com/dosilir/edit?js,output
- - `overflow: hidden`: https://jsbin.com/xecihez/edit?html,js,output
-
-
----
-
-
-#### `scrollFn` option
-Defines function that will be used for autoscrolling. el.scrollTop/el.scrollLeft is used by default.
-Useful when you have custom scrollbar with dedicated scroll function.
-
-
----
-
-
-#### `scrollSensitivity` option
-Defines how near the mouse must be to an edge to start scrolling.
-
-
----
-
-
-#### `scrollSpeed` option
-The speed at which the window should scroll once the mouse pointer gets within the `scrollSensitivity` distance.
-
-
----
-
-
-#### `bubbleScroll` option
-If set to `true`, the normal `autoscroll` function will also be applied to all parent elements of the element the user is dragging over.
-
-Demo: https://jsbin.com/kesewor/edit?html,js,output
 
 
 ---
@@ -682,7 +666,35 @@ Create new instance.
 
 
 ##### Sortable.active:`Sortable`
-Link to the active instance.
+The active Sortable instance.
+
+
+---
+
+
+##### Sortable.dragged:`HTMLElement`
+The element being dragged.
+
+
+---
+
+
+##### Sortable.ghost:`HTMLElement`
+The ghost element.
+
+
+---
+
+
+##### Sortable.clone:`HTMLElement`
+The clone element.
+
+
+---
+
+
+##### Sortable.mount(plugin:`...SortablePlugin|...SortablePlugin[]`)
+Mounts a plugin to Sortable.
 
 
 ---

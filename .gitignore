@@ -4,4 +4,3 @@ mock.png
 .build*
 jquery.fn.*
 .idea/
-package-lock.json
