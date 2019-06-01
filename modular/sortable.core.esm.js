@@ -260,10 +260,11 @@ function matrix(el, selfOnly) {
     /* jshint boss:true */
 
   } while (!selfOnly && (el = el.parentNode));
+
+  var matrixFn = window.DOMMatrix || window.WebKitCSSMatrix || window.CSSMatrix;
   /*jshint -W056 */
 
-
-  return new (window.DOMMatrix || window.WebKitCSSMatrix || window.CSSMatrix)(appliedTransforms);
+  return matrixFn && new matrixFn(appliedTransforms);
 }
 
 function find(ctx, tagName, iterator) {
@@ -638,8 +639,11 @@ function AnimationStateManager() {
 
         if (children[i].thisAnimationDuration) {
           var childMatrix = matrix(children[i], true);
-          fromRect.top -= childMatrix.f;
-          fromRect.left -= childMatrix.e;
+
+          if (childMatrix) {
+            fromRect.top -= childMatrix.f;
+            fromRect.left -= childMatrix.e;
+          }
         }
 
         children[i].fromRect = fromRect;
@@ -671,10 +675,14 @@ function AnimationStateManager() {
             prevFromRect = target.prevFromRect,
             prevToRect = target.prevToRect,
             animatingRect = animationStates[i].rect,
-            targetMatrix = matrix(target, true); // Compensate for current animation
+            targetMatrix = matrix(target, true);
 
-        toRect.top -= targetMatrix.f;
-        toRect.left -= targetMatrix.e;
+        if (targetMatrix) {
+          // Compensate for current animation
+          toRect.top -= targetMatrix.f;
+          toRect.left -= targetMatrix.e;
+        }
+
         target.toRect = toRect; // If element is scrolled out of view: Do not animate
 
         if ((isScrolledPast(target, toRect, 'bottom', 'top') || isScrolledPast(target, toRect, 'top', 'bottom') || isScrolledPast(target, toRect, 'right', 'left') || isScrolledPast(target, toRect, 'left', 'right')) && (isScrolledPast(target, animatingRect, 'bottom', 'top') || isScrolledPast(target, animatingRect, 'top', 'bottom') || isScrolledPast(target, animatingRect, 'right', 'left') || isScrolledPast(target, animatingRect, 'left', 'right')) && (isScrolledPast(target, fromRect, 'bottom', 'top') || isScrolledPast(target, fromRect, 'top', 'bottom') || isScrolledPast(target, fromRect, 'right', 'left') || isScrolledPast(target, fromRect, 'left', 'right'))) continue;
@@ -686,7 +694,7 @@ function AnimationStateManager() {
             // If returning to same place as started from animation and on same axis
             time = calculateRealTime(animatingRect, prevFromRect, prevToRect, this.options);
           }
-        } // if fromRect != toRect and not animating to same position as already animating: animate
+        } // if fromRect != toRect: animate
 
 
         if (!isRectEqual(toRect, fromRect)) {
@@ -2836,6 +2844,69 @@ var autoScroll = throttle(function (evt, options, rootEl, isFallback) {
   scrolling = scrollThisInstance; // in case another function catches scrolling as false in between when it is not
 }, 30);
 
+var drop = function drop(_ref) {
+  var originalEvent = _ref.originalEvent,
+      putSortable = _ref.putSortable,
+      dragEl = _ref.dragEl,
+      activeSortable = _ref.activeSortable,
+      dispatchSortableEvent = _ref.dispatchSortableEvent,
+      hideGhostForTarget = _ref.hideGhostForTarget,
+      unhideGhostForTarget = _ref.unhideGhostForTarget;
+  var toSortable = putSortable || activeSortable;
+  hideGhostForTarget();
+  var target = document.elementFromPoint(originalEvent.clientX, originalEvent.clientY);
+  unhideGhostForTarget();
+
+  if (toSortable && !toSortable.el.contains(target)) {
+    dispatchSortableEvent('spill');
+    this.onSpill(dragEl);
+  }
+};
+
+function Revert() {}
+
+Revert.prototype = {
+  startIndex: null,
+  dragStart: function dragStart(_ref2) {
+    var oldDraggableIndex = _ref2.oldDraggableIndex;
+    this.startIndex = oldDraggableIndex;
+  },
+  onSpill: function onSpill(dragEl) {
+    this.sortable.captureAnimationState();
+    var nextSibling = getChild(this.sortable.el, this.startIndex, this.sortable.options);
+
+    if (nextSibling) {
+      this.sortable.el.insertBefore(dragEl, nextSibling);
+    } else {
+      this.sortable.el.appendChild(dragEl);
+    }
+
+    this.sortable.animateAll();
+  },
+  drop: drop
+};
+
+_extends(Revert, {
+  pluginName: 'revertOnSpill'
+});
+
+function Remove() {}
+
+Remove.prototype = {
+  onSpill: function onSpill(dragEl) {
+    this.sortable.captureAnimationState();
+    dragEl.parentNode && dragEl.parentNode.removeChild(dragEl);
+    this.sortable.animateAll();
+  },
+  drop: drop
+};
+
+_extends(Remove, {
+  pluginName: 'removeOnSpill'
+});
+
+var OnSpill = [Remove, Revert];
+
 var lastSwapEl;
 
 function SwapPlugin() {
@@ -3524,4 +3595,4 @@ function removeMultiDragElements() {
 }
 
 export default Sortable$1;
-export { AutoScrollPlugin as AutoScroll, MultiDragPlugin as MultiDrag, Sortable$1 as Sortable, SwapPlugin as Swap };
+export { AutoScrollPlugin as AutoScroll, MultiDragPlugin as MultiDrag, OnSpill, Sortable$1 as Sortable, SwapPlugin as Swap };
