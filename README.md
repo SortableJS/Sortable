@@ -16,7 +16,7 @@ Supported by [<img width="100px" src="https://user-images.githubusercontent.com/
  * Built using native HTML5 drag and drop API
  * Supports
    * [Meteor](https://github.com/SortableJS/meteor-sortablejs)
-   * AngularJS
+   * Angular
      * [2.0+](https://github.com/SortableJS/angular-sortablejs)
      * [1.*](https://github.com/SortableJS/angular-legacy-sortablejs)
    * React
