@@ -1,6 +1,6 @@
 ## MultiDrag Plugin
 This plugin allows users to select multiple items within a sortable at once, and drag them as one item.
-Once placed, the items will unfold into their original order, but all beside eachother at the new position.
+Once placed, the items will unfold into their original order, but all beside each other at the new position.
 [Read More](https://github.com/SortableJS/Sortable/wiki/Dragging-Multiple-Items-in-Sortable)
 
 Demo: https://jsbin.com/wopavom/edit?js,output
@@ -63,13 +63,23 @@ Sortable.create(list, {
 
 
 ### Event Properties
- - items:`HTMLElement[]` - Array of selected items, or empty
- - clones:`HTMLElement[]` - Array of clones, or empty
+ - items:`HTMLElement[]` — Array of selected items, or empty
+ - clones:`HTMLElement[]` — Array of clones, or empty
+ - oldIndicies:`Index[]` — Array containing information on the old indicies of the selected elements.
+ - newIndicies:`Index[]` — Array containing information on the new indicies of the selected elements.
+
+#### Index Object
+ - element:`HTMLElement` — The element whose index is being given
+ - index:`Number` — The index of the element
+
+#### Note on `newIndicies`
+For any event that is fired during sorting, the index of any selected element that is not the main dragged element is given as `-1`.
+This is because it has either been removed from the DOM, or because it is in a folding animation (folding to the dragged element) and will be removed after this animation is complete.
 
 
 ---
 
 
 ### Sortable.utils
-* select(el`:HTMLElement`) — select the given multi-drag item
-* deselect(el`:HTMLElement`) — deselect the given multi-drag item
+* select(el:`HTMLElement`) — select the given multi-drag item
+* deselect(el:`HTMLElement`) — deselect the given multi-drag item

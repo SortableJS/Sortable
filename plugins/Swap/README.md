@@ -41,4 +41,4 @@ Sortable.create(list, {
 
 
 ### Event Properties
- - swapItem:`HTMLElement|undefined` - The element that the dragged element was swapped with
+ - swapItem:`HTMLElement|undefined` — The element that the dragged element was swapped with

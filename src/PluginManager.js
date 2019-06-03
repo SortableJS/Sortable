@@ -58,10 +58,7 @@ export default {
 		let eventOptions = {};
 		for (let i in plugins) {
 			if (typeof(plugins[i].eventOptions) !== 'function') continue;
-			eventOptions = {
-				...eventOptions,
-				...plugins[i].eventOptions(name, sortable)
-			};
+			Object.assign(eventOptions, plugins[i].eventOptions.call(sortable, name));
 		}
 		return eventOptions;
 	},

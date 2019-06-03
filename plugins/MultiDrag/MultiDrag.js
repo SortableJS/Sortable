@@ -534,9 +534,34 @@ function MultiDragPlugin() {
 			}
 		},
 		eventOptions() {
+			const oldIndicies = [],
+				newIndicies = [];
+
+			multiDragElements.forEach((element) => {
+				oldIndicies.push({
+					element,
+					index: element.sortableIndex
+				});
+
+				// multiDragElements will already be sorted if folding
+				let newIndex;
+				if (folding && element !== dragEl) {
+					newIndex = -1;
+				} else if (folding) {
+					newIndex = index(element, ':not(.' + this.options.selectedClass + ')');
+				} else {
+					newIndex = index(element);
+				}
+				newIndicies.push({
+					element,
+					index: newIndex
+				});
+			});
 			return {
 				items: [...multiDragElements],
-				clones: [...multiDragClones]
+				clones: [...multiDragClones],
+				oldIndicies,
+				newIndicies
 			};
 		},
 		optionListeners: {
