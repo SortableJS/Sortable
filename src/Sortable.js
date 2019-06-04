@@ -1698,14 +1698,12 @@ function _unsilent() {
 
 
 function _ghostIsLast(evt, vertical, sortable) {
-	let elRect = getRect(lastChild(sortable.el, sortable.options.draggable)),
-		mouseOnAxis = vertical ? evt.clientY : evt.clientX,
-		mouseOnOppAxis = vertical ? evt.clientX : evt.clientY,
-		targetS2 = vertical ? elRect.bottom : elRect.right,
-		targetS1Opp = vertical ? elRect.left : elRect.top,
-		targetS2Opp = vertical ? elRect.right : elRect.bottom;
+	let rect = getRect(lastChild(sortable.el, sortable.options.draggable));
+	const spacer = 10;
 
-	return (mouseOnAxis > targetS2 && mouseOnOppAxis > targetS1Opp && mouseOnOppAxis < targetS2Opp);
+	return vertical ?
+		(evt.clientX > rect.right + spacer || evt.clientX <= rect.right && evt.clientY > rect.bottom && evt.clientX >= rect.left) :
+		(evt.clientX > rect.right && evt.clientY > rect.top || evt.clientX <= rect.right && evt.clientY > rect.bottom + spacer);
 }
 
 function _getSwapDirection(evt, target, vertical, swapThreshold, invertedSwapThreshold, invertSwap, isLastTarget) {
