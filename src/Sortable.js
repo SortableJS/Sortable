@@ -362,7 +362,7 @@ function Sortable(el, options) {
 		dataIdAttr: 'data-id',
 		delay: 0,
 		delayOnTouchOnly: false,
-		touchStartThreshold: parseInt(window.devicePixelRatio, 10) || 1,
+		touchStartThreshold: Number.parseInt(window.devicePixelRatio, 10) || 1,
 		forceFallback: false,
 		fallbackClass: 'sortable-fallback',
 		fallbackOnBody: false,
