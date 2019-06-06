@@ -76,13 +76,13 @@ Cherrypick plugins:
 // Cherrypick extra plugins
 import Sortable, { MultiDrag, Swap } from 'sortablejs';
 
-Sortable.mount(MultiDrag, Swap);
+Sortable.mount(new MultiDrag(), new Swap());
 
 
 // Cherrypick default plugins
 import Sortable, { AutoScroll } from 'sortablejs/modular/sortable.core.esm.js';
 
-Sortable.mount(AutoScroll);
+Sortable.mount(new AutoScroll());
 ```
 
 
