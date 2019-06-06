@@ -36,6 +36,10 @@
 				<h5>Examples</h5>
 				<li><a href="#grid">Grid</a></li>
 				<li><a href="#nested">Nested sortables</a></li>
+				<h5>Plugins</h5>
+				<li><a href="#multi-drag">MultiDrag</a></li>
+				<li><a href="#swap">Swap</a></li>
+				<h5><a href="#comparisons">Comparisons</a></h5>
 				<h5><a href="#frameworks">Framework Support</a></h5>
 			</div>
 		</div>
@@ -300,7 +304,7 @@ new Sortable(example4Right, {
 
 		<div id="nested" class="row">
 			<h4 class="col-12">Nested Sortables Example</h4>
-			<p class="col-12">NOTE: When using nested Sortables with animation, it is recommended that the <code>fallbackOnBody</code> option is set to true.</p>
+			<p class="col-12">NOTE: When using nested Sortables with animation, it is recommended that the <code>fallbackOnBody</code> option is set to true. <br />It is also always recommended that either the <code>invertSwap</code> option is set to true, or the <code>swapThreshold</code> option is lower than the default value of 1 (eg <code>0.65</code>).</p>
 			<div id="nestedDemo" class="list-group col nested-sortable">
 				<div class="list-group-item nested-1">Item 1.1
 					<div class="list-group nested-sortable">
@@ -329,7 +333,84 @@ new Sortable(example4Right, {
 				</div>
 				<div class="list-group-item nested-1">Item 1.5</div>
 			</div>
+			<div style="padding: 0" class="col-12">
+<pre class="prettyprint">// Loop through each nested sortable element
+for (var i = 0; i < nestedSortables.length; i++) {
+	new Sortable(nestedSortables[i], {
+		group: 'nested',
+		animation: 150,
+		fallbackOnBody: true,
+		swapThreshold: 0.65
+	});
+}</pre>
+			</div>
 		</div>
+
+		<div class="row">
+			<h2 class="col-12">Plugins</h2>
+		</div>
+		<hr />
+
+		<div id="multi-drag" class="row">
+			<h4 class="col-12">MultiDrag</h4>
+			<p class="col-12">The <a target="_blank" href="https://github.com/SortableJS/Sortable/tree/master/plugins/MultiDrag">MultiDrag</a> plugin allows for multiple items to be dragged at a time. You can click to "select" multiple items, and then drag them as one item.</p>
+			<div id="multiDragDemo" class="list-group col">
+				<div class="list-group-item">Item 1</div>
+				<div class="list-group-item">Item 2</div>
+				<div class="list-group-item">Item 3</div>
+				<div class="list-group-item">Item 4</div>
+				<div class="list-group-item">Item 5</div>
+				<div class="list-group-item">Item 6</div>
+			</div>
+			<div style="padding: 0" class="col-12">
+<pre class="prettyprint">new Sortable(multiDragDemo, {
+	multiDrag: true, // Enable multi-drag
+	selectedClass: 'selected', // The class applied to the selected items
+	animation: 150
+});</pre>
+			</div>
+		</div>
+		<hr />
+
+		<div id="swap" class="row">
+			<h4 class="col-12">Swap</h4>
+			<p class="col-12">The <a target="_blank" href="https://github.com/SortableJS/Sortable/tree/master/plugins/Swap">Swap</a> plugin changes the behaviour of Sortable to allow for items to be swapped with eachother rather than sorted.</p>
+			<div id="swapDemo" class="list-group col">
+				<div class="list-group-item">Item 1</div>
+				<div class="list-group-item">Item 2</div>
+				<div class="list-group-item">Item 3</div>
+				<div class="list-group-item">Item 4</div>
+				<div class="list-group-item">Item 5</div>
+				<div class="list-group-item">Item 6</div>
+			</div>
+			<div style="padding: 0" class="col-12">
+<pre class="prettyprint">new Sortable(swapDemo, {
+	swap: true, // Enable swap plugin
+	swapClass: 'highlight', // The class applied to the hovered swap item
+	animation: 150
+});</pre>
+			</div>
+		</div>
+		<hr />
+
+
+
+		<div class="mt-4"></div>
+
+		<div id="comparisons" class="row">
+			<h2 class="col-12">Comparisons</h2>
+		</div>
+		<hr />
+
+
+		<div class="row frameworks">
+			<h2 class="col-12 text-center">jQuery-UI</h2>
+			<iframe class="mx-auto" src="https://player.vimeo.com/video/311581236?title=0&byline=0&portrait=0" width="640" height="361" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+
+			<h2 class="col-12 text-center mt-5">Dragula</h2>
+			<iframe class="mx-auto" src="https://player.vimeo.com/video/311584137?title=0&byline=0&portrait=0" width="640" height="361" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+		</div>
+
 		<div class="mt-4"></div>
 
 		<div id="frameworks" class="row">
@@ -346,7 +427,7 @@ new Sortable(example4Right, {
 			<h3 class="col-6"><a target="_blank" href="https://github.com/SortableJS/react-sortablejs">react-sortablejs</a></h3>
 
 			<h3 class="col-6">Angular</h3>
-			<h3 class="col-6"><a target="_blank" href="https://github.com/SortableJS/angular-sortablejs">angular-sortablejs</a></h3>
+			<h3 class="col-6"><a target="_blank" href="https://github.com/SortableJS/ngx-sortablejs">ngx-sortablejs</a></h3>
 
 			<h3 class="col-6">jQuery</h3>
 			<h3 class="col-6"><a target="_blank" href="https://github.com/SortableJS/jquery-sortablejs">jquery-sortablejs</a></h3>
@@ -359,6 +440,9 @@ new Sortable(example4Right, {
 
 			<h3 class="col-6">Polymer</h3>
 			<h3 class="col-6"><a target="_blank" href="https://github.com/SortableJS/polymer-sortablejs">polymer-sortablejs</a></h3>
+
+			<h3 class="col-6">Ember</h3>
+			<h3 class="col-6"><a target="_blank" href="https://github.com/SortableJS/ember-sortablejs">ember-sortablejs</a></h3>
 		</div>
 
 	</div>

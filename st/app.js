@@ -8,7 +8,9 @@ var example1 = document.getElementById('example1'),
 	example5 = document.getElementById('example5'),
 	example6 = document.getElementById('example6'),
 	example7 = document.getElementById('example7'),
-	gridDemo = document.getElementById('gridDemo');
+	gridDemo = document.getElementById('gridDemo'),
+	multiDragDemo = document.getElementById('multiDragDemo'),
+	swapDemo = document.getElementById('swapDemo');
 
 // Example 1 - Simple list
 new Sortable(example1, {
@@ -194,9 +196,27 @@ new Sortable(gridDemo, {
 // Nested demo
 var nestedSortables = [].slice.call(document.querySelectorAll('.nested-sortable'));
 
+// Loop through each nested sortable element
 for (var i = 0; i < nestedSortables.length; i++) {
 	new Sortable(nestedSortables[i], {
 		group: 'nested',
-		animation: 150
+		animation: 150,
+		fallbackOnBody: true,
+		swapThreshold: 0.65
 	});
 }
+
+// MultiDrag demo
+new Sortable(multiDragDemo, {
+	multiDrag: true,
+	selectedClass: 'selected',
+	animation: 150
+});
+
+
+// Swap demo
+new Sortable(swapDemo, {
+	swap: true,
+	swapClass: 'highlight',
+	animation: 150
+});

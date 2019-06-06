@@ -122,7 +122,7 @@ code {
 	margin: 12px;
 }
 
-#nestedDemo div, .nested-1, .nested-2, .nested-3 {
+.nested-sortable, .nested-1, .nested-2, .nested-3 {
 	margin-top: 5px;
 }
 
@@ -236,4 +236,19 @@ input[type=range]:focus::-ms-fill-upper {
 
 .blue-background-class {
 	background-color: #C8EBFB;
+}
+
+.col {
+	padding-right: 0;
+	margin-right: 15px;
+}
+
+.selected {
+	background-color: #f9c7c8;
+	border: solid red 1px !important;
+	z-index: 1 !important;
+}
+
+.highlight {
+	background-color: #B7F8C7;
 }
