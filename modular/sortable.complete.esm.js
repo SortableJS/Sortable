@@ -1,5 +1,5 @@
 /**!
- * Sortable 1.9.0
+ * Sortable 1.10.0-rc1
  * @author	RubaXa   <trash@rubaxa.org>
  * @author	owenm    <owen23355@gmail.com>
  * @license MIT
@@ -126,7 +126,7 @@ function _nonIterableSpread() {
   throw new TypeError("Invalid attempt to spread non-iterable instance");
 }
 
-var version = "1.9.0";
+var version = "1.10.0-rc1";
 
 function userAgent(pattern) {
   return !!navigator.userAgent.match(pattern);
@@ -835,7 +835,8 @@ var PluginManager = {
 
     for (var i in plugins) {
       if (typeof plugins[i].eventOptions !== 'function') continue;
-      eventOptions = _objectSpread({}, eventOptions, plugins[i].eventOptions(name, sortable));
+
+      _extends(eventOptions, plugins[i].eventOptions.call(sortable, name));
     }
 
     return eventOptions;
@@ -1041,6 +1042,15 @@ supportDraggable = 'draggable' in document.createElement('div'),
 
   return child1 && (firstChildCSS.display === 'block' || firstChildCSS.display === 'flex' || firstChildCSS.display === 'table' || firstChildCSS.display === 'grid' || firstChildWidth >= elWidth && elCSS[CSSFloatProperty] === 'none' || child2 && elCSS[CSSFloatProperty] === 'none' && firstChildWidth + secondChildWidth > elWidth) ? 'vertical' : 'horizontal';
 },
+    _dragElInRowColumn = function _dragElInRowColumn(dragRect, targetRect, vertical) {
+  var dragElS1Opp = vertical ? dragRect.left : dragRect.top,
+      dragElS2Opp = vertical ? dragRect.right : dragRect.bottom,
+      dragElOppLength = vertical ? dragRect.width : dragRect.height,
+      targetS1Opp = vertical ? targetRect.left : targetRect.top,
+      targetS2Opp = vertical ? targetRect.right : targetRect.bottom,
+      targetOppLength = vertical ? targetRect.width : targetRect.height;
+  return dragElS1Opp === targetS1Opp || dragElS2Opp === targetS2Opp || dragElS1Opp + dragElOppLength / 2 === targetS1Opp + targetOppLength / 2;
+},
 
 /**
  * Detects first nearest empty sortable to X and Y position using emptyInsertThreshold.
@@ -1198,7 +1208,7 @@ function Sortable$1(el, options) {
     dataIdAttr: 'data-id',
     delay: 0,
     delayOnTouchOnly: false,
-    touchStartThreshold: parseInt(window.devicePixelRatio, 10) || 1,
+    touchStartThreshold: Number.parseInt(window.devicePixelRatio, 10) || 1,
     forceFallback: false,
     fallbackClass: 'sortable-fallback',
     fallbackOnBody: false,
@@ -1785,7 +1795,7 @@ Sortable$1.prototype =
         target: target,
         completed: completed,
         onMove: function onMove(target, after) {
-          _onMove(rootEl, el, dragEl, dragRect, target, getRect(target), evt, after);
+          return _onMove(rootEl, el, dragEl, dragRect, target, getRect(target), evt, after);
         },
         changed: changed
       }, extra));
@@ -1943,20 +1953,22 @@ Sortable$1.prototype =
           return completed(true);
         }
       } else if (target.parentNode === el) {
+        targetRect = getRect(target);
         var direction = 0,
             targetBeforeFirstSwap,
             differentLevel = dragEl.parentNode !== el,
+            differentRowCol = !_dragElInRowColumn(dragEl.animated && dragEl.toRect || dragRect, target.animated && target.toRect || targetRect, vertical),
             side1 = vertical ? 'top' : 'left',
             scrolledPastTop = isScrolledPast(target, null, 'top', 'top') || isScrolledPast(dragEl, null, 'top', 'top'),
             scrollBefore = scrolledPastTop ? scrolledPastTop.scrollTop : void 0;
 
         if (lastTarget !== target) {
-          targetBeforeFirstSwap = getRect(target)[side1];
+          targetBeforeFirstSwap = targetRect[side1];
           pastFirstInvertThresh = false;
-          isCircumstantialInvert = options.invertSwap || differentLevel;
+          isCircumstantialInvert = !differentRowCol && options.invertSwap || differentLevel;
         }
 
-        direction = _getSwapDirection(evt, target, vertical, options.swapThreshold, options.invertedSwapThreshold == null ? options.swapThreshold : options.invertedSwapThreshold, isCircumstantialInvert, lastTarget === target);
+        direction = _getSwapDirection(evt, target, vertical, differentRowCol ? 1 : options.swapThreshold, options.invertedSwapThreshold == null ? options.swapThreshold : options.invertedSwapThreshold, isCircumstantialInvert, lastTarget === target);
         var sibling;
 
         if (direction !== 0) {
@@ -1976,7 +1988,6 @@ Sortable$1.prototype =
 
         lastTarget = target;
         lastDirection = direction;
-        targetRect = getRect(target);
         var nextSibling = target.nextElementSibling,
             after = false;
         after = direction === 1;
@@ -2445,13 +2456,9 @@ function _unsilent() {
 }
 
 function _ghostIsLast(evt, vertical, sortable) {
-  var elRect = getRect(lastChild(sortable.el, sortable.options.draggable)),
-      mouseOnAxis = vertical ? evt.clientY : evt.clientX,
-      mouseOnOppAxis = vertical ? evt.clientX : evt.clientY,
-      targetS2 = vertical ? elRect.bottom : elRect.right,
-      targetS1Opp = vertical ? elRect.left : elRect.top,
-      targetS2Opp = vertical ? elRect.right : elRect.bottom;
-  return mouseOnAxis > targetS2 && mouseOnOppAxis > targetS1Opp && mouseOnOppAxis < targetS2Opp;
+  var rect = getRect(lastChild(sortable.el, sortable.options.draggable));
+  var spacer = 10;
+  return vertical ? evt.clientX > rect.right + spacer || evt.clientX <= rect.right && evt.clientY > rect.bottom && evt.clientX >= rect.left : evt.clientX > rect.right && evt.clientY > rect.top || evt.clientX <= rect.right && evt.clientY > rect.bottom + spacer;
 }
 
 function _getSwapDirection(evt, target, vertical, swapThreshold, invertedSwapThreshold, invertSwap, isLastTarget) {
@@ -3534,9 +3541,36 @@ function MultiDragPlugin() {
       }
     },
     eventOptions: function eventOptions() {
+      var _this = this;
+
+      var oldIndicies = [],
+          newIndicies = [];
+      multiDragElements.forEach(function (element) {
+        oldIndicies.push({
+          element: element,
+          index: element.sortableIndex
+        }); // multiDragElements will already be sorted if folding
+
+        var newIndex;
+
+        if (folding && element !== dragEl$1) {
+          newIndex = -1;
+        } else if (folding) {
+          newIndex = index(element, ':not(.' + _this.options.selectedClass + ')');
+        } else {
+          newIndex = index(element);
+        }
+
+        newIndicies.push({
+          element: element,
+          index: newIndex
+        });
+      });
       return {
         items: _toConsumableArray(multiDragElements),
-        clones: [].concat(multiDragClones)
+        clones: [].concat(multiDragClones),
+        oldIndicies: oldIndicies,
+        newIndicies: newIndicies
       };
     },
     optionListeners: {
