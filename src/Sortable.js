@@ -201,6 +201,21 @@ let dragEl,
 		);
 	},
 
+	_dragElInRowColumn = function(dragRect, targetRect, vertical) {
+		let dragElS1Opp = vertical ? dragRect.left : dragRect.top,
+			dragElS2Opp = vertical ? dragRect.right : dragRect.bottom,
+			dragElOppLength = vertical ? dragRect.width : dragRect.height,
+			targetS1Opp = vertical ? targetRect.left : targetRect.top,
+			targetS2Opp = vertical ? targetRect.right : targetRect.bottom,
+			targetOppLength = vertical ? targetRect.width : targetRect.height;
+
+		return (
+			dragElS1Opp === targetS1Opp ||
+			dragElS2Opp === targetS2Opp ||
+			(dragElS1Opp + dragElOppLength / 2) === (targetS1Opp + targetOppLength / 2)
+		);
+	},
+
 	/**
 	 * Detects first nearest empty sortable to X and Y position using emptyInsertThreshold.
 	 * @param  {Number} x      X position
@@ -963,7 +978,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 				target,
 				completed,
 				onMove(target, after) {
-					onMove(rootEl, el, dragEl, dragRect, target, getRect(target), evt, after);
+					return onMove(rootEl, el, dragEl, dragRect, target, getRect(target), evt, after);
 				},
 				changed,
 				...extra
@@ -1137,23 +1152,25 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 				}
 			}
 			else if (target.parentNode === el) {
+				targetRect = getRect(target);
 				let direction = 0,
 					targetBeforeFirstSwap,
 					differentLevel = dragEl.parentNode !== el,
+					differentRowCol = !_dragElInRowColumn(dragEl.animated && dragEl.toRect || dragRect, target.animated && target.toRect || targetRect, vertical),
 					side1 = vertical ? 'top' : 'left',
 					scrolledPastTop = isScrolledPast(target, null, 'top', 'top') || isScrolledPast(dragEl, null, 'top', 'top'),
 					scrollBefore = scrolledPastTop ? scrolledPastTop.scrollTop : void 0;
 
 
 				if (lastTarget !== target) {
-					targetBeforeFirstSwap = getRect(target)[side1];
+					targetBeforeFirstSwap = targetRect[side1];
 					pastFirstInvertThresh = false;
-					isCircumstantialInvert = options.invertSwap || differentLevel;
+					isCircumstantialInvert = (!differentRowCol && options.invertSwap) || differentLevel;
 				}
 
 				direction = _getSwapDirection(
 					evt, target, vertical,
-					options.swapThreshold,
+					differentRowCol ? 1 : options.swapThreshold,
 					options.invertedSwapThreshold == null ? options.swapThreshold : options.invertedSwapThreshold,
 					isCircumstantialInvert,
 					lastTarget === target
@@ -1181,8 +1198,6 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 				lastTarget = target;
 
 				lastDirection = direction;
-
-				targetRect = getRect(target);
 
 				let nextSibling = target.nextElementSibling,
 					after = false;
