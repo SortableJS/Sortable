@@ -242,3 +242,13 @@ input[type=range]:focus::-ms-fill-upper {
 	padding-right: 0;
 	margin-right: 15px;
 }
+
+.selected {
+	background-color: #f9c7c8;
+	border: solid red 1px !important;
+	z-index: 1 !important;
+}
+
+.highlight {
+	background-color: #B7F8C7;
+}
