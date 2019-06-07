@@ -15,13 +15,13 @@ Supported by [<img width="100px" src="https://user-images.githubusercontent.com/
  * Smart auto-scrolling
  * Advanced swap detection
  * Smooth animations
- * [Multi-drag](https://github.com/SortableJS/Sortable/wiki/Dragging-Multiple-Items-in-Sortable) support
+ * [Multi-drag](https://github.com/SortableJS/Sortable/tree/master/plugins/MultiDrag) support
  * Built using native HTML5 drag and drop API
  * Supports
    * [Meteor](https://github.com/SortableJS/meteor-sortablejs)
    * Angular
      * [2.0+](https://github.com/SortableJS/angular-sortablejs)
-     * [1.*](https://github.com/SortableJS/angular-legacy-sortablejs)
+     * [1.&ast;](https://github.com/SortableJS/angular-legacy-sortablejs)
    * React
      * [ES2015+](https://github.com/SortableJS/react-sortablejs)
      * [Mixin](https://github.com/SortableJS/react-mixin-sortablejs)
@@ -31,6 +31,7 @@ Supported by [<img width="100px" src="https://user-images.githubusercontent.com/
    * [Ember](https://github.com/SortableJS/ember-sortablejs)
  * Supports any CSS library, e.g. [Bootstrap](#bs)
  * Simple API
+ * Support for [plugins](#plugins)
  * [CDN](#cdn)
  * No jQuery required (but there is [support](https://github.com/SortableJS/jquery-sortablejs))
 
@@ -714,6 +715,19 @@ Mounts a plugin to Sortable.
 * clone(el`:HTMLElement`)`:HTMLElement` — create a deep copy of the set of matched elements
 * toggleClass(el`:HTMLElement`, name`:String`, state`:Boolean`) — add or remove one classes from each element
 * detectDirection(el`:HTMLElement`)`:String` — automatically detect the [direction](https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction#direction) of the element as either `'vertical'` or `'horizontal'`
+
+
+---
+
+
+### Plugins
+#### Extra Plugins (included in complete versions)
+ - [MultiDrag](https://github.com/SortableJS/Sortable/tree/master/plugins/MultiDrag)
+ - [Swap](https://github.com/SortableJS/Sortable/tree/master/plugins/Swap)
+
+#### Default Plugins (included in default versions)
+ - [AutoScroll](https://github.com/SortableJS/Sortable/tree/master/plugins/AutoScroll)
+ - [OnSpill](https://github.com/SortableJS/Sortable/tree/master/plugins/OnSpill)
 
 
 ---

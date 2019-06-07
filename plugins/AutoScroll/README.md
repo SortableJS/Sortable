@@ -10,6 +10,17 @@ Demo:
 ---
 
 
+### Mounting
+```js
+import { Sortable, AutoScroll } from 'sortablejs';
+
+Sortable.mount(new AutoScroll());
+```
+
+
+---
+
+
 ### Options
 
 ```js

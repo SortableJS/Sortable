@@ -6,6 +6,17 @@ This file contains two seperate plugins, RemoveOnSpill and RevertOnSpill. They c
 ---
 
 
+### Mounting
+```js
+import { Sortable, OnSpill } from 'sortablejs';
+
+Sortable.mount(OnSpill);
+```
+
+
+---
+
+
 ## RevertOnSpill Plugin
 This plugin, when enabled, will cause the dragged item to be reverted to it's original position if it is spilled (ie. it is dropped outside of a valid Sortable drop target)
 

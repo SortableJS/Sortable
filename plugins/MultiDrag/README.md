@@ -9,6 +9,17 @@ Demo: https://jsbin.com/wopavom/edit?js,output
 ---
 
 
+### Mounting
+```js
+import { Sortable, MultiDrag } from 'sortablejs';
+
+Sortable.mount(new MultiDrag());
+```
+
+
+---
+
+
 ### Options
 
 ```js

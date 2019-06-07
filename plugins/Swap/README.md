@@ -7,6 +7,17 @@ Demo: https://jsbin.com/yejehog/edit?html,js,output
 ---
 
 
+### Mounting
+```js
+import { Sortable, Swap } from 'sortablejs';
+
+Sortable.mount(new Swap());
+```
+
+
+---
+
+
 ### Options
 
 ```js
