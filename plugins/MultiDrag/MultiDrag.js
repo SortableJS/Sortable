@@ -374,7 +374,7 @@ function MultiDragPlugin() {
 				// Do not "unfold" after around dragEl if reverted
 				if ((parentEl[expando].options.sort || parentEl !== rootEl) && multiDragElements.length > 1) {
 					let dragRect = getRect(dragEl),
-						multiDragIndex = index(dragEl, ':not(.' + Sortable.active.options.selectedClass + ')');
+						multiDragIndex = index(dragEl, ':not(.' + this.options.selectedClass + ')');
 
 					if (!initialFolding && options.animation) dragEl.thisAnimationDuration = null;
 

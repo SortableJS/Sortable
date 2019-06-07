@@ -1881,17 +1881,17 @@ Sortable.utils = {
  * @param  {...SortablePlugin|SortablePlugin[]} plugins       Plugins being mounted
  */
 Sortable.mount = function(...plugins) {
-		if (plugins[0].constructor === Array) plugins = plugins[0];
+	if (plugins[0].constructor === Array) plugins = plugins[0];
 
-		for (let i in plugins) {
-			let plugin = plugins[i];
-			if (!plugin.prototype || !plugin.prototype.constructor) {
-				throw `Sortable: Mounted plugin must be a constructor function, not ${ {}.toString.call(el) }`;
-			}
-			if (plugin.utils) Sortable.utils = { ...Sortable.utils, ...plugin.utils };
-
-			PluginManager.mount(plugin);
+	for (let i in plugins) {
+		let plugin = plugins[i];
+		if (!plugin.prototype || !plugin.prototype.constructor) {
+			throw `Sortable: Mounted plugin must be a constructor function, not ${ {}.toString.call(el) }`;
 		}
+		if (plugin.utils) Sortable.utils = { ...Sortable.utils, ...plugin.utils };
+
+		PluginManager.mount(plugin);
+	}
 };
 
 

@@ -11,6 +11,8 @@ import {
 	getWindowScrollingElement
 } from '../../src/utils.js';
 
+import Sortable from '../../src/Sortable.js';
+
 import { Edge, IE11OrLess, Safari } from '../../src/BrowserInfo.js';
 
 let autoScrolls = [],
