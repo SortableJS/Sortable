@@ -3,12 +3,13 @@ This file contains two seperate plugins, RemoveOnSpill and RevertOnSpill. They c
 
 **These plugins are default plugins, and are included in the default UMD and ESM builds of Sortable**
 
+
 ---
 
 
 ### Mounting
 ```js
-import { Sortable, OnSpill } from 'sortablejs';
+import { Sortable, OnSpill } from 'sortablejs/modular/sortable.core.esm';
 
 Sortable.mount(OnSpill);
 ```
@@ -21,7 +22,6 @@ Sortable.mount(OnSpill);
 This plugin, when enabled, will cause the dragged item to be reverted to it's original position if it is spilled (ie. it is dropped outside of a valid Sortable drop target)
 
 
----
 
 
 ### Options
