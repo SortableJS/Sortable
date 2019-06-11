@@ -377,7 +377,7 @@ function Sortable(el, options) {
 		dataIdAttr: 'data-id',
 		delay: 0,
 		delayOnTouchOnly: false,
-		touchStartThreshold: Number.parseInt(window.devicePixelRatio, 10) || 1,
+		touchStartThreshold: (Number.parseInt ? Number : window).parseInt(window.devicePixelRatio, 10) || 1,
 		forceFallback: false,
 		fallbackClass: 'sortable-fallback',
 		fallbackOnBody: false,
@@ -666,7 +666,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 	},
 
 	_triggerDragStart: function (/** Event */evt, /** Touch */touch) {
-		touch = touch || (evt.pointerType == 'touch' ? evt : null);
+		touch = touch || (evt.pointerType == 'touch' && evt);
 
 		if (!this.nativeDraggable || touch) {
 			if (this.options.supportPointer) {
