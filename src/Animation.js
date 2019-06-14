@@ -11,25 +11,25 @@ export default function AnimationStateManager() {
 			if (!this.options.animation) return;
 			let children = [].slice.call(this.el.children);
 
-			for (let i in children) {
-				if (css(children[i], 'display') === 'none' || children[i] === Sortable.ghost) continue;
+			children.forEach(child => {
+				if (css(child, 'display') === 'none' || child === Sortable.ghost) return;
 				animationStates.push({
-					target: children[i],
-					rect: getRect(children[i])
+					target: child,
+					rect: getRect(child)
 				});
-				let fromRect = getRect(children[i]);
+				let fromRect = getRect(child);
 
 				// If animating: compensate for current animation
-				if (children[i].thisAnimationDuration) {
-					let childMatrix = matrix(children[i], true);
+				if (child.thisAnimationDuration) {
+					let childMatrix = matrix(child, true);
 					if (childMatrix) {
 						fromRect.top -= childMatrix.f;
 						fromRect.left -= childMatrix.e;
 					}
 				}
 
-				children[i].fromRect = fromRect;
-			}
+				child.fromRect = fromRect;
+			});
 		},
 
 		addAnimationState(state) {
@@ -50,15 +50,14 @@ export default function AnimationStateManager() {
 			let animating = false,
 				animationTime = 0;
 
-			for (let i in animationStates) {
+			animationStates.forEach((animationState, i) => {
 				let time = 0,
-					animatingThis = false,
-					target = animationStates[i].target,
+					target = animationState.target,
 					fromRect = target.fromRect,
 					toRect = getRect(target),
 					prevFromRect = target.prevFromRect,
 					prevToRect = target.prevToRect,
-					animatingRect = animationStates[i].rect,
+					animatingRect = animationState.rect,
 					targetMatrix = matrix(target, true);
 
 
@@ -90,7 +89,7 @@ export default function AnimationStateManager() {
 						isScrolledPast(target, fromRect, 'right', 'left') ||
 						isScrolledPast(target, fromRect, 'left', 'right')
 					)
-				) continue;
+				) return;
 
 
 				if (target.thisAnimationDuration) {
@@ -137,7 +136,7 @@ export default function AnimationStateManager() {
 					}).bind({ animationStates, i: Number(i) }), time);
 					target.thisAnimationDuration = time;
 				}
-			}
+			});
 
 
 			clearTimeout(animationCallbackId);
