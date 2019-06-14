@@ -1169,7 +1169,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 				}
 
 				direction = _getSwapDirection(
-					evt, target, vertical,
+					evt, target, targetRect, vertical,
 					differentRowCol ? 1 : options.swapThreshold,
 					options.invertedSwapThreshold == null ? options.swapThreshold : options.invertedSwapThreshold,
 					isCircumstantialInvert,
@@ -1721,9 +1721,8 @@ function _ghostIsLast(evt, vertical, sortable) {
 		(evt.clientX > rect.right && evt.clientY > rect.top || evt.clientX <= rect.right && evt.clientY > rect.bottom + spacer);
 }
 
-function _getSwapDirection(evt, target, vertical, swapThreshold, invertedSwapThreshold, invertSwap, isLastTarget) {
-	let targetRect = getRect(target),
-		mouseOnAxis = vertical ? evt.clientY : evt.clientX,
+function _getSwapDirection(evt, target, targetRect, vertical, swapThreshold, invertedSwapThreshold, invertSwap, isLastTarget) {
+	let mouseOnAxis = vertical ? evt.clientY : evt.clientX,
 		targetLength = vertical ? targetRect.height : targetRect.width,
 		targetS1 = vertical ? targetRect.top : targetRect.left,
 		targetS2 = vertical ? targetRect.bottom : targetRect.right,
