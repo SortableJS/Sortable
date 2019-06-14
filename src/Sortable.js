@@ -223,18 +223,18 @@ let dragEl,
 	 * @return {HTMLElement}   Element of the first found nearest Sortable
 	 */
 	_detectNearestEmptySortable = function(x, y) {
-		for (let i in sortables) {
-			if (lastChild(sortables[i])) continue;
+		return sortables.find(sortable => {
+			if (!lastChild(sortable)) {
+				let rect = getRect(sortable),
+					threshold = sortables[i][expando].options.emptyInsertThreshold,
+					insideHorizontally = x >= (rect.left - threshold) && x <= (rect.right + threshold),
+					insideVertically = y >= (rect.top - threshold) && y <= (rect.bottom + threshold);
 
-			let rect = getRect(sortables[i]),
-				threshold = sortables[i][expando].options.emptyInsertThreshold,
-				insideHorizontally = x >= (rect.left - threshold) && x <= (rect.right + threshold),
-				insideVertically = y >= (rect.top - threshold) && y <= (rect.bottom + threshold);
-
-			if (threshold && insideHorizontally && insideVertically) {
-				return sortables[i];
+				if (threshold && insideHorizontally && insideVertically) {
+					return true;
+				}
 			}
-		}
+		});
 	},
 
 	_prepareGroup = function (options) {
@@ -1883,15 +1883,14 @@ Sortable.utils = {
 Sortable.mount = function(...plugins) {
 	if (plugins[0].constructor === Array) plugins = plugins[0];
 
-	for (let i in plugins) {
-		let plugin = plugins[i];
+	plugins.forEach(plugin => {
 		if (!plugin.prototype || !plugin.prototype.constructor) {
 			throw `Sortable: Mounted plugin must be a constructor function, not ${ {}.toString.call(el) }`;
 		}
 		if (plugin.utils) Sortable.utils = { ...Sortable.utils, ...plugin.utils };
 
 		PluginManager.mount(plugin);
-	}
+	});
 };
 
 
