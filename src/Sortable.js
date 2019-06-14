@@ -7,7 +7,7 @@
 
 import { version } from '../package.json';
 
-import { IE11OrLess, Edge, FireFox, Safari, IOS } from './BrowserInfo.js';
+import { IE11OrLess, Edge, FireFox, Safari, IOS, ChromeForAndroid } from './BrowserInfo.js';
 
 import AnimationStateManager from './Animation.js';
 
@@ -143,7 +143,7 @@ let dragEl,
 	CSSFloatProperty = Edge || IE11OrLess ? 'cssFloat' : 'float',
 
 	// This will not pass for IE9, because IE9 DnD only works on anchors
-	supportDraggable = ('draggable' in document.createElement('div')),
+	supportDraggable = !ChromeForAndroid && ('draggable' in document.createElement('div')),
 
 	supportCssPointerEvents = (function() {
 		// false when <= IE11
