@@ -395,8 +395,9 @@ function getRelativeScrollOffset(el) {
  */
 function indexOfObject(arr, obj) {
 	for (let i in arr) {
+		if (!arr.hasOwnProperty(i)) continue;
 		for (let key in obj) {
-			if (obj[key] === arr[i][key]) return Number(i);
+			if (obj.hasOwnProperty(key) && obj[key] === arr[i][key]) return Number(i);
 		}
 	}
 	return -1;

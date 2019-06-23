@@ -223,18 +223,20 @@ let dragEl,
 	 * @return {HTMLElement}   Element of the first found nearest Sortable
 	 */
 	_detectNearestEmptySortable = function(x, y) {
-		for (let i in sortables) {
-			if (lastChild(sortables[i])) continue;
+		let ret;
+		sortables.some((sortable) => {
+			if (lastChild(sortable)) return;
 
-			let rect = getRect(sortables[i]),
-				threshold = sortables[i][expando].options.emptyInsertThreshold,
+			let rect = getRect(sortable),
+				threshold = sortable[expando].options.emptyInsertThreshold,
 				insideHorizontally = x >= (rect.left - threshold) && x <= (rect.right + threshold),
 				insideVertically = y >= (rect.top - threshold) && y <= (rect.bottom + threshold);
 
 			if (threshold && insideHorizontally && insideVertically) {
-				return sortables[i];
+				return (ret = sortable);
 			}
-		}
+		});
+		return ret;
 	},
 
 	_prepareGroup = function (options) {
@@ -312,7 +314,9 @@ let nearestEmptyInsertDetectEvent = function(evt) {
 			// Create imitation event
 			let event = {};
 			for (let i in evt) {
-				event[i] = evt[i];
+				if (evt.hasOwnProperty(i)) {
+					event[i] = evt[i];
+				}
 			}
 			event.target = event.rootEl = nearest;
 			event.preventDefault = void 0;
@@ -1882,15 +1886,14 @@ Sortable.utils = {
 Sortable.mount = function(...plugins) {
 	if (plugins[0].constructor === Array) plugins = plugins[0];
 
-	for (let i in plugins) {
-		let plugin = plugins[i];
+	plugins.forEach((plugin) => {
 		if (!plugin.prototype || !plugin.prototype.constructor) {
 			throw `Sortable: Mounted plugin must be a constructor function, not ${ {}.toString.call(el) }`;
 		}
 		if (plugin.utils) Sortable.utils = { ...Sortable.utils, ...plugin.utils };
 
 		PluginManager.mount(plugin);
-	}
+	});
 };
 
 
