@@ -24,7 +24,8 @@ let multiDragElements = [],
 	dragStarted = false,
 	dragEl,
 	clonesFromRect,
-	clonesHidden;
+	clonesHidden,
+	cursorContainer; // Holds elements while creating drag image
 
 function MultiDragPlugin() {
 	function MultiDrag(sortable) {
@@ -58,7 +59,8 @@ function MultiDragPlugin() {
 					data = dragEl.textContent;
 				}
 				dataTransfer.setData('Text', data);
-			}
+			},
+			stackGhost: false
 		};
 	}
 
@@ -131,7 +133,7 @@ function MultiDragPlugin() {
 			return true;
 		},
 
-		dragStartGlobal({ sortable }) {
+		dragStartGlobal({ originalEvent, setGhost }) {
 			if (!this.isMultiDrag && multiDragSortable) {
 				multiDragSortable.multiDrag._deselectMultiDrag();
 			}
@@ -144,11 +146,41 @@ function MultiDragPlugin() {
 			multiDragElements = multiDragElements.sort(function(a, b) {
 				return a.sortableIndex - b.sortableIndex;
 			});
+
+			if (this.isMultiDrag && this.sortable.options.stackGhost && multiDragElements.length > 1) {
+				cursorContainer = document.createElement('div');
+				css(cursorContainer, 'position', 'relative');
+				css(cursorContainer, 'left', -window.innerWidth*2);
+				css(cursorContainer, 'margin', 0);
+				css(cursorContainer, 'padding', 0);
+				this.sortable.el.appendChild(cursorContainer);
+
+				let culX = 0, culY = 0;
+				for (let i in multiDragElements) {
+					const item = multiDragElements[i].cloneNode(true);
+					const { width, height } = getRect(multiDragElements[i]);
+					cursorContainer.appendChild(item);
+					css(item, 'position', 'absolute');
+					css(item, 'left', culX + 'px');
+					css(item, 'top', culY + 'px');
+					culX += 10;
+					culY += 10;
+					css(item, 'box-sizing', 'border-box');
+					css(item, 'width', width);
+					css(item, 'height', height);
+				}
+				setGhost(cursorContainer, false);
+			}
+
 			dragStarted = true;
 		},
 
-		dragStarted({ sortable }) {
+		dragStarted({ originalEvent, sortable }) {
 			if (!this.isMultiDrag) return;
+			if (cursorContainer && originalEvent.dataTransfer) {
+				cursorContainer.parentNode.removeChild(cursorContainer);
+				cursorContainer = null;
+			}
 			if (sortable.options.sort) {
 				// Capture rects,
 				// hide multi drag elements (by positioning them absolute),
@@ -303,6 +335,12 @@ function MultiDragPlugin() {
 
 			let options = sortable.options,
 				children = parentEl.children;
+
+			// Remove custom ghost image
+			if (cursorContainer) {
+				cursorContainer.parentNode.removeChild(cursorContainer);
+				cursorContainer = null;
+			}
 
 			// Multi-drag selection
 			if (!dragStarted) {

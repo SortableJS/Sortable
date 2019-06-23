@@ -15,7 +15,16 @@ var example1 = document.getElementById('example1'),
 // Example 1 - Simple list
 new Sortable(example1, {
 	animation: 150,
-	ghostClass: 'blue-background-class'
+	ghostClass: 'blue-background-class',
+	setData(dataTransfer, dragEl) {
+		let holder = document.createElement('div');
+		example1.appendChild(holder);
+		holder.appendChild(dragEl.cloneNode(true));
+		dataTransfer.setDragImage(holder, 10, 10);
+		setTimeout(() => {
+			example1.removeChild(holder);
+		}, 100);
+	}
 });
 
 
@@ -208,8 +217,9 @@ for (var i = 0; i < nestedSortables.length; i++) {
 
 // MultiDrag demo
 new Sortable(multiDragDemo, {
-	multiDrag: true,
-	selectedClass: 'selected',
+	multiDrag: true, // Enable multi-drag
+	stackGhost: true, // Stack the items under the cursor while dragging
+	selectedClass: 'selected', // The class applied to the selected items
 	animation: 150
 });
 

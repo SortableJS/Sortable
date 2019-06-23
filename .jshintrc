@@ -6,6 +6,7 @@
 	"supernew": true,
 	"laxbreak": true,
 	"esversion": 9,
+	"-W138": true,
 	"white": true,
 	"globals": {
 		"define": true,

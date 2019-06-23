@@ -27,6 +27,7 @@ new Sortable(el, {
 	multiDrag: false, // Enable the plugin
 	selectedClass: "sortable-selected", // Class name for selected item
 	multiDragKey: null, // Key that must be down for items to be selected
+	stackGhost: false, // Stack the items under the cursor while dragging
 
 	// Called when an item is selected
 	onSelect: function(/**Event*/evt) {
@@ -72,6 +73,13 @@ Sortable.create(list, {
 
 ---
 
+
+#### `stackGhost` option
+When set to `true`, the ghost image under the cursor will be the items that are being dragged stacked on top of eachother.
+Defaults to `false`. This option may not work on some browsers if using native drag & drop.
+
+
+---
 
 ### Event Properties
  - items:`HTMLElement[]` — Array of selected items, or empty

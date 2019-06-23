@@ -143,7 +143,7 @@ let dragEl,
 	CSSFloatProperty = Edge || IE11OrLess ? 'cssFloat' : 'float',
 
 	// This will not pass for IE9, because IE9 DnD only works on anchors
-	supportDraggable = !ChromeForAndroid && ('draggable' in document.createElement('div')),
+	supportDraggable = !ChromeForAndroid && !IOS && ('draggable' in document.createElement('div')),
 
 	supportCssPointerEvents = (function() {
 		// false when <= IE11
@@ -698,7 +698,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		}
 	},
 
-	_dragStarted: function (fallback, evt) {
+	_dragStarted: function (fallback, evt, ghostImg, keepGhostOffset) {
 		let _this = this;
 		awaitingDragStarted = false;
 		if (rootEl && dragEl) {
@@ -715,7 +715,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 
 			Sortable.active = this;
 
-			fallback && this._appendGhost();
+			fallback && this._appendGhost(ghostImg, !keepGhostOffset ? evt.clientX : null, !keepGhostOffset ? evt.clientY : null);
 
 			// Drag start event
 			_dispatchEvent({
@@ -813,13 +813,26 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		}
 	},
 
-	_appendGhost: function () {
+	/**
+	 * Append the ghost element
+	 * @param  {[HTMLElement]} image  Optional element to be used as the ghost
+	 * @param  {[Number]} xPos        X position of the ghost, defaults to position of dragged element
+	 * @param  {[Number]} yPos        Y position of the ghost, defaults to position of dragged element
+	 */
+	_appendGhost: function (image, xPos, yPos) {
 		// Bug if using scale(): https://stackoverflow.com/questions/2637058
 		// Not being adjusted for
 		if (!ghostEl) {
 			let container = this.options.fallbackOnBody ? document.body : rootEl,
-				rect = getRect(dragEl, true, PositionGhostAbsolutely, true, container),
+				rect,
 				options = this.options;
+
+			if (!image || xPos == undefined || yPos == undefined) {
+				rect = getRect(dragEl, true, PositionGhostAbsolutely, true, container);
+			}
+
+			(xPos == undefined) && (xPos = rect.left);
+			(yPos == undefined) && (yPos = rect.top);
 
 			// Position absolutely
 			if (PositionGhostAbsolutely) {
@@ -837,8 +850,8 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 				if (ghostRelativeParent !== document.body && ghostRelativeParent !== document.documentElement) {
 					if (ghostRelativeParent === document) ghostRelativeParent = getWindowScrollingElement();
 
-					rect.top += ghostRelativeParent.scrollTop;
-					rect.left += ghostRelativeParent.scrollLeft;
+					yPos += ghostRelativeParent.scrollTop;
+					xPos += ghostRelativeParent.scrollLeft;
 				} else {
 					ghostRelativeParent = getWindowScrollingElement();
 				}
@@ -846,7 +859,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			}
 
 
-			ghostEl = dragEl.cloneNode(true);
+			ghostEl = image || dragEl.cloneNode(true);
 
 			toggleClass(ghostEl, options.ghostClass, false);
 			toggleClass(ghostEl, options.fallbackClass, true);
@@ -855,13 +868,16 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			css(ghostEl, 'transition', '');
 			css(ghostEl, 'transform', '');
 
-			css(ghostEl, 'box-sizing', 'border-box');
-			css(ghostEl, 'margin', 0);
-			css(ghostEl, 'top', rect.top);
-			css(ghostEl, 'left', rect.left);
-			css(ghostEl, 'width', rect.width);
-			css(ghostEl, 'height', rect.height);
-			css(ghostEl, 'opacity', '0.8');
+			if (!image) {
+				css(ghostEl, 'box-sizing', 'border-box');
+				css(ghostEl, 'margin', 0);
+				css(ghostEl, 'width', rect.width);
+				css(ghostEl, 'height', rect.height);
+				css(ghostEl, 'opacity', '0.8');
+			}
+			css(ghostEl, 'top', yPos);
+			css(ghostEl, 'left', xPos);
+
 			css(ghostEl, 'position', (PositionGhostAbsolutely ? 'absolute' : 'fixed'));
 			css(ghostEl, 'zIndex', '100000');
 			css(ghostEl, 'pointerEvents', 'none');
@@ -876,8 +892,24 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		let _this = this;
 		let dataTransfer = evt.dataTransfer;
 		let options = _this.options;
-
-		pluginEvent('dragStart', this, { evt });
+		let ghostImg, keepGhostOffset = true;
+		pluginEvent('dragStart', this, {
+			evt,
+			setGhost(img, keepOffset = true) {
+				const dragRect = getRect(dragEl);
+				if (_this.nativeDraggable) {
+					evt.dataTransfer &&
+					evt.dataTransfer.setDragImage &&
+					evt.dataTransfer.setDragImage(img,
+						keepOffset ? evt.clientX - dragRect.left : 0,
+						keepOffset ? evt.clientY - dragRect.top : 0
+					);
+				} else {
+					ghostImg = img;
+					keepGhostOffset = keepOffset;
+				}
+			}
+		});
 		if (Sortable.eventCanceled) {
 			this._onDrop();
 			return;
@@ -938,8 +970,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		}
 
 		awaitingDragStarted = true;
-
-		_this._dragStartId = _nextTick(_this._dragStarted.bind(_this, fallback, evt));
+		_this._dragStartId = _nextTick(_this._dragStarted.bind(_this, fallback, evt, ghostImg, keepGhostOffset));
 		on(document, 'selectstart', _this);
 
 		moved = true;
