@@ -34,6 +34,7 @@
 	"files": [
 		"Sortable.js",
 		"Sortable.min.js",
+		"types/",
 		"modular/"
 	],
 	"keywords": [
@@ -47,5 +48,6 @@
 		"vue",
 		"mixin"
 	],
+	"types": "./types/index.d.ts",
 	"license": "MIT"
 }
