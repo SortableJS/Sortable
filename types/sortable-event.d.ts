@@ -9,13 +9,25 @@ export interface SortableEvent extends Event {
 	 */
 	item: HTMLElement;
 	/**
+	 * new index within parent, only counting draggable elements
+	 */
+	newDraggableIndex: number | undefined;
+	/**
 	 * new index within parent
 	 */
 	newIndex: number | undefined;
 	/**
+	 * old index within parent, only counting draggable elements
+	 */
+	oldDraggableIndex: number | undefined;
+	/**
 	 * old index within parent
 	 */
 	oldIndex: number | undefined;
+	/**
+	 * Pull mode if dragging into another sortable
+	 */
+	pullMode: 'clone' | boolean | undefined;
 	target: HTMLElement;
 	/**
 	 * list, in which moved element.

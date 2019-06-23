@@ -66,4 +66,9 @@ export interface SortableUtils {
 	 * @param state a class's state.
 	 */
 	toggleClass(element: HTMLElement, name: string, state: boolean): void;
+	/**
+	 * Automatically detect the direction of the element as either 'vertical' or 'horizontal'
+	 * @param element an HTMLElement.
+	 */
+	detectDirection(element: HTMLElement): 'vertical' | 'horizontal';
 }

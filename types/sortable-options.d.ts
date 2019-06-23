@@ -23,7 +23,7 @@ export interface SortableGroupOptions {
 	 */
 	checkPut?: (to: Sortable) => boolean;
 	/**
-	 * revert cloned element to initial position after moving to a another list.
+	 * revert cloned element to initial position after moving to another list.
 	 */
 	revertClone?: boolean;
 }
@@ -42,6 +42,14 @@ export interface SortableOptions {
 	 * time in milliseconds to define when the sorting should start
 	 */
 	delay?: number;
+	/*
+	 * only delay if user is using touch
+	 */
+	delayOnTouchOnly?: Boolean;
+	/**
+	 * Direction of Sortable (will be detected automatically if not given)
+	 */
+	direction?: 'horizontal' | 'vertical' | ((event: Event, target: HTMLElement, dragEl: HTMLElement) => 'horizontal'|'vertical');
 	/**
 	 * Disables the sortable if set to true.
 	 */
@@ -56,6 +64,14 @@ export interface SortableOptions {
 	draggable?: string;
 	dragoverBubble?: boolean;
 	dropBubble?: boolean;
+	/**
+	 * Easing for animation. Defaults to null. See https://easings.net/ for examples.
+	 */
+	easing?: string;
+	/**
+	 * distance in px mouse must be from empty sortable to insert drag element into it
+	 */
+	emptyInsertThreshold?: number;
 	/**
 	 * Class name for the cloned DOM Element when using forceFallback
 	 */
@@ -92,9 +108,21 @@ export interface SortableOptions {
 	handle?: string;
 	ignore?: string;
 	/**
+	 * Threshold of the inverted swap zone (will be set to swapThreshold value by default)
+	 */
+	invertedSwapThreshold?: number,
+	/**
+	 * Will always use inverted swap zone if set to true
+	 */
+	invertSwap?: boolean,
+	/**
 	 * Call `event.preventDefault()` when triggered `filter`
 	 */
 	preventOnFilter?: boolean;
+	/**
+	 * Remove the clone element when it is not showing, rather than just hiding it
+	 */
+	removeCloneOnHide?: boolean;
 	scroll?: boolean;
 	/**
 	 * if you have custom scrollbar scrollFn may be used for autoscrolling
@@ -116,6 +144,14 @@ export interface SortableOptions {
 		get: (sortable: Sortable) => string[];
 		set: (sortable: Sortable) => void;
 	};
+	/*
+	 * Threshold of the swap zone
+	 */
+	swapThreshold?: number,
+	/*
+	 * how many pixels the point should move before cancelling a delayed drag event
+	 */
+	touchStartThreshold?: number;
 	setData?: (dataTransfer: DataTransfer, draggedElement: HTMLElement) => void;
 	/**
 	 * Element dragging started
@@ -133,6 +169,10 @@ export interface SortableOptions {
 	 * Created a clone of an element
 	 */
 	onClone?: (event: SortableEvent) => void;
+	/**
+	 * Dragging element changes position
+	 */
+	onChange?: (event: SortableEvent) => void;
 	/**
 	 * Element is chosen
 	 */
