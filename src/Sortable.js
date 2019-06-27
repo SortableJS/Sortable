@@ -143,7 +143,7 @@ let dragEl,
 	CSSFloatProperty = Edge || IE11OrLess ? 'cssFloat' : 'float',
 
 	// This will not pass for IE9, because IE9 DnD only works on anchors
-	supportDraggable = !ChromeForAndroid && ('draggable' in document.createElement('div')),
+	supportDraggable = !ChromeForAndroid && !IOS && ('draggable' in document.createElement('div')),
 
 	supportCssPointerEvents = (function() {
 		// false when <= IE11
