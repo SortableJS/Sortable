@@ -95,8 +95,8 @@ function AutoScrollPlugin() {
 		},
 
 		_handleAutoScroll(evt, fallback) {
-			const x = evt.clientX,
-				y = evt.clientY,
+			const x = (evt.touches ? evt.touches[0] : evt).clientX,
+				y = (evt.touches ? evt.touches[0] : evt).clientY,
 
 				elem = document.elementFromPoint(x, y);
 

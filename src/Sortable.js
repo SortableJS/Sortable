@@ -178,7 +178,7 @@ let dragEl,
 			return elCSS.gridTemplateColumns.split(' ').length <= 1 ? 'vertical' : 'horizontal';
 		}
 
-		if (child1 && firstChildCSS.float !== 'none') {
+		if (child1 && firstChildCSS.float && firstChildCSS.float !== 'none') {
 			let touchingSideChild2 = firstChildCSS.float === 'left' ? 'left' : 'right';
 
 			return child2 && (secondChildCSS.clear === 'both' || secondChildCSS.clear === touchingSideChild2) ?
@@ -1878,6 +1878,15 @@ Sortable.utils = {
 	getChild: getChild
 };
 
+
+/**
+ * Get the Sortable instance of an element
+ * @param  {HTMLElement} element The element
+ * @return {Sortable|undefined}         The instance of Sortable
+ */
+Sortable.get = function(element) {
+	return element[expando];
+};
 
 /**
  * Mount a plugin to Sortable

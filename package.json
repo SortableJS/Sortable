@@ -10,6 +10,8 @@
 		"rollup-plugin-babel": "^4.3.2",
 		"rollup-plugin-json": "^4.0.0",
 		"rollup-plugin-node-resolve": "^5.0.0",
+		"testcafe": "^1.2.1",
+		"testcafe-browser-provider-browserstack": "^1.9.0",
 		"uglify-js": "^3.5.12"
 	},
 	"description": "JavaScript library for reorderable drag-and-drop lists on modern browsers and touch devices. No jQuery required. Supports Meteor, AngularJS, React, Polymer, Vue, Knockout and any CSS library, e.g. Bootstrap.",
@@ -21,7 +23,8 @@
 		"build:es": "set NODE_ENV=es&& rollup -c build/esm-build.js",
 		"build:es:watch": "set NODE_ENV=es&& rollup -w -c build/esm-build.js",
 		"minify": "node build/minify.js",
-		"build": "npm run build:es && npm run build:umd && npm run minify"
+		"build": "npm run build:es && npm run build:umd && npm run minify",
+		"test": "node ./build/test.js"
 	},
 	"maintainers": [
 		"Konstantin Lebedev <ibnRubaXa@gmail.com>",
