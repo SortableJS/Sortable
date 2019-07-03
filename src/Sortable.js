@@ -457,7 +457,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			options = this.options,
 			preventOnFilter = options.preventOnFilter,
 			type = evt.type,
-			touch = evt.touches && evt.touches[0],
+			touch = (evt.touches && evt.touches[0]) || (evt.pointerType && evt.pointerType === 'touch' && evt),
 			target = (touch || evt).target,
 			originalTarget = evt.target.shadowRoot && ((evt.path && evt.path[0]) || (evt.composedPath && evt.composedPath()[0])) || target,
 			filter = options.filter;
@@ -1888,7 +1888,7 @@ Sortable.mount = function(...plugins) {
 
 	plugins.forEach((plugin) => {
 		if (!plugin.prototype || !plugin.prototype.constructor) {
-			throw `Sortable: Mounted plugin must be a constructor function, not ${ {}.toString.call(el) }`;
+			throw `Sortable: Mounted plugin must be a constructor function, not ${ {}.toString.call(plugin) }`;
 		}
 		if (plugin.utils) Sortable.utils = { ...Sortable.utils, ...plugin.utils };
 
