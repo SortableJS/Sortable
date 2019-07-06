@@ -1,5 +1,5 @@
 .list > div {
-	height: 50px;
+	min-height: 50px;
 	border-style: solid;
 	border-width: 2px;
 	text-align: center;

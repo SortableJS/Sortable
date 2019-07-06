@@ -284,7 +284,7 @@ Whether or not the delay should be applied only if the user is using touch (eg. 
 
 
 #### `swapThreshold` option
-Percentage of the target that the swap zone will take up, as a float between `0` and `1`. This option has nothing to do with the `swap` option.
+Percentage of the target that the swap zone will take up, as a float between `0` and `1`.
 
 [Read more](https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction#swap-threshold)
 
@@ -295,7 +295,7 @@ Demo: http://sortablejs.github.io/Sortable#thresholds
 
 
 #### `invertSwap` option
-Set to `true` to set the swap zone to the sides of the target, for the effect of sorting "in between" items. This option has nothing to do with the `swap` option.
+Set to `true` to set the swap zone to the sides of the target, for the effect of sorting "in between" items.
 
 [Read more](https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction#forcing-inverted-swap-zone)
 
@@ -306,7 +306,7 @@ Demo: http://sortablejs.github.io/Sortable#thresholds
 
 
 #### `invertedSwapThreshold` option
-Percentage of the target that the inverted swap zone will take up, as a float between `0` and `1`. If not given, will default to `swapThreshold`. This option has nothing to do with the `swap` option.
+Percentage of the target that the inverted swap zone will take up, as a float between `0` and `1`. If not given, will default to `swapThreshold`.
 
 [Read more](https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction#dealing-with-swap-glitching)
 
