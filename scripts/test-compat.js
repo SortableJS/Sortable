@@ -19,9 +19,7 @@ createTestCafe().then((tc) => {
 	return runner
 		.src('./tests/Sortable.compat.test.js')
 		.browsers(browsers)
-		.run({
-			speed: 0.5
-		});
+		.run();
 }).then(() => {
     testcafe.close();
 });

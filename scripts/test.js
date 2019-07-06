@@ -10,9 +10,7 @@ createTestCafe().then((tc) => {
 	return runner
 		.src('./tests/Sortable.test.js')
 		.browsers('chrome')
-		.run({
-			speed: 0.5
-		});
+		.run();
 }).then(() => {
     testcafe.close();
 });
