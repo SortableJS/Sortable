@@ -10,6 +10,7 @@ createTestCafe().then((tc) => {
 	return runner
 		.src('./tests/Sortable.test.js')
 		.browsers('chrome')
+		.concurrency(3)
 		.run();
 }).then(() => {
     testcafe.close();
