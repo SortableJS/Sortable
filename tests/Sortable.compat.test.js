@@ -1,4 +1,4 @@
-import { t, Selector } from 'testcafe';
+import { Selector } from 'testcafe';
 
 
 fixture `Simple Sorting`

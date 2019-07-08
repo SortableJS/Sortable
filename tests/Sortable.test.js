@@ -1,4 +1,4 @@
-import { t, Selector } from 'testcafe';
+import { Selector } from 'testcafe';
 const itemHeight = 54; // px
 const leeway = 1;
 
