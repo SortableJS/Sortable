@@ -19,9 +19,7 @@ jobs:
           key: v1-dependencies-{{ checksum "package.json" }}
 
       - run: npm run test:compat
-      - store_test_results:
-          path: /tmp/test-results
-
       - run: npm run test
+
       - store_test_results:
           path: /tmp/test-results
