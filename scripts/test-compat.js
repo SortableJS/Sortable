@@ -3,7 +3,7 @@ const createTestCafe = require('testcafe');
 // Testcafe testing on Chrome Android is currently broken (https://github.com/DevExpress/testcafe/issues/3948)
 const browsers = [
 	'saucelabs:iPhone XS Simulator@12.2',
-	'saucelabs:Internet Explorer@9.0:Windows 7'
+	'saucelabs:Internet Explorer@11.285:Windows 10'
 	//
 	// 'saucelabs:Chrome@75.0:Windows 10'
 	//
