@@ -20,7 +20,7 @@
 	"main": "./Sortable.js",
 	"module": "modular/sortable.esm.js",
 	"scripts": {
-		"build:umd": "set NODE_ENV=umd&& rollup -c ./scripts/umd-build.js",
+		"build:umd": "NODE_ENV=umd rollup -c ./scripts/umd-build.js",
 		"build:umd:watch": "set NODE_ENV=umd&& rollup -w -c ./scripts/umd-build.js",
 		"build:es": "set NODE_ENV=es&& rollup -c ./scripts/esm-build.js",
 		"build:es:watch": "set NODE_ENV=es&& rollup -w -c ./scripts/esm-build.js",
