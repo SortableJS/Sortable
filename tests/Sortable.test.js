@@ -57,7 +57,7 @@ test('Swap threshold', async browser => {
 		.expect(dragStartPosition.innerText).eql(dragEl.innerText)
 		.expect(targetStartPosition.innerText).eql(target.innerText)
 		.dragToElement(dragEl, target, {
-			destinationOffsetY: Math.round(itemHeight / 2 * 0.4 - leeway)
+			destinationOffsetY: Math.round(itemHeight / 2 * 0.4 + leeway)
 		})
 		.expect(dragStartPosition.innerText).eql(dragEl.innerText)
 		.expect(targetStartPosition.innerText).eql(target.innerText)
