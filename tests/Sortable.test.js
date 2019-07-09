@@ -120,7 +120,7 @@ test('Inverted swap threshold', async browser => {
 		.expect(dragStartPosition.innerText).eql(dragEl.innerText)
 		.expect(targetStartPosition.innerText).eql(target.innerText)
 		.dragToElement(dragEl, target, {
-			destinationOffsetY: Math.round(itemHeight - (itemHeight / 2 * 0.5) + leeway)
+			destinationOffsetY: Math.round(itemHeight - (itemHeight / 2 * 0.5) - leeway)
 		})
 		.expect(dragEndPosition.innerText).eql(dragEl.innerText)
 		.expect(targetEndPosition.innerText).eql(target.innerText);
