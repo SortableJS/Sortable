@@ -20,11 +20,11 @@
 	"main": "./Sortable.js",
 	"module": "modular/sortable.esm.js",
 	"scripts": {
-		"build:umd": "set NODE_ENV=umd&& rollup -c build/umd-build.js",
-		"build:umd:watch": "set NODE_ENV=umd&& rollup -w -c build/umd-build.js",
-		"build:es": "set NODE_ENV=es&& rollup -c build/esm-build.js",
-		"build:es:watch": "set NODE_ENV=es&& rollup -w -c build/esm-build.js",
-		"minify": "node build/minify.js",
+		"build:umd": "set NODE_ENV=umd&& rollup -c ./build/umd-build.js",
+		"build:umd:watch": "set NODE_ENV=umd&& rollup -w -c ./build/umd-build.js",
+		"build:es": "set NODE_ENV=es&& rollup -c ./build/esm-build.js",
+		"build:es:watch": "set NODE_ENV=es&& rollup -w -c ./build/esm-build.js",
+		"minify": "node ./build/minify.js",
 		"build": "npm run build:es && npm run build:umd && npm run minify",
 		"test:compat": "node ./scripts/test-compat.js",
 		"test": "node ./scripts/test.js"
