@@ -14,6 +14,8 @@ createTestCafe().then((tc) => {
 		.concurrency(3)
 		.run();
 }).then((actualFailedCount) => {
-    testcafe.close();
+	failedCount = actualFailedCount;
+	console.log('FAILED COUNT', actualFailedCount)
+    return testcafe.close();
 }).then(() => process.exit(failedCount));
 
