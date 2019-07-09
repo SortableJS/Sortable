@@ -20,6 +20,10 @@ jobs:
 
       - run: npm run build:umd
 
+      - store_artifacts:
+          path: ./Sortable.js
+
+
       - run: npm run test:compat
       - run: npm run test
 
