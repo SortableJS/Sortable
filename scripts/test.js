@@ -2,6 +2,7 @@ const createTestCafe = require('testcafe');
 
 let testcafe;
 let runner;
+let failedCount;
 
 
 createTestCafe().then((tc) => {
@@ -12,8 +13,7 @@ createTestCafe().then((tc) => {
 		.browsers('chrome')
 		.concurrency(3)
 		.run();
-}).then(() => {
+}).then((actualFailedCount) => {
     testcafe.close();
-});
-
+}).then(() => process.exit(failedCount));
 

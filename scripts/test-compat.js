@@ -11,7 +11,7 @@ const browsers = [
 ];
 let testcafe;
 let runner;
-
+let failedCount;
 
 createTestCafe(null, 8000, 8001).then((tc) => {
 	testcafe = tc;
@@ -20,8 +20,10 @@ createTestCafe(null, 8000, 8001).then((tc) => {
 		.src('./tests/Sortable.compat.test.js')
 		.browsers(browsers)
 		.run();
-}).then(() => {
-    testcafe.close();
-});
+}).then((actualFailedCount) => {
+	// https://testcafe-discuss.devexpress.com/t/why-circleci-marked-build-as-green-even-if-this-build-contain-failed-test/726/2
+	failedCount = actualFailedCount;
+    return testcafe.close();
+}).then(() => process.exit(failedCount));
 
 
