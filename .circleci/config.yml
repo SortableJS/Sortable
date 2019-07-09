@@ -18,6 +18,8 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
 
+      - run: npm build:umd
+
       - run: npm run test:compat
       - run: npm run test
 
