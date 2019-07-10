@@ -18,8 +18,8 @@ test('Sort down list', async browser => {
 		.expect(dragStartPosition.innerText).eql(dragEl.innerText)
 		.expect(targetStartPosition.innerText).eql(target.innerText)
 		.dragToElement(dragEl, target)
-		.expect(dragEndPosition.innerText).eql(dragEl.innerText)
-		.expect(targetEndPosition.innerText).eql(target.innerText);
+		.expect(dragEndPosition.innerText).eql(target.innerText)
+		.expect(targetEndPosition.innerText).eql(dragEl.innerText);
 });
 
 test('Sort up list', async browser => {
