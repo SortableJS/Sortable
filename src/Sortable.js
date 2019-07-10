@@ -961,7 +961,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			group = options.group,
 			activeSortable = Sortable.active,
 			isOwner = (activeGroup === group),
-			canSort = options.sort,
+			canSort = false,
 			fromSortable = (putSortable || activeSortable),
 			vertical,
 			_this = this,
