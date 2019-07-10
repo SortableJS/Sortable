@@ -2,17 +2,12 @@ const createTestCafe = require('testcafe');
 // Testcafe cannot test on IE < 11
 // Testcafe testing on Chrome Android is currently broken (https://github.com/DevExpress/testcafe/issues/3948)
 const browsers = [
-	// 'saucelabs:iPhone XS Simulator@12.2',
-	// 'saucelabs:Internet Explorer@11.285:Windows 10'
-	//
-	// 'saucelabs:Chrome@75.0:Windows 10'
-	//
+	'saucelabs:Internet Explorer@11.285:Windows 10',
+	'saucelabs:MicrosoftEdge@16.16299:Windows 10',
+	'saucelabs:iPhone XS Simulator@12.2',
+	'saucelabs:Safari@12.0:macOS 10.14',
 	'chrome:headless',
-	'firefox:headless',
-	'browserstack:edge@16.0:Windows 10',
-	'browserstack:safari@12.1:OS X Mojave',
-	'browserstack:ie@11.0:Windows 10',
-	'browserstack:iPhone 8@12.1'
+	'firefox:headless'
 ];
 let testcafe;
 let runner;
