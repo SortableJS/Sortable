@@ -9,6 +9,7 @@ const browsers = [
 	'chrome:headless',
 	'firefox:headless'
 ];
+
 let testcafe;
 let runner;
 let failedCount;

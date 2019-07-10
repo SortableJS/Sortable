@@ -19,10 +19,6 @@
  2. Clone locally
  3. Run `npm i` in the local repo
 
-### Testing
- - To run the e2e tests in Chrome, use `npm run test`
- - Tests will be run automatically in continuous integration before your PR is merged
-
 ### Building
 
  - For development, build the `./Sortable.js` file using the command `npm run build:umd:watch`

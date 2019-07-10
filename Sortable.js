@@ -1032,7 +1032,7 @@
       return elCSS.gridTemplateColumns.split(' ').length <= 1 ? 'vertical' : 'horizontal';
     }
 
-    if (child1 && firstChildCSS["float"] && firstChildCSS["float"] !== 'none') {
+    if (child1 && firstChildCSS["float"] !== 'none') {
       var touchingSideChild2 = firstChildCSS["float"] === 'left' ? 'left' : 'right';
       return child2 && (secondChildCSS.clear === 'both' || secondChildCSS.clear === touchingSideChild2) ? 'vertical' : 'horizontal';
     }
@@ -2588,19 +2588,9 @@
     getChild: getChild
   };
   /**
-   * Get the Sortable instance of an element
-   * @param  {HTMLElement} element The element
-   * @return {Sortable|undefined}         The instance of Sortable
-   */
-
-  Sortable.get = function (element) {
-    return element[expando];
-  };
-  /**
    * Mount a plugin to Sortable
    * @param  {...SortablePlugin|SortablePlugin[]} plugins       Plugins being mounted
    */
-
 
   Sortable.mount = function () {
     for (var _len = arguments.length, plugins = new Array(_len), _key = 0; _key < _len; _key++) {
@@ -2703,8 +2693,8 @@
       _handleAutoScroll: function _handleAutoScroll(evt, fallback) {
         var _this = this;
 
-        var x = (evt.touches ? evt.touches[0] : evt).clientX,
-            y = (evt.touches ? evt.touches[0] : evt).clientY,
+        var x = evt.clientX,
+            y = evt.clientY,
             elem = document.elementFromPoint(x, y);
         touchEvt$1 = evt; // IE does not seem to have native autoscroll,
         // Edge's autoscroll seems too conditional,

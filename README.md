@@ -694,7 +694,14 @@ The clone element.
 ---
 
 
-##### Sortable.mount(plugin:`...SortablePlugin|...SortablePlugin[]`)
+##### Sortable.get(element:`HTMLElement`):`Sortable`
+Get the Sortable instance on an element.
+
+
+---
+
+
+##### Sortable.mount(plugin:`...SortablePlugin|SortablePlugin[]`)
 Mounts a plugin to Sortable.
 
 
