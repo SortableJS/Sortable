@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="./style.css">
+</head>
+<body>
+
+<div class="list" id="list1">
+	<div>Item 1.1</div>
+	<div>Item 1.2</div>
+	<div class="filtered">Item 1.3</div>
+	<div>Item 1.4</div>
+	<div>Item 1.5</div>
+</div>
+
+
+
+
+<script src="../Sortable.js"></script>
+
+<script type="text/javascript">
+	new Sortable(document.getElementById('list1'), { filter: '.filtered' });
+</script>
+
+</body>
+</html>

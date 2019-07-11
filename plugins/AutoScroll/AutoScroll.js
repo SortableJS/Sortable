@@ -95,8 +95,8 @@ function AutoScrollPlugin() {
 		},
 
 		_handleAutoScroll(evt, fallback) {
-			const x = evt.clientX,
-				y = evt.clientY,
+			const x = (evt.touches ? evt.touches[0] : evt).clientX,
+				y = (evt.touches ? evt.touches[0] : evt).clientY,
 
 				elem = document.elementFromPoint(x, y);
 
@@ -164,7 +164,9 @@ function clearPointerElemChangedInterval() {
 const autoScroll = throttle(function(evt, options, rootEl, isFallback) {
 	// Bug: https://bugzilla.mozilla.org/show_bug.cgi?id=505521
 	if (!options.scroll) return;
-	const sens = options.scrollSensitivity,
+	const x = (evt.touches ? evt.touches[0] : evt).clientX,
+		y = (evt.touches ? evt.touches[0] : evt).clientY,
+		sens = options.scrollSensitivity,
 		speed = options.scrollSpeed,
 		winScroller = getWindowScrollingElement();
 
@@ -220,8 +222,8 @@ const autoScroll = throttle(function(evt, options, rootEl, isFallback) {
 			canScrollY = height < scrollHeight && (elCSS.overflowY === 'auto' || elCSS.overflowY === 'scroll');
 		}
 
-		let vx = canScrollX && (Math.abs(right - evt.clientX) <= sens && (scrollPosX + width) < scrollWidth) - (Math.abs(left - evt.clientX) <= sens && !!scrollPosX);
-		let vy = canScrollY && (Math.abs(bottom - evt.clientY) <= sens && (scrollPosY + height) < scrollHeight) - (Math.abs(top - evt.clientY) <= sens && !!scrollPosY);
+		let vx = canScrollX && (Math.abs(right - x) <= sens && (scrollPosX + width) < scrollWidth) - (Math.abs(left - x) <= sens && !!scrollPosX);
+		let vy = canScrollY && (Math.abs(bottom - y) <= sens && (scrollPosY + height) < scrollHeight) - (Math.abs(top - y) <= sens && !!scrollPosY);
 
 
 		if (!autoScrolls[layersOut]) {
