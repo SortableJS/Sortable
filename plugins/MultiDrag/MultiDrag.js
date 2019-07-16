@@ -596,7 +596,7 @@ function insertMultiDragElements(clonesInserted, rootEl) {
  * @param  {HTMLElement} rootEl
  */
 function insertMultiDragClones(elementsInserted, rootEl) {
-	multiDragClones.forEach(clone => {
+	multiDragClones.forEach((clone, i) => {
 		let target = rootEl.children[clone.sortableIndex + (elementsInserted ? Number(i) : 0)];
 		if (target) {
 			rootEl.insertBefore(clone, target);
