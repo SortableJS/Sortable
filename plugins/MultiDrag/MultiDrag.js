@@ -580,7 +580,7 @@ function MultiDragPlugin() {
 }
 
 function insertMultiDragElements(clonesInserted, rootEl) {
-	multiDragElements.forEach(multiDragElement => {
+	multiDragElements.forEach((multiDragElement, i) => {
 		let target = rootEl.children[multiDragElement.sortableIndex + (clonesInserted ? Number(i) : 0)];
 		if (target) {
 			rootEl.insertBefore(multiDragElement, target);
