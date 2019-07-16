@@ -20,7 +20,10 @@ jobs:
 
       - run: npm run build:umd
 
-      - run: npm run test:compat
+      - run: |
+        if [ -z "$CIRCLE_PR_NUMBER" ]; then
+          npm run test:compat
+        fi
       - run: npm run test
 
       - store_test_results:
