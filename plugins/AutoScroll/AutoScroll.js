@@ -107,7 +107,7 @@ function AutoScrollPlugin() {
 			// MACOS Safari does not have autoscroll,
 			// Firefox and Chrome are good
 			if (fallback || Edge || IE11OrLess || Safari) {
-				autoScroll(evt, this.options, elem, fallback);
+				autoScroll(evt, this.sortable.options, elem, fallback);
 
 				// Listener for pointer element change
 				let ogElemScroller = getParentAutoScrollElement(elem, true);
@@ -127,7 +127,7 @@ function AutoScrollPlugin() {
 							ogElemScroller = newElem;
 							clearAutoScrolls();
 						}
-						autoScroll(evt, this.options, newElem, fallback);
+						autoScroll(evt, this.sortable.options, newElem, fallback);
 					}, 10);
 					lastAutoScrollX = x;
 					lastAutoScrollY = y;
@@ -138,7 +138,7 @@ function AutoScrollPlugin() {
 					clearAutoScrolls();
 					return;
 				}
-				autoScroll(evt, this.options, getParentAutoScrollElement(elem, false), false);
+				autoScroll(evt, this.sortable.options, getParentAutoScrollElement(elem, false), false);
 			}
 		}
 	};
