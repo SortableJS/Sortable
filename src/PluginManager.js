@@ -12,7 +12,9 @@ export default {
 				plugin[option] = defaults[option];
 			}
 		}
-		plugins.push(plugin);
+		if(!!~plugins.indexOf(plugin)) {
+			plugins.push(plugin);
+		}
 	},
 	pluginEvent(eventName, sortable, evt) {
 		this.eventCanceled = false;
