@@ -11,7 +11,9 @@ export default function dispatchEvent(
 		originalEvent, putSortable, eventOptions
 	}
 ) {
-	sortable = (sortable || rootEl[expando]);
+	sortable = (sortable || (rootEl && rootEl[expando]));
+	if (!sortable) return;
+
 	let evt,
 		options = sortable.options,
 		onName = 'on' + name.charAt(0).toUpperCase() + name.substr(1);

@@ -10,7 +10,7 @@ createTestCafe().then((tc) => {
 	runner = tc.createRunner();
 	return runner
 		.src('./tests/Sortable.test.js')
-		.browsers('chrome')
+		.browsers('chrome:headless')
 		.concurrency(3)
 		.run();
 }).then((actualFailedCount) => {
