@@ -28,7 +28,11 @@ This plugin, when enabled, will cause the dragged item to be reverted to it's or
 
 ```js
 new Sortable(el, {
-	revertOnSpill: false // Enable plugin
+	revertOnSpill: false, // Enable plugin
+	// Called when item is spilled
+	onSpill: function(/**Event*/evt) {
+		evt.item // The spilled item
+	}
 });
 ```
 
@@ -47,6 +51,10 @@ This plugin, when enabled, will cause the dragged item to be removed from the DO
 
 ```js
 new Sortable(el, {
-	removeOnSpill: false // Enable plugin
+	removeOnSpill: false, // Enable plugin
+	// Called when item is spilled
+	onSpill: function(/**Event*/evt) {
+		evt.item // The spilled item
+	}
 });
 ```
