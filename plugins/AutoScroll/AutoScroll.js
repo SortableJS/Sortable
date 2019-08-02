@@ -27,7 +27,7 @@ let autoScrolls = [],
 function AutoScrollPlugin() {
 
 	function AutoScroll() {
-		this.options = {
+		this.defaults = {
 			scroll: true,
 			scrollSensitivity: 30,
 			scrollSpeed: 10,
@@ -47,7 +47,7 @@ function AutoScrollPlugin() {
 			if (this.sortable.nativeDraggable) {
 				on(document, 'dragover', this._handleAutoScroll);
 			} else {
-				if (this.sortable.options.supportPointer) {
+				if (this.options.supportPointer) {
 					on(document, 'pointermove', this._handleFallbackAutoScroll);
 				} else if (originalEvent.touches) {
 					on(document, 'touchmove', this._handleFallbackAutoScroll);
@@ -59,7 +59,7 @@ function AutoScrollPlugin() {
 
 		dragOverCompleted({ originalEvent }) {
 			// For when bubbling is canceled and using fallback (fallback 'touchmove' always reached)
-			if (!this.sortable.options.dragOverBubble && !originalEvent.rootEl) {
+			if (!this.options.dragOverBubble && !originalEvent.rootEl) {
 				this._handleAutoScroll(originalEvent);
 			}
 		},
@@ -107,7 +107,7 @@ function AutoScrollPlugin() {
 			// MACOS Safari does not have autoscroll,
 			// Firefox and Chrome are good
 			if (fallback || Edge || IE11OrLess || Safari) {
-				autoScroll(evt, this.sortable.options, elem, fallback);
+				autoScroll(evt, this.options, elem, fallback);
 
 				// Listener for pointer element change
 				let ogElemScroller = getParentAutoScrollElement(elem, true);
@@ -127,18 +127,18 @@ function AutoScrollPlugin() {
 							ogElemScroller = newElem;
 							clearAutoScrolls();
 						}
-						autoScroll(evt, this.sortable.options, newElem, fallback);
+						autoScroll(evt, this.options, newElem, fallback);
 					}, 10);
 					lastAutoScrollX = x;
 					lastAutoScrollY = y;
 				}
 			} else {
 				// if DnD is enabled (and browser has good autoscrolling), first autoscroll will already scroll, so get parent autoscroll of first autoscroll
-				if (!this.sortable.options.bubbleScroll || getParentAutoScrollElement(elem, true) === getWindowScrollingElement()) {
+				if (!this.options.bubbleScroll || getParentAutoScrollElement(elem, true) === getWindowScrollingElement()) {
 					clearAutoScrolls();
 					return;
 				}
-				autoScroll(evt, this.sortable.options, getParentAutoScrollElement(elem, false), false);
+				autoScroll(evt, this.options, getParentAutoScrollElement(elem, false), false);
 			}
 		}
 	};
