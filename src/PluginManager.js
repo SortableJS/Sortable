@@ -26,7 +26,7 @@ export default {
 			if (
 				sortable[plugin.pluginName][eventNameGlobal]
 			) {
-				!!sortable[plugin.pluginName][eventNameGlobal]({ sortable, ...evt });
+				sortable[plugin.pluginName][eventNameGlobal]({ sortable, ...evt });
 			}
 
 			// Only fire plugin event if plugin is enabled in this sortable,
@@ -35,7 +35,7 @@ export default {
 				sortable.options[plugin.pluginName] &&
 				sortable[plugin.pluginName][eventName]
 			) {
-				!!sortable[plugin.pluginName][eventName]({ sortable, ...evt });
+				sortable[plugin.pluginName][eventName]({ sortable, ...evt });
 			}
 		});
 	},
