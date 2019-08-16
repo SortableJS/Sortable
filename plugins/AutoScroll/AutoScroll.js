@@ -95,6 +95,7 @@ function AutoScrollPlugin() {
 		},
 
 		_handleAutoScroll(evt, fallback) {
+			var _this = this;
 			const x = (evt.touches ? evt.touches[0] : evt).clientX,
 				y = (evt.touches ? evt.touches[0] : evt).clientY,
 
@@ -127,7 +128,7 @@ function AutoScrollPlugin() {
 							ogElemScroller = newElem;
 							clearAutoScrolls();
 						}
-						autoScroll(evt, this.sortable.options, newElem, fallback);
+						autoScroll(evt, _this.sortable.options, newElem, fallback);
 					}, 10);
 					lastAutoScrollX = x;
 					lastAutoScrollY = y;
