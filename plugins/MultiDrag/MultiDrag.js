@@ -27,8 +27,7 @@ let multiDragElements = [],
 	clonesHidden;
 
 function MultiDragPlugin() {
-	function MultiDrag(sortable, el, options) {
-		console.log(sortable, el, options)
+	function MultiDrag(sortable) {
 		// Bind all private methods
 		for (let fn in this) {
 			if (fn.charAt(0) === '_' && typeof this[fn] === 'function') {
