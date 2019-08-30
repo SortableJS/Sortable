@@ -33,7 +33,7 @@ Revert.prototype = {
 		if (putSortable) {
 			putSortable.captureAnimationState();
 		}
-		let nextSibling = getChild(this.sortable.el, this.startIndex, this.sortable.options);
+		let nextSibling = getChild(this.sortable.el, this.startIndex, this.options);
 
 		if (nextSibling) {
 			this.sortable.el.insertBefore(dragEl, nextSibling);

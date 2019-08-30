@@ -8,7 +8,7 @@ let lastSwapEl;
 
 function SwapPlugin() {
 	function Swap() {
-		this.options = {
+		this.defaults = {
 			swapClass: 'sortable-swap-highlight'
 		};
 	}
@@ -17,10 +17,10 @@ function SwapPlugin() {
 		dragStart({ dragEl }) {
 			lastSwapEl = dragEl;
 		},
-		dragOverValid({ completed, target, onMove, activeSortable, changed }) {
+		dragOverValid({ completed, target, onMove, activeSortable, changed, cancel }) {
 			if (!activeSortable.options.swap) return;
 			let el = this.sortable.el,
-				options = this.sortable.options;
+				options = this.options;
 			if (target && target !== el) {
 				let prevSwapEl = lastSwapEl;
 				if (onMove(target) !== false) {
@@ -36,11 +36,12 @@ function SwapPlugin() {
 			}
 			changed();
 
-			return completed(true);
+			completed(true);
+			cancel();
 		},
 		drop({ activeSortable, putSortable, dragEl }) {
 			let toSortable = (putSortable || this.sortable);
-			let options = this.sortable.options;
+			let options = this.options;
 			lastSwapEl && toggleClass(lastSwapEl, options.swapClass, false);
 			if (lastSwapEl && (options.swap || putSortable && putSortable.options.swap)) {
 				if (dragEl !== lastSwapEl) {
@@ -60,7 +61,7 @@ function SwapPlugin() {
 
 	return Object.assign(Swap, {
 		pluginName: 'swap',
-		eventOptions() {
+		eventProperties() {
 			return {
 				swapItem: lastSwapEl
 			};

@@ -16,6 +16,9 @@ export default {
 	},
 	pluginEvent(eventName, sortable, evt) {
 		this.eventCanceled = false;
+		evt.cancel = () => {
+			this.eventCanceled = true;
+		};
 		const eventNameGlobal = eventName + 'Global';
 		plugins.forEach(plugin => {
 			if (!sortable[plugin.pluginName]) return;
@@ -23,7 +26,7 @@ export default {
 			if (
 				sortable[plugin.pluginName][eventNameGlobal]
 			) {
-				this.eventCanceled = !!sortable[plugin.pluginName][eventNameGlobal]({ sortable, ...evt });
+				sortable[plugin.pluginName][eventNameGlobal]({ sortable, ...evt });
 			}
 
 			// Only fire plugin event if plugin is enabled in this sortable,
@@ -32,21 +35,22 @@ export default {
 				sortable.options[plugin.pluginName] &&
 				sortable[plugin.pluginName][eventName]
 			) {
-				this.eventCanceled = this.eventCanceled || !!sortable[plugin.pluginName][eventName]({ sortable, ...evt });
+				sortable[plugin.pluginName][eventName]({ sortable, ...evt });
 			}
 		});
 	},
-	initializePlugins(sortable, el, defaults) {
+	initializePlugins(sortable, el, defaults, options) {
 		plugins.forEach(plugin => {
 			const pluginName = plugin.pluginName;
 			if (!sortable.options[pluginName] && !plugin.initializeByDefault) return;
 
-			let initialized = new plugin(sortable, el);
+			let initialized = new plugin(sortable, el, sortable.options);
 			initialized.sortable = sortable;
+			initialized.options = sortable.options;
 			sortable[pluginName] = initialized;
 
 			// Add default options from plugin
-			Object.assign(defaults, initialized.options);
+			Object.assign(defaults, initialized.defaults);
 		});
 
 		for (let option in sortable.options) {
@@ -57,14 +61,14 @@ export default {
 			}
 		}
 	},
-	getEventOptions(name, sortable) {
-		let eventOptions = {};
+	getEventProperties(name, sortable) {
+		let eventProperties = {};
 		plugins.forEach(plugin => {
-			if (typeof(plugin.eventOptions) !== 'function') return;
-			Object.assign(eventOptions, plugin.eventOptions.call(sortable, name));
+			if (typeof(plugin.eventProperties) !== 'function') return;
+			Object.assign(eventProperties, plugin.eventProperties.call(sortable[plugin.pluginName], name));
 		});
 
-		return eventOptions;
+		return eventProperties;
 	},
 	modifyOption(sortable, name, value) {
 		let modifiedValue;

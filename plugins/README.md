@@ -8,6 +8,8 @@ Sortable plugins are plugins that can be directly mounted to the Sortable class.
 
 `el: HTMLElement` — The element that the sortable is being initialized on
 
+`options: Object` — The options object that the user has passed into Sortable (not merged with defaults yet)
+
 
 ## Static Properties
 The constructor function passed to `Sortable.mount` may contain several static properties and methods. The following static properties may be defined:
@@ -16,10 +18,10 @@ The constructor function passed to `Sortable.mount` may contain several static p
 The name of the option that the user will use in their sortable's options to enable the plugin. Should start with a lower case and be camel-cased. For example: `'multiDrag'`. This is also the property name that the plugin's instance will be under in a sortable instance (ex. `sortableInstance.multiDrag`).
 
 `utils: Object`
-Object containing functions that will be added to the `Sortable.utils` default object on the Sortable class.
+Object containing functions that will be added to the `Sortable.utils` static object on the Sortable class.
 
 `eventOptions(eventName: String): Function`
-A function that is called whenever Sortable fires an event. This function should return an object to be combined with the event object that Sortable will emit. The function will be called in the context of the Sortable that is firing the event (ie. the `this` keyword will be the Sortable calling the event).
+A function that is called whenever Sortable fires an event. This function should return an object to be combined with the event object that Sortable will emit. The function will be called in the context of the instance of the plugin on the Sortable that is firing the event (ie. the `this` keyword will be the plugin instance).
 
 `initializeByDefault: Boolean`
 Determines whether or not the plugin will always be initialized on every new Sortable instance. If this option is enabled, it does not mean that by default the plugin will be enabled on the Sortable - this must still be done in the options via the plugin's `pluginName`, or it can be enabled by default if your plugin specifies it's pluginName as a default option that is truthy. Since the plugin will already be initialized on every Sortable instance, it can also be enabled dynamically via `sortableInstance.option('pluginName', true)`.
@@ -51,11 +53,11 @@ Plugin.optionModifiers = {
 ``` 
 
 ## Plugin Options
-Plugins may have custom options or override the defaults of certain options. In order to do this, there must be an `options` object on the initialized plugin. This can be set in the plugin's prototype, or during the initialization of the plugin (when the `el` is available). For example:
+Plugins may have custom default options or may override the defaults of other options. In order to do this, there must be a `defaults` object on the initialized plugin. This can be set in the plugin's prototype, or during the initialization of the plugin (when the `el` is available). For example:
 
 ```js
-function myPlugin(el) {
-	this.options = {
+function myPlugin(sortable, el, options) {
+	this.defaults = {
 		color: el.style.backgroundColor
 	};
 }
@@ -67,7 +69,7 @@ Sortable.mount(myPlugin);
 ## Plugin Events
 
 ### Context
-The events will be fired in the context of their own parent object (ie. context is not changed), however the plugin instance's Sortable instance is available under `this.sortable`.
+The events will be fired in the context of their own parent object (ie. context is not changed), however the plugin instance's Sortable instance is available under `this.sortable`. Likewise, the options are available under `this.options`.
 
 ### Event List
 The following table contains details on the events that a plugin may handle in the prototype of the plugin's constructor function.
