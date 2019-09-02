@@ -1284,7 +1284,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			evt
 		});
 
-		parentEl = dragEl.parentNode;
+		parentEl = dragEl && dragEl.parentNode;
 
 		// Get again after plugin event
 		newIndex = index(dragEl);

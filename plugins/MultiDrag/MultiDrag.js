@@ -456,7 +456,7 @@ function MultiDragPlugin() {
 			multiDragClones.length = 0;
 		},
 
-		destroy() {
+		destroyGlobal() {
 			this._deselectMultiDrag();
 			off(document, 'pointerup', this._deselectMultiDrag);
 			off(document, 'mouseup', this._deselectMultiDrag);
