@@ -22,7 +22,7 @@ Sortable.mount(new Swap());
 
 ```js
 new Sortable(el, {
-	swap: false, // Enable swap mode
+	swap: true, // Enable swap mode
 	swapClass: "sortable-swap-highlight" // Class name for swap item (if swap mode is enabled)
 });
 ```

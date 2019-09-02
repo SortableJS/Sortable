@@ -24,7 +24,7 @@ Sortable.mount(new MultiDrag());
 
 ```js
 new Sortable(el, {
-	multiDrag: false, // Enable the plugin
+	multiDrag: true, // Enable the plugin
 	selectedClass: "sortable-selected", // Class name for selected item
 	multiDragKey: null, // Key that must be down for items to be selected
 
