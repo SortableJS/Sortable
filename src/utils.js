@@ -109,14 +109,18 @@ function css(el, prop, val) {
 
 function matrix(el, selfOnly) {
 	let appliedTransforms = '';
-	do {
-		let transform = css(el, 'transform');
+	if (typeof(el) === 'string') {
+		appliedTransforms = el;
+	} else {
+		do {
+			let transform = css(el, 'transform');
 
-		if (transform && transform !== 'none') {
-			appliedTransforms = transform + ' ' + appliedTransforms;
-		}
-		/* jshint boss:true */
-	} while (!selfOnly && (el = el.parentNode));
+			if (transform && transform !== 'none') {
+				appliedTransforms = transform + ' ' + appliedTransforms;
+			}
+			/* jshint boss:true */
+		} while (!selfOnly && (el = el.parentNode));
+	}
 
 	const matrixFn = window.DOMMatrix || window.WebKitCSSMatrix || window.CSSMatrix;
 	/*jshint -W056 */

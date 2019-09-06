@@ -16,6 +16,7 @@ Demo: http://sortablejs.github.io/Sortable/
  * Advanced swap detection
  * Smooth animations
  * [Multi-drag](https://github.com/SortableJS/Sortable/tree/master/plugins/MultiDrag) support
+ * Support for CSS transforms
  * Built using native HTML5 drag and drop API
  * Supports
    * [Meteor](https://github.com/SortableJS/meteor-sortablejs)

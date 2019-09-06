@@ -120,6 +120,10 @@ let dragEl,
 
 	tapEvt,
 	touchEvt,
+	lastDx,
+	lastDy,
+	tapDistanceLeft,
+	tapDistanceTop,
 
 	moved,
 
@@ -548,6 +552,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			el = _this.el,
 			options = _this.options,
 			ownerDocument = el.ownerDocument,
+			dragRect = getRect(target),
 			dragStartFn;
 
 		if (target && !dragEl && (target.parentNode === el)) {
@@ -565,6 +570,9 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 				clientX: (touch || evt).clientX,
 				clientY: (touch || evt).clientY
 			};
+
+			tapDistanceLeft = tapEvt.clientX - dragRect.left;
+			tapDistanceTop = tapEvt.clientY - dragRect.top;
 
 			this._lastX = (touch || evt).clientX;
 			this._lastY = (touch || evt).clientY;
@@ -789,8 +797,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 						+ (relativeScrollOffset ? (relativeScrollOffset[0] - ghostRelativeParentInitialScroll[0]) : 0) / (scaleX || 1),
 				dy = ((touch.clientY - tapEvt.clientY)
 						+ fallbackOffset.y) / (scaleY || 1)
-						+ (relativeScrollOffset ? (relativeScrollOffset[1] - ghostRelativeParentInitialScroll[1]) : 0) / (scaleY || 1),
-				translate3d = evt.touches ? 'translate3d(' + dx + 'px,' + dy + 'px,0)' : 'translate(' + dx + 'px,' + dy + 'px)';
+						+ (relativeScrollOffset ? (relativeScrollOffset[1] - ghostRelativeParentInitialScroll[1]) : 0) / (scaleY || 1);
 
 			// only set the status to dragging, when we are actually dragging
 			if (!Sortable.active && !awaitingDragStarted) {
@@ -802,12 +809,33 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 				this._onDragStart(evt, true);
 			}
 
-			touchEvt = touch;
+			if (ghostEl) {
+				if (ghostMatrix) {
+					ghostMatrix.e += dx - (lastDx || 0);
+					ghostMatrix.f += dy - (lastDy || 0);
+				} else {
+					ghostMatrix = {
+						a: 1,
+						b: 0,
+						c: 0,
+						d: 1,
+						e: dx,
+						f: dy
+					};
+				}
 
-			css(ghostEl, 'webkitTransform', translate3d);
-			css(ghostEl, 'mozTransform', translate3d);
-			css(ghostEl, 'msTransform', translate3d);
-			css(ghostEl, 'transform', translate3d);
+				let cssMatrix = `matrix(${ghostMatrix.a},${ghostMatrix.b},${ghostMatrix.c},${ghostMatrix.d},${ghostMatrix.e},${ghostMatrix.f})`;
+
+				css(ghostEl, 'webkitTransform', cssMatrix);
+				css(ghostEl, 'mozTransform', cssMatrix);
+				css(ghostEl, 'msTransform', cssMatrix);
+				css(ghostEl, 'transform', cssMatrix);
+
+				lastDx = dx;
+				lastDy = dy;
+
+				touchEvt = touch;
+			}
 
 			evt.cancelable && evt.preventDefault();
 		}
@@ -866,9 +894,13 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			css(ghostEl, 'zIndex', '100000');
 			css(ghostEl, 'pointerEvents', 'none');
 
+
 			Sortable.ghost = ghostEl;
 
 			container.appendChild(ghostEl);
+
+			// Set transform-origin
+			css(ghostEl, 'transform-origin', (tapDistanceLeft / parseInt(ghostEl.style.width) * 100) + '% ' + (tapDistanceTop / parseInt(ghostEl.style.height) * 100) + '%');
 		}
 	},
 
@@ -1476,7 +1508,9 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			el.checked = true;
 		});
 
-		savedInputChecked.length = 0;
+		savedInputChecked.length =
+		lastDx =
+		lastDy = 0;
 	},
 
 	handleEvent: function (/**Event*/evt) {
