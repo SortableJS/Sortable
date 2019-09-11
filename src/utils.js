@@ -255,14 +255,13 @@ function getRect(el, relativeToContainingBlock, relativeToNonStaticParent, undoS
 /**
  * Checks if a side of an element is scrolled past a side of its parents
  * @param  {HTMLElement}  el           The element who's side being scrolled out of view is in question
- * @param  {[DOMRect]}    rect         Optional rect of `el` to use
  * @param  {String}       elSide       Side of the element in question ('top', 'left', 'right', 'bottom')
  * @param  {String}       parentSide   Side of the parent in question ('top', 'left', 'right', 'bottom')
  * @return {HTMLElement}               The parent scroll element that the el's side is scrolled past, or null if there is no such element
  */
-function isScrolledPast(el, rect, elSide, parentSide) {
+function isScrolledPast(el, elSide, parentSide) {
 	let parent = getParentAutoScrollElement(el, true),
-		elSideVal = (rect ? rect : getRect(el))[elSide];
+		elSideVal = getRect(el)[elSide];
 
 	/* jshint boss:true */
 	while (parent) {

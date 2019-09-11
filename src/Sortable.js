@@ -552,10 +552,10 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			el = _this.el,
 			options = _this.options,
 			ownerDocument = el.ownerDocument,
-			dragRect = getRect(target),
 			dragStartFn;
 
 		if (target && !dragEl && (target.parentNode === el)) {
+			let dragRect = getRect(target);
 			rootEl = el;
 			dragEl = target;
 			parentEl = dragEl.parentNode;
@@ -1194,7 +1194,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 					differentLevel = dragEl.parentNode !== el,
 					differentRowCol = !_dragElInRowColumn(dragEl.animated && dragEl.toRect || dragRect, target.animated && target.toRect || targetRect, vertical),
 					side1 = vertical ? 'top' : 'left',
-					scrolledPastTop = isScrolledPast(target, null, 'top', 'top') || isScrolledPast(dragEl, null, 'top', 'top'),
+					scrolledPastTop = isScrolledPast(target, 'top', 'top') || isScrolledPast(dragEl, 'top', 'top'),
 					scrollBefore = scrolledPastTop ? scrolledPastTop.scrollTop : void 0;
 
 

@@ -1,4 +1,4 @@
-import { getRect, css, isScrolledPast, matrix, isRectEqual, indexOfObject } from './utils.js';
+import { getRect, css, matrix, isRectEqual, indexOfObject } from './utils.js';
 import Sortable from './Sortable.js';
 
 export default function AnimationStateManager() {
@@ -17,7 +17,7 @@ export default function AnimationStateManager() {
 					target: child,
 					rect: getRect(child)
 				});
-				let fromRect = getRect(child);
+				let fromRect = { ...animationStates[animationStates.length - 1].rect };
 
 				// If animating: compensate for current animation
 				if (child.thisAnimationDuration) {
@@ -70,29 +70,6 @@ export default function AnimationStateManager() {
 
 				target.toRect = toRect;
 
-				// If element is scrolled out of view: Do not animate
-				if (
-					(
-						isScrolledPast(target, toRect, 'bottom', 'top') ||
-						isScrolledPast(target, toRect, 'top', 'bottom') ||
-						isScrolledPast(target, toRect, 'right', 'left') ||
-						isScrolledPast(target, toRect, 'left', 'right')
-					) &&
-					(
-						isScrolledPast(target, animatingRect, 'bottom', 'top') ||
-						isScrolledPast(target, animatingRect, 'top', 'bottom') ||
-						isScrolledPast(target, animatingRect, 'right', 'left') ||
-						isScrolledPast(target, animatingRect, 'left', 'right')
-					) &&
-					(
-						isScrolledPast(target, fromRect, 'bottom', 'top') ||
-						isScrolledPast(target, fromRect, 'top', 'bottom') ||
-						isScrolledPast(target, fromRect, 'right', 'left') ||
-						isScrolledPast(target, fromRect, 'left', 'right')
-					)
-				) return;
-
-
 				if (target.thisAnimationDuration) {
 					// Could also check if animatingRect is between fromRect and toRect
 					if (
@@ -120,6 +97,7 @@ export default function AnimationStateManager() {
 					this.animate(
 						target,
 						animatingRect,
+						toRect,
 						time
 					);
 				}
@@ -151,16 +129,15 @@ export default function AnimationStateManager() {
 			animationStates = [];
 		},
 
-		animate(target, prev, duration) {
+		animate(target, currentRect, toRect, duration) {
 			if (duration) {
 				css(target, 'transition', '');
 				css(target, 'transform', '');
-				let currentRect = getRect(target),
-					elMatrix = matrix(this.el),
+				let elMatrix = matrix(this.el),
 					scaleX = elMatrix && elMatrix.a,
 					scaleY = elMatrix && elMatrix.d,
-					translateX = (prev.left - currentRect.left) / (scaleX || 1),
-					translateY = (prev.top - currentRect.top) / (scaleY || 1);
+					translateX = (currentRect.left - toRect.left) / (scaleX || 1),
+					translateY = (currentRect.top - toRect.top) / (scaleY || 1);
 
 				target.animatingX = !!translateX;
 				target.animatingY = !!translateY;
