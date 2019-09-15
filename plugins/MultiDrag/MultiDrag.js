@@ -323,7 +323,7 @@ function MultiDragPlugin() {
 					});
 
 					// Modifier activated, select from last to dragEl
-					if ((!options.multiDragKey || this.multiDragKeyDown) && evt.shiftKey && lastMultiDragSelect && sortable.el.contains(lastMultiDragSelect)) {
+					if (evt.shiftKey && lastMultiDragSelect && sortable.el.contains(lastMultiDragSelect)) {
 						let lastIndex = index(lastMultiDragSelect),
 							currentIndex = index(dragEl);
 
