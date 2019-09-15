@@ -12,9 +12,9 @@ const drop = function({
 }) {
 	let toSortable = putSortable || activeSortable;
 	hideGhostForTarget();
-	let target = document.elementFromPoint(originalEvent.clientX, originalEvent.clientY);
+	let touch = originalEvent.changedTouches && originalEvent.changedTouches.length ? originalEvent.changedTouches[0] : originalEvent;
+	let target = document.elementFromPoint(touch.clientX, touch.clientY);
 	unhideGhostForTarget();
-
 	if (toSortable && !toSortable.el.contains(target)) {
 		dispatchSortableEvent('spill');
 		this.onSpill({ dragEl, putSortable });
