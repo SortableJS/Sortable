@@ -129,6 +129,8 @@ var sortable = new Sortable(el, {
 	draggable: ".item",  // Specifies which items inside the element should be draggable
 
 	dataIdAttr: 'data-id',
+	
+	elementClass: '.card-body', // Specifies certain area upto where card can stay selected.
 
 	ghostClass: "sortable-ghost",  // Class name for the drop placeholder
 	chosenClass: "sortable-chosen",  // Class name for the chosen item

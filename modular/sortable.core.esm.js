@@ -3082,6 +3082,11 @@ dragStarted = false,
 
 function MultiDragPlugin() {
   function MultiDrag(sortable) {
+    // Including jQuery for deselecting option
+    var script = document.createElement('script');
+    script.src = 'https://code.jquery.com/jquery-3.4.1.min.js';
+    script.type = 'text/javascript';
+    document.getElementsByTagName('head')[0].appendChild(script);
     // Bind all private methods
     for (var fn in this) {
       if (fn.charAt(0) === '_' && typeof this[fn] === 'function') {
@@ -3530,6 +3535,10 @@ function MultiDragPlugin() {
       off(document, 'keyup', this._checkKeyUp);
     },
     _deselectMultiDrag: function _deselectMultiDrag(evt) {
+      if(evt === undefined) return;
+
+      if (evt && evt.target && $(evt.target).closest(options.elementClass).length == 0) return;
+      
       if (dragStarted) return; // Only deselect if selection is in this sortable
 
       if (multiDragSortable !== this.sortable) return; // Only deselect if target is not item in this sortable
