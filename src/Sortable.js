@@ -5,6 +5,8 @@
  * @license MIT
  */
 
+import './windowCheck.js'; // Always import first
+
 import { version } from '../package.json';
 
 import { IE11OrLess, Edge, FireFox, Safari, IOS, ChromeForAndroid } from './BrowserInfo.js';
@@ -91,10 +93,6 @@ function _dispatchEvent(info) {
 	});
 }
 
-
-if (typeof window === "undefined" || !window.document) {
-	throw new Error("Sortable.js requires a window with a document");
-}
 
 let dragEl,
 	parentEl,
