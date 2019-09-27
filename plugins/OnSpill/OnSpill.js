@@ -10,6 +10,7 @@ const drop = function({
 	hideGhostForTarget,
 	unhideGhostForTarget
 }) {
+	if (!originalEvent) return;
 	let toSortable = putSortable || activeSortable;
 	hideGhostForTarget();
 	let touch = originalEvent.changedTouches && originalEvent.changedTouches.length ? originalEvent.changedTouches[0] : originalEvent;
