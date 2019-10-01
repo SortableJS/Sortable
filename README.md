@@ -4,7 +4,7 @@ Sortable is a JavaScript library for reorderable drag-and-drop lists.
 
 Demo: http://sortablejs.github.io/Sortable/
 
-[<img width="250px" src="./st/saucelabs.svg">](https://saucelabs.com/)
+[<img width="250px" src="https://raw.githubusercontent.com/SortableJS/Sortable/HEAD/st/saucelabs.svg?sanitize=true">](https://saucelabs.com/)
 
 ## Features
 
