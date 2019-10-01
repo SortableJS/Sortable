@@ -1,5 +1,5 @@
 /**!
- * Sortable 1.10.0
+ * Sortable 1.10.1
  * @author	RubaXa   <trash@rubaxa.org>
  * @author	owenm    <owen23355@gmail.com>
  * @license MIT
@@ -126,12 +126,14 @@ function _nonIterableSpread() {
   throw new TypeError("Invalid attempt to spread non-iterable instance");
 }
 
-var version = "1.10.0";
+var version = "1.10.1";
 
 function userAgent(pattern) {
-  return !!
-  /*@__PURE__*/
-  navigator.userAgent.match(pattern);
+  if (typeof window !== 'undefined' && window.navigator) {
+    return !!
+    /*@__PURE__*/
+    navigator.userAgent.match(pattern);
+  }
 }
 
 var IE11OrLess = userAgent(/(?:Trident.*rv[ :]?11\.|msie|iemobile|Windows Phone)/i);
@@ -966,10 +968,6 @@ function _dispatchEvent(info) {
   }, info));
 }
 
-if (typeof window === "undefined" || !window.document) {
-  throw new Error("Sortable.js requires a window with a document");
-}
-
 var dragEl,
     parentEl,
     ghostEl,
@@ -1007,12 +1005,14 @@ _silent = false,
     savedInputChecked = [];
 /** @const */
 
-var PositionGhostAbsolutely = IOS,
+var documentExists = typeof document !== 'undefined',
+    PositionGhostAbsolutely = IOS,
     CSSFloatProperty = Edge || IE11OrLess ? 'cssFloat' : 'float',
     // This will not pass for IE9, because IE9 DnD only works on anchors
-supportDraggable = !ChromeForAndroid && !IOS && 'draggable' in document.createElement('div'),
+supportDraggable = documentExists && !ChromeForAndroid && !IOS && 'draggable' in document.createElement('div'),
     supportCssPointerEvents = function () {
-  // false when <= IE11
+  if (!documentExists) return; // false when <= IE11
+
   if (IE11OrLess) {
     return false;
   }
@@ -1126,15 +1126,17 @@ _detectNearestEmptySortable = function _detectNearestEmptySortable(x, y) {
 }; // #1184 fix - Prevent click event on fallback if dragged but item not changed position
 
 
-document.addEventListener('click', function (evt) {
-  if (ignoreNextClick) {
-    evt.preventDefault();
-    evt.stopPropagation && evt.stopPropagation();
-    evt.stopImmediatePropagation && evt.stopImmediatePropagation();
-    ignoreNextClick = false;
-    return false;
-  }
-}, true);
+if (documentExists) {
+  document.addEventListener('click', function (evt) {
+    if (ignoreNextClick) {
+      evt.preventDefault();
+      evt.stopPropagation && evt.stopPropagation();
+      evt.stopImmediatePropagation && evt.stopImmediatePropagation();
+      ignoreNextClick = false;
+      return false;
+    }
+  }, true);
+}
 
 var nearestEmptyInsertDetectEvent = function nearestEmptyInsertDetectEvent(evt) {
   if (dragEl) {
@@ -2594,11 +2596,14 @@ function _cancelNextTick(id) {
 } // Fixed #973:
 
 
-on(document, 'touchmove', function (evt) {
-  if ((Sortable.active || awaitingDragStarted) && evt.cancelable) {
-    evt.preventDefault();
-  }
-}); // Export utils
+if (documentExists) {
+  on(document, 'touchmove', function (evt) {
+    if ((Sortable.active || awaitingDragStarted) && evt.cancelable) {
+      evt.preventDefault();
+    }
+  });
+} // Export utils
+
 
 Sortable.utils = {
   on: on,
@@ -2900,6 +2905,7 @@ var drop = function drop(_ref) {
       dispatchSortableEvent = _ref.dispatchSortableEvent,
       hideGhostForTarget = _ref.hideGhostForTarget,
       unhideGhostForTarget = _ref.unhideGhostForTarget;
+  if (!originalEvent) return;
   var toSortable = putSortable || activeSortable;
   hideGhostForTarget();
   var touch = originalEvent.changedTouches && originalEvent.changedTouches.length ? originalEvent.changedTouches[0] : originalEvent;
