@@ -5,8 +5,6 @@
  * @license MIT
  */
 
-import './windowCheck.js'; // Always import first
-
 import { version } from '../package.json';
 
 import { IE11OrLess, Edge, FireFox, Safari, IOS, ChromeForAndroid } from './BrowserInfo.js';
@@ -140,14 +138,17 @@ let dragEl,
 	savedInputChecked = [];
 
 	/** @const */
-	const PositionGhostAbsolutely = IOS,
+	const documentExists = typeof document !== 'undefined',
+
+	PositionGhostAbsolutely = IOS,
 
 	CSSFloatProperty = Edge || IE11OrLess ? 'cssFloat' : 'float',
 
 	// This will not pass for IE9, because IE9 DnD only works on anchors
-	supportDraggable = !ChromeForAndroid && !IOS && ('draggable' in document.createElement('div')),
+	supportDraggable = documentExists && !ChromeForAndroid && !IOS && ('draggable' in document.createElement('div')),
 
 	supportCssPointerEvents = (function() {
+		if (!documentExists) return;
 		// false when <= IE11
 		if (IE11OrLess) {
 			return false;
@@ -297,15 +298,17 @@ let dragEl,
 
 
 // #1184 fix - Prevent click event on fallback if dragged but item not changed position
-document.addEventListener('click', function(evt) {
-	if (ignoreNextClick) {
-		evt.preventDefault();
-		evt.stopPropagation && evt.stopPropagation();
-		evt.stopImmediatePropagation && evt.stopImmediatePropagation();
-		ignoreNextClick = false;
-		return false;
-	}
-}, true);
+if (documentExists) {
+	document.addEventListener('click', function(evt) {
+		if (ignoreNextClick) {
+			evt.preventDefault();
+			evt.stopPropagation && evt.stopPropagation();
+			evt.stopImmediatePropagation && evt.stopImmediatePropagation();
+			ignoreNextClick = false;
+			return false;
+		}
+	}, true);
+}
 
 let nearestEmptyInsertDetectEvent = function(evt) {
 	if (dragEl) {
@@ -1613,7 +1616,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			return options[name];
 		} else {
 			let modifiedValue = PluginManager.modifyOption(this, name, value);
-			if (typeof(modifiedValue) !== 'undefined') {
+			if (typeof modifiedValue !== 'undefined') {
 				options[name] = modifiedValue;
 			} else {
 				options[name] = value;
@@ -1884,11 +1887,13 @@ function _cancelNextTick(id) {
 }
 
 // Fixed #973:
-on(document, 'touchmove', function(evt) {
-	if ((Sortable.active || awaitingDragStarted) && evt.cancelable) {
-		evt.preventDefault();
-	}
-});
+if (documentExists) {
+	on(document, 'touchmove', function(evt) {
+		if ((Sortable.active || awaitingDragStarted) && evt.cancelable) {
+			evt.preventDefault();
+		}
+	});
+}
 
 
 // Export utils

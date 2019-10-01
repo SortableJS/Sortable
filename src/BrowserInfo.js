@@ -1,5 +1,7 @@
 function userAgent(pattern) {
-	return !!/*@__PURE__*/navigator.userAgent.match(pattern);
+	if (typeof window !== 'undefined' && window.navigator) {
+		return !!/*@__PURE__*/navigator.userAgent.match(pattern);
+	}
 }
 
 export const IE11OrLess = userAgent(/(?:Trident.*rv[ :]?11\.|msie|iemobile|Windows Phone)/i);
