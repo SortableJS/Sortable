@@ -1351,6 +1351,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			css(document.body, 'user-select', '');
 		}
 
+    css(dragEl, 'transform', '');
 
 		if (evt) {
 			if (moved) {
