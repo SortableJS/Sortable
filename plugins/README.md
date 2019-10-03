@@ -38,7 +38,7 @@ Example:
 
 ```js
 Plugin.name = 'generateTitle';
-Plugin.optionModifiers = {
+Plugin.optionListeners = {
 	// Listen for option 'generateTitle'
 	generateTitle: function(title) {
 		// Store the option in all caps
