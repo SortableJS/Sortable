@@ -1,3 +1,5 @@
+import { SortableDOMRect } from "./sortable-utils";
+
 export interface SortableEvent extends Event {
 	clone: HTMLElement;
 	/**
@@ -46,15 +48,4 @@ export interface SortableMoveEvent extends Event {
 	relatedRect: SortableDOMRect;
 	to: HTMLElement;
 	willInsertAfter?: boolean;
-}
-
-export interface SortableDOMRect {
-	bottom: number;
-	height: number;
-	left: number;
-	right: number;
-	top: number;
-	width: number;
-	x: number;
-	y: number;
 }
