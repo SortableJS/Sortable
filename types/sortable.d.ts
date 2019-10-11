@@ -22,7 +22,7 @@ export class Sortable {
 	* Mount a plugin.
 	* @param plugin A Sortable plugin.
 	*/
-	static mount(plugins: SortablePlugin | SortablePlugin[]): void;
+	static mount(...plugins:  SortablePlugin[]): void;
 
 	/**
 	* Options getter/setter
