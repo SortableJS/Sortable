@@ -1,4 +1,4 @@
-# Sortable &nbsp; [![CircleCI](https://circleci.com/gh/SortableJS/Sortable.svg?style=svg)](https://circleci.com/gh/SortableJS/Sortable) [![DeepScan grade](https://deepscan.io/api/teams/3901/projects/5666/branches/43977/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=3901&pid=5666&bid=43977) [![](https://data.jsdelivr.com/v1/package/npm/sortablejs/badge)](https://www.jsdelivr.com/package/npm/sortablejs) [![npm](https://img.shields.io/npm/v/sortablejs.svg)](https://www.npmjs.com/package/sortablejs)
+# Sortable &nbsp; [![Financial Contributors on Open Collective](https://opencollective.com/Sortable/all/badge.svg?label=financial+contributors)](https://opencollective.com/Sortable) [![CircleCI](https://circleci.com/gh/SortableJS/Sortable.svg?style=svg)](https://circleci.com/gh/SortableJS/Sortable) [![DeepScan grade](https://deepscan.io/api/teams/3901/projects/5666/branches/43977/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=3901&pid=5666&bid=43977) [![](https://data.jsdelivr.com/v1/package/npm/sortablejs/badge)](https://www.jsdelivr.com/package/npm/sortablejs) [![npm](https://img.shields.io/npm/v/sortablejs.svg)](https://www.npmjs.com/package/sortablejs)
 
 Sortable is a JavaScript library for reorderable drag-and-drop lists.
 
@@ -760,6 +760,36 @@ Please, [read this](CONTRIBUTING.md).
 
 ---
 
+
+## Contributors
+
+### Code Contributors
+
+This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
+<a href="https://github.com/SortableJS/Sortable/graphs/contributors"><img src="https://opencollective.com/Sortable/contributors.svg?width=890&button=false" /></a>
+
+### Financial Contributors
+
+Become a financial contributor and help us sustain our community. [[Contribute](https://opencollective.com/Sortable/contribute)]
+
+#### Individuals
+
+<a href="https://opencollective.com/Sortable"><img src="https://opencollective.com/Sortable/individuals.svg?width=890"></a>
+
+#### Organizations
+
+Support this project with your organization. Your logo will show up here with a link to your website. [[Contribute](https://opencollective.com/Sortable/contribute)]
+
+<a href="https://opencollective.com/Sortable/organization/0/website"><img src="https://opencollective.com/Sortable/organization/0/avatar.svg"></a>
+<a href="https://opencollective.com/Sortable/organization/1/website"><img src="https://opencollective.com/Sortable/organization/1/avatar.svg"></a>
+<a href="https://opencollective.com/Sortable/organization/2/website"><img src="https://opencollective.com/Sortable/organization/2/avatar.svg"></a>
+<a href="https://opencollective.com/Sortable/organization/3/website"><img src="https://opencollective.com/Sortable/organization/3/avatar.svg"></a>
+<a href="https://opencollective.com/Sortable/organization/4/website"><img src="https://opencollective.com/Sortable/organization/4/avatar.svg"></a>
+<a href="https://opencollective.com/Sortable/organization/5/website"><img src="https://opencollective.com/Sortable/organization/5/avatar.svg"></a>
+<a href="https://opencollective.com/Sortable/organization/6/website"><img src="https://opencollective.com/Sortable/organization/6/avatar.svg"></a>
+<a href="https://opencollective.com/Sortable/organization/7/website"><img src="https://opencollective.com/Sortable/organization/7/avatar.svg"></a>
+<a href="https://opencollective.com/Sortable/organization/8/website"><img src="https://opencollective.com/Sortable/organization/8/avatar.svg"></a>
+<a href="https://opencollective.com/Sortable/organization/9/website"><img src="https://opencollective.com/Sortable/organization/9/avatar.svg"></a>
 
 ## MIT LICENSE
 Permission is hereby granted, free of charge, to any person obtaining
