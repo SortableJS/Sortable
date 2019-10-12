@@ -1654,6 +1654,8 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 
 		this._onDrop();
 
+		this._disableDelayedDragEvents();
+
 		sortables.splice(sortables.indexOf(this.el), 1);
 
 		this.el = el = null;
