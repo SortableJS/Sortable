@@ -27,7 +27,9 @@
 		"minify": "node ./scripts/minify.js",
 		"build": "npm run build:es && npm run build:umd && npm run minify",
 		"test:compat": "node ./scripts/test-compat.js",
-		"test": "node ./scripts/test.js"
+		"test": "node ./scripts/test.js",
+		"test:debug": "./node_modules/testcafe/bin/testcafe.js chrome ./tests/Sortable.test.js -d",
+		"test:debugOnFail": "./node_modules/testcafe/bin/testcafe.js chrome ./tests/Sortable.test.js --debug-on-fail"
 	},
 	"maintainers": [
 		"Konstantin Lebedev <ibnRubaXa@gmail.com>",
