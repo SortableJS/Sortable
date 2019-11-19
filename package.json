@@ -6,6 +6,7 @@
 		"@babel/core": "^7.4.4",
 		"@babel/plugin-transform-object-assign": "^7.2.0",
 		"@babel/preset-env": "^7.4.4",
+		"cross-env": "^6.0.3",
 		"rollup": "^1.11.3",
 		"rollup-plugin-babel": "^4.3.2",
 		"rollup-plugin-json": "^4.0.0",
@@ -19,7 +20,7 @@
 	"main": "./Sortable.js",
 	"module": "modular/sortable.esm.js",
 	"scripts": {
-		"build:umd": "NODE_ENV=umd rollup -c ./scripts/umd-build.js",
+		"build:umd": "cross-env NODE_ENV=umd rollup -c ./scripts/umd-build.js",
 		"build:umd:watch": "set NODE_ENV=umd&& rollup -w -c ./scripts/umd-build.js",
 		"build:es": "set NODE_ENV=es&& rollup -c ./scripts/esm-build.js",
 		"build:es:watch": "set NODE_ENV=es&& rollup -w -c ./scripts/esm-build.js",
