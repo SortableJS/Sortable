@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="./style.css">
+</head>
+<body>
+
+<div class="list" id="list1">
+	<header>Items</header>
+	<div>Item 1.1</div>
+	<div>Item 1.2</div>
+	<div>Item 1.3</div>
+	<div>Item 1.4</div>
+	<div>Item 1.5</div>
+</div>
+
+<button id="reverse">Reverse</button>
+
+<script src="../Sortable.js"></script>
+
+<script type="text/javascript">
+	const instance = new Sortable(document.getElementById('list1'), { filter: '.filtered', draggable: 'div' });
+	reverseOrder = function() {
+		const order = instance.toArray();
+		const newOrder = [ order[0], order[1], order[3], order[2], order[4] ];
+		instance.sort( newOrder );
+	}
+	document.getElementById('reverse').addEventListener("click", reverseOrder);
+</script>
+
+</body>
+</html>

@@ -304,7 +304,24 @@ test('Allow dragging of non-filtered element', async browser => {
 		.expect(targetEndPosition.innerText).eql(target.innerText);
 });
 
+fixture `Extra Child`
+	.page `./extra-child.html`;
 
+test.only('Ignore extra child element when calling .sort', async browser => {
+	const dragStartPosition = list1.child('div:nth-of-type(3)');
+	const dragEl = await dragStartPosition();
+	const dragEndPosition = dragStartPosition.nextSibling();
+	const targetStartPosition = dragStartPosition.nextSibling();
+	const target = await targetStartPosition();
+	const targetEndPosition = dragStartPosition;
+
+	await browser
+		.expect(dragStartPosition.innerText).eql(dragEl.innerText)
+		.expect(targetStartPosition.innerText).eql(target.innerText)
+		.click('#reverse')
+		.expect(dragEndPosition.innerText).eql(dragEl.innerText)
+		.expect(targetEndPosition.innerText).eql(target.innerText);
+});
 
 fixture `Nested`
 	.page `./nested.html`;
