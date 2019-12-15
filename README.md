@@ -35,6 +35,7 @@ Demo: http://sortablejs.github.io/Sortable/
  * Support for [plugins](#plugins)
  * [CDN](#cdn)
  * No jQuery required (but there is [support](https://github.com/SortableJS/jquery-sortablejs))
+ * Typescript definitions at `@types/sortablejs`
 
 
 <br/>
