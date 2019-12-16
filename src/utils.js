@@ -147,10 +147,12 @@ function find(ctx, tagName, iterator) {
 
 
 function getWindowScrollingElement() {
-	if (IE11OrLess) {
-		return document.documentElement;
+	let scrollingElement = document.scrollingElement;
+
+	if (scrollingElement) {
+		return scrollingElement
 	} else {
-		return document.scrollingElement;
+		return document.documentElement
 	}
 }
 
