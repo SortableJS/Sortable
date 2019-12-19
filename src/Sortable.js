@@ -1565,10 +1565,10 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 	 * @param  {String[]}  order  order of the items
 	 */
 	sort: function (order) {
-		let items = {}, rootEl = this.el;
+		let items = {}, rootEl = this.el, sortableChildren = [].slice.call(rootEl.querySelectorAll(this.options.draggable));
 
 		this.toArray().forEach(function (id, i) {
-			let el = rootEl.children[i];
+			let el = sortableChildren[i];
 
 			if (closest(el, this.options.draggable, rootEl, false)) {
 				items[id] = el;

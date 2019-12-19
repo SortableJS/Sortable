@@ -266,7 +266,7 @@
       } while (!selfOnly && (el = el.parentNode));
     }
 
-    var matrixFn = window.DOMMatrix || window.WebKitCSSMatrix || window.CSSMatrix;
+    var matrixFn = window.DOMMatrix || window.WebKitCSSMatrix || window.CSSMatrix || window.MSCSSMatrix;
     /*jshint -W056 */
 
     return matrixFn && new matrixFn(appliedTransforms);
@@ -2136,6 +2136,8 @@
         css(document.body, 'user-select', '');
       }
 
+      css(dragEl, 'transform', '');
+
       if (evt) {
         if (moved) {
           evt.cancelable && evt.preventDefault();
@@ -2317,9 +2319,10 @@
      */
     sort: function sort(order) {
       var items = {},
-          rootEl = this.el;
+          rootEl = this.el,
+          sortableChildren = [].slice.call(rootEl.querySelectorAll(this.options.draggable));
       this.toArray().forEach(function (id, i) {
-        var el = rootEl.children[i];
+        var el = sortableChildren[i];
 
         if (closest(el, this.options.draggable, rootEl, false)) {
           items[id] = el;
@@ -2399,6 +2402,8 @@
       });
 
       this._onDrop();
+
+      this._disableDelayedDragEvents();
 
       sortables.splice(sortables.indexOf(this.el), 1);
       this.el = el = null;
