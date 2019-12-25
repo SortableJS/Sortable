@@ -1,5 +1,5 @@
 /**!
- * Sortable 1.10.1
+ * Sortable 1.10.2
  * @author	RubaXa   <trash@rubaxa.org>
  * @author	owenm    <owen23355@gmail.com>
  * @license MIT
@@ -126,7 +126,7 @@ function _nonIterableSpread() {
   throw new TypeError("Invalid attempt to spread non-iterable instance");
 }
 
-var version = "1.10.1";
+var version = "1.10.2";
 
 function userAgent(pattern) {
   if (typeof window !== 'undefined' && window.navigator) {
@@ -260,7 +260,7 @@ function matrix(el, selfOnly) {
     } while (!selfOnly && (el = el.parentNode));
   }
 
-  var matrixFn = window.DOMMatrix || window.WebKitCSSMatrix || window.CSSMatrix;
+  var matrixFn = window.DOMMatrix || window.WebKitCSSMatrix || window.CSSMatrix || window.MSCSSMatrix;
   /*jshint -W056 */
 
   return matrixFn && new matrixFn(appliedTransforms);
@@ -285,10 +285,12 @@ function find(ctx, tagName, iterator) {
 }
 
 function getWindowScrollingElement() {
-  if (IE11OrLess) {
-    return document.documentElement;
+  var scrollingElement = document.scrollingElement;
+
+  if (scrollingElement) {
+    return scrollingElement;
   } else {
-    return document.scrollingElement;
+    return document.documentElement;
   }
 }
 /**
@@ -1625,7 +1627,7 @@ Sortable.prototype =
           fallbackTolerance = options.fallbackTolerance,
           fallbackOffset = options.fallbackOffset,
           touch = evt.touches ? evt.touches[0] : evt,
-          ghostMatrix = ghostEl && matrix(ghostEl),
+          ghostMatrix = ghostEl && matrix(ghostEl, true),
           scaleX = ghostEl && ghostMatrix && ghostMatrix.a,
           scaleY = ghostEl && ghostMatrix && ghostMatrix.d,
           relativeScrollOffset = PositionGhostAbsolutely && ghostRelativeParent && getRelativeScrollOffset(ghostRelativeParent),
@@ -2130,6 +2132,8 @@ Sortable.prototype =
       css(document.body, 'user-select', '');
     }
 
+    css(dragEl, 'transform', '');
+
     if (evt) {
       if (moved) {
         evt.cancelable && evt.preventDefault();
@@ -2393,6 +2397,8 @@ Sortable.prototype =
     });
 
     this._onDrop();
+
+    this._disableDelayedDragEvents();
 
     sortables.splice(sortables.indexOf(this.el), 1);
     this.el = el = null;
@@ -3536,7 +3542,7 @@ function MultiDragPlugin() {
       off(document, 'keyup', this._checkKeyUp);
     },
     _deselectMultiDrag: function _deselectMultiDrag(evt) {
-      if (dragStarted) return; // Only deselect if selection is in this sortable
+      if (typeof dragStarted !== "undefined" && dragStarted) return; // Only deselect if selection is in this sortable
 
       if (multiDragSortable !== this.sortable) return; // Only deselect if target is not item in this sortable
 
