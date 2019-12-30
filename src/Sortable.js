@@ -799,7 +799,9 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 				dy = ((touch.clientY - tapEvt.clientY)
 						+ fallbackOffset.y) / (scaleY || 1)
 						+ (relativeScrollOffset ? (relativeScrollOffset[1] - ghostRelativeParentInitialScroll[1]) : 0) / (scaleY || 1);
-
+				
+			pluginEvent("dragging", this, {evt});
+			
 			// only set the status to dragging, when we are actually dragging
 			if (!Sortable.active && !awaitingDragStarted) {
 				if (fallbackTolerance &&
