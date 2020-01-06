@@ -11,7 +11,7 @@ import {
 	unsetRect,
 	matrix,
 	expando
-} from '../../src/utils.js';
+} from '../../src/utils.ts';
 
 import dispatchEvent from '../../src/EventDispatcher.js';
 

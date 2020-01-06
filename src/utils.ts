@@ -127,9 +127,13 @@ function matrix(el, selfOnly?) {
 
 	//@ts-ignore
 	const matrixFn =
+		//@ts-ignore
 		window.DOMMatrix ||
+		//@ts-ignore
 		window.WebKitCSSMatrix ||
+		//@ts-ignore
 		window.CSSMatrix ||
+		//@ts-ignore
 		window.MSCSSMatrix;
 	/*jshint -W056 */
 	return matrixFn && new matrixFn(appliedTransforms);
@@ -371,6 +375,7 @@ function index(el, selector) {
 		//@ts-ignore
 		if (
 			el.nodeName.toUpperCase() !== "TEMPLATE" &&
+			//@ts-ignore
 			el !== Sortable.clone &&
 			(!selector || matches(el, selector))
 		) {

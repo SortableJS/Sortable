@@ -1,7 +1,7 @@
 import {
 	toggleClass,
 	index
-} from '../../src/utils.js';
+} from '../../src/utils.ts';
 
 let lastSwapEl;
 
