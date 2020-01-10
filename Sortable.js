@@ -8,7 +8,7 @@
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
 	typeof define === 'function' && define.amd ? define(factory) :
 	(global = global || self, global.Sortable = factory());
-}(this, function () { 'use strict';
+}(this, (function () { 'use strict';
 
 	var version = "1.10.2";
 
@@ -3730,4 +3730,4 @@
 
 	return Sortable;
 
-}));
+})));
