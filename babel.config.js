@@ -10,7 +10,8 @@ module.exports = function(api) {
 				{
 					modules: false
 				}
-			]
+			],
+			["@babel/preset-typescript"]
 		];
 	} else if (process.env.NODE_ENV === "umd") {
 		presets = [["@babel/preset-env"], ["@babel/preset-typescript"]];
