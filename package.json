@@ -31,7 +31,7 @@
 		"build:umd:watch": "set NODE_ENV=umd&& rollup -w -c ./scripts/umd-build.js",
 		"build:es": "set NODE_ENV=es&& rollup -c ./scripts/esm-build.js",
 		"build:es:watch": "set NODE_ENV=es&& rollup -w -c ./scripts/esm-build.js",
-		"minify": "ts-node ./scripts/minify.ts",
+		"minify": "node ./scripts/minify.js",
 		"build": "npm run build:es && npm run build:umd && npm run minify",
 		"test:compat": "node ./scripts/test-compat.js",
 		"test": "node ./scripts/test.js"
