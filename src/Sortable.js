@@ -35,7 +35,7 @@ import {
 	scrollBy,
 	clone,
 	expando
-} from './utils.js';
+} from './utils.ts';
 
 
 let pluginEvent = function(eventName, sortable, { evt: originalEvent, ...data } = {}) {

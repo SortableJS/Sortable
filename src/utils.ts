@@ -113,6 +113,7 @@ function matrix(el, selfOnly) {
 		appliedTransforms = el;
 	} else {
 		do {
+			//@ts-ignore
 			let transform = css(el, 'transform');
 
 			if (transform && transform !== 'none') {
@@ -122,6 +123,7 @@ function matrix(el, selfOnly) {
 		} while (!selfOnly && (el = el.parentNode));
 	}
 
+			//@ts-ignore
 	const matrixFn = window.DOMMatrix || window.WebKitCSSMatrix || window.CSSMatrix || window.MSCSSMatrix;
 	/*jshint -W056 */
 	return matrixFn && (new matrixFn(appliedTransforms));
@@ -206,15 +208,19 @@ function getRect(el, relativeToContainingBlock, relativeToNonStaticParent, undoS
 					container &&
 					container.getBoundingClientRect &&
 					(
+			//@ts-ignore
 						css(container, 'transform') !== 'none' ||
 						relativeToNonStaticParent &&
+			//@ts-ignore
 						css(container, 'position') !== 'static'
 					)
 				) {
 					let containerRect = container.getBoundingClientRect();
 
 					// Set relative to edges of padding box of container
+			//@ts-ignore
 					top -= containerRect.top + parseInt(css(container, 'border-top-width'));
+			//@ts-ignore
 					left -= containerRect.left + parseInt(css(container, 'border-left-width'));
 					bottom = top + elRect.height;
 					right = left + elRect.width;
@@ -228,6 +234,7 @@ function getRect(el, relativeToContainingBlock, relativeToNonStaticParent, undoS
 
 	if (undoScale && el !== window) {
 		// Adjust for scale()
+			//@ts-ignore
 		let elMatrix = matrix(container || el),
 			scaleX = elMatrix && elMatrix.a,
 			scaleY = elMatrix && elMatrix.d;
@@ -263,10 +270,12 @@ function getRect(el, relativeToContainingBlock, relativeToNonStaticParent, undoS
  */
 function isScrolledPast(el, elSide, parentSide) {
 	let parent = getParentAutoScrollElement(el, true),
+			//@ts-ignore
 		elSideVal = getRect(el)[elSide];
 
 	/* jshint boss:true */
 	while (parent) {
+			//@ts-ignore
 		let parentSideVal = getRect(parent)[parentSide],
 			visible;
 
@@ -304,7 +313,9 @@ function getChild(el, childNum, options) {
 	while (i < children.length) {
 		if (
 			children[i].style.display !== 'none' &&
+			//@ts-ignore
 			children[i] !== Sortable.ghost &&
+			//@ts-ignore
 			children[i] !== Sortable.dragged &&
 			closest(children[i], options.draggable, el, false)
 		) {
@@ -331,7 +342,9 @@ function lastChild(el, selector) {
 	while (
 		last &&
 		(
+			//@ts-ignore
 			last === Sortable.ghost ||
+			//@ts-ignore
 			css(last, 'display') === 'none' ||
 			selector && !matches(last, selector)
 		)
@@ -359,6 +372,7 @@ function index(el, selector) {
 
 	/* jshint boss:true */
 	while (el = el.previousElementSibling) {
+			//@ts-ignore
 		if ((el.nodeName.toUpperCase() !== 'TEMPLATE') && el !== Sortable.clone && (!selector || matches(el, selector))) {
 			index++;
 		}
@@ -380,6 +394,7 @@ function getRelativeScrollOffset(el) {
 
 	if (el) {
 		do {
+			//@ts-ignore
 			let elMatrix = matrix(el),
 				scaleX = elMatrix.a,
 				scaleY = elMatrix.d;
@@ -418,6 +433,7 @@ function getParentAutoScrollElement(el, includeSelf) {
 	do {
 		// we don't need to get elem css if it isn't even overflowing in the first place (performance)
 		if (elem.clientWidth < elem.scrollWidth || elem.clientHeight < elem.scrollHeight) {
+			//@ts-ignore
 			let elemCSS = css(elem);
 			if (
 				elem.clientWidth < elem.scrollWidth && (elemCSS.overflowX == 'auto' || elemCSS.overflowX == 'scroll') ||
@@ -490,7 +506,9 @@ function scrollBy(el, x, y) {
 
 
 function clone(el) {
+			//@ts-ignore
 	let Polymer = window.Polymer;
+			//@ts-ignore
 	let $ = window.jQuery || window.Zepto;
 
 	if (Polymer && Polymer.dom) {

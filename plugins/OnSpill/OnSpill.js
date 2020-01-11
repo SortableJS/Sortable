@@ -1,4 +1,4 @@
-import { getChild } from '../../src/utils.js';
+import { getChild } from '../../src/utils.ts';
 
 
 const drop = function({

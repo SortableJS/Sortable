@@ -1,5 +1,5 @@
 import { IE11OrLess, Edge } from './BrowserInfo.js';
-import { expando } from './utils.js';
+import { expando } from './utils.ts';
 import PluginManager from './PluginManager.js';
 
 export default function dispatchEvent(

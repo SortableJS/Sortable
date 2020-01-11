@@ -9,7 +9,7 @@ import {
 	expando,
 	getRect,
 	getWindowScrollingElement
-} from '../../src/utils.js';
+} from '../../src/utils.ts';
 
 import Sortable from '../../src/Sortable.js';
 

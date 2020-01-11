@@ -1,4 +1,4 @@
-import { getRect, css, matrix, isRectEqual, indexOfObject } from './utils.js';
+import { getRect, css, matrix, isRectEqual, indexOfObject } from './utils.ts';
 import Sortable from './Sortable.js';
 
 export default function AnimationStateManager() {

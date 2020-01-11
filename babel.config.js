@@ -3,25 +3,25 @@ module.exports = function(api) {
 
 	let presets;
 
-	if (process.env.NODE_ENV === 'es') {
+	if (process.env.NODE_ENV === "es") {
 		presets = [
 			[
 				"@babel/preset-env",
 				{
-					"modules": false
+					modules: false
 				}
 			]
 		];
-	} else if (process.env.NODE_ENV === 'umd') {
-		presets = [
-			[
-				"@babel/preset-env"
-			]
-		];
+	} else if (process.env.NODE_ENV === "umd") {
+		presets = [["@babel/preset-env"], ["@babel/preset-typescript"]];
 	}
 
 	return {
-		plugins: ['@babel/plugin-transform-object-assign'],
+		plugins: [
+			"@babel/plugin-transform-object-assign",
+			"@babel/proposal-class-properties",
+			"@babel/proposal-object-rest-spread"
+		],
 		presets
 	};
 };
