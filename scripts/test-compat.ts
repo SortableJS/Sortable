@@ -12,7 +12,9 @@ const browsers = [
 ];
 
 (async () => {
+	console.log("Here we go team, lets run some tests!");
 	const testCafe = await createTestCafe(null, 8000, 8001);
+	console.log("testcafe instance created :)");
 	const errors = await testCafe
 		.createRunner()
 		.src("./tests/Sortable.compat.test.js")
@@ -23,5 +25,8 @@ const browsers = [
 	.then(failedTests =>
 		console.log(`We had "${failedTests}" amount of failed tests.`)
 	)
-	.catch(err => console.error(err))
+	.catch(err => {
+		console.log("Uh oh, we had some errors!");
+		console.error(err);
+	})
 	.finally(() => process.exit());
