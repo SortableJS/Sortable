@@ -6,12 +6,15 @@ let list1 = Selector("#list1");
 
 test("Sort down list", async browser => {
 	const dragStartPosition = list1.child(0);
-	const dragEl = dragStartPosition();
+	const dragEl = await dragStartPosition();
 	const dragEndPosition = list1.child(2);
 
 	const targetStartPosition = list1.child(2);
 	const target = targetStartPosition();
 	const targetEndPosition = list1.child(1);
+
+	console.log(dragEl)
+	console.log(target)
 
 	await browser
 		.expect(dragStartPosition.innerText)
@@ -39,6 +42,9 @@ test("Sort up list", async browser => {
 	const targetStartPosition = list1.child(0);
 	const target = targetStartPosition();
 	const targetEndPosition = list1.child(1);
+
+	console.log(dragEl)
+	console.log(target)
 
 	await browser
 		.expect(dragStartPosition.innerText)
