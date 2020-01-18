@@ -15,7 +15,10 @@ const browsers = [
 ];
 
 testCompat()
-	.catch(console.error)
+	.catch(error => {
+		console.error(error);
+		process.exit(1);
+	})
 	.finally(() => {
 		console.log("We're now finished with the test runner!");
 		console.log("If any anything failed, go ahead and fix it.");
