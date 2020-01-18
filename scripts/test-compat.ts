@@ -14,21 +14,8 @@ const browsers = [
 	"firefox:headless"
 ];
 
-testCompat()
-	.catch(error => {
-		console.error(error);
-		process.exit(1);
-	})
-	.finally(() => {
-		console.log("We're now finished with the test runner!");
-		console.log("If any anything failed, go ahead and fix it.");
-		process.exit();
-	});
-
 async function testCompat() {
 	const testCafe = await createTestCafe(null, 8000, 8001);
-	console.log("Test cafe instance created.");
-
 	const dir = path.resolve(__dirname, "../tests/Sortable.compat.test.js");
 	const runner = testCafe
 		.createRunner()
@@ -38,18 +25,32 @@ async function testCompat() {
 	console.log(`Test cafe runner created. Running tests from "${dir}"...`);
 
 	// Runs the test and return how many tests failed.
-	const count = await runner.run().catch(error => {
-		console.log("Looks like we had an error! Please see below for details:\n");
-		console.error(error);
-		return;
-	});
-
-	// Print errors.
-	if (count === 0) console.log(`All test passed with "${count}" failed tests!`);
-	else if (count > 0)
-		console.error(`Not all tests passed, with "${count}" tests failing.`);
-	else console.error("Test runner didn't work... Tests did not actually run.");
+	const count = await runner.run();
 
 	// Close the tests.
-	return testCafe.close();
+	testCafe.close();
+	return count;
 }
+
+testCompat()
+	// Print to console basd on count.
+	.then(count => {
+		// passed tests.
+		if (count === 0)
+			return console.log(`All test passed with "${count}" failed tests!`);
+		// failed tests.
+		if (count > 0)
+			throw new Error(`Not all tests passed, with "${count}" tests failing.`);
+		// chances are tests didn't run here.
+		else
+			throw new Error("Test runner didn't work... Tests did not actually run.");
+	})
+	.catch(error => {
+		console.log("Uh oh, we had an error! Please read the details below:\n");
+		console.error(error);
+		process.exit(1);
+	})
+	.finally(() => {
+		console.log("Compatability testing complete.");
+		process.exit();
+	});
