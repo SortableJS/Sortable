@@ -28,7 +28,7 @@ async function testCompat() {
 	console.log(`Test cafe runner created. Running tests from "${dir}"...`);
 
 	// Runs the test and return how many tests failed.
-	const count = await runner.run().catch(error => {
+	const count = await runner.run({ speed: 0.1 }).catch(error => {
 		console.error("We ran into an error in the test! Please see below:\n");
 		throw new Error(error);
 	});
