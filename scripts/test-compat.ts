@@ -41,11 +41,14 @@ async function testCompat() {
 	const count = await runner.run().catch(error => {
 		console.log("Looks like we had an error! Please see below for details:\n");
 		console.error(error);
+		return;
 	});
 
 	// Print errors.
 	if (count === 0) console.log(`All test passed with "${count}" failed tests!`);
-	else console.error(`Not all tests passed, with "${count}" tests failing.`);
+	else if (count > 0)
+		console.error(`Not all tests passed, with "${count}" tests failing.`);
+	else console.error("Test runner didn't work... Tests did not actually run.");
 
 	// Close the tests.
 	return testCafe.close();
