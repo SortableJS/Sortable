@@ -13,20 +13,25 @@ test("Sort down list", async browser => {
 	const target = targetStartPosition();
 	const targetEndPosition = list1.child(1);
 
-	console.log(dragEl)
-	console.log(target)
-
 	await browser
 		.expect(dragStartPosition.innerText)
 		.eql(dragEl.innerText)
 
 		.expect(targetStartPosition.innerText)
-		.eql(target.innerText)
+		.eql(target.innerText);
 
+	console.log({ dragEl: dragEl.innerText });
+	console.log({ target: target.innerText });
+
+	await browser
 		.takeScreenshot()
 		.dragToElement(dragEl, target)
-		.takeScreenshot()
+		.takeScreenshot();
 
+	console.log({ dragEl: dragEl.innerText });
+	console.log({ target: target.innerText });
+
+	await browser
 		.expect(dragEndPosition.innerText)
 		.eql(dragEl.innerText)
 
@@ -43,20 +48,25 @@ test("Sort up list", async browser => {
 	const target = await targetStartPosition();
 	const targetEndPosition = list1.child(1);
 
-	console.log(dragEl)
-	console.log(target)
-
 	await browser
 		.expect(dragStartPosition.innerText)
 		.eql(dragEl.innerText)
 
 		.expect(targetStartPosition.innerText)
-		.eql(target.innerText)
+		.eql(target.innerText);
 
+	console.log({ dragEl: dragEl.innerText });
+	console.log({ target: target.innerText });
+
+	await browser
 		.takeScreenshot()
 		.dragToElement(dragEl, target)
-		.takeScreenshot()
+		.takeScreenshot();
 
+	console.log({ dragEl: dragEl.innerText });
+	console.log({ target: target.innerText });
+
+	await browser
 		.expect(dragEndPosition.innerText)
 		.eql(dragEl.innerText)
 
