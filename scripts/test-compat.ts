@@ -20,7 +20,8 @@ async function testCompat() {
 	const runner = testCafe
 		.createRunner()
 		.src(dir)
-		.browsers(browsers);
+		.browsers(browsers)
+		.reporter("standard out", process.stdout);
 
 	console.log(`Test cafe runner created. Running tests from "${dir}"...`);
 
