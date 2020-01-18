@@ -17,8 +17,11 @@ test("Sort down list", async browser => {
 			.expect(dragStartPosition.innerText)
 			.eql(dragEl.innerText)
 			.expect(targetStartPosition.innerText)
-			.eql(target.innerText)
-			.dragToElement(dragEl, target)
+			.eql(target.innerText);
+		console.log("so good so far...");
+		await browser.dragToElement(dragEl, target);
+		console.log("Great! the drag promise finished.");
+		await browser
 			.expect(dragEndPosition.innerText)
 			.eql(dragEl.innerText)
 			.expect(targetEndPosition.innerText)
