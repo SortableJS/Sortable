@@ -12,20 +12,16 @@ test("Sort down list", async browser => {
 	const target = await targetStartPosition();
 	const targetEndPosition = list1.child(1);
 
-	try {
-		await browser
-			.expect(dragStartPosition.innerText)
-			.eql(dragEl.innerText)
-			.expect(targetStartPosition.innerText)
-			.eql(target.innerText)
-			.dragToElement(dragEl, target)
-			.expect(dragEndPosition.innerText)
-			.eql(dragEl.innerText)
-			.expect(targetEndPosition.innerText)
-			.eql(target.innerText);
-	} catch (error) {
-		throw new Error(error);
-	}
+	await browser
+		.expect(dragStartPosition.innerText)
+		.eql(dragEl.innerText)
+		.expect(targetStartPosition.innerText)
+		.eql(target.innerText)
+		.dragToElement(dragEl, target)
+		.expect(dragEndPosition.innerText)
+		.eql(dragEl.innerText)
+		.expect(targetEndPosition.innerText)
+		.eql(target.innerText);
 });
 
 test("Sort up list", async browser => {
@@ -35,18 +31,14 @@ test("Sort up list", async browser => {
 	const targetStartPosition = list1.child(0);
 	const target = await targetStartPosition();
 	const targetEndPosition = list1.child(1);
-	try {
-		await browser
-			.expect(dragStartPosition.innerText)
-			.eql(dragEl.innerText)
-			.expect(targetStartPosition.innerText)
-			.eql(target.innerText)
-			.dragToElement(dragEl, target)
-			.expect(dragEndPosition.innerText)
-			.eql(dragEl.innerText)
-			.expect(targetEndPosition.innerText)
-			.eql(target.innerText);
-	} catch (error) {
-		throw new Error(error);
-	}
+	await browser
+		.expect(dragStartPosition.innerText)
+		.eql(dragEl.innerText)
+		.expect(targetStartPosition.innerText)
+		.eql(target.innerText)
+		.dragToElement(dragEl, target)
+		.expect(dragEndPosition.innerText)
+		.eql(dragEl.innerText)
+		.expect(targetEndPosition.innerText)
+		.eql(target.innerText);
 });
