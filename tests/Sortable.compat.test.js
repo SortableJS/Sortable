@@ -36,11 +36,11 @@ test("Sort down list", async browser => {
 
 test("Sort up list", async browser => {
 	const dragStartPosition = list1.child(2);
-	const dragEl = dragStartPosition();
+	const dragEl = await dragStartPosition();
 	const dragEndPosition = list1.child(0);
 
 	const targetStartPosition = list1.child(0);
-	const target = targetStartPosition();
+	const target = await targetStartPosition();
 	const targetEndPosition = list1.child(1);
 
 	console.log(dragEl)
