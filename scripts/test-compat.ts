@@ -30,7 +30,7 @@ async function testCompat() {
 	// Runs the test and return how many tests failed.
 	const count = await runner.run({ speed: 0.1 }).catch(error => {
 		console.error("We ran into an error in the test! Please see below:\n");
-		throw new Error(error);
+		console.error(error);
 	});
 
 	// Close the tests.
