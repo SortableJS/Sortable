@@ -23,7 +23,7 @@ async function testCompat() {
 		.browsers(browsers)
 		// This error is annoying but required so we can see the errors in `stdout`.
 		// — "The "reporter" option from the configuration file will be ignored.
-		.reporter("list", process.stdout);
+		.reporter("json", process.stdout);
 
 	console.log(`Test cafe runner created. Running tests from "${dir}"...`);
 
