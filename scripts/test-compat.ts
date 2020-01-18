@@ -1,6 +1,6 @@
-import createTestCafe from "testcafe";
+import { default as createTestCafe } from "testcafe";
 
-import path from "path";
+import * as path from "path";
 
 // Testcafe cannot test on IE < 11
 // Testcafe testing on Chrome Android is currently broken (https://github.com/DevExpress/testcafe/issues/3948)
@@ -13,6 +13,14 @@ const browsers = [
 	"chrome:headless",
 	"firefox:headless"
 ];
+
+testCompat()
+	.catch(console.error)
+	.finally(() => {
+		console.log("We're now finished with the test runner!");
+		console.log("If any anything failed, go ahead and fix it.");
+		process.exit();
+	});
 
 async function testCompat() {
 	const testCafe = await createTestCafe(null, 8000, 8001);
@@ -37,7 +45,5 @@ async function testCompat() {
 	else console.error(`Not all tests passed, with "${count}" tests failing.`);
 
 	// Close the tests.
-	testCafe.close();
+	return testCafe.close();
 }
-
-testCompat().finally(() => process.exit());
