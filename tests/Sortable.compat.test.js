@@ -15,11 +15,17 @@ test("Sort down list", async browser => {
 	await browser
 		.expect(dragStartPosition.innerText)
 		.eql(dragEl.innerText)
+
 		.expect(targetStartPosition.innerText)
 		.eql(target.innerText)
+
+		.takeScreenshot()
 		.dragToElement(dragEl, target)
+		.takeScreenshot()
+
 		.expect(dragEndPosition.innerText)
 		.eql(dragEl.innerText)
+
 		.expect(targetEndPosition.innerText)
 		.eql(target.innerText);
 });
@@ -34,11 +40,17 @@ test("Sort up list", async browser => {
 	await browser
 		.expect(dragStartPosition.innerText)
 		.eql(dragEl.innerText)
+
 		.expect(targetStartPosition.innerText)
 		.eql(target.innerText)
+
+		.takeScreenshot()
 		.dragToElement(dragEl, target)
+		.takeScreenshot()
+
 		.expect(dragEndPosition.innerText)
 		.eql(dragEl.innerText)
+
 		.expect(targetEndPosition.innerText)
 		.eql(target.innerText);
 });
