@@ -29,13 +29,13 @@ async function testCompat() {
 	const testCafe = await createTestCafe(null, 8000, 8001);
 	console.log("Test cafe instance created.");
 
-	const dir = path.resolve(__dirname, "./tests/Sortable.compat.test.js");
+	const dir = path.resolve(__dirname, "../tests/Sortable.compat.test.js");
 	const runner = testCafe
 		.createRunner()
 		.src(dir)
 		.browsers(browsers);
 
-	console.log("Test cafe runner created. Running tests...");
+	console.log(`Test cafe runner created. Running tests from "${dir}"...`);
 
 	// Runs the test and return how many tests failed.
 	const count = await runner.run().catch(error => {
