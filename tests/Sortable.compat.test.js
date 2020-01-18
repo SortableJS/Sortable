@@ -24,7 +24,7 @@ test("Sort down list", async browser => {
 			.expect(targetEndPosition.innerText)
 			.eql(target.innerText);
 	} catch (error) {
-		console.error(error);
+		throw new Error(error);
 	}
 });
 
@@ -48,6 +48,6 @@ test("Sort up list", async browser => {
 			.expect(targetEndPosition.innerText)
 			.eql(target.innerText);
 	} catch (error) {
-		console.error(error);
+		throw new Error(error);
 	}
 });
