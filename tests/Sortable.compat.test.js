@@ -10,7 +10,7 @@ test("Sort down list", async browser => {
 	const dragEndPosition = list1.child(2);
 
 	const targetStartPosition = list1.child(2);
-	const target = targetStartPosition();
+	const target = await targetStartPosition();
 	const targetEndPosition = list1.child(1);
 
 	await browser
