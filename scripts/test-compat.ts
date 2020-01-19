@@ -16,7 +16,7 @@ const browsers = [
 
 async function testCompat() {
 	const testCafe = await createTestCafe(null, 8000, 8001);
-	const dir = path.resolve(__dirname, "../tests/Sortable.compat.test.js");
+	const dir = path.resolve(__dirname, "../tests/Sortable.compat.test.ts");
 	const runner = testCafe
 		.createRunner()
 		.src(dir)
