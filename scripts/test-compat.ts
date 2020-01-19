@@ -28,13 +28,11 @@ async function testCompat() {
 	const { start, stop } = createDotty();
 	start();
 	// Runs the test and return how many tests failed.
-	const count = await runner
-		.run({ speed: 0.1 })
-		.catch(error => {
-			console.error("We ran into an error in the test! Please see below:\n");
-			console.error(error);
-		})
-		.finally(stop);
+	const count = await runner.run({ speed: 0.1 }).catch(error => {
+		console.error("We ran into an error in the test! Please see below:\n");
+		console.error(error);
+	});
+	stop();
 
 	// Close the tests.
 	testCafe.close();
