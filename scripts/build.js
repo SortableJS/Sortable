@@ -1,17 +1,12 @@
-import babel from 'rollup-plugin-babel';
-import json from 'rollup-plugin-json';
-import resolve from 'rollup-plugin-node-resolve';
-import banner from './banner.js';
-
+import json from "rollup-plugin-json";
+import resolve from "rollup-plugin-node-resolve";
+import banner from "./banner.js";
+import typescript2 from "rollup-plugin-typescript2";
 
 export default {
 	output: {
 		banner,
-		name: 'Sortable'
+		name: "Sortable"
 	},
-	plugins: [
-		json(),
-		babel(),
-		resolve()
-    ]
+	plugins: [json(), typescript2(), resolve()]
 };

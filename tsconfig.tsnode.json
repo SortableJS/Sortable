@@ -1,0 +1,13 @@
+/** ts-node needs a specific config, such as module=commonjs */
+{
+    "compilerOptions": {
+        "allowJs": false,
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "skipDefaultLibCheck": true,
+        "noEmit": true,
+        "target": "es5",
+        "module": "CommonJS",
+    }
+}

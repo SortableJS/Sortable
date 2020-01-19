@@ -13,7 +13,10 @@
 		"testcafe": "^1.3.1",
 		"testcafe-browser-provider-saucelabs": "^1.7.0",
 		"testcafe-reporter-xunit": "^2.1.0",
-		"uglify-js": "^3.5.12"
+		"uglify-js": "^3.5.12",
+		"rollup-plugin-typescript2": "^0.25.3",
+		"ts-node": "^8.6.2",
+		"typescript": "^3.7.5"
 	},
 	"description": "JavaScript library for reorderable drag-and-drop lists on modern browsers and touch devices. No jQuery required. Supports Meteor, AngularJS, React, Polymer, Vue, Knockout and any CSS library, e.g. Bootstrap.",
 	"main": "./Sortable.js",
@@ -25,7 +28,7 @@
 		"build:es:watch": "set NODE_ENV=es&& rollup -w -c ./scripts/esm-build.js",
 		"minify": "node ./scripts/minify.js",
 		"build": "npm run build:es && npm run build:umd && npm run minify",
-		"test:compat": "node ./scripts/test-compat.js",
+		"test:compat": "ts-node ./scripts/test-compat.js",
 		"test": "node ./scripts/test.js"
 	},
 	"maintainers": [
