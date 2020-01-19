@@ -21,36 +21,38 @@ async function testCompat() {
 		.createRunner()
 		.src(dir)
 		.browsers(browsers)
-		// This error is annoying but required so we can see the errors in `stdout`.
-		// — "The "reporter" option from the configuration file will be ignored.
 		.reporter("json", process.stdout);
 
 	console.log(`Test cafe runner created. Running tests from "${dir}"...`);
 
+	const { start, stop } = createDotty();
+	start();
 	// Runs the test and return how many tests failed.
-	const count = await runner.run({ speed: 0.1 }).catch(error => {
-		console.error("We ran into an error in the test! Please see below:\n");
-		console.error(error);
-	});
+	const count = await runner
+		.run({ speed: 0.1 })
+		.catch(error => {
+			console.error("We ran into an error in the test! Please see below:\n");
+			console.error(error);
+		})
+		.finally(stop);
 
 	// Close the tests.
 	testCafe.close();
-	return count;
+
+	// Print to console basd on count of failed tests.
+	// passed tests.
+	if (count === 0) console.log(`All test passed with "${count}" failed tests!`);
+
+	// failed tests.
+	if (count > 0)
+		throw new Error(`Not all tests passed, with "${count}" tests failing.`);
+
+	// chances are tests didn't run here.
+	if (!count || count < 0)
+		throw new Error("Test runner didn't work... Tests did not actually run.");
 }
 
 testCompat()
-	// Print to console basd on count.
-	.then(count => {
-		// passed tests.
-		if (count === 0)
-			return console.log(`All test passed with "${count}" failed tests!`);
-		// failed tests.
-		if (count > 0)
-			throw new Error(`Not all tests passed, with "${count}" tests failing.`);
-		// chances are tests didn't run here.
-		else
-			throw new Error("Test runner didn't work... Tests did not actually run.");
-	})
 	.catch(error => {
 		console.log("Uh oh, we had an error! Please read the details below:\n");
 		console.error(error);
@@ -58,5 +60,19 @@ testCompat()
 	})
 	.finally(() => {
 		console.log("Compatability testing complete.");
-		process.exit();
+		process.exit(0);
 	});
+
+function createDotty(): { start: () => void; stop: () => void } {
+	let timeout: NodeJS.Timeout;
+
+	// starts the timer to print std.out every second
+	const start = () => {
+		timeout = setInterval(() => process.stdout.write("... "), 1000);
+	};
+
+	// stops the timer.
+	const stop = () => clearInterval(timeout);
+
+	return { start, stop };
+}
