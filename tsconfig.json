@@ -5,7 +5,7 @@
   "compilerOptions": {
     "resolveJsonModule": true,
     /* Basic Options */
-    // "incremental": true,                   /* Enable incremental compilation */
+    "incremental": true,                   /* Enable incremental compilation */
     "target": "es5", /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019' or 'ESNEXT'. */
     "module": "esnext", /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */
     // "lib": [],                             /* Specify library files to be included in the compilation. */
@@ -24,7 +24,7 @@
     "noEmit": true,                        /* Do not emit outputs. */
     // "importHelpers": true,                 /* Import emit helpers from 'tslib'. */
     // "downlevelIteration": true,            /* Provide full support for iterables in 'for-of', spread, and destructuring when targeting 'ES5' or 'ES3'. */
-    // "isolatedModules": true,               /* Transpile each file as a separate module (similar to 'ts.transpileModule'). */
+    "isolatedModules": true,               /* Transpile each file as a separate module (similar to 'ts.transpileModule'). */
     /* Strict Type-Checking Options */
     "strict": true, /* Enable all strict type-checking options. */
     "noImplicitAny": false,                 /* Raise error on expressions and declarations with an implied 'any' type. */

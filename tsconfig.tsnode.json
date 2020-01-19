@@ -1,3 +1,4 @@
+/** ts-node needs a specific config, such as module=commonjs */
 {
     "include": [
         "src"
