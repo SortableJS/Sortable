@@ -28,7 +28,7 @@
 		"build:es:watch": "set NODE_ENV=es&& rollup -w -c ./scripts/esm-build.js",
 		"minify": "node ./scripts/minify.js",
 		"build": "npm run build:es && npm run build:umd && npm run minify",
-		"test:compat": "ts-node ./scripts/test-compat.js",
+		"test:compat": "ts-node ./scripts/test-compat.ts",
 		"test": "node ./scripts/test.js"
 	},
 	"maintainers": [
