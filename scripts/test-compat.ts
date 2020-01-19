@@ -66,7 +66,7 @@ function createDotty(): { start: () => void; stop: () => void } {
 
 	// starts the timer to print std.out every second
 	const start = () => {
-		timeout = setInterval(() => process.stdout.write("... "), 1000);
+		timeout = setInterval(() => console.log("... "), 1000);
 	};
 
 	// stops the timer.
