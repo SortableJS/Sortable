@@ -3,7 +3,6 @@ import { Selector } from "testcafe";
 fixture`Simple Sorting`.page`./single-list.html`;
 
 let list1 = Selector("#list1");
-
 test("Sort down list", async browser => {
 	const dragStartPosition = list1.child(0);
 	const dragEl = await dragStartPosition();
@@ -19,7 +18,7 @@ test("Sort down list", async browser => {
 			.expect(targetStartPosition.innerText)
 			.eql(target.innerText);
 		console.log("Before dragToElement is called.");
-		await browser.dragToElement(dragEl, target);
+		await browser.dragToElement(dragStartPosition, targetStartPosition);
 		console.log("After dragToElement is called.");
 		await browser
 			.expect(dragEndPosition.innerText)
