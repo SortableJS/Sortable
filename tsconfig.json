@@ -3,7 +3,7 @@
         "src"
     ],
     "compilerOptions": {
-        "allowJs": false,
+        "allowJs": true,
         "allowSyntheticDefaultImports": true,
         "esModuleInterop": true,
         "skipLibCheck": true,
@@ -11,5 +11,8 @@
         "noEmit": true,
         "target": "es5",
         "module": "esnext",
+        "moduleResolution": "node",
+        "forceConsistentCasingInFileNames": true,
+        "strict": true
     }
 }
