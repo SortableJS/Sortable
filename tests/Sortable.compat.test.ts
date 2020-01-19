@@ -18,9 +18,9 @@ test("Sort down list", async browser => {
 			.eql(dragEl.innerText)
 			.expect(targetStartPosition.innerText)
 			.eql(target.innerText);
-		console.log("so good so far...");
+		console.log("Before dragToElement is called.");
 		await browser.dragToElement(dragEl, target);
-		console.log("Great! the drag promise finished.");
+		console.log("After dragToElement is called.");
 		await browser
 			.expect(dragEndPosition.innerText)
 			.eql(dragEl.innerText)
