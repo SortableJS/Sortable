@@ -102,7 +102,7 @@ var example7SizeProperty = 'width';
 
 function renderThresholdWidth(evt) {
 	example7SwapThreshold = Number(evt.target.value);
-	example7SwapThresholdCode.innerHTML = evt.target.value.indexOf('.') > -1 ? evt.target.value.padEnd(4, '0') : evt.target.value;
+	example7SwapThresholdCode.innerHTML = evt.target.value.indexOf('.') > -1 ? (evt.target.value + '0000').slice(0, 4) : evt.target.value;
 
 	for (var i = 0; i < activeIndicators.length; i++) {
 		activeIndicators[i].style[example7SizeProperty] = (evt.target.value * 100) /
@@ -113,8 +113,9 @@ function renderThresholdWidth(evt) {
 }
 
 example7SwapThresholdInput.addEventListener('input', renderThresholdWidth);
+example7SwapThresholdInput.addEventListener('change', renderThresholdWidth);
 
-example7InvertSwapInput.addEventListener('input', function(evt) {
+example7InvertSwapInput.addEventListener('change', function(evt) {
 	example7Sortable.option('invertSwap', evt.target.checked);
 
 
@@ -180,7 +181,7 @@ function renderDirection(evt) {
 		target: example7SwapThresholdInput
 	});
 }
-example7DirectionInput.addEventListener('input', renderDirection);
+example7DirectionInput.addEventListener('change', renderDirection);
 
 renderDirection({
 	target: example7DirectionInput
