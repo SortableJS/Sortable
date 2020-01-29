@@ -9,7 +9,7 @@ const browsers = [
 	// "saucelabs:Internet Explorer@11.285:Windows 10",
 	// "saucelabs:MicrosoftEdge@16.16299:Windows 10",
 	"saucelabs:iPhone XS Simulator@12.2",
-	// "saucelabs:Safari@12.0:macOS 10.14",
+	"saucelabs:Safari@12.0:macOS 10.14",
 	"chrome:headless",
 	"firefox:headless"
 ];
@@ -24,6 +24,8 @@ async function testCompat() {
 		.reporter("json", process.stdout);
 
 	console.log(`Test cafe runner created. Running tests from "${dir}"...`);
+	console.log(`Tests are being run in the following browsers:`);
+	console.table(browsers)
 
 	const { start, stop } = createDotty();
 	start();
