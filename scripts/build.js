@@ -8,5 +8,12 @@ export default {
 		banner,
 		name: "Sortable"
 	},
-	plugins: [json(), typescript2(), resolve()]
+	plugins: [
+		json(),
+		resolve(),
+		typescript2({
+			include: ["*.js+(|x)", "**/*.js+(|x)"],
+			rollupCommonJSResolveHack: true
+		})
+	]
 };
