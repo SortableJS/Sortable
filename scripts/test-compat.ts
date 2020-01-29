@@ -1,5 +1,5 @@
 import { default as createTestCafe } from "testcafe";
-
+import * as fs from "fs";
 import * as path from "path";
 
 // Testcafe cannot test on IE < 11
@@ -21,7 +21,7 @@ async function testCompat() {
 		.createRunner()
 		.src(dir)
 		.browsers(browsers)
-		.reporter("json", process.stdout);
+		.reporter("json", fs.createWriteStream(path.resolve("/tmp/test-results")));
 
 	console.log(`Test cafe runner created. Running tests from "${dir}"...`);
 	console.log(`Tests are being run in the following browsers:`);
