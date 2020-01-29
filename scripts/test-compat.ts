@@ -25,16 +25,15 @@ async function testCompat() {
 
 	console.log(`Test cafe runner created. Running tests from "${dir}"...`);
 	console.log(`Tests are being run in the following browsers:`);
-	console.table(browsers)
+	console.table(browsers);
 
-	const { start, stop } = createDotty();
-	start();
 	// Runs the test and return how many tests failed.
 	const count = await runner.run().catch(error => {
-		console.error("We ran into an error in the test! Please see below:\n");
+		console.error(
+			"We ran into an error when resolving a promise from the runner! Please see below:\n"
+		);
 		console.error(error);
 	});
-	stop();
 
 	// Close the tests.
 	testCafe.close();
@@ -63,6 +62,7 @@ testCompat()
 		process.exit(0);
 	});
 
+/** returns some functions that can be called to start and stop a continuous loop of console.log('...') */
 function createDotty(): { start: () => void; stop: () => void } {
 	let timeout: NodeJS.Timeout;
 
