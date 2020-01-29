@@ -18,10 +18,14 @@ test("Sort down list", async browser => {
 			.expect(targetStartPosition.innerText)
 			.eql(target.innerText);
 
-		console.log("Before dragToElement is called.");
+		console.log(
+			`Before dragToElement is called, on browser: "${browser.browser.prettyUserAgent}"`
+		);
 		await browser.dragToElement(dragStartPosition, targetStartPosition);
-		console.log("After dragToElement is called.");
-		
+		console.log(
+			`After dragToElement is called, on browser: "${browser.browser.prettyUserAgent}"`
+		);
+
 		await browser
 			.expect(dragEndPosition.innerText)
 			.eql(dragEl.innerText)
@@ -29,6 +33,9 @@ test("Sort down list", async browser => {
 			.eql(target.innerText);
 	} catch (reason) {
 		console.error(reason.callsite.stackFrames.map(frame => frame.toString()));
+		throw new Error(
+			"The test itself threw an error. Check out the details above:"
+		);
 	}
 });
 
