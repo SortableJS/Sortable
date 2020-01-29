@@ -6,8 +6,8 @@ import * as path from "path";
 // Testcafe testing on Chrome Android is currently broken (https://github.com/DevExpress/testcafe/issues/3948)
 
 const browsers = [
-	// "saucelabs:Internet Explorer@11.285:Windows 10",
-	// "saucelabs:MicrosoftEdge@16.16299:Windows 10",
+	"saucelabs:Internet Explorer@11.285:Windows 10",
+	"saucelabs:MicrosoftEdge@16.16299:Windows 10",
 	"saucelabs:iPhone XS Simulator@12.2",
 	"saucelabs:Safari@12.0:macOS 10.14",
 	"chrome:headless",
