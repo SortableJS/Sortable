@@ -27,7 +27,7 @@ async function testCompat() {
 	console.log(`Tests are being run in the following browsers:`);
 	console.table(browsers);
 
-	const periods = createPeriods()
+	// const periods = createPeriods()
 
 	// Runs the test and return how many tests failed.
 	const count = await runner.run().catch(error => {
@@ -64,17 +64,17 @@ testCompat()
 		process.exit(0);
 	});
 
-/** returns some functions that can be called to start and stop a continuous loop of console.log('...') */
-function createPeriods(): { start: () => void; stop: () => void } {
-	let timeout: NodeJS.Timeout;
+// /** returns some functions that can be called to start and stop a continuous loop of console.log('...') */
+// function createPeriods(): { start: () => void; stop: () => void } {
+// 	let timeout: NodeJS.Timeout;
 
-	// starts the timer to print std.out every second
-	const start = () => {
-		timeout = setInterval(() => console.log("... "), 4000);
-	};
+// 	// starts the timer to print std.out every second
+// 	const start = () => {
+// 		timeout = setInterval(() => console.log("... "), 4000);
+// 	};
 
-	// stops the timer.
-	const stop = () => clearInterval(timeout);
+// 	// stops the timer.
+// 	const stop = () => clearInterval(timeout);
 
-	return { start, stop };
-}
+// 	return { start, stop };
+// }
