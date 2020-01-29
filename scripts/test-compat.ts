@@ -32,7 +32,7 @@ async function testCompat() {
 	// const periods = createPeriods()
 
 	// Runs the test and return how many tests failed.
-	const count = await runner.run().catch(error => {
+	const count = await runner.run({debugMode: true}).catch(error => {
 		console.error(
 			"We ran into an error when resolving a promise from the runner! Please see below:\n"
 		);
