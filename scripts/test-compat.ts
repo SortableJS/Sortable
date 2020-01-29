@@ -27,6 +27,8 @@ async function testCompat() {
 	console.log(`Tests are being run in the following browsers:`);
 	console.table(browsers);
 
+	const periods = createPeriods()
+
 	// Runs the test and return how many tests failed.
 	const count = await runner.run().catch(error => {
 		console.error(
@@ -63,7 +65,7 @@ testCompat()
 	});
 
 /** returns some functions that can be called to start and stop a continuous loop of console.log('...') */
-function createDotty(): { start: () => void; stop: () => void } {
+function createPeriods(): { start: () => void; stop: () => void } {
 	let timeout: NodeJS.Timeout;
 
 	// starts the timer to print std.out every second
