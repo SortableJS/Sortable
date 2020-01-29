@@ -10,8 +10,8 @@ const browsers = [
 	// "saucelabs:MicrosoftEdge@16.16299:Windows 10",
 	// "saucelabs:iPhone XS Simulator@12.2",
 	// "saucelabs:Safari@12.0:macOS 10.14",
-	"chrome:headless"
-	// "firefox:headless"
+	"chrome:headless",
+	"firefox:headless"
 ];
 
 async function testCompat() {
