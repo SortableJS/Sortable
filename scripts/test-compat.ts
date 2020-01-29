@@ -10,7 +10,7 @@ const browsers = [
 	// "saucelabs:MicrosoftEdge@16.16299:Windows 10",
 	// "saucelabs:iPhone XS Simulator@12.2",
 	// "saucelabs:Safari@12.0:macOS 10.14",
-	"chrome:headless",
+	"chrome:headless"
 	// "firefox:headless"
 ];
 
@@ -46,7 +46,7 @@ async function testCompat() {
 		throw new Error(`Not all tests passed, with "${count}" tests failing.`);
 
 	// chances are tests didn't run here.
-	if (!count || count < 0)
+	if (count === undefined || count === null || count < 0)
 		throw new Error("Test runner didn't work... Tests did not actually run.");
 }
 
