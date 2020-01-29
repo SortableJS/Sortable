@@ -7,8 +7,8 @@ import * as path from "path";
 
 const browsers = [
 	// "saucelabs:Internet Explorer@11.285:Windows 10",
-	"saucelabs:MicrosoftEdge@16.16299:Windows 10",
-	// "saucelabs:iPhone XS Simulator@12.2",
+	// "saucelabs:MicrosoftEdge@16.16299:Windows 10",
+	"saucelabs:iPhone XS Simulator@12.2",
 	// "saucelabs:Safari@12.0:macOS 10.14",
 	"chrome:headless",
 	"firefox:headless"
