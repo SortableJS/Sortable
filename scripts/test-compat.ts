@@ -19,11 +19,17 @@ const browsers = [
 async function testCompat() {
 	const testCafe = await createTestCafe(null, 8000, 8001);
 	const dir = path.resolve(__dirname, "../tests/Sortable.compat.test.ts");
+	
+	const testDir = path.resolve("/tmp/test-results/");
+	fs.mkdirSync(testDir, { recursive: true });
+	const writeStream = fs.createWriteStream(
+		path.resolve(testDir, "compatability-test.xml")
+	);
 	const runner = testCafe
 		.createRunner()
 		.src(dir)
 		.browsers(browsers)
-		.reporter("xunit", fs.createWriteStream(path.resolve("/tmp/test-results/compatability-test.xml")));
+		.reporter("xunit", writeStream);
 
 	console.log(`Test cafe runner created. Running tests from "${dir}"...`);
 	console.log(`Tests are being run in the following browsers:`);
@@ -32,14 +38,12 @@ async function testCompat() {
 	// const periods = createPeriods()
 
 	// Runs the test and return how many tests failed.
-	const count = await runner
-		.run({assertionTimeout: 10000})
-		.catch(error => {
-			console.error(
-				"We ran into an error when resolving a promise from the runner! Please see below:\n"
-			);
-			console.error(error);
-		});
+	const count = await runner.run({ assertionTimeout: 10000 }).catch(error => {
+		console.error(
+			"We ran into an error when resolving a promise from the runner! Please see below:\n"
+		);
+		console.error(error);
+	});
 
 	// Close the tests.
 	testCafe.close();
