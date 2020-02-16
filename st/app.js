@@ -210,6 +210,7 @@ for (var i = 0; i < nestedSortables.length; i++) {
 new Sortable(multiDragDemo, {
 	multiDrag: true,
 	selectedClass: 'selected',
+	fallbackTolerance: 3, // So that we can select items on mobile
 	animation: 150
 });
 
