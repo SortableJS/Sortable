@@ -484,6 +484,11 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			return;
 		}
 
+		// Safari ignores further event handling after mousedown
+		if (!this.nativeDraggable && Safari && target && target.tagName.toUpperCase() === 'SELECT') {
+			return;
+		}
+
 		target = closest(target, options.draggable, el, false);
 
 
