@@ -1,7 +1,6 @@
 {
-	"include": ["src"],
 	"compilerOptions": {
-		"allowJs": true,
+		"allowJs": false,
 		"allowSyntheticDefaultImports": true,
 		"esModuleInterop": true,
 		"skipLibCheck": true,
