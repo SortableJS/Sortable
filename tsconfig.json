@@ -1,18 +1,16 @@
 {
-    "include": [
-        "src"
-    ],
-    "compilerOptions": {
-        "allowJs": true,
-        "allowSyntheticDefaultImports": true,
-        "esModuleInterop": true,
-        "skipLibCheck": true,
-        "skipDefaultLibCheck": true,
-        "noEmit": true,
-        "target": "es5",
-        "module": "esnext",
-        "moduleResolution": "node",
-        "forceConsistentCasingInFileNames": true,
-        "strict": true
-    }
+	"include": ["src"],
+	"compilerOptions": {
+		"allowJs": true,
+		"allowSyntheticDefaultImports": true,
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"skipDefaultLibCheck": true,
+		"noEmit": true,
+		"target": "es5",
+		"module": "esnext",
+		"moduleResolution": "node",
+		"forceConsistentCasingInFileNames": true,
+		"strict": true
+	}
 }
