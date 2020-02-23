@@ -19,7 +19,7 @@ const browsers = [
 async function testCompat() {
 	const testCafe = await createTestCafe(null, 8000, 8001);
 	const dir = path.resolve(__dirname, "../tests/Sortable.compat.test.ts");
-	
+
 	const testDir = path.resolve("/tmp/test-results/");
 	fs.mkdirSync(testDir, { recursive: true });
 	const writeStream = fs.createWriteStream(
@@ -71,18 +71,3 @@ testCompat()
 		console.log("Compatability testing complete.");
 		process.exit(0);
 	});
-
-// /** returns some functions that can be called to start and stop a continuous loop of console.log('...') */
-// function createPeriods(): { start: () => void; stop: () => void } {
-// 	let timeout: NodeJS.Timeout;
-
-// 	// starts the timer to print std.out every second
-// 	const start = () => {
-// 		timeout = setInterval(() => console.log("... "), 4000);
-// 	};
-
-// 	// stops the timer.
-// 	const stop = () => clearInterval(timeout);
-
-// 	return { start, stop };
-// }
