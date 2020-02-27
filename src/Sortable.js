@@ -334,7 +334,7 @@ let nearestEmptyInsertDetectEvent = function(evt) {
 
 let _checkOutsideTargetEl = function(evt) {
 	if (dragEl) {
-		dragEl.parentNode[expando]._isOutsideThisEl(evt.target);
+		parentEl[expando]._isOutsideThisEl(evt.target);
 	}
 };
 
@@ -758,7 +758,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 				parent = target;
 			}
 
-			dragEl.parentNode[expando]._isOutsideThisEl(target);
+			parentEl[expando]._isOutsideThisEl(target);
 
 			if (parent) {
 				do {
@@ -1083,7 +1083,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 
 			// no bubbling and not fallback
 			if (!options.dragoverBubble && !evt.rootEl && target !== document) {
-				dragEl.parentNode[expando]._isOutsideThisEl(evt.target);
+				parentEl[expando]._isOutsideThisEl(evt.target);
 
 				// Do not detect for empty insert if already inserted
 				!insertion && nearestEmptyInsertDetectEvent(evt);
