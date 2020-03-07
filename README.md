@@ -555,7 +555,7 @@ Get or set the option.
 
 
 
-##### closest(el:`String`[, selector:`HTMLElement`]):`HTMLElement|null`
+##### closest(el:`HTMLElement`[, selector:`String`]):`HTMLElement|null`
 For each element in the set, get the first element that matches the selector by testing the element itself and traversing up through its ancestors in the DOM tree.
 
 
