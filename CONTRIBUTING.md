@@ -19,6 +19,16 @@
  2. Clone locally
  3. Run `npm i` in the local repo
 
+### Online one-click setup
+
+You can use Gitpod (a free online VS Code-like IDE) for contributing, With a single click it'll launch a workspace and automatically:
+
+- clone the Sortable repo.
+- install the dependencies.
+- run `npm run build:umd:watch`.
+
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/SortableJS/Sortable/)
+
 ### Building
 
  - For development, build the `./Sortable.js` file using the command `npm run build:umd:watch`
