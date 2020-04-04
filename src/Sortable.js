@@ -1692,7 +1692,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			if (Sortable.eventCanceled) return;
 
 			// show clone at dragEl or original position
-			if (rootEl.contains(dragEl) && !this.options.group.revertClone) {
+			if (dragEl.parentNode == rootEl && !this.options.group.revertClone) {
 				rootEl.insertBefore(cloneEl, dragEl);
 			} else if (nextEl) {
 				rootEl.insertBefore(cloneEl, nextEl);
