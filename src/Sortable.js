@@ -1590,14 +1590,14 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 	_toHierarchy: function( el ) {
 		let order = [],
 			children = el.children,
-			n = children.length;
+			n = children.length,
+			options = this.options;
 		for( let i = 0; i < n; ++i ) {
 			let child = children[i],
 				grandChildren = child.children,
 				m = grandChildren.length;
 			// I am not sure about this closest() call if the 3rd
-			// argument should be this.el or the local el?
-			// It was this.el and I changed it to just el
+			// argument should be 'this.el' or the local 'el'?
 			if( closest( child, options.draggable, el, false ) ) {
 				order.push( child.getAttribute(options.dataIdAttr) || _generateId(child) );
 			}
@@ -1625,7 +1625,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		    recursionClasses = this.options.recursionClasses || [],
 		    recursionIds = this.options.recursionIds || [];
 		if( !el ) return false;
-		if( recusionTags.include( el.nodeName ) ) return true;
+		if( recursionTags.includes( el.nodeName ) ) return true;
 		if( el.id && el.id != 'undefined' && recursionIds.includes( el.id ) ) return true;
 		let classList = el.className.split(' ');
 		for( let i = 0; i < recursionClasses.length; ++i ) {
