@@ -394,9 +394,9 @@ function Sortable(el, options) {
 		fallbackOffset: {x: 0, y: 0},
 		supportPointer: Sortable.supportPointer !== false && ('PointerEvent' in window),
 		emptyInsertThreshold: 5,
-		recursionTags = [ "UL", "OL" ],
-		recursionClasses = [],
-		recursionIds = [];
+		recursionTags: [ "UL", "OL" ],
+		recursionClasses: [],
+		recursionIds: []
 	};
 
 	PluginManager.initializePlugins(this, el, defaults);
@@ -1626,13 +1626,13 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		    recursionIds = this.options.recursionIds || [];
 		if( !el ) return false;
 		if( recusionTags.include( el.nodeName ) ) return true;
-		if( el.id && el.id != 'undefined' && recursionIds.includes( el.id ) return true;
+		if( el.id && el.id != 'undefined' && recursionIds.includes( el.id ) ) return true;
 		let classList = el.className.split(' ');
 		for( let i = 0; i < recursionClasses.length; ++i ) {
-			if( classList.includes( recursionClasses[i] ) return true;
+			if( classList.includes( recursionClasses[i] ) ) return true;
 		}
 		return false;
-	}
+	},
 
 
 	/**
