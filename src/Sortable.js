@@ -393,7 +393,10 @@ function Sortable(el, options) {
 		fallbackTolerance: 0,
 		fallbackOffset: {x: 0, y: 0},
 		supportPointer: Sortable.supportPointer !== false && ('PointerEvent' in window),
-		emptyInsertThreshold: 5
+		emptyInsertThreshold: 5,
+		recursionTags = [ "UL", "OL" ],
+		recursionClasses = [],
+		recursionIds = [];
 	};
 
 	PluginManager.initializePlugins(this, el, defaults);
@@ -1563,6 +1566,73 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 
 		return order;
 	},
+
+
+	/**
+	 * Serializes the item into an array of strings and arrays
+	 * The structure is: [ id1, id2, [id2.1, id2.2, [id2.2.1], id2.3], id3]
+	 * for:	id1
+	 *	id2
+	 *	    id2.1
+	 *	    id2.2
+	 *		id2.2.1
+	 *	    id2.3
+	 *	id3
+	 */
+	toHierarchy: function() {
+		return this._toHierarchy( this.el );
+	},
+
+	/**
+	 * Recursive method to build hierarchy for the passed element
+	 * @param   {HTMLElement}  el
+	 */
+	_toHierarchy: function( el ) {
+		let order = [],
+			children = el.children,
+			n = children.length;
+		for( let i = 0; i < n; ++i ) {
+			let child = children[i],
+				grandChildren = child.children,
+				m = grandChildren.length;
+			// I am not sure about this closest() call if the 3rd
+			// argument should be this.el or the local el?
+			// It was this.el and I changed it to just el
+			if( closest( child, options.draggable, el, false ) ) {
+				order.push( child.getAttribute(options.dataIdAttr) || _generateId(child) );
+			}
+			// Recurse if there are grandchildren
+			for( let j = 0; j < m; ++j ) {
+				let grandChild = grandChildren[j];
+				if( this.shouldRecurse( grandChild ) ) {
+					let childOrder = this._toHierarchy( grandChild );
+					if( childOrder.length > 0 ) order.push( childOrder );
+				}
+			}
+		}
+		return order;
+	},
+
+
+	/**
+	 * Determine if this element should be considered a parent of more sortable
+	 * elements to be recursed to based on it nodeName, id and/or classes.
+	 *
+	 * @param   {HTMLElement}  el
+	 */
+	shouldRecurse: function( el ) {
+		let recursionTags = this.options.recursionTags || [ "UL", "OL" ],
+		    recursionClasses = this.options.recursionClasses || [],
+		    recursionIds = this.options.recursionIds || [];
+		if( !el ) return false;
+		if( recusionTags.include( el.nodeName ) ) return true;
+		if( el.id && el.id != 'undefined' && recursionIds.includes( el.id ) return true;
+		let classList = el.className.split(' ');
+		for( let i = 0; i < recursionClasses.length; ++i ) {
+			if( classList.includes( recursionClasses[i] ) return true;
+		}
+		return false;
+	}
 
 
 	/**
