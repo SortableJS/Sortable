@@ -1569,21 +1569,6 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 
 
 	/**
-	 * Serializes the item into an array of strings and arrays
-	 * The structure is: [ id1, id2, [id2.1, id2.2, [id2.2.1], id2.3], id3]
-	 * for:	id1
-	 *	id2
-	 *	    id2.1
-	 *	    id2.2
-	 *		id2.2.1
-	 *	    id2.3
-	 *	id3
-	 */
-	toHierarchy: function() {
-		return this._toHierarchy( this.el );
-	},
-
-	/**
 	 * Recursive method to build hierarchy for the passed element
 	 * @param   {HTMLElement}  el
 	 */
@@ -1611,6 +1596,86 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			}
 		}
 		return order;
+	},
+
+	/**
+	 * Serializes the item into an array describing the structure
+	 * The default returned structure is:
+	 * [
+	 *    { 'id': id1, 'children': [
+	 *        ]
+	 *    },
+	 *    { 'id': id2, 'children': [
+	 *        { 'id': id2.1, 'children': [
+	 *            ]
+	 *        },
+	 *        { 'id': id2.2, 'children': [
+	 *            { 'id': id2.2.1, 'children': [
+	 *                ]
+	 *            }
+	 *        ],
+	 *        { 'id': id2.3, 'children': [
+	 *            ]
+	 *        }
+	 *    ],
+	 *    { 'id': id3, 'children': [
+	 *        ]
+	 *    }
+	 * ]
+	 * This can be simplified by removing all the empty 'children'
+	 * arrays setting the optional parameter to 1.  The returned structure is:
+	 * [
+	 *    { 'id': id1 },
+	 *    { 'id': id2, 'children': [
+	 *        { 'id': id2.1 },
+	 *        { 'id': id2.2, 'children': [
+	 *            { 'id': id2.2.1 }
+	 *        ],
+	 *        { 'id': id2.3 }
+	 *    ],
+	 *    { 'id': id3 }
+	 * ]
+	 * This can be further simplified to just and array or arrays
+	 * by setting the optional parameter to 2. The returned structure is:
+	 *    [ 'id1', 'id2', ['id2.1', 'id2.2', ['id2.2.1'], 'id2.3'], 'id3']
+	 *
+	 * These are all for the HTML:
+	 *       <ul>
+	 *     	    <li data-id="id1">Hello 1<li>
+	 *	    <li data-id="id2">Hello 2<li>
+	 *          <ul>
+	 *	        <li data-id="id2.1">Hello 2.1<li>
+	 *	        <li data-id="id2.2">Hello 2.2<li>
+	 *              <ul>
+	 *		    <li data-id="id2.2.1">Hello 2.2.1<li>
+	 *              </ul>
+	 *	        <li data-id="id2.3">Hello 2.3<li>
+	 *          </ul>
+	 *	    <li data-id="id3">Hello 3<li>
+	 *	</ul>
+	 */
+	getHierarchy: function( mode ) {
+		mode = (mode === 2) ? 2 : ((mode === 1) ? 1 : 0);
+		let hierarchy = this._toHierarchy( this.el );
+		if( mode != 2 ) {
+			hierarchy = this._getHierarchy( hierarchy, mode );
+		}
+		return hierarchy;
+	},
+
+	_getHierarchy: function( sibship, mode ) {
+		mode = (mode === 1) ? 1 : 0;
+		let objects = [];
+		for( let i = 0; i < sibship.length; ++i ) {
+			let node = { 'id': sibship[i] };
+			if( (i+1) < sibship.length && Array.isArray( sibship[i+1] ) ) {
+				node['children'] = this._getHierarchy( sibship[++i], mode );
+			} else if( mode == 0 ) {
+				node['children'] = [];
+			}
+			objects.push( node );
+		}
+		return objects;
 	},
 
 
