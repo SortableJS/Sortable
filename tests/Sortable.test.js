@@ -312,6 +312,10 @@ fixture `Nested`
 let list1n1 = Selector('.n1');
 let list1n2 = Selector('.n2');
 let list2n1 = Selector('.n1:nth-of-type(2)');
+let asArray = Selector('#as-array');
+let mode0 = Selector('#structure-mode0');
+let mode1 = Selector('#structure-mode1');
+let mode2 = Selector('#structure-mode2');
 
 test('Dragging from level 1 to level 0', async browser => {
 	const dragStartPosition = list1n1.child(0);
@@ -326,7 +330,11 @@ test('Dragging from level 1 to level 0', async browser => {
 		.expect(targetStartPosition.innerText).eql(target.innerText)
 		.dragToElement(dragEl, target, { destinationOffsetY: 0 })
 		.expect(dragEndPosition.innerText).eql(dragEl.innerText)
-		.expect(targetEndPosition.innerText).eql(target.innerText);
+		.expect(targetEndPosition.innerText).eql(target.innerText)
+		.expect(asArray.innerText).eql('["1.1","1.2","2.1","1.3","1.4","1.5"]')
+		.expect(mode0.innerText).eql('[{"id":"1.1","children":[{"id":"2.2","children":[{"id":"3.1","children":[]},{"id":"3.2","children":[]},{"id":"3.3","children":[]},{"id":"3.4","children":[]}]},{"id":"2.3","children":[]},{"id":"2.4","children":[]}]},{"id":"1.2","children":[]},{"id":"2.1","children":[]},{"id":"1.3","children":[]},{"id":"1.4","children":[{"id":"2.1","children":[]},{"id":"2.2","children":[]},{"id":"2.3","children":[]},{"id":"2.4","children":[]}]},{"id":"1.5","children":[]}]')
+		.expect(mode1.innerText).eql('[{"id":"1.1","children":[{"id":"2.2","children":[{"id":"3.1"},{"id":"3.2"},{"id":"3.3"},{"id":"3.4"}]},{"id":"2.3"},{"id":"2.4"}]},{"id":"1.2"},{"id":"2.1"},{"id":"1.3"},{"id":"1.4","children":[{"id":"2.1"},{"id":"2.2"},{"id":"2.3"},{"id":"2.4"}]},{"id":"1.5"}]')
+		.expect(mode2.innerText).eql('["1.1",["2.2",["3.1","3.2","3.3","3.4"],"2.3","2.4"],"1.2","2.1","1.3","1.4",["2.1","2.2","2.3","2.4"],"1.5"]');
 });
 
 
@@ -343,7 +351,12 @@ test('Dragging from level 0 to level 2', async browser => {
 		.expect(targetStartPosition.innerText).eql(target.innerText)
 		.dragToElement(dragEl, target, { destinationOffsetY: 0 })
 		.expect(dragEndPosition.innerText).eql(dragEl.innerText)
-		.expect(targetEndPosition.innerText).eql(target.innerText);
+		.expect(targetEndPosition.innerText).eql(target.innerText)
+		.expect(asArray.innerText).eql('["1.1","1.3","1.4","1.5"]')
+		.expect(mode0.innerText).eql('[{"id":"1.1","children":[{"id":"2.1","children":[]},{"id":"2.2","children":[{"id":"3.1","children":[]},{"id":"3.2","children":[]},{"id":"1.2","children":[]},{"id":"3.3","children":[]},{"id":"3.4","children":[]}]},{"id":"2.3","children":[]},{"id":"2.4","children":[]}]},{"id":"1.3","children":[]},{"id":"1.4","children":[{"id":"2.1","children":[]},{"id":"2.2","children":[]},{"id":"2.3","children":[]},{"id":"2.4","children":[]}]},{"id":"1.5","children":[]}]')
+		.expect(mode1.innerText).eql('[{"id":"1.1","children":[{"id":"2.1"},{"id":"2.2","children":[{"id":"3.1"},{"id":"3.2"},{"id":"1.2"},{"id":"3.3"},{"id":"3.4"}]},{"id":"2.3"},{"id":"2.4"}]},{"id":"1.3"},{"id":"1.4","children":[{"id":"2.1"},{"id":"2.2"},{"id":"2.3"},{"id":"2.4"}]},{"id":"1.5"}]')
+		.expect(mode2.innerText).eql('["1.1",["2.1","2.2",["3.1","3.2","1.2","3.3","3.4"],"2.3","2.4"],"1.3","1.4",["2.1","2.2","2.3","2.4"],"1.5"]')
+		.wait(60000);
 });
 
 
