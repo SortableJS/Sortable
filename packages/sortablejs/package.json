@@ -3,12 +3,11 @@
 	"exportName": "Sortable",
 	"version": "1.10.2",
 	"description": "JavaScript library for reorderable drag-and-drop lists on modern browsers and touch devices. No jQuery required. Supports Meteor, AngularJS, React, Polymer, Vue, Knockout and any CSS library, e.g. Bootstrap.",
-	"main": "./Sortable.js",
-	"module": "modular/sortable.esm.js",
+	"main": "dist/umd/sortable.js",
+	"browser": "dist/umd/sortable.min.js",
+	"module": "dist/modular/sortable.esm.js",
 	"files": [
-		"Sortable.js",
-		"Sortable.min.js",
-		"modular/"
+		"dist"
 	],
 	"scripts": {
 		"build:umd": "set NODE_ENV=umd && rollup -c ./scripts/rollup/umd-build.js",
