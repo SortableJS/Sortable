@@ -1,0 +1,14 @@
+{
+	"name": "site",
+	"version": "0.0.0",
+	"main": "public/index.html",
+	"license": "MIT",
+	"devDependencies": {
+		"@types/parcel-bundler": "^1.12.1",
+		"parcel-bundler": "^1.12.4"
+	},
+	"scripts": {
+		"start": "parcel --out-dir .temp/dev/dist --cache-dir .temp/dev/cache public/index.html",
+		"build": "parcel --out-dir .temp/build/dist --cache-dir .temp/build/cache public/index.html"
+	}
+}

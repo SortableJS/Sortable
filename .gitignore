@@ -4,3 +4,5 @@ mock.png
 .build*
 jquery.fn.*
 .idea/
+.temp
+dist

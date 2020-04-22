@@ -1,7 +1,0 @@
-{
-	"speed": 0.4,
-	"reporter": {
-		"name": "xunit",
-		"output": "/tmp/test-results/res.xml"
-	}
-}

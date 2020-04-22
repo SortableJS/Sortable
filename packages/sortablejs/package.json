@@ -1,0 +1,57 @@
+{
+	"name": "sortablejs",
+	"exportName": "Sortable",
+	"version": "1.10.2",
+	"description": "JavaScript library for reorderable drag-and-drop lists on modern browsers and touch devices. No jQuery required. Supports Meteor, AngularJS, React, Polymer, Vue, Knockout and any CSS library, e.g. Bootstrap.",
+	"main": "./Sortable.js",
+	"module": "modular/sortable.esm.js",
+	"files": [
+		"Sortable.js",
+		"Sortable.min.js",
+		"modular/"
+	],
+	"scripts": {
+		"build:umd": "set NODE_ENV=umd && rollup -c ./scripts/rollup/umd-build.js",
+		"build:es": "set NODE_ENV=es && rollup -c ./scripts/rollup/esm-build.js",
+		"watch:umd": "set NODE_ENV=umd && rollup -w -c ./scripts/rollup/umd-build.js",
+		"watch:es": "set NODE_ENV=es && rollup -w -c ./scripts/rollup/esm-build.js",
+		"minify": "node ./scripts/minify.js",
+		"build": "yarn build:es && yarn build:umd && yarn minify",
+		"test": "yarn build:umd && ts-node scripts/tests/integration.ts"
+	},
+	"devDependencies": {
+		"@babel/core": "^7.4.5",
+		"@babel/plugin-transform-object-assign": "^7.2.0",
+		"@babel/preset-env": "^7.4.5",
+		"rollup": "^1.12.3",
+		"rollup-plugin-babel": "^4.3.2",
+		"rollup-plugin-json": "^4.0.0",
+		"rollup-plugin-node-resolve": "^5.0.0",
+		"testcafe": "^1.3.1",
+		"testcafe-reporter-xunit": "^2.1.0",
+		"ts-node": "^8.8.2",
+		"typescript": "^3.8.3",
+		"uglify-js": "^3.5.15"
+	},
+	"maintainers": [
+		"Konstantin Lebedev <ibnRubaXa@gmail.com>",
+		"Owen Mills <owen23355@gmail.com>",
+		"Wayne Van Son <waynevanson@gmail.com>"
+	],
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/SortableJS/Sortable.git"
+	},
+	"keywords": [
+		"sortable",
+		"reorder",
+		"drag",
+		"meteor",
+		"angular",
+		"ng-sortable",
+		"react",
+		"vue",
+		"mixin"
+	],
+	"license": "MIT"
+}

@@ -1,33 +1,30 @@
 version: 2.0
+
 jobs:
   build:
     docker:
-      - image: circleci/node:10.16-browsers
+      - image: circleci/node:lts-browsers
     steps:
       - checkout
-
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "package.json" }}
-          - v1-dependencies-
+            # when lock file changes, use increasingly general patterns to restore cache
+            - yarn-packages-v1-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - yarn-packages-v1-{{ .Branch }}-
+            - yarn-packages-v1-
 
-      - run: npm install
+      - run:
+          name: Installing Dependencies
+          command: yarn --frozen-lockfile --cache-folder ~/.cache/yarn
 
       - save_cache:
           paths:
-            - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
-
-      - run: npm run build:umd
+            - ~/.cache/yarn
+          key: yarn-packages-v1-{{ .Branch }}-{{ checksum "yarn.lock" }}
 
       - run:
-          name: Compatibility Test
-          command: |
-            if [ -z "$CIRCLE_PR_NUMBER" ];
-            then
-              npm run test:compat
-            fi
-      - run: npm run test
+          name: Testing Browsers via Headless
+          command: yarn test:headless
 
       - store_test_results:
           path: /tmp/test-results
