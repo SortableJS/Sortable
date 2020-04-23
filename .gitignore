@@ -5,4 +5,5 @@ mock.png
 jquery.fn.*
 .idea/
 .temp
-dist
+umd
+modular

@@ -4,7 +4,7 @@ export default [
 	{
 		input: "./scripts/entry/entry-complete.js",
 		output: Object.assign({}, build.output, {
-			file: "dist/umd/sortable.js",
+			file: "umd/sortable.js",
 			format: "umd",
 		}),
 	},

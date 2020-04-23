@@ -7,8 +7,7 @@ const UglifyJS = require("uglify-js"),
 const banner = `/*! Sortable ${package.version} - ${package.license} | ${package.repository.url} */\n`;
 
 const projectDir = path.resolve(__dirname, "../");
-const distDir = path.resolve(projectDir, "dist");
-const umd = path.resolve(distDir, "umd");
+const umd = path.resolve(projectDir, "umd");
 
 const src = path.resolve(umd, "sortable.js");
 const dest = path.resolve(umd, "sortable.min.js");

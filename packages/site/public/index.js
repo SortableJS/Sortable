@@ -1,4 +1,4 @@
-import Sortable from "../../sortablejs/entry/entry-complete";
+import Sortable from "../../sortablejs/scripts/entry/entry-complete";
 
 var example1 = document.getElementById("example1"),
 	example2Left = document.getElementById("example2-left"),
