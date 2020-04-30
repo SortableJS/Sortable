@@ -138,7 +138,7 @@ function AutoScrollPlugin() {
 					clearAutoScrolls();
 					return;
 				}
-				autoScroll(evt, this.options, getParentAutoScrollElement(elem, false), false);
+				autoScroll(evt, this.options, getParentAutoScrollElement(elem, true), false);
 			}
 		}
 	};
