@@ -6,4 +6,4 @@ jquery.fn.*
 .idea/
 .temp
 umd
-modular
+packages/sortablejs/modular
