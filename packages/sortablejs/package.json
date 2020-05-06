@@ -23,6 +23,7 @@
 		"@babel/core": "^7.4.5",
 		"@babel/plugin-transform-object-assign": "^7.2.0",
 		"@babel/preset-env": "^7.4.5",
+		"fp-ts": "^2.5.4",
 		"rollup": "^1.12.3",
 		"rollup-plugin-babel": "^4.3.2",
 		"rollup-plugin-json": "^4.0.0",

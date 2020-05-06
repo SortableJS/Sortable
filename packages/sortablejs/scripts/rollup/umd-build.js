@@ -1,6 +1,15 @@
 import build from "./build.js";
 
 export default [
+	// directs to monorepo folder
+	{
+		input: "./scripts/entry/entry-complete.js",
+		output: Object.assign({}, build.output, {
+			file: "../../Sortable.js",
+			format: "umd",
+		}),
+	},
+	// directs to sortablejs folder
 	{
 		input: "./scripts/entry/entry-complete.js",
 		output: Object.assign({}, build.output, {

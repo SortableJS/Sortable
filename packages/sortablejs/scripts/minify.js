@@ -7,11 +7,20 @@ const UglifyJS = require("uglify-js"),
 const banner = `/*! Sortable ${package.version} - ${package.license} | ${package.repository.url} */\n`;
 
 const projectDir = path.resolve(__dirname, "../");
-const umd = path.resolve(projectDir, "umd");
 
-const src = path.resolve(umd, "sortable.js");
-const dest = path.resolve(umd, "sortable.min.js");
+const monorepoDir = path.resolve(projectDir, "../../");
+
+const src = path.resolve(monorepoDir, "Sortable.js");
+const destMonorepo = path.resolve(monorepoDir, "Sortable.min.js");
+
+const destSortablejs = path.resolve(projectDir, "./umd/sortable.min.js");
 
 const srcCode = fs.readFileSync(src, "utf8");
 
-fs.writeFileSync(dest, banner + UglifyJS.minify(srcCode).code, "utf8");
+fs.writeFileSync(destMonorepo, banner + UglifyJS.minify(srcCode).code, "utf8");
+
+fs.writeFileSync(
+	destSortablejs,
+	banner + UglifyJS.minify(srcCode).code,
+	"utf8"
+);
