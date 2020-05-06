@@ -13,7 +13,7 @@ import {
 	expando,
 } from "../../utils/src/utils";
 
-import dispatchEvent from "../../core/src/EventDispatcher";
+import dispatchEvent from "sortablejs/src/EventDispatcher";
 
 let multiDragElements = [],
 	multiDragClones = [],

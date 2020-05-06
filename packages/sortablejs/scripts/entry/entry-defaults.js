@@ -1,4 +1,4 @@
-import { Sortable } from "@sortablejs/core/src/Sortable";
+import { Sortable } from "../../src/Sortable";
 import { AutoScroll } from "@sortablejs/plugin-autoscroll";
 import { RemoveOnSpill, RevertOnSpill } from "@sortablejs/plugin-onspill/";
 import { Swap } from "@sortablejs/plugin-swap/";

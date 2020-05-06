@@ -11,7 +11,7 @@ import {
 	getWindowScrollingElement,
 } from "../../utils/src/utils";
 
-import { Sortable } from "../../core/src/Sortable";
+import { Sortable } from "../../sortablejs/src/Sortable";
 
 import { Edge, IE11OrLess, Safari } from "../../utils/src/browser-info";
 

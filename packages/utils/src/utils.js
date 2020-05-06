@@ -1,5 +1,5 @@
 import { IE11OrLess } from "./browser-info.js";
-import { Sortable } from "../../core/src/Sortable.js";
+import { Sortable } from "../../sortablejs/src/Sortable.js";
 
 const captureMode = {
 	capture: false,
