@@ -95,7 +95,7 @@ The following table contains details on the events that a plugin may handle in t
 
 ### Global Events
 Normally, an event will only be fired in a plugin if the plugin is enabled on the Sortable from which the event is being fired. However, it sometimes may be desirable for a plugin to listen in on an event from Sortables in which it is not enabled on. This is possible with global events. For an event to be global, simply add the suffix 'Global' to the event's name (casing matters) (eg. `dragStartGlobal`).
-Please note that your plugin must be initialized on any Sortable from which it expects to recieve events, and that includes global events. In other words, you will want to keep the `initializeByDefault` option as it's default `true` value if your plugin needs to recieve events from Sortables it is not enabled on.
+Please note that your plugin must be initialized on any Sortable from which it expects to receive events, and that includes global events. In other words, you will want to keep the `initializeByDefault` option as it's default `true` value if your plugin needs to receive events from Sortables it is not enabled on.
 Please also note that if both normal and global event handlers are set, the global event handler will always be fired before the regular one.
 
 ### Event Object

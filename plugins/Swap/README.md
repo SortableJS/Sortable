@@ -1,5 +1,5 @@
 ## Swap Plugin
-This plugin modifies the behaviour of Sortable to allow for items to be swapped with eachother rather than sorted. Once dragging starts, the user can drag over other items and there will be no change in the elements. However, the item that the user drops on will be swapped with the originally dragged item.
+This plugin modifies the behaviour of Sortable to allow for items to be swapped with each other rather than sorted. Once dragging starts, the user can drag over other items and there will be no change in the elements. However, the item that the user drops on will be swapped with the originally dragged item.
 
 Demo: https://jsbin.com/yejehog/edit?html,js,output
 
