@@ -150,9 +150,9 @@ function getWindowScrollingElement() {
 	let scrollingElement = document.scrollingElement;
 
 	if (scrollingElement) {
-		return scrollingElement
+		return scrollingElement;
 	} else {
-		return document.documentElement
+		return document.documentElement;
 	}
 }
 
