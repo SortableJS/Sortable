@@ -159,7 +159,7 @@ function getWindowScrollingElement() {
 
 /**
  * Returns the "bounding client rect" of given element
- * @param  {HTMLElement} el                       The element whose boundingClientRect is wanted
+ * @param  {HTMLElement|Window} el                The element whose boundingClientRect is wanted
  * @param  {[Boolean]} relativeToContainingBlock  Whether the rect should be relative to the containing block of (including) the container
  * @param  {[Boolean]} relativeToNonStaticParent  Whether the rect should be relative to the relative parent of (including) the container
  * @param  {[Boolean]} undoScale                  Whether the container's scale() should be undone
