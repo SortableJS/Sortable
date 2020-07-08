@@ -593,7 +593,7 @@ function insertMultiDragElements(clonesInserted, rootEl) {
 
 /**
  * Insert multi-drag clones
- * @param  {[Boolean]} elementsInserted  Whether the multi-drag elements are inserted
+ * @param  {Boolean} [elementsInserted] Whether the multi-drag elements are inserted
  * @param  {HTMLElement} rootEl
  */
 function insertMultiDragClones(elementsInserted, rootEl) {
