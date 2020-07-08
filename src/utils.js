@@ -347,7 +347,7 @@ function lastChild(el, selector) {
  * Returns the index of an element within its parent for a selected set of
  * elements
  * @param  {HTMLElement} el
- * @param  {selector} selector
+ * @param  {string} [selector] CSS selector query
  * @return {number}
  */
 function index(el, selector) {
