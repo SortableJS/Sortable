@@ -1173,27 +1173,29 @@
 		destroy: function () {
 			var el = this.el;
 
-			el[expando] = null;
+			if (el){
+				el[expando] = null;
 
-			_off(el, 'mousedown', this._onTapStart);
-			_off(el, 'touchstart', this._onTapStart);
-			_off(el, 'pointerdown', this._onTapStart);
+				_off(el, 'mousedown', this._onTapStart);
+				_off(el, 'touchstart', this._onTapStart);
+				_off(el, 'pointerdown', this._onTapStart);
 
-			if (this.nativeDraggable) {
-				_off(el, 'dragover', this);
-				_off(el, 'dragenter', this);
+				if (this.nativeDraggable) {
+					_off(el, 'dragover', this);
+					_off(el, 'dragenter', this);
+				}
+
+				// Remove draggable attributes
+				Array.prototype.forEach.call(el.querySelectorAll('[draggable]'), function (el) {
+					el.removeAttribute('draggable');
+				});
+
+				touchDragOverListeners.splice(touchDragOverListeners.indexOf(this._onDragOver), 1);
+
+				this._onDrop();
+
+				this.el = el = null;
 			}
-
-			// Remove draggable attributes
-			Array.prototype.forEach.call(el.querySelectorAll('[draggable]'), function (el) {
-				el.removeAttribute('draggable');
-			});
-
-			touchDragOverListeners.splice(touchDragOverListeners.indexOf(this._onDragOver), 1);
-
-			this._onDrop();
-
-			this.el = el = null;
 		}
 	};
 
