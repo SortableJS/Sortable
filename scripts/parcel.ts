@@ -1,6 +1,11 @@
 // es module interop
 import { randomBytes } from "crypto";
-import { io as IO, readonlyRecord as ROR, taskEither as TE } from "fp-ts";
+import {
+  io as IO,
+  readonlyRecord as ROR,
+  taskEither as TE,
+  console as C,
+} from "fp-ts";
 import { pipe } from "fp-ts/lib/pipeable";
 import Bundler from "parcel-bundler";
 import * as path from "path";
@@ -97,18 +102,20 @@ const bundlers = { ...nonmodular, ...modular };
 const program = pipe(
   bundlers,
   // bundle each bundler
-  ROR.map(bundle),
+  ROR.mapWithIndex((k, v) =>
+    pipe(
+      bundle(v),
+      TE.chain(() => TE.fromIO(C.info(`Bundled target "${k}" successfully.`)))
+    )
+  ),
   // run them in parallel
   ROR.sequence(TE.ApplicativePar)
 );
 
-// run the program,
-(async () => {
-  await program()
-    // logging the errors
-    .catch(console.error)
-    // logging the good stuff
-    .then(console.log)
-    // ensuring node exits
-    .finally(() => process.exit(0));
-})();
+program()
+  // logging the errors
+  .catch(C.error)
+  // logging the good stuff
+  .then(C.log)
+  // ensuring node exits
+  .finally(() => process.exit(0));

@@ -64,6 +64,4 @@ export const program = pipe(
   R.map(teLog)
 );
 
-(async () => {
-  await program(settings)().finally(process.exit);
-})();
+program(settings)().finally(process.exit);
