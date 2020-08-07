@@ -5,10 +5,15 @@ import {
   readonlyRecord as ROR,
   taskEither as TE,
   console as C,
+  either as E,
+  task as T,
+  reader as R,
 } from "fp-ts";
 import { pipe } from "fp-ts/lib/pipeable";
 import Bundler from "parcel-bundler";
 import * as path from "path";
+import { flow } from "fp-ts/lib/function";
+import { tell } from "fp-ts/lib/Writer";
 
 const projectDir = path.resolve(__dirname, "../");
 const entryDir = path.resolve(projectDir, "./entry");
@@ -52,7 +57,6 @@ const nonmodular = {
     cacheDir: generateCacheDir(),
     minify: false,
     sourceMaps: false,
-    scopeHoist: true,
     cache: false,
   }),
   min: bundler({
@@ -62,7 +66,6 @@ const nonmodular = {
     outFile: "./Sortable.min.js",
     cacheDir: generateCacheDir(),
     sourceMaps: false,
-    scopeHoist: true,
     cache: false,
   }),
 };
@@ -99,6 +102,17 @@ const modular = {
 
 const bundlers = { ...nonmodular, ...modular };
 
+const teLog = TE.fold(
+  flow(
+    T.fromIOK(C.error),
+    T.map(() => 1)
+  ),
+  flow(
+    T.fromIOK(C.log),
+    T.map(() => 0)
+  )
+);
+
 const program = pipe(
   bundlers,
   // bundle each bundler
@@ -109,13 +123,8 @@ const program = pipe(
     )
   ),
   // run them in parallel
-  ROR.sequence(TE.ApplicativePar)
+  ROR.sequence(TE.ApplicativePar),
+  teLog
 );
 
-program()
-  // logging the errors
-  .catch(C.error)
-  // logging the good stuff
-  .then(C.log)
-  // ensuring node exits
-  .finally(() => process.exit(0));
+program().then(process.exit);
