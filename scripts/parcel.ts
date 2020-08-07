@@ -4,6 +4,7 @@ import { io as IO, readonlyRecord as ROR, taskEither as TE } from "fp-ts";
 import { pipe } from "fp-ts/lib/pipeable";
 import Bundler from "parcel-bundler";
 import * as path from "path";
+import { Role } from "testcafe";
 
 const projectDir = path.resolve(__dirname, "../");
 const entryDir = path.resolve(projectDir, "./entry");
@@ -48,6 +49,7 @@ const nonmodular = {
     minify: false,
     sourceMaps: false,
     scopeHoist: true,
+    cache: false,
   }),
   min: bundler({
     entryFiles: entryDefault,
@@ -57,6 +59,7 @@ const nonmodular = {
     cacheDir: generateCacheDir(),
     sourceMaps: false,
     scopeHoist: true,
+    cache: false,
   }),
 };
 
@@ -70,6 +73,7 @@ const modular = {
     outFile: "./sortable.core.esm.js",
     cacheDir: generateCacheDir(),
     sourceMaps: false,
+    cache: false,
   }),
   complete: bundler({
     entryFiles: path.resolve(entryDir, "./entry-complete.js"),
@@ -77,6 +81,7 @@ const modular = {
     outFile: "./sortable.complete.esm.js",
     cacheDir: generateCacheDir(),
     sourceMaps: false,
+    cache: false,
   }),
   default: bundler({
     entryFiles: entryDefault,
@@ -84,6 +89,7 @@ const modular = {
     outFile: "./sortable.esm.js",
     cacheDir: generateCacheDir(),
     sourceMaps: false,
+    cache: false,
   }),
 };
 
