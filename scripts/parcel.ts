@@ -104,10 +104,12 @@ const program = pipe(
 );
 
 // run the program,
-program()
-  // logging the errors
-  .catch(console.error)
-  // logging the good stuff
-  .then(console.log)
-  // ensuring node exits
-  .finally(() => process.exit(0));
+(async () => {
+  await program()
+    // logging the errors
+    .catch(console.error)
+    // logging the good stuff
+    .then(console.log)
+    // ensuring node exits
+    .finally(() => process.exit(0));
+})();

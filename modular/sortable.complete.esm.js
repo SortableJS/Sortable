@@ -3930,7 +3930,7 @@ $parcel$require("oPI2", "../plugins/MultiDrag");
 $oPI2$import$Sortable.mount(new $oPI2$import$AutoScroll());
 $oPI2$import$Sortable.mount($oPI2$import$RemoveOnSpill, $oPI2$import$RevertOnSpill);
 
-if (window & !window.Sortable) {
+if (window && !window.Sortable) {
   window.Sortable = $oPI2$import$Sortable;
 }
 
@@ -3954,7 +3954,7 @@ var _MultiDrag = _interopRequireDefault(require("../plugins/MultiDrag"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-if (window & !window.Sortable) {
+if (window && !window.Sortable) {
   window.Sortable = _entryDefaults.default;
 }
 
@@ -3992,7 +3992,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "44227" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "35513" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

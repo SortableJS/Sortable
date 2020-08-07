@@ -8,7 +8,7 @@ import MultiDrag from "../plugins/MultiDrag";
 Sortable.mount(new AutoScroll());
 Sortable.mount(RemoveOnSpill, RevertOnSpill);
 
-if (window & !window.Sortable) {
+if (window && !window.Sortable) {
   window.Sortable = Sortable;
 }
 

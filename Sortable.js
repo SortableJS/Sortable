@@ -3867,7 +3867,7 @@ function $Wg5j$var$removeMultiDragElements() {
 $pYnI$export$default.mount(new $blm2$export$default());
 $pYnI$export$default.mount($nFhH$export$RemoveOnSpill, $nFhH$export$RevertOnSpill);
 
-if (window & !window.Sortable) {
+if (window && !window.Sortable) {
   window.Sortable = $pYnI$export$default;
 }
 

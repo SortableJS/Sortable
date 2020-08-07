@@ -2,7 +2,7 @@ import Sortable from "./entry-defaults.js";
 import Swap from "../plugins/Swap";
 import MultiDrag from "../plugins/MultiDrag";
 
-if (window & !window.Sortable) {
+if (window && !window.Sortable) {
   window.Sortable = Sortable;
 }
 

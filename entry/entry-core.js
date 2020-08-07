@@ -4,7 +4,7 @@ import OnSpill from "../plugins/OnSpill";
 import Swap from "../plugins/Swap";
 import MultiDrag from "../plugins/MultiDrag";
 
-if (window & !window.Sortable) {
+if (window && !window.Sortable) {
   window.Sortable = Sortable;
 }
 

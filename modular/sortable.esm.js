@@ -3026,10 +3026,22 @@ var autoScroll = (0, _utils.throttle)(function (evt, options, rootEl, isFallback
 }, 30);
 var _default = AutoScrollPlugin;
 exports.default = _default;
-},{"../../src/utils.js":"O3AG","../../src/Sortable.js":"pYnI","../../src/BrowserInfo.js":"jXvt"}],"dE7w":[function(require,module,exports) {
-var $dE7w$exports = {};
-$parcel$require("dE7w", "./AutoScroll.js");
-$dE7w$exports.default = $dE7w$import$default;
+},{"../../src/utils.js":"O3AG","../../src/Sortable.js":"pYnI","../../src/BrowserInfo.js":"jXvt"}],"../plugins/AutoScroll/index.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+Object.defineProperty(exports, "default", {
+  enumerable: true,
+  get: function () {
+    return _AutoScroll.default;
+  }
+});
+
+var _AutoScroll = _interopRequireDefault(require("./AutoScroll.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 },{"./AutoScroll.js":"../plugins/AutoScroll/AutoScroll.js"}],"../plugins/OnSpill/OnSpill.js":[function(require,module,exports) {
 "use strict";
 
@@ -3121,12 +3133,36 @@ Object.assign(Remove, {
 });
 var _default = [Remove, Revert];
 exports.default = _default;
-},{"../../src/utils.js":"O3AG"}],"NOdn":[function(require,module,exports) {
-var $NOdn$exports = {};
-$parcel$require("NOdn", "./OnSpill.js");
-$NOdn$exports.RevertOnSpill = $NOdn$import$RevertOnSpill;
-$NOdn$exports.RemoveOnSpill = $NOdn$import$RemoveOnSpill;
-$NOdn$exports.default = $NOdn$import$default;
+},{"../../src/utils.js":"O3AG"}],"../plugins/OnSpill/index.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+Object.defineProperty(exports, "default", {
+  enumerable: true,
+  get: function () {
+    return _OnSpill.default;
+  }
+});
+Object.defineProperty(exports, "RemoveOnSpill", {
+  enumerable: true,
+  get: function () {
+    return _OnSpill.RemoveOnSpill;
+  }
+});
+Object.defineProperty(exports, "RevertOnSpill", {
+  enumerable: true,
+  get: function () {
+    return _OnSpill.RevertOnSpill;
+  }
+});
+
+var _OnSpill = _interopRequireWildcard(require("./OnSpill.js"));
+
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 },{"./OnSpill.js":"../plugins/OnSpill/OnSpill.js"}],"../plugins/Swap/Swap.js":[function(require,module,exports) {
 "use strict";
 
@@ -3232,10 +3268,22 @@ function swapNodes(n1, n2) {
 
 var _default = SwapPlugin;
 exports.default = _default;
-},{"../../src/utils.js":"O3AG"}],"iMlf":[function(require,module,exports) {
-var $iMlf$exports = {};
-$parcel$require("iMlf", "./Swap.js");
-$iMlf$exports.default = $iMlf$import$default;
+},{"../../src/utils.js":"O3AG"}],"../plugins/Swap/index.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+Object.defineProperty(exports, "default", {
+  enumerable: true,
+  get: function () {
+    return _Swap.default;
+  }
+});
+
+var _Swap = _interopRequireDefault(require("./Swap.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 },{"./Swap.js":"../plugins/Swap/Swap.js"}],"../plugins/MultiDrag/MultiDrag.js":[function(require,module,exports) {
 "use strict";
 
@@ -3880,10 +3928,22 @@ function removeMultiDragElements() {
 
 var _default = MultiDragPlugin;
 exports.default = _default;
-},{"../../src/utils.js":"O3AG","../../src/EventDispatcher.js":"kuw9"}],"JQ7s":[function(require,module,exports) {
-var $JQ7s$exports = {};
-$parcel$require("JQ7s", "./MultiDrag.js");
-$JQ7s$exports.default = $JQ7s$import$default;
+},{"../../src/utils.js":"O3AG","../../src/EventDispatcher.js":"kuw9"}],"../plugins/MultiDrag/index.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+Object.defineProperty(exports, "default", {
+  enumerable: true,
+  get: function () {
+    return _MultiDrag.default;
+  }
+});
+
+var _MultiDrag = _interopRequireDefault(require("./MultiDrag.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 },{"./MultiDrag.js":"../plugins/MultiDrag/MultiDrag.js"}],"entry-defaults.js":[function(require,module,exports) {
 "use strict";
 
@@ -3927,13 +3987,13 @@ _Sortable.default.mount(new _AutoScroll.default());
 
 _Sortable.default.mount(_OnSpill.RemoveOnSpill, _OnSpill.RevertOnSpill);
 
-if (window & !window.Sortable) {
+if (window && !window.Sortable) {
   window.Sortable = _Sortable.default;
 }
 
 var _default = _Sortable.default;
 exports.default = _default;
-},{"../src/Sortable.js":"pYnI","../plugins/AutoScroll":"dE7w","../plugins/OnSpill":"NOdn","../plugins/Swap":"iMlf","../plugins/MultiDrag":"JQ7s"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"../src/Sortable.js":"pYnI","../plugins/AutoScroll":"../plugins/AutoScroll/index.js","../plugins/OnSpill":"../plugins/OnSpill/index.js","../plugins/Swap":"../plugins/Swap/index.js","../plugins/MultiDrag":"../plugins/MultiDrag/index.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -3961,7 +4021,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "38233" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "37375" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

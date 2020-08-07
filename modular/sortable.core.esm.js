@@ -3892,7 +3892,7 @@ $parcel$require("EKsr", "../plugins/OnSpill");
 $parcel$require("EKsr", "../plugins/Swap");
 $parcel$require("EKsr", "../plugins/MultiDrag");
 
-if (window & !window.Sortable) {
+if (window && !window.Sortable) {
   window.Sortable = $EKsr$import$Sortable;
 }
 
@@ -3930,7 +3930,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "44627" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "36629" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
