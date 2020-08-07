@@ -2,7 +2,7 @@ version: 2.0
 jobs:
   build:
     docker:
-      - image: circleci/node:12.17 -browsers
+      - image: circleci/node:12-browsers
     steps:
       - checkout
 
