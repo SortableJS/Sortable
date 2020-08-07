@@ -4,7 +4,6 @@ import { io as IO, readonlyRecord as ROR, taskEither as TE } from "fp-ts";
 import { pipe } from "fp-ts/lib/pipeable";
 import Bundler from "parcel-bundler";
 import * as path from "path";
-import { Role } from "testcafe";
 
 const projectDir = path.resolve(__dirname, "../");
 const entryDir = path.resolve(projectDir, "./entry");
