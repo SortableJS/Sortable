@@ -1,4 +1,5 @@
 import build from './build.js';
+import { terser } from 'rollup-plugin-terser'
 
 export default ([
 	{
@@ -23,6 +24,6 @@ export default ([
 		})
 	}
 ]).map(config => {
-	let buildCopy = { ...build };
+	let buildCopy = { ...build, plugins: [...build.plugins, terser()] };
 	return Object.assign(buildCopy, config);
 });
