@@ -220,6 +220,8 @@ var sortable = new Sortable(el, {
 		// return false; — for cancel
 		// return -1; — insert before target
 		// return 1; — insert after target
+		// return true; — keep default insertion point based on the direction
+		// return void; — keep default insertion point based on the direction
 	},
 
 	// Called when creating a clone of element
