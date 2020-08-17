@@ -50,8 +50,8 @@ const teLog = TE.fold(
 // settings used for these tests
 const settings = (runner: Runner): Runner =>
   runner
-    .src("./tests/Sortable.test.js")
-    .browsers("chrome:headless")
+    .src("./tests/e2e-local/Sortable.test.js")
+    .browsers("firefox:headless")
     .concurrency(3);
 
 export const program = pipe(
