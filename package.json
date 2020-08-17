@@ -1,7 +1,7 @@
 {
   "name": "sortablejs",
   "exportName": "Sortable",
-  "version": "1.10.2",
+  "version": "1.11.2",
   "scripts": {
     "build:umd": "NODE_ENV=umd rollup -c ./scripts/umd-build.js",
     "build:umd:watch": "set NODE_ENV=umd&& rollup -w -c ./scripts/umd-build.js",
