@@ -4,10 +4,16 @@
     "description": "Sortable is a JavaScript library for reorderable drag-and-drop lists.",
     "homepage": "http://rubaxa.github.io/Sortable/",
     "license": "MIT",
-    "authors": [{
-        "name": "RubaXa",
-        "email": "ibnRubaXa@gmail.com"
-    }],
+    "authors": [
+      {
+          "name": "Wayne Van Son",
+          "email": "waynevanson@gmail.com"
+      },
+      {
+          "name": "Owen Mills",
+          "email": "owen23355@gmail.com"
+      }
+    ],
     "keywords": [
         "sortable",
         "reorder",
