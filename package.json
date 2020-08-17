@@ -2,12 +2,21 @@
   "name": "sortablejs",
   "exportName": "Sortable",
   "version": "1.10.2",
+  "scripts": {
+    "build:umd": "NODE_ENV=umd rollup -c ./scripts/umd-build.js",
+    "build:umd:watch": "set NODE_ENV=umd&& rollup -w -c ./scripts/umd-build.js",
+    "build:es": "set NODE_ENV=es&& rollup -c ./scripts/esm-build.js",
+    "build:es:watch": "set NODE_ENV=es&& rollup -w -c ./scripts/esm-build.js",
+    "minify": "node ./scripts/minify.js",
+    "build": "npm run build:es && npm run build:umd && npm run minify",
+    "test:compat": "ts-node ./scripts/test-compat.ts",
+    "test": "ts-node ./scripts/test.ts"
+  },
   "devDependencies": {
     "@babel/core": "^7.4.4",
     "@babel/plugin-transform-object-assign": "^7.2.0",
     "@babel/preset-env": "^7.4.4",
     "@types/node": "^14.0.27",
-    "cypress": "^4.12.1",
     "fp-ts": "^2.8.1",
     "logging-ts": "^0.3.3",
     "rollup": "^1.11.3",
@@ -24,16 +33,6 @@
   "description": "JavaScript library for reorderable drag-and-drop lists on modern browsers and touch devices. No jQuery required. Supports Meteor, AngularJS, React, Polymer, Vue, Knockout and any CSS library, e.g. Bootstrap.",
   "main": "./Sortable.js",
   "module": "modular/sortable.esm.js",
-  "scripts": {
-    "build:umd": "NODE_ENV=umd rollup -c ./scripts/umd-build.js",
-    "build:umd:watch": "set NODE_ENV=umd&& rollup -w -c ./scripts/umd-build.js",
-    "build:es": "set NODE_ENV=es&& rollup -c ./scripts/esm-build.js",
-    "build:es:watch": "set NODE_ENV=es&& rollup -w -c ./scripts/esm-build.js",
-    "minify": "node ./scripts/minify.js",
-    "build": "npm run build:es && npm run build:umd && npm run minify",
-    "test:compat": "ts-node ./scripts/test-compat.ts",
-    "test": "ts-node ./scripts/test.ts"
-  },
   "maintainers": [
     "Konstantin Lebedev <ibnRubaXa@gmail.com>",
     "Owen Mills <owen23355@gmail.com>"
