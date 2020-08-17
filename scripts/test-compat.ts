@@ -58,7 +58,9 @@ const teLog = TE.fold(
 
 // settings used for these tests
 const settings = (runner: Runner): Runner =>
-  runner.src("./tests/Sortable.compat.test.js").browsers(browsers);
+  runner
+    .src("./tests/e2e-saucelabs/Sortable.compat.test.js")
+    .browsers(browsers);
 
 export const program = pipe(
   runTests,

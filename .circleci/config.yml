@@ -22,6 +22,8 @@ jobs:
 
       - run:
           name: Compatibility Test
+          # Only run e2e-tests if the PR
+          # is published by the Sortable Organization
           command: |
             if [ -z "$CIRCLE_PR_NUMBER" ];
             then
