@@ -1,10 +1,10 @@
 /**!
- * Sortable 1.10.2
+ * Sortable 1.11.0
  * @author	RubaXa   <trash@rubaxa.org>
  * @author	owenm    <owen23355@gmail.com>
  * @license MIT
  */
-var version = "1.10.2";
+var version = "1.11.0";
 
 function userAgent(pattern) {
 	if (typeof window !== 'undefined' && window.navigator) {
