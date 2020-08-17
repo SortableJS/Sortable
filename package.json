@@ -1,7 +1,7 @@
 {
   "name": "sortablejs",
   "exportName": "Sortable",
-  "version": "1.10.2",
+  "version": "1.11.2",
   "scripts": {
     "build:umd": "NODE_ENV=umd rollup -c ./scripts/umd-build.js",
     "build:umd:watch": "set NODE_ENV=umd&& rollup -w -c ./scripts/umd-build.js",
@@ -16,10 +16,14 @@
     "@babel/core": "^7.4.4",
     "@babel/plugin-transform-object-assign": "^7.2.0",
     "@babel/preset-env": "^7.4.4",
+    "@rollup/plugin-babel": "^5.2.0",
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^9.0.0",
+    "@rollup/plugin-typescript": "^5.0.2",
     "@types/node": "^14.0.27",
     "fp-ts": "^2.8.1",
     "logging-ts": "^0.3.3",
-    "rollup": "^1.11.3",
+    "rollup": "^2.14",
     "rollup-plugin-babel": "^4.3.2",
     "rollup-plugin-json": "^4.0.0",
     "rollup-plugin-node-resolve": "^5.0.0",
@@ -27,6 +31,7 @@
     "testcafe-browser-provider-saucelabs": "^1.7.0",
     "testcafe-reporter-xunit": "^2.1.0",
     "ts-node": "^8.10.2",
+    "tslib": "^2.0.1",
     "typescript": "^3.9.7",
     "uglify-js": "^3.5.12"
   },

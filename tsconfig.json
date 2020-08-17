@@ -1,8 +1,8 @@
 {
-	"compilerOptions": {
-		"target": "es5",
-		"allowJs": false,
-		"esModuleInterop": true
-	},
-	"include": ["scripts"]
+  "compilerOptions": {
+    "target": "es5",
+    "allowJs": false,
+    "esModuleInterop": true
+  },
+  "include": ["scripts"]
 }
