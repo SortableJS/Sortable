@@ -11,7 +11,7 @@
 ### Pull Request
 
  1. Only request to merge with the [master](https://github.com/SortableJS/Sortable/tree/master/)-branch.
- 2. Only modify source files, **do not commit the resulting build**
+ 2. Only modify source files, **do not commit the resulting build**. Build files are Sortable.js, Sortable.min.js and modular/*.js.
 
 ### Setup
 
