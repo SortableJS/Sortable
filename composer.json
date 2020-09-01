@@ -26,7 +26,7 @@
     ],
     "support": {
         "issues": "https://github.com/RubaXa/Sortable/issues",
-        "source": "https://github.com/RubaXa/Sortable.git"
+        "source": "https://github.com/SortableJS/Sortable.git"
     },
     "prefer-stable": true,
     "minimum-stability": "dev",
