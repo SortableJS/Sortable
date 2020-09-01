@@ -34,8 +34,7 @@
         "component": {
             "files": [
                 "Sortable.js",
-                "Sortable.min.js",
-                "jquery.binding.js"
+                "Sortable.min.js"
             ]
         }
     }
