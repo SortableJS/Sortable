@@ -25,7 +25,7 @@
         "dnd"
     ],
     "support": {
-        "issues": "https://github.com/RubaXa/Sortable/issues",
+        "issues": "https://github.com/SortableJS/Sortable/issues",
         "source": "https://github.com/SortableJS/Sortable.git"
     },
     "prefer-stable": true,
