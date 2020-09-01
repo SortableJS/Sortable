@@ -2109,6 +2109,10 @@
 
         let elLastChild = lastChild(el, options.draggable);
 
+        if (rootEl !== el) {
+          elLastChild = null;
+  			}
+
         if (
           !elLastChild ||
           (_ghostIsLast(evt, vertical, this) && !elLastChild.animated)
