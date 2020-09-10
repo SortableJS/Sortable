@@ -178,7 +178,7 @@ function getRect(el, relativeToContainingBlock, relativeToNonStaticParent, undoS
 		height,
 		width;
 
-	if (el !== window && el !== getWindowScrollingElement()) {
+	if (el !== window && el.parentNode && el !== getWindowScrollingElement()) {
 		elRect = el.getBoundingClientRect();
 		top = elRect.top;
 		left = elRect.left;
