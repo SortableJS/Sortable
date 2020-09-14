@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "strict": false,
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "declaration": false
+  },
+  "include": ["src", "../sortable", "../plugins", "../utils"]
+}
