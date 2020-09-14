@@ -7,18 +7,24 @@ jobs:
       - checkout
 
       - restore_cache:
+          name: Restore Yarn Package Cache
           keys:
-            - v1-dependencies-{{ checksum "package.json" }}
-            - v1-dependencies-
-
-      - run: npm install
+            - yarn-packages-{{ checksum "yarn.lock" }}
+      - run:
+          name: Install Dependencies
+          command: yarn install --immutable
 
       - save_cache:
+          name: Save Yarn Package Cache
+          key: yarn-packages-{{ checksum "yarn.lock" }}
           paths:
-            - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
+            - ~/.cache/yarn
 
-      - run: npm run build:umd
+      - run:
+          name: Bootstrap with Lerna
+          command: yarn lerna bootstrap
+
+      - run: yarn build:umd
 
       - run:
           name: Compatibility Test
@@ -27,9 +33,9 @@ jobs:
           command: |
             if [ -z "$CIRCLE_PR_NUMBER" ];
             then
-              npm run test:compat
+              yarn test:compat
             fi
-      - run: npm run test
+      - run: yarn test
 
       - store_test_results:
           path: /tmp/test-results
