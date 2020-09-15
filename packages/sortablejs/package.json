@@ -1,6 +1,6 @@
 {
   "name": "sortablejs",
-  "version": "1.11.2-alpha.2",
+  "version": "1.11.2-alpha.3",
   "description": "JavaScript library for reorderable drag-and-drop lists on modern browsers and touch devices",
   "main": "dist/sortable.js",
   "browser": "dist/sortable.umd.js",
