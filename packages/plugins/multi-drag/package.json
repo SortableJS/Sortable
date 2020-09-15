@@ -1,3 +1,4 @@
 {
-  "name": "@sortable/plugin-multi-drag"
+  "name": "@sortable/plugin-multi-drag",
+  "private": true
 }

@@ -1,3 +1,4 @@
 {
-  "name": "@sortable/utils"
+  "name": "@sortable/utils",
+  "private": true
 }
