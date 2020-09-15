@@ -1,6 +1,6 @@
 {
   "name": "sortablejs",
-  "version": "1.11.1",
+  "version": "1.11.2-alpha.3",
   "description": "JavaScript library for reorderable drag-and-drop lists on modern browsers and touch devices",
   "main": "dist/sortable.js",
   "browser": "dist/sortable.umd.js",
@@ -10,10 +10,12 @@
     "build:umd": "microbundle -f umd -i src/complete-umd.ts -o dist/sortable.umd.js --name Sortable",
     "build:modular-core": "microbundle -f esm -i src/core-named.ts -o modular/sortable.core.esm.js",
     "build:modular-default": "microbundle -f esm -i src/default-named.ts -o modular/sortable.esm.js",
-    "build:modular-complete": "microbundle -f esm -i src/complete-named.ts -o modular/sortable.complete.esm.js"
+    "build:modular-complete": "microbundle -f esm -i src/complete-named.ts -o modular/sortable.complete.esm.js",
+    "prepublishOnly": "yarn build"
   },
   "files": [
-    "dist"
+    "dist",
+    "modular"
   ],
   "repository": {
     "type": "git",
