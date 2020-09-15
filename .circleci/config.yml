@@ -10,8 +10,7 @@ jobs:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
             - v1-dependencies-
-
-      - run: lerna bootstrap
+      - run: npm install --global lerna && lerna bootstrap
 
       - save_cache:
           paths:
