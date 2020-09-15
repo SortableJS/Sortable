@@ -2,6 +2,8 @@
 
 ## Entry points
 
+todo: fix
+
 All files in `src` are points of entry.
 
 A plugin is either exported or mounted.
