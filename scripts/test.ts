@@ -22,7 +22,11 @@ const runTests = (settings: (runner: Runner) => Runner) =>
         () => pipe(testcafe.createRunner(), settings, (runner) => runner.run()),
         (e) => e
       ),
-    (testcafe) => TE.fromIO(() => testcafe.close())
+    (testcafe) =>
+      TE.tryCatch(
+        () => testcafe.close(),
+        (e) => e
+      )
   );
 
 // if failed count is 0, it passes
