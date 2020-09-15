@@ -14,7 +14,8 @@
     "prepublishOnly": "yarn build"
   },
   "files": [
-    "dist"
+    "dist",
+    "modular"
   ],
   "repository": {
     "type": "git",
