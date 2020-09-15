@@ -1,3 +1,4 @@
 {
-  "name": "@sortable/plugin-on-spill"
+  "name": "@sortable/plugin-on-spill",
+  "private": true
 }

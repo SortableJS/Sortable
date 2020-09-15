@@ -1,3 +1,4 @@
 {
-  "name": "@sortable/plugin-auto-scroll"
+  "name": "@sortable/plugin-auto-scroll",
+  "private": true
 }
