@@ -6,7 +6,7 @@ jobs:
     steps:
       - checkout
 
-      restore_cache:
+      - restore_cache:
           name: Restore Yarn Package Cache
           keys:
             - yarn-packages-{{ checksum "yarn.lock" }}
