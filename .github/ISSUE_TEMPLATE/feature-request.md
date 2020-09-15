@@ -6,36 +6,16 @@ labels: ""
 assignees: ""
 ---
 
-<!--
+_**[PLEASE READ THE CONTRIBUTION GUIDELINES HERE!](https://github.com/SortableJS/Sortable/tree/master/CONTRIBUTING.md)**_
 
-PLEASE READ BEFORE POSTING YOUR ISSUE!
+_Failure to comply may have your issue automatically closed._
 
-If your issue is related to a framework or @types/sortablejs,
-please post an issue on it's relevant repository instead:
+## Summary
 
-- Angular
-  - 2.0+: https://github.com/SortableJS/angular-sortablejs/issues
-  - legacy: https://github.com/SortableJS/angular-legacy-sortablejs/issues
-- React
-  - ES2015+: https://github.com/SortableJS/react-sortablejs/issues
-  - mixin: https://github.com/SortableJS/react-mixin-sortablejs/issues
-- Polymer: https://github.com/SortableJS/polymer-sortablejs/issues
-- Knockout: https://github.com/SortableJS/knockout-sortablejs/issues
-- Meteor: https://github.com/SortableJS/meteor-sortablejs/issues
+Please answer the following questions in sentences.
 
+- What is the feature?
+- Why is having this feature important to you?
+- Who else will find having this feature helpful?
 
-If it is a bug found from using one of these, please link to the related issue.
-
--->
-
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
-
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
-
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
-
-**Additional context**
-Add any other context or screenshots about the feature request here.
+## Additional Context
