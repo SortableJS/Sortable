@@ -41,7 +41,7 @@ Please replace your usage of bower with npm, yarn or a javascript package manage
 - Smart auto-scrolling
 - Advanced swap detection
 - Smooth animations
-- [Multi-drag](https://github.com/SortableJS/Sortable/tree/master/plugins/MultiDrag) support
+- [Multi-drag](https://github.com/SortableJS/Sortable/tree/master/packages/plugins/multi-drag) support
 - Support for CSS transforms
 - Built using native HTML5 drag and drop API
 - Supports
@@ -133,7 +133,7 @@ You can use any element for the list and its elements, not just `ul`/`li`. Here 
 
 ### Options
 
-Here we've summarised the options with their ~~default values~~ example values. More details available in the [docs/sortable-options](https://github.com/SortableJS/Sortable/tree/master/docs/sortable-options)
+Here we've summarised the options with their ~~default values~~ example values. More details available in the [docs/sortable-options](https://github.com/SortableJS/Sortable/blob/master/docs/sortable-options.md)
 
 ```ts
 var sortable = new Sortable(el, {
@@ -435,13 +435,13 @@ Mounts a plugin to Sortable.
 
 #### Extra Plugins (included in complete versions)
 
-- [MultiDrag](https://github.com/SortableJS/Sortable/tree/master/plugins/MultiDrag)
-- [Swap](https://github.com/SortableJS/Sortable/tree/master/plugins/Swap)
+- [MultiDrag](https://github.com/SortableJS/Sortable/tree/master/packages/plugins/multi-drag)
+- [Swap](https://github.com/SortableJS/Sortable/tree/master/packages/plugins/swap)
 
 #### Default Plugins (included in default versions)
 
-- [AutoScroll](https://github.com/SortableJS/Sortable/tree/master/plugins/AutoScroll)
-- [OnSpill](https://github.com/SortableJS/Sortable/tree/master/plugins/OnSpill)
+- [AutoScroll](https://github.com/SortableJS/Sortable/tree/master/packages/plugins/auto-scroll)
+- [OnSpill](https://github.com/SortableJS/Sortable/tree/master/packages/plugins/on-spill)
 
 ---
 
