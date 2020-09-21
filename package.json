@@ -1,5 +1,5 @@
 {
-  "name": "@sortable/monorepo",
+  "name": "@sortablejs/monorepo",
   "private": true,
   "scripts": {
     "test:compat": "ts-node scripts/test-compat.ts",
