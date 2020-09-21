@@ -3,7 +3,6 @@
   "version": "1.12.0",
   "description": "JavaScript library for reorderable drag-and-drop lists on modern browsers and touch devices",
   "main": "dist/sortable.umd.js",
-  "module": "modular/sortable.complete.esm.js",
   "scripts": {
     "build": "npm-run-all --parallel build:*",
     "build:umd": "microbundle -f umd -i src/umd.ts -o dist/sortable.umd.js --name Sortable",
