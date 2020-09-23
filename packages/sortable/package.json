@@ -1,5 +1,5 @@
 {
-  "name": "@sortablejs/sortable",
+  "name": "@sortablejs/core",
   "version": "1.13.0",
   "private": true
 }
