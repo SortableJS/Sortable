@@ -12,7 +12,11 @@ const pluginManager = {
         plugin[option] = defaults[option];
       }
     }
-    plugins.push(plugin);
+
+    //  only add plugins once, even if they're mounted multiple times
+    if (!plugins.map((p) => p.name).includes(plugin.name)) {
+      plugins.push(plugin);
+    }
   },
   pluginEvent(eventName, sortable, evt) {
     this.eventCanceled = false;
