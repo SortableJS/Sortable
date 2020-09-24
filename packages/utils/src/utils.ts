@@ -185,7 +185,9 @@ function getRect(
 
   let elRect, top, left, bottom, right, height, width;
 
-  if (el !== window && el !== getWindowScrollingElement()) {
+  // Fix IE11 "SCRIPT16389: Unspecified error." when dragging element #1904
+  // submitted by laukstein
+  if (el !== window && el.parentNode && el !== getWindowScrollingElement()) {
     elRect = el.getBoundingClientRect();
     top = elRect.top;
     left = elRect.left;
