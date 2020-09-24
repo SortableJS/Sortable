@@ -60,6 +60,17 @@ This function should return `'continue'` if it wishes to allow Sortable's native
 #### `scrollSensitivity` option
 Defines how near the mouse must be to an edge to start scrolling.
 
+Instead of a number, you can use an object to configure `top`, `bottom`, `left` and `right` scroll sensitivity.
+
+```js
+var scrollSensitivity = {
+	top: 130, // take a fixed header height into account
+	bottom: 30,
+	left: 30,
+	right: 30
+};
+```
+
 
 ---
 

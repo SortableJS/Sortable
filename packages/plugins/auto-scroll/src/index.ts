@@ -170,7 +170,10 @@ const autoScroll = throttle(function (evt, options, rootEl, isFallback) {
   if (!options.scroll) return;
   const x = (evt.touches ? evt.touches[0] : evt).clientX,
     y = (evt.touches ? evt.touches[0] : evt).clientY,
-    sens = options.scrollSensitivity,
+    sensTop = typeof options.scrollSensitivity === 'object' ? options.scrollSensitivity.top : options.scrollSensitivity,
+    sensBottom = typeof options.scrollSensitivity === 'object' ? options.scrollSensitivity.bottom : options.scrollSensitivity,
+    sensLeft = typeof options.scrollSensitivity === 'object' ? options.scrollSensitivity.left : options.scrollSensitivity,
+    sensRight = typeof options.scrollSensitivity === 'object' ? options.scrollSensitivity.right : options.scrollSensitivity,
     speed = options.scrollSpeed,
     winScroller = getWindowScrollingElement();
 
@@ -235,15 +238,15 @@ const autoScroll = throttle(function (evt, options, rootEl, isFallback) {
     let vx =
       canScrollX &&
       //@ts-ignore
-      (Math.abs(right - x) <= sens && scrollPosX + width < scrollWidth) -
+      (Math.abs(right - x) <= sensRight && scrollPosX + width < scrollWidth) -
         //@ts-ignore
-        (Math.abs(left - x) <= sens && !!scrollPosX);
+        (Math.abs(left - x) <= sensLeft && !!scrollPosX);
     let vy =
       canScrollY &&
       //@ts-ignore
-      (Math.abs(bottom - y) <= sens && scrollPosY + height < scrollHeight) -
+      (Math.abs(bottom - y) <= sensBottom && scrollPosY + height < scrollHeight) -
         //@ts-ignore
-        (Math.abs(top - y) <= sens && !!scrollPosY);
+        (Math.abs(top - y) <= sensTop && !!scrollPosY);
 
     if (!autoScrolls[layersOut]) {
       for (let i = 0; i <= layersOut; i++) {
