@@ -1,0 +1,41 @@
+{
+    "name": "SortableJS/Sortable",
+    "type": "component",
+    "description": "Sortable is a JavaScript library for reorderable drag-and-drop lists.",
+    "homepage": "http://sortablejs.github.io/Sortable/",
+    "license": "MIT",
+    "authors": [
+      {
+          "name": "Wayne Van Son",
+          "email": "waynevanson@gmail.com"
+      },
+      {
+          "name": "Owen Mills",
+          "email": "owen23355@gmail.com"
+      }
+    ],
+    "keywords": [
+        "sortable",
+        "reorder",
+        "list",
+        "html5",
+        "drag",
+        "and",
+        "drop",
+        "dnd"
+    ],
+    "support": {
+        "issues": "https://github.com/SortableJS/Sortable/issues",
+        "source": "https://github.com/SortableJS/Sortable.git"
+    },
+    "prefer-stable": true,
+    "minimum-stability": "dev",
+    "extra": {
+        "component": {
+            "files": [
+                "Sortable.js",
+                "Sortable.min.js"
+            ]
+        }
+    }
+}
