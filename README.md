@@ -30,7 +30,7 @@ These files now trigger console.warn with a message to come here:
 ### Bower
 
 Bower has been deprecated, which means we will no longer support it.
-Please replace your usage of bower with npm, yarn or a javascript package manager of your choice.
+Please replace your usage of bower with npm, yarn or a JavaScript package manager of your choice.
 
 ## Features
 
@@ -50,13 +50,13 @@ Please replace your usage of bower with npm, yarn or a javascript package manage
 - Support for [plugins](#plugins)
 - [CDN](#cdn)
 - No jQuery required (but there is [support]())
-- Typescript definitions via [@types/sortablejs](https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/sortablejs)
+- TypeScript definitions via [@types/sortablejs](https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/sortablejs)
 
 ### Bindings and Components
 
 There are many bindings for SortableJS to use with your favourite frameworks and libraries:
 
-- [JQuery](https://github.com/SortableJS/jquery-sortablejs)
+- [jQuery](https://github.com/SortableJS/jquery-sortablejs)
 - [Meteor](https://github.com/SortableJS/meteor-sortablejs)
 - Angular
   - [2.0+](https://github.com/SortableJS/angular-sortablejs)
@@ -85,7 +85,7 @@ Install via command line using `yarn` or `npm`.
 npm install sortablejs --save
 
 # yarn v1.x
-yarn add -D sortablejs
+yarn add sortablejs
 ```
 
 Import into your project:
