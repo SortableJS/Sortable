@@ -45,7 +45,7 @@ Please replace your usage of bower with npm, yarn or a JavaScript package manage
 - Support for CSS transforms
 - Built using native HTML5 drag and drop API
 - Supports
-- Supports any CSS library, e.g. [Bootstrap](#bs)
+- Supports any CSS library, e.g. Bootstrap
 - Simple API
 - Support for [plugins](#plugins)
 - [CDN](#cdn)
