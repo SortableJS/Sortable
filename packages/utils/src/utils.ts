@@ -215,28 +215,29 @@ function getRect(
     // Not needed on <= IE11
     if (!IE11OrLess) {
       do {
-        if (
-          container &&
-          container.getBoundingClientRect &&
+        if (container && container.getBoundingClientRect) {
           //@ts-ignore
-          (css(container, "transform") !== "none" ||
-            (relativeToNonStaticParent &&
-              //@ts-ignore
-              css(container, "position") !== "static"))
-        ) {
-          let containerRect = container.getBoundingClientRect();
+          const containerStyle = css(container);
+          if (
+            (containerStyle.transform && containerStyle.transform !== "none") ||
+            (containerStyle.perspective &&
+              containerStyle.perspective !== "none") ||
+            (containerStyle.filter && containerStyle.filter !== "none") ||
+            (relativeToNonStaticParent && containerStyle.position !== "static")
+          ) {
+            let containerRect = container.getBoundingClientRect();
 
-          // Set relative to edges of padding box of container
-          top -=
-            //@ts-ignore
-            containerRect.top + parseInt(css(container, "border-top-width"));
-          left -=
-            //@ts-ignore
-            containerRect.left + parseInt(css(container, "border-left-width"));
-          bottom = top + elRect.height;
-          right = left + elRect.width;
+            // Set relative to edges of padding box of container
+            top -=
+              containerRect.top + parseInt(containerStyle["border-top-width"]);
+            left -=
+              containerRect.left +
+              parseInt(containerStyle["border-left-width"]);
+            bottom = top + elRect.height;
+            right = left + elRect.width;
 
-          break;
+            break;
+          }
         }
         /* jshint boss:true */
       } while ((container = container.parentNode));
