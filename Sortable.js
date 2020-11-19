@@ -398,6 +398,29 @@
 
     return last || null;
   }
+  
+  /**
+   * Gets the first child in the el, ignoring ghostEl or invisible elements (clones)
+   * @param  {HTMLElement} el       Parent element
+   * @param  {selector} selector    Any other elements that should be ignored
+   * @return {HTMLElement}          The first child, ignoring ghostEl
+   */
+  function firstChild(el, selector) {
+    let first = el.firstElementChild;
+
+    while (
+      first &&
+      //@ts-ignore
+      (first === Sortable.ghost ||
+        //@ts-ignore
+        css(first, "display") === "none" ||
+        (selector && !matches(first, selector)))
+    ) {
+      first = first.previousElementSibling;
+    }
+
+    return first || null;
+  }
 
   /**
    * Returns the index of an element within its parent for a selected set of
@@ -1142,7 +1165,8 @@
       let ret;
       sortables.some((sortable) => {
         if (lastChild(sortable)) return;
-
+        if (firstChild(sortable)) return;
+        
         let rect = getRect(sortable),
           threshold = sortable[expando].options.emptyInsertThreshold,
           insideHorizontally =
@@ -1237,7 +1261,6 @@
     if (dragEl) {
       evt = evt.touches ? evt.touches[0] : evt;
       let nearest = _detectNearestEmptySortable(evt.clientX, evt.clientY);
-
       if (nearest) {
         // Create imitation event
         let event = {};
@@ -2190,18 +2213,22 @@
 
         let elLastChild = lastChild(el, options.draggable);
 
+        let elFirstChild = firstChild(el, options.draggable);
         if (
           !elLastChild ||
-          (_ghostIsLast(evt, vertical, this) && !elLastChild.animated)
+          (_ghostIsLast(evt, vertical, this) && !elLastChild.animated) || !elFirstChild || (_ghostIsFirst(evt,vertical,this) && !elFirstChild.animated)
         ) {
           // If already at end of list: Do not insert
-          if (elLastChild === dragEl) {
+          if (elLastChild === dragEl || elFirstChild === dragEl) {
             return completed(false);
           }
 
           // assign target only if condition is true
           if (elLastChild && el === evt.target) {
             target = elLastChild;
+          }
+          if (elFirstChild && el === evt.target) {
+            target = elFirstChild;
           }
 
           if (target) {
@@ -2217,17 +2244,22 @@
               target,
               targetRect,
               evt,
-              !!target
+               !!target
             ) !== false
           ) {
             capture();
-            el.appendChild(dragEl);
+            if(!elLastChild ||
+                (_ghostIsLast(evt, vertical, this) && !elLastChild.animated)){
+              el.appendChild(dragEl);
+            } else {
+              el.insertBefore(dragEl, elFirstChild);
+            }
             parentEl = el; // actualization
-
             changed();
             return completed(true);
           }
-        } else if (target.parentNode === el) {
+        }
+        else if (target.parentNode === el) {
           targetRect = getRect(target);
           let direction = 0,
             targetBeforeFirstSwap,
@@ -2823,6 +2855,19 @@
             evt.clientX >= rect.left)
       : (evt.clientX > rect.right && evt.clientY > rect.top) ||
           (evt.clientX <= rect.right && evt.clientY > rect.bottom + spacer);
+  }
+
+  function _ghostIsFirst(evt, vertical, sortable) {
+    let rect = getRect(firstChild(sortable.el, sortable.options.draggable));
+    const spacer = 10;
+
+    return vertical
+      ? evt.clientX > rect.right + spacer ||
+          (evt.clientX <= rect.right &&
+            evt.clientY < rect.top &&
+            evt.clientX >= rect.left)
+      : (evt.clientX < rect.left && evt.clientY > rect.top) ||
+          (evt.clientX >= rect.left && evt.clientY > rect.bottom + spacer);
   }
 
   function _getSwapDirection(
