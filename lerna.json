@@ -1,0 +1,10 @@
+{
+  "packages": [
+    "packages/sortable",
+    "packages/sortablejs",
+    "packages/plugins/*",
+    "packages/utils"
+  ],
+  "version": "1.13.0",
+  "npmClient": "yarn"
+}
