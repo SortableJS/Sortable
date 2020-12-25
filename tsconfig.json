@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "allowJs": false,
+    "esModuleInterop": true
+  },
+  "include": ["scripts"]
+}

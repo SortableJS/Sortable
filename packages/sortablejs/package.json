@@ -1,0 +1,45 @@
+{
+  "name": "sortablejs",
+  "version": "1.12.0",
+  "description": "JavaScript library for reorderable drag-and-drop lists on modern browsers and touch devices",
+  "main": "dist/sortable.umd.js",
+  "scripts": {
+    "build": "npm-run-all --parallel build:*",
+    "build:umd": "microbundle -f umd -i src/umd.ts -o dist/sortable.umd.js --name Sortable",
+    "build:modular-core": "microbundle -f esm -i src/modular-core.ts -o modular/sortable.core.esm.js",
+    "build:modular-default": "microbundle -f esm -i src/modular-default.ts -o modular/sortable.esm.js",
+    "build:modular-complete": "microbundle -f esm -i src/modular-complete.ts -o modular/sortable.complete.esm.js",
+    "prepublishOnly": "yarn build"
+  },
+  "files": [
+    "dist",
+    "modular"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/SortableJS/Sortable.git"
+  },
+  "maintainers": [
+    "Konstantin Lebedev <ibnRubaXa@gmail.com>",
+    "Owen Mills <owen23355@gmail.com>",
+    "Wayne Van Son <waynevanson@gmail.com>"
+  ],
+  "keywords": [
+    "sortable",
+    "reorder",
+    "drag",
+    "meteor",
+    "angular",
+    "ng-sortable",
+    "react",
+    "vue",
+    "mixin"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "colorette": "^1.2.1",
+    "microbundle": "^0.12.3",
+    "npm-run-all": "^4.1.5",
+    "typescript": "^3.9.7"
+  }
+}
