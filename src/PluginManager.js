@@ -12,6 +12,13 @@ export default {
 				plugin[option] = defaults[option];
 			}
 		}
+
+		plugins.forEach(p => {
+			if (p.pluginName === plugin.pluginName) {
+				throw (`Sortable: Cannot mount plugin ${ plugin.pluginName } more than once`);
+			}
+		});
+
 		plugins.push(plugin);
 	},
 	pluginEvent(eventName, sortable, evt) {
