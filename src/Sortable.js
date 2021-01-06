@@ -393,7 +393,10 @@ function Sortable(el, options) {
 		fallbackTolerance: 0,
 		fallbackOffset: {x: 0, y: 0},
 		supportPointer: Sortable.supportPointer !== false && ('PointerEvent' in window),
-		emptyInsertThreshold: 5
+		emptyInsertThreshold: 5,
+		recursionTags: [ "UL", "OL" ],
+		recursionClasses: [],
+		recursionIds: []
 	};
 
 	PluginManager.initializePlugins(this, el, defaults);
@@ -1562,6 +1565,138 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		}
 
 		return order;
+	},
+
+
+	/**
+	 * Recursive method to build hierarchy for the passed element
+	 * @param   {HTMLElement}  el
+	 */
+	_toHierarchy: function( el ) {
+		let order = [],
+			children = el.children,
+			n = children.length,
+			options = this.options;
+		for( let i = 0; i < n; ++i ) {
+			let child = children[i],
+				grandChildren = child.children,
+				m = grandChildren.length;
+			// I am not sure about this closest() call if the 3rd
+			// argument should be 'this.el' or the local 'el'?
+			if( closest( child, options.draggable, el, false ) ) {
+				order.push( child.getAttribute(options.dataIdAttr) || _generateId(child) );
+			}
+			// Recurse if there are grandchildren
+			for( let j = 0; j < m; ++j ) {
+				let grandChild = grandChildren[j];
+				if( this.shouldRecurse( grandChild ) ) {
+					let childOrder = this._toHierarchy( grandChild );
+					if( childOrder.length > 0 ) order.push( childOrder );
+				}
+			}
+		}
+		return order;
+	},
+
+	/**
+	 * Serializes the item into an array describing the structure
+	 * The default returned structure is:
+	 * [
+	 *    { 'id': id1, 'children': [
+	 *        ]
+	 *    },
+	 *    { 'id': id2, 'children': [
+	 *        { 'id': id2.1, 'children': [
+	 *            ]
+	 *        },
+	 *        { 'id': id2.2, 'children': [
+	 *            { 'id': id2.2.1, 'children': [
+	 *                ]
+	 *            }
+	 *        ],
+	 *        { 'id': id2.3, 'children': [
+	 *            ]
+	 *        }
+	 *    ],
+	 *    { 'id': id3, 'children': [
+	 *        ]
+	 *    }
+	 * ]
+	 * This can be simplified by removing all the empty 'children'
+	 * arrays setting the optional parameter to 1.  The returned structure is:
+	 * [
+	 *    { 'id': id1 },
+	 *    { 'id': id2, 'children': [
+	 *        { 'id': id2.1 },
+	 *        { 'id': id2.2, 'children': [
+	 *            { 'id': id2.2.1 }
+	 *        ],
+	 *        { 'id': id2.3 }
+	 *    ],
+	 *    { 'id': id3 }
+	 * ]
+	 * This can be further simplified to just and array or arrays
+	 * by setting the optional parameter to 2. The returned structure is:
+	 *    [ 'id1', 'id2', ['id2.1', 'id2.2', ['id2.2.1'], 'id2.3'], 'id3']
+	 *
+	 * These are all for the HTML:
+	 *       <ul>
+	 *     	    <li data-id="id1">Hello 1<li>
+	 *	    <li data-id="id2">Hello 2<li>
+	 *          <ul>
+	 *	        <li data-id="id2.1">Hello 2.1<li>
+	 *	        <li data-id="id2.2">Hello 2.2<li>
+	 *              <ul>
+	 *		    <li data-id="id2.2.1">Hello 2.2.1<li>
+	 *              </ul>
+	 *	        <li data-id="id2.3">Hello 2.3<li>
+	 *          </ul>
+	 *	    <li data-id="id3">Hello 3<li>
+	 *	</ul>
+	 */
+	getHierarchy: function( mode ) {
+		mode = (mode === 2) ? 2 : ((mode === 1) ? 1 : 0);
+		let hierarchy = this._toHierarchy( this.el );
+		if( mode != 2 ) {
+			hierarchy = this._getHierarchy( hierarchy, mode );
+		}
+		return hierarchy;
+	},
+
+	_getHierarchy: function( sibship, mode ) {
+		mode = (mode === 1) ? 1 : 0;
+		let objects = [];
+		for( let i = 0; i < sibship.length; ++i ) {
+			let node = { 'id': sibship[i] };
+			if( (i+1) < sibship.length && Array.isArray( sibship[i+1] ) ) {
+				node['children'] = this._getHierarchy( sibship[++i], mode );
+			} else if( mode == 0 ) {
+				node['children'] = [];
+			}
+			objects.push( node );
+		}
+		return objects;
+	},
+
+
+	/**
+	 * Determine if this element should be considered a parent of more sortable
+	 * elements to be recursed to based on it nodeName, id and/or classes.
+	 *
+	 * @param   {HTMLElement}  el
+	 */
+	shouldRecurse: function( el ) {
+		let recursionTags = this.options.recursionTags || [ "UL", "OL" ],
+		    recursionClasses = this.options.recursionClasses || [],
+		    recursionIds = this.options.recursionIds || [];
+		if( !el ) return false;
+		if( recursionTags.includes( el.nodeName ) ) return true;
+		if( el.id && el.id != 'undefined' && recursionIds.includes( el.id ) ) return true;
+		let classList = el.className.split(' ');
+		for( let i = 0; i < recursionClasses.length; ++i ) {
+			if( classList.includes( recursionClasses[i] ) ) return true;
+		}
+		return false;
 	},
 
 

@@ -429,6 +429,142 @@ Sortable.create(list, {
 ---
 
 
+#### `recursionTags` option
+This option controls how the `getHierarchy` method descends the
+hierarchical structure. It must be set to an array of element tag names.
+The tag names of elements within list items are compared to this array
+and, if found, will result in `getHierarchy`  descending
+into it as a sublist. (default `[ "UL", "OL" ]`)
+
+With the default settings
+```html
+<ul>
+	<li>list item one text</li>
+	<li>list item two text
+		<ul>
+			<li>sublist item one text</li>
+			<li>sublist item two text</li>
+		</ul>
+	</li>
+	<li>list item three text
+		<ul>
+			<li>sublist item three text</li>
+			<li>sublist item four text</li>
+		</ul>
+	</li>
+</ul>
+```
+
+`getHierarchy` will generate the expected structure of three elements with the second
+and third elements having two children each.
+
+To convert this over to using `<div>` elements instead use
+```js
+Sortable.create(el, {
+	recursionTags: [ "DIV" ]
+});
+```
+
+```html
+<div>
+	<div>list item one text</div>
+	<div>list item two text
+		<div>
+			<div>sublist item one text</div>
+			<div>sublist item two text</div>
+		</div>
+	</div>
+	<div>list item three text
+		<div>
+			<div>sublist item three text</div>
+			<div>sublist item four text</div>
+		</div>
+	</div>
+</div>
+```
+`getHierarchy` will generate the same structure of three elements with the second
+and third elements having two children each.
+
+
+---
+
+
+#### `recursionClasses` option
+This option is similar to `recursionTags` except it looks at the classes
+set on the elements within list items.
+```js
+Sortable.create(el, {
+	recursionTags: [ ]
+	recursionClasses: [ "choose-me" ]
+});
+```
+
+```html
+<ul>
+	<li>list item one text</li>
+	<li>list item two text
+		<ul>
+			<li>sublist item one text</li>
+			<li>sublist item two text</li>
+		</ul>
+	</li>
+	<li>list item three text
+		<ul class="choose-me">
+			<li>sublist item three text</li>
+			<li>sublist item four text</li>
+		</ul>
+	</li>
+</ul>
+```
+`getHierarchy` will generate the expected structure of three elements with only
+the third element having two children.
+Note that the `recursionTag` option must be cleared to an
+empty array to prevent recursion on the matching tag names.
+
+
+---
+
+
+#### `recursionIds` option
+This option is similar to `recursionTags` and `recursionClasses`
+except it looks at the id attribute set on the elements within list items.
+
+```js
+Sortable.create(el, {
+	recursionIds: [ "chosen1", "chosen2" ]
+});
+```
+
+```html
+<div>
+	<div>list item one text</div>
+	<div>list item two text
+		<div id="chosen2">
+			<div>sublist item one text</div>
+			<div>sublist item two text</div>
+		</div>
+	</div>
+	<div>list item three text
+		<div id="chosen1">
+			<div>sublist item three text</div>
+			<div>sublist item four text</div>
+		</div>
+	</div>
+</div>
+```
+`getHierarchy` will generate the expected structure of three elements with
+the second and third elements having two children each.
+Note that the `recursionTag` option dit not need to be cleared
+to an empty array to prevent recursion because there are no
+`<ul>` or `<ol>` elements within the list items although
+there would be no harm in doing it and might protect against
+unexpected results if the HTML was ever changed to use
+list items in the future.
+
+
+---
+
+
 #### `ghostClass` option
 Class name for the drop placeholder (default `sortable-ghost`).
 
@@ -564,6 +700,57 @@ For each element in the set, get the first element that matches the selector by 
 ##### toArray():`String[]`
 Serializes the sortable's item `data-id`'s (`dataIdAttr` option) into an array of string.
 
+
+##### getHierarchy([mode = 0]):`Mixed[]`
+Hierarchically serializes the sortable's item `data-id`'s (`dataIdAttr` option) into an
+array of objects or an array of strings and arrays if the mode parameter is set to 2.
+
+Recursing into the hierarchy is controlled by three options, each of which takes
+an array. The `recursionTags` option defaults to `[ "UL", "OL" ]` resulting in
+recursing into every `<ul>` or `<ol>` in the sortable's element.  Finer grained
+control can be achieved by using the `recursionClasses` option to only recurse
+into elements with a class from this array set. The finest control can be gained
+by setting the `recursionIds` option to the specific element id's to be recursed
+into. Note that setting `recursionTags` to `[ ]` is needed to block the default
+behavior since a match in any of the options will result inrecursion.
+
+In its default mode, `getHierarchy` returns an array of objects, each with an `'id'`
+and a `'children'` property.
+
+Using the default mode will result in between 4 and 5 times larger data streams
+to be communicated but some may find processing the data easier.
+Setting mode to 1 will reduce this my about 25% by stripping
+out all the empty `'children'` properties.
+
+Setting mode to 2 will reduce the data size by 75 to 80%. This is done by having
+`getHierarchy` return an array of strings of the `data-id`'s followed by an array
+if that node has children.
+
+As an example the recursive `toHTML` function shown below will replace the
+contents of the element with the id of `myTree` with the current structure
+using unordered lists:
+
+```js
+let hierarchy = Sortable.getHierarchy( 2 );
+let myTree = document.getElementById("myTree");
+myTree.innerHTML = toHTML( hierarchy );
+
+function toHTML( arr, level ) {
+    level = level || 0;
+    let str = "<ul>\n",
+        n = arr.length;
+    if( level === 0 ) str = "";
+    for( let i = 0; i < n; ++i ) {
+        str += '<li data-id="' + arr[i] + ">" + fetch( arr[i] ).toString();
+        if( i+1 < n && Array.isArray( arr[i+1 ) ) {
+            str += "\n" + toHTML( arr[++i], level+1 );
+        }
+        str += "</li>\n";
+    }
+    if( level > 0 ) str += "</ul>\n";
+    return str;
+}
+```
 
 ##### sort(order:`String[]`)
 Sorts the elements according to the array.
