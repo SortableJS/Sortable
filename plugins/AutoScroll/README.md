@@ -49,9 +49,11 @@ Demo:
 
 
 #### `scrollFn` option
-Defines function that will be used for autoscrolling. el.scrollTop/el.scrollLeft is used by default.
 Useful when you have custom scrollbar with dedicated scroll function.
-This function should return `'continue'` if it wishes to allow Sortable's native autoscrolling.
+Defines a function that will be used for autoscrolling. Sortable uses el.scrollTop/el.scrollLeft by default. Set this option if you wish to handle it differently.
+This function should return `'continue'` if it wishes to allow Sortable's native autoscrolling, otherwise Sortable will not scroll anything if this option is set.
+
+**Note that this option will only work on all browsers/devices if Sortable's `forceFallback: true` option is set.**
 
 
 ---
@@ -60,12 +62,16 @@ This function should return `'continue'` if it wishes to allow Sortable's native
 #### `scrollSensitivity` option
 Defines how near the mouse must be to an edge to start scrolling.
 
+**Note that this option will only work on all browsers/devices if Sortable's `forceFallback: true` option is set.**
+
 
 ---
 
 
 #### `scrollSpeed` option
 The speed at which the window should scroll once the mouse pointer gets within the `scrollSensitivity` distance.
+
+**Note that this option will only work on all browsers/devices if Sortable's `forceFallback: true` option is set.**
 
 
 ---
