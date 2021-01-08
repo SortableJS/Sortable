@@ -1,5 +1,5 @@
 /**!
- * Sortable 1.10.2
+ * Sortable 1.13.0
  * @author	RubaXa   <trash@rubaxa.org>
  * @author	owenm    <owen23355@gmail.com>
  * @license MIT
@@ -132,7 +132,7 @@
     throw new TypeError("Invalid attempt to spread non-iterable instance");
   }
 
-  var version = "1.10.2";
+  var version = "1.13.0";
 
   function userAgent(pattern) {
     if (typeof window !== 'undefined' && window.navigator) {
@@ -314,7 +314,7 @@
     if (!el.getBoundingClientRect && el !== window) return;
     var elRect, top, left, bottom, right, height, width;
 
-    if (el !== window && el !== getWindowScrollingElement()) {
+    if (el !== window && el.parentNode && el !== getWindowScrollingElement()) {
       elRect = el.getBoundingClientRect();
       top = elRect.top;
       left = elRect.left;
@@ -754,7 +754,7 @@
           target.animatingX = !!translateX;
           target.animatingY = !!translateY;
           css(target, 'transform', 'translate3d(' + translateX + 'px,' + translateY + 'px,0)');
-          repaint(target); // repaint
+          this.forRepaintDummy = repaint(target); // repaint
 
           css(target, 'transition', 'transform ' + duration + 'ms' + (this.options.easing ? ' ' + this.options.easing : ''));
           css(target, 'transform', 'translate3d(0,0,0)');
@@ -792,6 +792,11 @@
         }
       }
 
+      plugins.forEach(function (p) {
+        if (p.pluginName === plugin.pluginName) {
+          throw "Sortable: Cannot mount plugin ".concat(plugin.pluginName, " more than once");
+        }
+      });
       plugins.push(plugin);
     },
     pluginEvent: function pluginEvent(eventName, sortable, evt) {
@@ -1235,7 +1240,7 @@
         x: 0,
         y: 0
       },
-      supportPointer: Sortable.supportPointer !== false && 'PointerEvent' in window,
+      supportPointer: Sortable.supportPointer !== false && 'PointerEvent' in window && !Safari,
       emptyInsertThreshold: 5
     };
     PluginManager.initializePlugins(this, el, defaults); // Set default options
@@ -1321,6 +1326,11 @@
 
 
       if (originalTarget.isContentEditable) {
+        return;
+      } // Safari ignores further event handling after mousedown
+
+
+      if (!this.nativeDraggable && Safari && target && target.tagName.toUpperCase() === 'SELECT') {
         return;
       }
 
@@ -2319,7 +2329,7 @@
      * Sorts the elements according to the array.
      * @param  {String[]}  order  order of the items
      */
-    sort: function sort(order) {
+    sort: function sort(order, useAnimation) {
       var items = {},
           rootEl = this.el;
       this.toArray().forEach(function (id, i) {
@@ -2329,12 +2339,14 @@
           items[id] = el;
         }
       }, this);
+      useAnimation && this.captureAnimationState();
       order.forEach(function (id) {
         if (items[id]) {
           rootEl.removeChild(items[id]);
           rootEl.appendChild(items[id]);
         }
       });
+      useAnimation && this.animateAll();
     },
 
     /**
@@ -2433,7 +2445,7 @@
         pluginEvent('showClone', this);
         if (Sortable.eventCanceled) return; // show clone at dragEl or original position
 
-        if (rootEl.contains(dragEl) && !this.options.group.revertClone) {
+        if (dragEl.parentNode == rootEl && !this.options.group.revertClone) {
           rootEl.insertBefore(cloneEl, dragEl);
         } else if (nextEl) {
           rootEl.insertBefore(cloneEl, nextEl);
