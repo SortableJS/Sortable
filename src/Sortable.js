@@ -1569,7 +1569,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 	 * Sorts the elements according to the array.
 	 * @param  {String[]}  order  order of the items
 	 */
-	sort: function (order) {
+	sort: function (order, useAnimation) {
 		let items = {}, rootEl = this.el;
 
 		this.toArray().forEach(function (id, i) {
@@ -1580,12 +1580,14 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			}
 		}, this);
 
+		useAnimation && this.captureAnimationState();
 		order.forEach(function (id) {
 			if (items[id]) {
 				rootEl.removeChild(items[id]);
 				rootEl.appendChild(items[id]);
 			}
 		});
+		useAnimation && this.animateAll();
 	},
 
 

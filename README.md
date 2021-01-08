@@ -565,12 +565,12 @@ For each element in the set, get the first element that matches the selector by 
 Serializes the sortable's item `data-id`'s (`dataIdAttr` option) into an array of string.
 
 
-##### sort(order:`String[]`)
+##### sort(order:`String[]`, useAnimation:`Boolean`)
 Sorts the elements according to the array.
 
 ```js
 var order = sortable.toArray();
-sortable.sort(order.reverse()); // apply
+sortable.sort(order.reverse(), true); // apply
 ```
 
 
