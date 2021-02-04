@@ -129,7 +129,7 @@ var sortable = new Sortable(el, {
 	preventOnFilter: true, // Call `event.preventDefault()` when triggered `filter`
 	draggable: ".item",  // Specifies which items inside the element should be draggable
 
-	dataIdAttr: 'data-id',
+	dataIdAttr: 'data-id', // HTML attribute that is used by the `toArray()` method
 
 	ghostClass: "sortable-ghost",  // Class name for the drop placeholder
 	chosenClass: "sortable-chosen",  // Class name for the chosen item
@@ -549,7 +549,7 @@ Demo: https://jsbin.com/becavoj/edit?js,output
 ---
 
 
-### Method
+### Methods
 
 
 ##### option(name:`String`[, value:`*`]):`*`
