@@ -1769,7 +1769,7 @@ function _ghostIsLast(evt, vertical, sortable) {
 
 	return vertical ?
 		(evt.clientX > rect.right + spacer || evt.clientX <= rect.right && evt.clientY > rect.bottom && evt.clientX >= rect.left) :
-		(evt.clientX > rect.right && evt.clientY > rect.top || evt.clientX <= rect.right && evt.clientY > rect.bottom + spacer);
+		(evt.clientX > rect.right && evt.clientY > rect.top && evt.clientY < rect.bottom + spacer);
 }
 
 function _getSwapDirection(evt, target, targetRect, vertical, swapThreshold, invertedSwapThreshold, invertSwap, isLastTarget) {
