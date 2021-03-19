@@ -300,7 +300,7 @@ function MultiDragPlugin() {
 		drop({ originalEvent: evt, rootEl, parentEl, sortable, dispatchSortableEvent, oldIndex, putSortable }) {
 			let toSortable = (putSortable || this.sortable);
 
-			if (!evt) return;
+			if (!evt || parentEl === null) return;
 
 			let options = this.options,
 				children = parentEl.children;
