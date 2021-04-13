@@ -16,7 +16,7 @@
 		"uglify-js": "^3.5.12"
 	},
 	"description": "JavaScript library for reorderable drag-and-drop lists on modern browsers and touch devices. No jQuery required. Supports Meteor, AngularJS, React, Polymer, Vue, Knockout and any CSS library, e.g. Bootstrap.",
-	"main": "./Sortable.js",
+	"main": "./Sortable.min.js",
 	"module": "modular/sortable.esm.js",
 	"scripts": {
 		"build:umd": "NODE_ENV=umd rollup -c ./scripts/umd-build.js",
