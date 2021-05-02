@@ -373,6 +373,7 @@ function MultiDragPlugin() {
 
 			// Multi-drag drop
 			if (dragStarted && this.isMultiDrag) {
+				folding = false;
 				// Do not "unfold" after around dragEl if reverted
 				if ((parentEl[expando].options.sort || parentEl !== rootEl) && multiDragElements.length > 1) {
 					let dragRect = getRect(dragEl),
