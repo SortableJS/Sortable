@@ -1,0 +1,147 @@
+@media (min-width: 992px) {
+  #carbonads {
+    display: block;
+    overflow: hidden;
+    padding: 10px;
+    box-shadow: 0 1px 3px hsla(0, 0%, 0%, .05);
+    border-radius: 4px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    max-width: 300px;
+    margin-top: 50px;
+    font-size: 12px;
+    position: absolute;
+    background-color: #fff;
+  }
+
+  #carbonads a {
+    text-decoration: none;
+  }
+
+  #carbonads span {
+    position: relative;
+    display: block;
+    overflow: hidden;
+  }
+
+  .carbon-img {
+    float: left;
+    margin-right: 1em;
+  }
+
+  .carbon-img img {
+    display: block;
+  }
+
+  .carbon-text {
+    display: block;
+    float: left;
+    max-width: calc(100% - 130px - 1em);
+    text-align: left;
+    color: #637381;
+  }
+
+  .carbon-poweredby {
+    position: absolute;
+    left: 142px;
+    bottom: 0;
+    display: block;
+    font-size: 8px;
+    color: #c5cdd0;
+    font-weight: 500;
+    text-transform: uppercase;
+    line-height: 1;
+    letter-spacing: 1px;
+  }
+}
+
+@media (max-width: 992px) {
+ #carbonads {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", Helvetica, Arial,
+    sans-serif;
+    --width: 728px;
+    --font-size: 22px;
+  }
+
+  #carbonads {
+    display: block;
+    overflow: hidden;
+    max-width: var(--width);
+    position: relative;
+    background-color: hsl(0, 0%, 99%);
+    border: solid 1px #eee;
+    font-size: var(--font-size);
+    box-sizing: border-box;
+  }
+
+  .detail #carbonads {
+    margin-top: 12px;
+  }
+
+  #carbonads a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  #carbonads a:hover {
+    color: inherit;
+  }
+
+  .carbon-wrap {
+    display: flex;
+    align-items: center;
+  }
+
+  carbon-img {
+    display: block;
+    float: left;
+    margin: 0;
+    max-width: var(--width);
+    line-height: 1;
+  }
+
+  .carbon-img img {
+    display: block;
+    height: 90px;
+    width: auto;
+  }
+
+  .carbon-text {
+    display: block;
+    float: left;
+    padding: 0 1em;
+    line-height: 1.35;
+    max-width: calc(100% - 130px - 2em);
+    text-align: left;
+  }
+
+  .carbon-poweredby {
+    display: block;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    padding: 6px 10px;
+    background: repeating-linear-gradient(
+                    -45deg,
+                    transparent,
+                    transparent 5px,
+                    hsla(0, 0%, 0%, 0.025) 5px,
+                    hsla(0, 0%, 0%, 0.025) 10px
+    )
+    hsla(203, 11%, 95%, 0.8);
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    font-size: 8px;
+    border-top-left-radius: 4px;
+    line-height: 1;
+  }
+
+  @media only screen and (min-width: 320px) and (max-width: 759px) {
+    .carbon-text {
+      font-size: 14px;
+    }
+  }
+}
