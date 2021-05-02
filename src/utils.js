@@ -68,6 +68,16 @@ function closest(/**HTMLElement*/el, /**String*/selector, /**HTMLElement*/ctx, i
 	return null;
 }
 
+function getParentSortable(target) {
+	while (target = getParentOrHost(target)) {
+		if (target[expando]) {
+			return target[expando];
+		}
+	}
+
+	return null;
+}
+
 const R_SPACE = /\s+/g;
 
 function toggleClass(el, name, state) {
@@ -320,14 +330,15 @@ function getChild(el, childNum, options) {
 }
 
 /**
- * Gets the last child in the el, ignoring ghostEl or invisible elements (clones)
+ * Gets the last child matching the selector the el, ignoring ghostEl or invisible elements (clones)
  * @param  {HTMLElement} el       Parent element
  * @param  {selector} selector    Any other elements that should be ignored
  * @return {HTMLElement}          The last child, ignoring ghostEl
  */
 function lastChild(el, selector) {
 	let last = el.lastElementChild;
-
+	// No point in traversing recursively if only matching immediate children
+	let immediateChildrenOnly = selector.substring(1) === '>';
 	while (
 		last &&
 		(
@@ -552,5 +563,6 @@ export {
 	clone,
 	setRect,
 	unsetRect,
-	expando
-};
+	expando,
+	getParentSortable
+}

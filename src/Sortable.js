@@ -34,7 +34,8 @@ import {
 	throttle,
 	scrollBy,
 	clone,
-	expando
+	expando,
+	getParentSortable
 } from './utils.js';
 
 
@@ -334,7 +335,7 @@ let nearestEmptyInsertDetectEvent = function(evt) {
 
 let _checkOutsideTargetEl = function(evt) {
 	if (dragEl) {
-		dragEl.parentNode[expando]._isOutsideThisEl(evt.target);
+		getParentSortable(dragEl)._isOutsideThisEl(evt.target);
 	}
 };
 
@@ -560,11 +561,11 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			ownerDocument = el.ownerDocument,
 			dragStartFn;
 
-		if (target && !dragEl && (target.parentNode === el)) {
+		if (target && !dragEl && getParentSortable(target) === this) {
 			let dragRect = getRect(target);
 			rootEl = el;
 			dragEl = target;
-			parentEl = dragEl.parentNode;
+			parentEl = getParentSortable(dragEl).el;
 			nextEl = dragEl.nextSibling;
 			lastDownEl = target;
 			activeGroup = options.group;
@@ -758,7 +759,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 				parent = target;
 			}
 
-			dragEl.parentNode[expando]._isOutsideThisEl(target);
+			getParentSortable(dragEl)._isOutsideThisEl(target);
 
 			if (parent) {
 				do {
@@ -1083,7 +1084,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 
 			// no bubbling and not fallback
 			if (!options.dragoverBubble && !evt.rootEl && target !== document) {
-				dragEl.parentNode[expando]._isOutsideThisEl(evt.target);
+				getParentSortable(dragEl)._isOutsideThisEl(evt.target);
 
 				// Do not detect for empty insert if already inserted
 				!insertion && nearestEmptyInsertDetectEvent(evt);
@@ -1193,16 +1194,17 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 					return completed(true);
 				}
 			}
-			else if (target.parentNode === el) {
+			else if (getParentSortable(target) === this) {
 				targetRect = getRect(target);
 				let direction = 0,
 					targetBeforeFirstSwap,
-					differentLevel = dragEl.parentNode !== el,
+					differentLevel = getParentSortable(dragEl).el !== el,
 					differentRowCol = !_dragElInRowColumn(dragEl.animated && dragEl.toRect || dragRect, target.animated && target.toRect || targetRect, vertical),
 					side1 = vertical ? 'top' : 'left',
 					scrolledPastTop = isScrolledPast(target, 'top', 'top') || isScrolledPast(dragEl, 'top', 'top'),
 					scrollBefore = scrolledPastTop ? scrolledPastTop.scrollTop : void 0;
 
+				console.log(differentLevel)
 
 				if (lastTarget !== target) {
 					targetBeforeFirstSwap = targetRect[side1];
@@ -1226,7 +1228,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 
 					do {
 						dragIndex -= direction;
-						sibling = parentEl.children[dragIndex];
+						sibling = dragEl.parentNode.children[dragIndex];
 					} while (sibling && (css(sibling, 'display') === 'none' || sibling === ghostEl));
 				}
 				// If dragEl is already beside target: Do not insert
@@ -1269,7 +1271,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 						scrollBy(scrolledPastTop, 0, scrollBefore - scrolledPastTop.scrollTop);
 					}
 
-					parentEl = dragEl.parentNode; // actualization
+					parentEl = getParentSortable(dragEl).el; // actualization
 
 					// must be done before animation
 					if (targetBeforeFirstSwap !== undefined && !isCircumstantialInvert) {
@@ -1322,7 +1324,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			evt
 		});
 
-		parentEl = dragEl && dragEl.parentNode;
+		parentEl = dragEl && getParentSortable(dragEl);
 
 		// Get again after plugin event
 		newIndex = index(dragEl);
@@ -1694,7 +1696,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			if (Sortable.eventCanceled) return;
 
 			// show clone at dragEl or original position
-			if (dragEl.parentNode == rootEl && !this.options.group.revertClone) {
+			if (getParentSortable(dragEl) == rootEl && !this.options.group.revertClone) {
 				rootEl.insertBefore(cloneEl, dragEl);
 			} else if (nextEl) {
 				rootEl.insertBefore(cloneEl, nextEl);
