@@ -1175,7 +1175,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 					return completed(false);
 				}
 
-				// assign target only if condition is true
+				// if there is a last element, it is the target
 				if (elLastChild && el === evt.target) {
 					target = elLastChild;
 				}
@@ -1187,6 +1187,23 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 				if (onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt, !!target) !== false) {
 					capture();
 					el.appendChild(dragEl);
+					parentEl = el; // actualization
+
+					changed();
+					return completed(true);
+				}
+			}
+			else if (elLastChild && _ghostIsFirst(evt, vertical, this)) {
+				let firstChild = getChild(el, 0, options, true);
+				if (firstChild === dragEl) {
+					return completed(false);
+				}
+				target = firstChild;
+				targetRect = getRect(target);
+
+				if (onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt, false) !== false) {
+					capture();
+					el.insertBefore(dragEl, firstChild);
 					parentEl = el; // actualization
 
 					changed();
@@ -1762,6 +1779,14 @@ function _unsilent() {
 	_silent = false;
 }
 
+function _ghostIsFirst(evt, vertical, sortable) {
+	let rect = getRect(getChild(sortable.el, 0, sortable.options));
+	const spacer = 10;
+
+	return vertical ?
+		((evt.clientX < rect.left - spacer) || (evt.clientY < rect.top && evt.clientX < rect.right)) :
+		((evt.clientY < rect.top - spacer) || (evt.clientY < rect.bottom && evt.clientX < rect.left))
+}
 
 function _ghostIsLast(evt, vertical, sortable) {
 	let rect = getRect(lastChild(sortable.el, sortable.options.draggable));

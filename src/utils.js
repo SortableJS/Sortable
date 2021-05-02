@@ -296,7 +296,7 @@ function isScrolledPast(el, elSide, parentSide) {
  * @param  {Object} options       Parent Sortable's options
  * @return {HTMLElement}          The child at index childNum, or null if not found
  */
-function getChild(el, childNum, options) {
+function getChild(el, childNum, options, includeDragEl) {
 	let currentChild = 0,
 		i = 0,
 		children = el.children;
@@ -305,7 +305,7 @@ function getChild(el, childNum, options) {
 		if (
 			children[i].style.display !== 'none' &&
 			children[i] !== Sortable.ghost &&
-			children[i] !== Sortable.dragged &&
+			(includeDragEl || children[i] !== Sortable.dragged) &&
 			closest(children[i], options.draggable, el, false)
 		) {
 			if (currentChild === childNum) {
