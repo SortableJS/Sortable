@@ -521,6 +521,19 @@ The distance (in pixels) the mouse must be from an empty sortable while dragging
 
 Demo: https://jsbin.com/becavoj/edit?js,output
 
+Instead of this, you can just set a padding on your list when it is empty. Warning, for :empty to work, it must have no node inside (even text one).
+(It will help if your lists are side-by-side, since you only want the drag occurs when you are under the list - not at the left)
+
+Adding a CSS rule :
+`ul:empty {
+  background:pink;
+  padding-bottom:3em;
+}`
+
+And rewriting the empty list as : `<ul id="list2" class="list-group"></ul>` (so that it is really empty)
+
+You got :
+https://jsbin.com/galujuvayi/edit?html,css,js,output
 
 ---
 ### Event object ([demo](https://jsbin.com/fogujiv/edit?js,output))
