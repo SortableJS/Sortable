@@ -1131,7 +1131,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 
 		if (activeSortable && !options.disabled &&
 			(isOwner
-				? canSort || (revert = !rootEl.contains(dragEl)) // Reverting item into the original list
+				? canSort || (revert = parentEl !== rootEl) // Reverting item into the original list
 				: (
 					putSortable === this ||
 					(
