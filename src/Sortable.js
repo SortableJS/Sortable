@@ -1119,6 +1119,10 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		dragOverEvent('dragOver');
 		if (Sortable.eventCanceled) return completedFired;
 
+		if (dragEl.contains(evt.target)) {
+			_onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt, after);
+		}
+
 		if (
 			dragEl.contains(evt.target) ||
 			target.animated && target.animatingX && target.animatingY ||
