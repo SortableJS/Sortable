@@ -29,6 +29,7 @@ function AutoScrollPlugin() {
 	function AutoScroll() {
 		this.defaults = {
 			scroll: true,
+			forceAutoScrollFallback: false,
 			scrollSensitivity: 30,
 			scrollSpeed: 10,
 			bubbleScroll: true
@@ -106,7 +107,7 @@ function AutoScrollPlugin() {
 			// Edge's autoscroll seems too conditional,
 			// MACOS Safari does not have autoscroll,
 			// Firefox and Chrome are good
-			if (fallback || Edge || IE11OrLess || Safari) {
+			if (fallback || this.options.forceAutoScrollFallback || Edge || IE11OrLess || Safari) {
 				autoScroll(evt, this.options, elem, fallback);
 
 				// Listener for pointer element change

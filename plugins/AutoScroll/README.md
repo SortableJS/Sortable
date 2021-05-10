@@ -26,6 +26,7 @@ Sortable.mount(new AutoScroll());
 ```js
 new Sortable(el, {
 	scroll: true, // Enable the plugin. Can be HTMLElement.
+	forceAutoscrollFallback: false, // force autoscroll plugin to enable even when native browser autoscroll is available
 	scrollFn: function(offsetX, offsetY, originalEvent, touchEvt, hoverTargetEl) { ... }, // if you have custom scrollbar scrollFn may be used for autoscrolling
 	scrollSensitivity: 30, // px, how near the mouse must be to an edge to start scrolling.
 	scrollSpeed: 10, // px, speed of the scrolling
@@ -40,9 +41,18 @@ new Sortable(el, {
 #### `scroll` option
 Enables the plugin. Defaults to `true`. May also be set to an HTMLElement which will be where autoscrolling is rooted.
 
+**Note: Just because this plugin is enabled does not mean that it will always be used for autoscrolling. Some browsers have native drag and drop autoscroll, in which case this autoscroll plugin won't be invoked. If you wish to have this always be invoked for autoscrolling, set the option `forceAutoScrollFallback` to `true`.**
+
 Demo:
  - `window`: https://jsbin.com/dosilir/edit?js,output
  - `overflow: hidden`: https://jsbin.com/xecihez/edit?html,js,output
+
+
+---
+
+
+#### `forceAutoScrollFallback` option
+Enables sortable's autoscroll even when the browser can handle it (with native drag and drop). Defaults to `false`. This will not disable the native autoscrolling. Note that setting `forceFallback: true` in the sortable options will also enable this.
 
 
 ---
