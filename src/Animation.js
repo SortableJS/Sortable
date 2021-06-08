@@ -130,6 +130,10 @@ export default function AnimationStateManager() {
 		},
 
 		animate(target, currentRect, toRect, duration) {
+			const position = css(target, 'position');
+			if (position !== 'static' && position !== 'relative') {
+				return;
+			}
 			if (duration) {
 				css(target, 'transition', '');
 				css(target, 'transform', '');
