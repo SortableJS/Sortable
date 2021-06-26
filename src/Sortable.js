@@ -1170,6 +1170,8 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			let elLastChild = lastChild(el, options.draggable);
 
 			if (!elLastChild || _ghostIsLast(evt, vertical, this) && !elLastChild.animated) {
+				// Insert to end of list
+
 				// If already at end of list: Do not insert
 				if (elLastChild === dragEl) {
 					return completed(false);
@@ -1194,6 +1196,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 				}
 			}
 			else if (elLastChild && _ghostIsFirst(evt, vertical, this)) {
+				// Insert to start of list
 				let firstChild = getChild(el, 0, options, true);
 				if (firstChild === dragEl) {
 					return completed(false);
@@ -1780,7 +1783,7 @@ function _unsilent() {
 }
 
 function _ghostIsFirst(evt, vertical, sortable) {
-	let rect = getRect(getChild(sortable.el, 0, sortable.options));
+	let rect = getRect(getChild(sortable.el, 0, sortable.options, true));
 	const spacer = 10;
 
 	return vertical ?
