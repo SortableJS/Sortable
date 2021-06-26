@@ -235,7 +235,7 @@ let dragEl,
 				insideHorizontally = x >= (rect.left - threshold) && x <= (rect.right + threshold),
 				insideVertically = y >= (rect.top - threshold) && y <= (rect.bottom + threshold);
 
-			if (threshold && insideHorizontally && insideVertically) {
+			if (insideHorizontally && insideVertically) {
 				return (ret = sortable);
 			}
 		});
