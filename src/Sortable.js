@@ -228,10 +228,10 @@ let dragEl,
 	_detectNearestEmptySortable = function(x, y) {
 		let ret;
 		sortables.some((sortable) => {
-			if (lastChild(sortable)) return;
+			const threshold = sortable[expando].options.emptyInsertThreshold;
+			if (!threshold || lastChild(sortable)) return;
 
-			let rect = getRect(sortable),
-				threshold = sortable[expando].options.emptyInsertThreshold,
+			const rect = getRect(sortable),
 				insideHorizontally = x >= (rect.left - threshold) && x <= (rect.right + threshold),
 				insideVertically = y >= (rect.top - threshold) && y <= (rect.bottom + threshold);
 
