@@ -521,6 +521,19 @@ The distance (in pixels) the mouse must be from an empty sortable while dragging
 
 Demo: https://jsbin.com/becavoj/edit?js,output
 
+An alternative to this option would be to set a padding on your list when it is empty.
+
+For example:
+```css
+ul:empty {
+  padding-bottom: 20px;
+}
+```
+
+Warning: For `:empty` to work, it must have no node inside (even text one).
+
+Demo:
+https://jsbin.com/yunakeg/edit?html,css,js,output
 
 ---
 ### Event object ([demo](https://jsbin.com/fogujiv/edit?js,output))
