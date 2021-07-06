@@ -1747,7 +1747,7 @@
           ghostRelativeParentInitialScroll = getRelativeScrollOffset(ghostRelativeParent);
         }
 
-        ghostEl = dragEl.cloneNode(true);
+        ghostEl = options.clone ? options.clone(dragEl) : dragEl.cloneNode(true);
         toggleClass(ghostEl, options.ghostClass, false);
         toggleClass(ghostEl, options.fallbackClass, true);
         toggleClass(ghostEl, options.dragClass, true);
@@ -1791,7 +1791,7 @@
       pluginEvent('setupClone', this);
 
       if (!Sortable.eventCanceled) {
-        cloneEl = clone(dragEl);
+        cloneEl = this.options.clone ? this.options.clone(dragEl) : clone(dragEl);
         cloneEl.draggable = false;
         cloneEl.style['will-change'] = '';
 
