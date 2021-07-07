@@ -150,6 +150,13 @@ var sortable = new Sortable(el, {
 	removeCloneOnHide: true, // Remove the clone element when it is not showing, rather than just hiding it
 	emptyInsertThreshold: 5, // px, distance mouse must be from empty sortable to insert drag element into it
 
+	// custom function for cloning HTML element
+	// if not given, default cloning will be used, that is HTMLElement.cloneNode
+	clone: function (/** HTMLElement */elToClone) {
+		// must return clone of the element
+		return elToClone.cloneNode(true);
+	},
+
 
 	setData: function (/** DataTransfer */dataTransfer, /** HTMLElement*/dragEl) {
 		dataTransfer.setData('Text', dragEl.textContent); // `dataTransfer` object of HTML5 DragEvent
