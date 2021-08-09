@@ -319,7 +319,7 @@ function MultiDragPlugin() {
 						rootEl,
 						name: 'select',
 						targetEl: dragEl,
-						originalEvt: evt
+						originalEvent: evt
 					});
 
 					// Modifier activated, select from last to dragEl
@@ -349,7 +349,7 @@ function MultiDragPlugin() {
 									rootEl,
 									name: 'select',
 									targetEl: children[i],
-									originalEvt: evt
+									originalEvent: evt
 								});
 							}
 						}
@@ -366,7 +366,7 @@ function MultiDragPlugin() {
 						rootEl,
 						name: 'deselect',
 						targetEl: dragEl,
-						originalEvt: evt
+						originalEvent: evt
 					});
 				}
 			}
@@ -488,7 +488,7 @@ function MultiDragPlugin() {
 					rootEl: this.sortable.el,
 					name: 'deselect',
 					targetEl: el,
-					originalEvt: evt
+					originalEvent: evt
 				});
 			}
 		},
