@@ -541,7 +541,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 
 			if (filter) {
                 preventOnFilter && evt.cancelable;
-                if (!evt.target.tagName == 'INPUT') evt.preventDefault();
+                if (evt.target.tagName != 'INPUT') evt.preventDefault();
 				return; // cancel dnd
 			}
 		}
