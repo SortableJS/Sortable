@@ -1,7 +1,0 @@
-node_modules
-mock.png
-.*.sw*
-.build*
-jquery.fn.*
-.idea/
-/.vs/Sortable/v16/.suo
