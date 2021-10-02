@@ -798,10 +798,10 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 				scaleX = ghostEl && ghostMatrix && ghostMatrix.a,
 				scaleY = ghostEl && ghostMatrix && ghostMatrix.d,
 				relativeScrollOffset = PositionGhostAbsolutely && ghostRelativeParent && getRelativeScrollOffset(ghostRelativeParent),
-				dx = ((touch.clientX - tapEvt.clientX)
+				dx = options.direction === 'vertical' ? 0 : ((touch.clientX - tapEvt.clientX)
 						+ fallbackOffset.x) / (scaleX || 1)
 						+ (relativeScrollOffset ? (relativeScrollOffset[0] - ghostRelativeParentInitialScroll[0]) : 0) / (scaleX || 1),
-				dy = ((touch.clientY - tapEvt.clientY)
+				dy = options.direction === 'horizontal' ? 0 : ((touch.clientY - tapEvt.clientY)
 						+ fallbackOffset.y) / (scaleY || 1)
 						+ (relativeScrollOffset ? (relativeScrollOffset[1] - ghostRelativeParentInitialScroll[1]) : 0) / (scaleY || 1);
 

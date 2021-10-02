@@ -1681,8 +1681,8 @@
             scaleX = ghostEl && ghostMatrix && ghostMatrix.a,
             scaleY = ghostEl && ghostMatrix && ghostMatrix.d,
             relativeScrollOffset = PositionGhostAbsolutely && ghostRelativeParent && getRelativeScrollOffset(ghostRelativeParent),
-            dx = (touch.clientX - tapEvt.clientX + fallbackOffset.x) / (scaleX || 1) + (relativeScrollOffset ? relativeScrollOffset[0] - ghostRelativeParentInitialScroll[0] : 0) / (scaleX || 1),
-            dy = (touch.clientY - tapEvt.clientY + fallbackOffset.y) / (scaleY || 1) + (relativeScrollOffset ? relativeScrollOffset[1] - ghostRelativeParentInitialScroll[1] : 0) / (scaleY || 1); // only set the status to dragging, when we are actually dragging
+            dx = options.direction === 'vertical' ? 0 : (touch.clientX - tapEvt.clientX + fallbackOffset.x) / (scaleX || 1) + (relativeScrollOffset ? relativeScrollOffset[0] - ghostRelativeParentInitialScroll[0] : 0) / (scaleX || 1),
+            dy = options.direction === 'horizontal' ? 0 : (touch.clientY - tapEvt.clientY + fallbackOffset.y) / (scaleY || 1) + (relativeScrollOffset ? relativeScrollOffset[1] - ghostRelativeParentInitialScroll[1] : 0) / (scaleY || 1); // only set the status to dragging, when we are actually dragging
 
         if (!Sortable.active && !awaitingDragStarted) {
           if (fallbackTolerance && Math.max(Math.abs(touch.clientX - this._lastX), Math.abs(touch.clientY - this._lastY)) < fallbackTolerance) {
@@ -3480,7 +3480,7 @@
               rootEl: rootEl,
               name: 'select',
               targetEl: dragEl$1,
-              originalEvt: evt
+              originalEvent: evt
             }); // Modifier activated, select from last to dragEl
 
             if (evt.shiftKey && lastMultiDragSelect && sortable.el.contains(lastMultiDragSelect)) {
@@ -3509,7 +3509,7 @@
                     rootEl: rootEl,
                     name: 'select',
                     targetEl: children[i],
-                    originalEvt: evt
+                    originalEvent: evt
                   });
                 }
               }
@@ -3526,7 +3526,7 @@
               rootEl: rootEl,
               name: 'deselect',
               targetEl: dragEl$1,
-              originalEvt: evt
+              originalEvent: evt
             });
           }
         } // Multi-drag drop
@@ -3637,7 +3637,7 @@
             rootEl: this.sortable.el,
             name: 'deselect',
             targetEl: el,
-            originalEvt: evt
+            originalEvent: evt
           });
         }
       },
