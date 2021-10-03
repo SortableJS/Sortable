@@ -35,11 +35,13 @@ function MultiDragPlugin() {
 			}
 		}
 
-		if (sortable.options.supportPointer) {
-			on(document, 'pointerup', this._deselectMultiDrag);
-		} else {
-			on(document, 'mouseup', this._deselectMultiDrag);
-			on(document, 'touchend', this._deselectMultiDrag);
+		if (!sortable.options.avoidImplicitDeselect) {
+			if (sortable.options.supportPointer) {
+				on(document, 'pointerup', this._deselectMultiDrag);
+			} else {
+				on(document, 'mouseup', this._deselectMultiDrag);
+				on(document, 'touchend', this._deselectMultiDrag);
+			}
 		}
 
 		on(document, 'keydown', this._checkKeyDown);
@@ -48,6 +50,7 @@ function MultiDragPlugin() {
 		this.defaults = {
 			selectedClass: 'sortable-selected',
 			multiDragKey: null,
+			avoidImplicitDeselect: false,
 			setData(dataTransfer, dragEl) {
 				let data = '';
 				if (multiDragElements.length && multiDragSortable === sortable) {
