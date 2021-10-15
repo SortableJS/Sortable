@@ -27,7 +27,8 @@ new Sortable(el, {
 	multiDrag: true, // Enable the plugin
 	selectedClass: "sortable-selected", // Class name for selected item
 	multiDragKey: null, // Key that must be down for items to be selected
-
+	avoidImplicitDeselect: false, // true - if you don't want to deselect items on outside click
+	
 	// Called when an item is selected
 	onSelect: function(/**Event*/evt) {
 		evt.item // The selected item

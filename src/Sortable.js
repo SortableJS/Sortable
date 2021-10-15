@@ -1188,7 +1188,12 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 
 				if (onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt, !!target) !== false) {
 					capture();
-					el.appendChild(dragEl);
+					if (elLastChild && elLastChild.nextSibling) { // the last draggable element is not the last node
+						el.insertBefore(dragEl, elLastChild.nextSibling);
+					}
+					else {
+						el.appendChild(dragEl);
+					}
 					parentEl = el; // actualization
 
 					changed();
