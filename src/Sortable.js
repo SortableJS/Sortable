@@ -298,7 +298,7 @@ let dragEl,
 
 
 // #1184 fix - Prevent click event on fallback if dragged but item not changed position
-if (documentExists) {
+if (documentExists && !ChromeForAndroid) {
 	document.addEventListener('click', function(evt) {
 		if (ignoreNextClick) {
 			evt.preventDefault();
