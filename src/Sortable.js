@@ -924,7 +924,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		pluginEvent('setupClone', this);
 		if (!Sortable.eventCanceled) {
 			cloneEl = this.options.clone ? this.options.clone(dragEl) : clone(dragEl);
-
+			cloneEl.removeAttribute("id");
 			cloneEl.draggable = false;
 			cloneEl.style['will-change'] = '';
 
