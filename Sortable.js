@@ -1568,14 +1568,12 @@
 
         if (ghostEl) {
           if (ghostMatrix) {
-            const vertical = this._getDirection(evt, target) === 'vertical';
-
-            if (!vertical) {
-              ghostMatrix.e += dx - (lastDx || 0);
-            }
+            const vertical = this._getDirection(evt, evt.target) === 'vertical';
 
             if (vertical) {
               ghostMatrix.f += dy - (lastDy || 0);
+            } else {
+              ghostMatrix.e += dx - (lastDx || 0);
             }
           } else {
             ghostMatrix = {
