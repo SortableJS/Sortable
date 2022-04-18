@@ -1545,28 +1545,6 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		lastDy = 0;
 	},
 
-	handleEvent: function (/**Event*/evt) {
-		switch (evt.type) {
-			case 'drop':
-			case 'dragend':
-				this._onDrop(evt);
-				break;
-
-			case 'dragenter':
-			case 'dragover':
-				if (dragEl) {
-					this._onDragOver(evt);
-					_globalDragOver(evt);
-				}
-				break;
-
-			case 'selectstart':
-				evt.preventDefault();
-				break;
-		}
-	},
-
-
 	/**
 	 * Serializes the item into an array of string.
 	 * @returns {String[]}
