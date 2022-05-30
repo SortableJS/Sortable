@@ -3,7 +3,7 @@ import {
 	index
 } from '../../src/utils.js';
 
-let lastSwapEl;
+let lastSwapValidEl;
 
 
 function SwapPlugin() {
@@ -14,48 +14,57 @@ function SwapPlugin() {
 	}
 
 	Swap.prototype = {
-		dragStart({ dragEl }) {
-			lastSwapEl = dragEl;
-		},
-		dragOverValid({ completed, target, onMove, activeSortable, changed, cancel }) {
-			if (!activeSortable.options.swap) return;
+		dragOver({ activeSortable, target, dragEl, onMove, completed, cancel }) {
 			let el = this.sortable.el,
 				options = this.options;
-			if (target && target !== el) {
-				let prevSwapEl = lastSwapEl;
-				if (onMove(target) !== false) {
-					toggleClass(target, options.swapClass, true);
-					lastSwapEl = target;
-				} else {
-					lastSwapEl = null;
-				}
 
-				if (prevSwapEl && prevSwapEl !== lastSwapEl) {
-					toggleClass(prevSwapEl, options.swapClass, false);
-				}
+			if (!activeSortable.options.swap || !target || target === el || target.contains(dragEl) || onMove(target) === false) {
+				lastSwapValidEl && toggleClass(lastSwapValidEl, options.swapClass, false);
+				lastSwapValidEl = null;
+
+				completed(false);
+				cancel();
 			}
+		},
+		dragOverValid({ target, changed, completed, cancel }) {
+			let options = this.options;
+
+			if (lastSwapValidEl && lastSwapValidEl !== target) {
+				toggleClass(lastSwapValidEl, options.swapClass, false);
+			}
+
+			toggleClass(target, options.swapClass, true);
+			lastSwapValidEl = target;
+
 			changed();
 
 			completed(true);
 			cancel();
 		},
-		drop({ activeSortable, putSortable, dragEl }) {
-			let toSortable = (putSortable || this.sortable);
-			let options = this.options;
-			lastSwapEl && toggleClass(lastSwapEl, options.swapClass, false);
-			if (lastSwapEl && (options.swap || putSortable && putSortable.options.swap)) {
-				if (dragEl !== lastSwapEl) {
-					toSortable.captureAnimationState();
-					if (toSortable !== activeSortable) activeSortable.captureAnimationState();
-					swapNodes(dragEl, lastSwapEl);
+		drop({ activeSortable, putSortable, dragEl, cancel }) {
+			let toSortable = putSortable || this.sortable,
+				options = this.options;
+				
+			if (!lastSwapValidEl) {
+				toggleClass(dragEl, options.ghostClass, false);
+				cancel();
+				return 
+			}
 
-					toSortable.animateAll();
-					if (toSortable !== activeSortable) activeSortable.animateAll();
-				}
+			toggleClass(lastSwapValidEl, options.swapClass, false);
+			
+			if (options.swap || putSortable && putSortable.options.swap) {
+				toSortable.captureAnimationState();
+				if (toSortable !== activeSortable) activeSortable.captureAnimationState();
+
+				swapNodes(dragEl, lastSwapValidEl);
+
+				toSortable.animateAll();
+				if (toSortable !== activeSortable) activeSortable.animateAll();
 			}
 		},
 		nulling() {
-			lastSwapEl = null;
+			lastSwapValidEl = null;
 		}
 	};
 
@@ -63,7 +72,7 @@ function SwapPlugin() {
 		pluginName: 'swap',
 		eventProperties() {
 			return {
-				swapItem: lastSwapEl
+				swapItem: lastSwapValidEl
 			};
 		}
 	});
