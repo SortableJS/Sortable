@@ -29,7 +29,10 @@ function SwapPlugin() {
 		dragOverValid({ target, changed, completed, cancel }) {
 			let options = this.options;
 
-			toggleClass(swapValidEl, options.swapClass, false);
+			if (swapValidEl && swapValidEl !== target) {
+				toggleClass(swapValidEl, options.swapClass, false);
+			}
+			
 			toggleClass(target, options.swapClass, true);
 			swapValidEl = target;
 
