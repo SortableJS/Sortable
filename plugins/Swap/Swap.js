@@ -3,7 +3,7 @@ import {
 	index
 } from '../../src/utils.js';
 
-let lastSwapValidEl;
+let swapValidEl;
 
 
 function SwapPlugin() {
@@ -19,8 +19,8 @@ function SwapPlugin() {
 				options = this.options;
 
 			if (!activeSortable.options.swap || !target || target === el || target.contains(dragEl) || onMove(target) === false) {
-				lastSwapValidEl && toggleClass(lastSwapValidEl, options.swapClass, false);
-				lastSwapValidEl = null;
+				swapValidEl && toggleClass(swapValidEl, options.swapClass, false);
+				swapValidEl = null;
 
 				completed(false);
 				cancel();
@@ -29,12 +29,9 @@ function SwapPlugin() {
 		dragOverValid({ target, changed, completed, cancel }) {
 			let options = this.options;
 
-			if (lastSwapValidEl && lastSwapValidEl !== target) {
-				toggleClass(lastSwapValidEl, options.swapClass, false);
-			}
-
+			toggleClass(swapValidEl, options.swapClass, false);
 			toggleClass(target, options.swapClass, true);
-			lastSwapValidEl = target;
+			swapValidEl = target;
 
 			changed();
 
@@ -45,26 +42,26 @@ function SwapPlugin() {
 			let toSortable = putSortable || this.sortable,
 				options = this.options;
 				
-			if (!lastSwapValidEl) {
+			if (!swapValidEl) {
 				toggleClass(dragEl, options.ghostClass, false);
 				cancel();
 				return 
 			}
 
-			toggleClass(lastSwapValidEl, options.swapClass, false);
+			toggleClass(swapValidEl, options.swapClass, false);
 			
 			if (options.swap || putSortable && putSortable.options.swap) {
 				toSortable.captureAnimationState();
 				if (toSortable !== activeSortable) activeSortable.captureAnimationState();
 
-				swapNodes(dragEl, lastSwapValidEl);
+				swapNodes(dragEl, swapValidEl);
 
 				toSortable.animateAll();
 				if (toSortable !== activeSortable) activeSortable.animateAll();
 			}
 		},
 		nulling() {
-			lastSwapValidEl = null;
+			swapValidEl = null;
 		}
 	};
 
@@ -72,7 +69,7 @@ function SwapPlugin() {
 		pluginName: 'swap',
 		eventProperties() {
 			return {
-				swapItem: lastSwapValidEl
+				swapItem: swapValidEl
 			};
 		}
 	});
