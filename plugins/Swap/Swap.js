@@ -45,11 +45,7 @@ function SwapPlugin() {
 			let toSortable = putSortable || this.sortable,
 				options = this.options;
 				
-			if (!swapValidEl) {
-				toggleClass(dragEl, options.ghostClass, false);
-				cancel();
-				return 
-			}
+			if (!swapValidEl) return 
 
 			toggleClass(swapValidEl, options.swapClass, false);
 			
