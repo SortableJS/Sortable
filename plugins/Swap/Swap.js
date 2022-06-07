@@ -41,12 +41,12 @@ function SwapPlugin() {
 			completed(true);
 			cancel();
 		},
-		drop({ activeSortable, putSortable, dragEl, cancel }) {
+		drop({ activeSortable, putSortable, dragEl }) {
+			if (!swapValidEl) return 
+			
 			let toSortable = putSortable || this.sortable,
 				options = this.options;
 				
-			if (!swapValidEl) return 
-
 			toggleClass(swapValidEl, options.swapClass, false);
 			
 			if (options.swap || putSortable && putSortable.options.swap) {
