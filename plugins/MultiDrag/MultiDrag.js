@@ -10,7 +10,8 @@ import {
 	setRect,
 	unsetRect,
 	matrix,
-	expando
+	expando,
+	getParentOrHost,
 } from '../../src/utils.js';
 
 import dispatchEvent from '../../src/EventDispatcher.js';
@@ -19,6 +20,7 @@ let multiDragElements = [],
 	multiDragClones = [],
 	lastMultiDragSelect, // for selection with modifier key down (SHIFT)
 	multiDragSortable,
+	multiDragGroupMembers = {},
 	initialFolding = false, // Initial multi-drag fold when drag started
 	folding = false, // Folding any other time
 	dragStarted = false,
@@ -42,6 +44,14 @@ function MultiDragPlugin() {
 				on(document, 'mouseup', this._deselectMultiDrag);
 				on(document, 'touchend', this._deselectMultiDrag);
 			}
+		}
+
+		if (sortable.options.group) {
+			const group = typeof sortable.options.group === 'string' ? { name: sortable.options.group } : sortable.options.group;
+			if (multiDragGroupMembers[group.name] === undefined) {
+				multiDragGroupMembers[group.name] = [];
+			}
+			multiDragGroupMembers[group.name].push(sortable);
 		}
 
 		on(document, 'keydown', this._checkKeyDown);
@@ -69,7 +79,6 @@ function MultiDragPlugin() {
 		multiDragKeyDown: false,
 		isMultiDrag: false,
 
-
 		delayStartGlobal({ dragEl: dragged }) {
 			dragEl = dragged;
 		},
@@ -84,6 +93,7 @@ function MultiDragPlugin() {
 				multiDragClones.push(clone(multiDragElements[i]));
 
 				multiDragClones[i].sortableIndex = multiDragElements[i].sortableIndex;
+				multiDragClones[i].sortableParentEl = multiDragElements[i].sortableParentEl;
 
 				multiDragClones[i].draggable = false;
 				multiDragClones[i].style['will-change'] = '';
@@ -136,11 +146,12 @@ function MultiDragPlugin() {
 
 		dragStartGlobal({ sortable }) {
 			if (!this.isMultiDrag && multiDragSortable) {
-				multiDragSortable.multiDrag._deselectMultiDrag();
+				MultiDrag.utils.clear();
 			}
 
 			multiDragElements.forEach(multiDragElement => {
 				multiDragElement.sortableIndex = index(multiDragElement);
+				multiDragElement.sortableParentEl = getParentOrHost(multiDragElement);
 			});
 
 			// Sort multi-drag elements
@@ -197,8 +208,44 @@ function MultiDragPlugin() {
 			});
 		},
 
-		dragOver({ target, completed, cancel }) {
+		dragOver({ target, completed, cancel, originalEvent }) {
 			if (folding && ~multiDragElements.indexOf(target)) {
+				completed(false);
+				cancel();
+				return;
+			}
+
+			const toSortable = target.parentNode[expando];
+
+			if (!toSortable || multiDragElements.length === 0) {
+				return;
+			}
+
+			let checkPut;
+
+			if (toSortable.options.group) {
+				checkPut = toSortable.options.group.checkPut;
+			}
+
+			const forbiddenMove = ~multiDragElements.findIndex((el) => {
+				if (!el.sortableParentEl) {
+					return false;
+				}
+
+				const fromSortable = el.sortableParentEl[expando];
+
+				if (fromSortable && fromSortable.options.group && !fromSortable.options.group.checkPull(toSortable, fromSortable, el, originalEvent)) {
+					return true;
+				}
+
+				if (checkPut && !checkPut(toSortable, fromSortable, el, originalEvent)) {
+					return true;
+				}
+
+				return false;
+			});
+
+			if (forbiddenMove) {
 				completed(false);
 				cancel();
 			}
@@ -311,7 +358,7 @@ function MultiDragPlugin() {
 			// Multi-drag selection
 			if (!dragStarted) {
 				if (options.multiDragKey && !this.multiDragKeyDown) {
-					this._deselectMultiDrag();
+					MultiDrag.utils.clear();
 				}
 				toggleClass(dragEl, options.selectedClass, !~multiDragElements.indexOf(dragEl));
 
@@ -461,39 +508,38 @@ function MultiDragPlugin() {
 		},
 
 		destroyGlobal() {
-			this._deselectMultiDrag();
+			MultiDrag.utils.clear();
+
 			off(document, 'pointerup', this._deselectMultiDrag);
 			off(document, 'mouseup', this._deselectMultiDrag);
 			off(document, 'touchend', this._deselectMultiDrag);
 
 			off(document, 'keydown', this._checkKeyDown);
 			off(document, 'keyup', this._checkKeyUp);
+
+			const groupMembers = findAllMembersInSortableGroup(this.sortable);
+
+			if (groupMembers) {
+				let membersIndex;
+				if (~(membersIndex = groupMembers.indexOf(this.sortable))) {
+					groupMembers.splice(membersIndex, 1);
+				}
+			}
 		},
 
 		_deselectMultiDrag(evt) {
-			if (typeof dragStarted !== "undefined" && dragStarted) return;
-
 			// Only deselect if selection is in this sortable
 			if (multiDragSortable !== this.sortable) return;
 
-			// Only deselect if target is not item in this sortable
-			if (evt && closest(evt.target, this.options.draggable, this.sortable.el, false)) return;
+			if (evt) {
+				// Only deselect if left click
+				if (evt.button !== 0) return;
 
-			// Only deselect if left click
-			if (evt && evt.button !== 0) return;
-
-			while (multiDragElements.length) {
-				let el = multiDragElements[0];
-				toggleClass(el, this.options.selectedClass, false);
-				multiDragElements.shift();
-				dispatchEvent({
-					sortable: this.sortable,
-					rootEl: this.sortable.el,
-					name: 'deselect',
-					targetEl: el,
-					originalEvent: evt
-				});
+				// Only deselect if target is not item in any sortable in group (including this)
+				if (itemElIsInSortableGroup(evt.target, this.sortable)) return;
 			}
+
+			MultiDrag.utils.clear(evt);
 		},
 
 		_checkKeyDown(evt) {
@@ -521,7 +567,9 @@ function MultiDragPlugin() {
 				let sortable = el.parentNode[expando];
 				if (!sortable || !sortable.options.multiDrag || ~multiDragElements.indexOf(el)) return;
 				if (multiDragSortable && multiDragSortable !== sortable) {
-					multiDragSortable.multiDrag._deselectMultiDrag();
+					if (!itemElIsInSortableGroup(el, multiDragSortable)) {
+						MultiDrag.utils.clear();
+					}
 					multiDragSortable = sortable;
 				}
 				toggleClass(el, sortable.options.selectedClass, true);
@@ -537,6 +585,24 @@ function MultiDragPlugin() {
 				if (!sortable || !sortable.options.multiDrag || !~index) return;
 				toggleClass(el, sortable.options.selectedClass, false);
 				multiDragElements.splice(index, 1);
+			},
+			clear(evt) {
+				if (typeof dragStarted !== "undefined" && dragStarted) return;
+
+				while (multiDragElements.length) {
+					const el = multiDragElements[0];
+					const sortableEl = getParentOrHost(el);
+					const sortable = sortableEl[expando];
+					toggleClass(el, sortable.options.selectedClass, false);
+					multiDragElements.shift();
+					dispatchEvent({
+						sortable: sortable,
+						rootEl: sortableEl,
+						name: 'deselect',
+						targetEl: el,
+						originalEvent: evt
+					});
+				}
 			}
 		},
 		eventProperties() {
@@ -546,6 +612,7 @@ function MultiDragPlugin() {
 			multiDragElements.forEach(multiDragElement => {
 				oldIndicies.push({
 					multiDragElement,
+					parentElement: multiDragElement.sortableParentEl,
 					index: multiDragElement.sortableIndex
 				});
 
@@ -560,9 +627,11 @@ function MultiDragPlugin() {
 				}
 				newIndicies.push({
 					multiDragElement,
+					parentElement: multiDragElement.sortableParentEl,
 					index: newIndex
 				});
 			});
+
 			return {
 				items: [...multiDragElements],
 				clones: [...multiDragClones],
@@ -572,11 +641,13 @@ function MultiDragPlugin() {
 		},
 		optionListeners: {
 			multiDragKey(key) {
-				key = key.toLowerCase();
-				if (key === 'ctrl') {
-					key = 'Control';
-				} else if (key.length > 1) {
-					key = key.charAt(0).toUpperCase() + key.substr(1);
+				if (typeof key === 'string') {
+					key = key.toLowerCase();
+					if (key === 'ctrl') {
+						key = 'Control';
+					} else if (key.length > 1) {
+						key = key.charAt(0).toUpperCase() + key.substr(1);
+					}
 				}
 				return key;
 			}
@@ -616,6 +687,17 @@ function removeMultiDragElements() {
 		if (multiDragElement === dragEl) return;
 		multiDragElement.parentNode && multiDragElement.parentNode.removeChild(multiDragElement);
 	});
+}
+
+function findAllMembersInSortableGroup(sortable) {
+	if (!sortable.options.group) {
+		return null;
+	}
+	return multiDragGroupMembers[sortable.options.group.name] || [];
+}
+
+function itemElIsInSortableGroup(itemEl, sortable) {
+	return ~(findAllMembersInSortableGroup(sortable) || [sortable]).findIndex((sortable) => closest(itemEl, sortable.options.draggable, sortable.el, false));
 }
 
 export default MultiDragPlugin;
