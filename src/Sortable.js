@@ -358,6 +358,7 @@ function Sortable(el, options) {
 
 	let defaults = {
 		group: null,
+		revertDOM: false,
 		sort: true,
 		disabled: false,
 		store: null,
@@ -1426,12 +1427,31 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 				if (rootEl !== parentEl) {
 
 					if (newIndex >= 0) {
+						// drag from one list and drop into another
+
+						/* ----- */
+
+						if (parentEl[expando].options.revertDOM) {
+							parentEl.removeChild(dragEl);
+						}
+
+						if (rootEl[expando].options.revertDOM) {
+							rootEl.insertBefore(dragEl, rootEl.children[oldIndex]);
+							if (putSortable.lastPutMode === 'clone') {
+								rootEl.removeChild(cloneEl);
+							}
+						}
+
+						/* ----- */
+
 						// Add event
 						_dispatchEvent({
 							rootEl: parentEl,
 							name: 'add',
 							toEl: parentEl,
+							toSortable: parentEl[expando],
 							fromEl: rootEl,
+							fromSortable: rootEl[expando],
 							originalEvent: evt
 						});
 
@@ -1440,24 +1460,31 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 							sortable: this,
 							name: 'remove',
 							toEl: parentEl,
+							toSortable: parentEl[expando],
 							originalEvent: evt
 						});
 
-						// drag from one list and drop into another
-						_dispatchEvent({
-							rootEl: parentEl,
-							name: 'sort',
-							toEl: parentEl,
-							fromEl: rootEl,
-							originalEvent: evt
-						});
+						if (!parentEl[expando].options.revertDOM) {
+							_dispatchEvent({
+								rootEl: parentEl,
+								name: 'sort',
+								toEl: parentEl,
+								toSortable: parentEl[expando],
+								fromEl: rootEl,
+								fromSortable: rootEl[expando],
+								originalEvent: evt
+							});
+						}
 
-						_dispatchEvent({
-							sortable: this,
-							name: 'sort',
-							toEl: parentEl,
-							originalEvent: evt
-						});
+						if (!rootEl[expando].options.revertDOM) {
+							_dispatchEvent({
+								sortable: this,
+								name: 'sort',
+								toEl: parentEl,
+								toSortable: parentEl[expando],
+								originalEvent: evt
+							});
+						}
 					}
 
 					putSortable && putSortable.save();
@@ -1465,10 +1492,24 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 					if (newIndex !== oldIndex) {
 						if (newIndex >= 0) {
 							// drag & drop within the same list
+
+							/* ----- */
+
+							if (parentEl[expando].options.revertDOM) {
+								parentEl.removeChild(dragEl);
+							}
+
+							if (rootEl[expando].options.revertDOM) {
+								rootEl.insertBefore(dragEl, rootEl.children[oldIndex]);
+							}
+
+							/* ----- */
+
 							_dispatchEvent({
 								sortable: this,
 								name: 'update',
 								toEl: parentEl,
+								toSortable: parentEl[expando],
 								originalEvent: evt
 							});
 
@@ -1476,6 +1517,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 								sortable: this,
 								name: 'sort',
 								toEl: parentEl,
+								toSortable: parentEl[expando],
 								originalEvent: evt
 							});
 						}

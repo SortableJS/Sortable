@@ -5,7 +5,7 @@ import PluginManager from './PluginManager.js';
 export default function dispatchEvent(
 	{
 		sortable, rootEl, name,
-		targetEl, cloneEl, toEl, fromEl,
+		targetEl, cloneEl, toEl, toSortable, fromEl, fromSortable,
 		oldIndex, newIndex,
 		oldDraggableIndex, newDraggableIndex,
 		originalEvent, putSortable, extraEventProperties
@@ -29,7 +29,9 @@ export default function dispatchEvent(
 	}
 
 	evt.to = toEl || rootEl;
+	evt.toSortable = toSortable || undefined;
 	evt.from = fromEl || rootEl;
+	evt.fromSortable = fromSortable || undefined;
 	evt.item = targetEl || rootEl;
 	evt.clone = cloneEl;
 
