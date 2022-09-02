@@ -814,7 +814,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			// I think the bug is because we tell the ParentEl to listen to the DragLeave
 			// but if we change too quickly of parent, then the ParentEl is another...
 			// so is never called and stays with the hover variable on true
-			// So moved to
+			// So moved to _detectNearestEmptySortable
 			/* parentEl[expando]._onDragLeave({
 				type: 'pointermove',
 				clientX: touchEvt.clientX,
