@@ -1185,7 +1185,9 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		dragOverEvent('dragOver');
 		if (Sortable.eventCanceled) return completedFired;
 
-		if ( !options._isHovered && !dragEl.contains(el) ) {
+		if ( !options._isHovered && !dragEl.contains(el)
+		     && activeSortable && !options.disabled
+		) {
 			options._isHovered = true;
 			_dispatchEvent({
 				rootEl: el,
@@ -1568,7 +1570,12 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 					}
 
 					sortables.some((sortable) => {
-						if ( sortable.contains(document.elementFromPoint(evt.clientX, evt.clientY)) ) {
+
+						let x = (evt.changedTouches ? evt.changedTouches[0] : evt).clientX,
+							y = (evt.changedTouches ? evt.changedTouches[0] : evt).clientY,
+							elem = document.elementFromPoint(x, y);
+
+						if ( sortable.contains(elem) ) {
 							_dispatchEvent({
 								sortable: sortable[expando],
 								name: 'drop',
