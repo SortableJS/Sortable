@@ -1574,7 +1574,9 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 								name: 'drop',
 								originalEvent: evt
 							});
+							return true;
 						}
+						return false;
 					});
 
 					_dispatchEvent({
