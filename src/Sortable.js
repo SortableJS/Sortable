@@ -1185,6 +1185,15 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		dragOverEvent('dragOver');
 		if (Sortable.eventCanceled) return completedFired;
 
+		if ( !options._isHovered ) {
+			options._isHovered = true;
+			_dispatchEvent({
+				rootEl: el,
+				name: 'dragIn',
+				originalEvent: evt
+			});
+		}
+
 		if (
 			dragEl.contains(evt.target) ||
 			target.animated && target.animatingX && target.animatingY ||
@@ -1210,15 +1219,6 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			vertical = this._getDirection(evt, target) === 'vertical';
 
 			dragRect = getRect(dragEl);
-
-			if ( !options._isHovered ) {
-				options._isHovered = true;
-				_dispatchEvent({
-					rootEl: el,
-					name: 'dragIn',
-					originalEvent: evt
-				});
-			}
 
 			dragOverEvent('dragOverValid');
 			if (Sortable.eventCanceled) return completedFired;
