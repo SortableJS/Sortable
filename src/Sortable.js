@@ -1567,6 +1567,16 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 						newDraggableIndex = oldDraggableIndex;
 					}
 
+					sortables.some((sortable) => {
+						if ( sortable.contains(document.elementFromPoint(evt.clientX, evt.clientY)) ) {
+							_dispatchEvent({
+								sortable: sortable[expando],
+								name: 'drop',
+								originalEvent: evt
+							});
+						}
+					});
+
 					_dispatchEvent({
 						sortable: this,
 						name: 'end',
