@@ -1185,7 +1185,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		dragOverEvent('dragOver');
 		if (Sortable.eventCanceled) return completedFired;
 
-		if ( !options._isHovered ) {
+		if ( !options._isHovered && !dragEl.contains(el) ) {
 			options._isHovered = true;
 			_dispatchEvent({
 				rootEl: el,
