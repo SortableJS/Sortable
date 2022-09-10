@@ -87,6 +87,7 @@ function _dispatchEvent(info) {
 		oldDraggableIndex,
 		newIndex,
 		newDraggableIndex,
+		originalAllEventProperties,
 		...info
 	});
 }
@@ -109,6 +110,8 @@ let dragEl,
 
 	activeGroup,
 	putSortable,
+
+	originalAllEventProperties,
 
 	awaitingDragStarted = false,
 	ignoreNextClick = false,
@@ -1423,6 +1426,8 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 					originalEvent: evt
 				});
 
+				const allEventProperties = PluginManager.getEventProperties(null, rootEl[expando]);
+				originalAllEventProperties = allEventProperties;
 
 				if (rootEl !== parentEl) {
 
@@ -1431,14 +1436,52 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 
 						/* ----- */
 
-						if (parentEl[expando].options.revertDOM) {
-							parentEl.removeChild(dragEl);
-						}
+						if (allEventProperties.hasOwnProperty("items") && allEventProperties.items.length > 0) {
+							// Multidrag Plugin
 
-						if (rootEl[expando].options.revertDOM) {
-							rootEl.insertBefore(dragEl, rootEl.children[oldIndex]);
-							if (putSortable.lastPutMode === 'clone') {
-								rootEl.removeChild(cloneEl);
+							if (parentEl[expando].options.revertDOM) {
+								// Remove added elements in new list
+								for (const el of allEventProperties.items) {
+									if (parentEl.contains(el)) {
+									parentEl.removeChild(el);
+									}
+								}
+							}
+
+							if (rootEl[expando].options.revertDOM) {
+								// Return items back to original list
+								if (putSortable.lastPutMode === 'clone') {
+									for (const cl of allEventProperties.clones) {
+										if (rootEl.contains(cl)) {
+											rootEl.removeChild(cl);
+										}
+									}
+								}
+
+								for (let m = 0; m < allEventProperties.items.length; m++) {
+									const multEl = allEventProperties.items[m];
+									const prevIx = allEventProperties.oldIndicies[m].index;
+									if (!parentEl.contains(multEl)) {
+										rootEl.insertBefore(multEl, rootEl.children[prevIx]);
+									}
+									Sortable.utils.deselect(multEl);
+								}
+							}
+
+						} else {
+							// Normal Sortable (Not Multidrag Plugin)
+
+							if (parentEl[expando].options.revertDOM) {
+								// Remove added elements in new list
+								parentEl.removeChild(dragEl);
+							}
+
+							if (rootEl[expando].options.revertDOM) {
+								// Return items back to original list
+								if (putSortable.lastPutMode === 'clone') {
+									rootEl.removeChild(cloneEl);
+								}
+								rootEl.insertBefore(dragEl, rootEl.children[oldIndex]);
 							}
 						}
 
@@ -1495,12 +1538,42 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 
 							/* ----- */
 
-							if (parentEl[expando].options.revertDOM) {
-								parentEl.removeChild(dragEl);
-							}
+							if (allEventProperties.hasOwnProperty("items") && allEventProperties.items.length > 0) {
+								// Multidrag Plugin
 
-							if (rootEl[expando].options.revertDOM) {
-								rootEl.insertBefore(dragEl, rootEl.children[oldIndex]);
+								if (parentEl[expando].options.revertDOM) {
+									// Remove added elements in new list
+									for (const el of allEventProperties.items) {
+										if (parentEl.contains(el)) {
+											parentEl.removeChild(el);
+										}
+									}
+								}
+
+								if (rootEl[expando].options.revertDOM) {
+									// Return items back to original list
+									for (let m = 0; m < allEventProperties.items.length; m++) {
+										const multEl = allEventProperties.items[m];
+										const prevIx = allEventProperties.oldIndicies[m].index;
+										if (!parentEl.contains(multEl)) {
+											rootEl.insertBefore(multEl, rootEl.children[prevIx]);
+										}
+										Sortable.utils.deselect(multEl);
+									}
+								}
+
+							} else {
+								// Normal Sortable (Not Multidrag Plugin)
+
+								if (parentEl[expando].options.revertDOM) {
+									// Remove added elements in new list
+									parentEl.removeChild(dragEl);
+								}
+
+								if (rootEl[expando].options.revertDOM) {
+									// Return items back to original list
+									rootEl.insertBefore(dragEl, rootEl.children[oldIndex]);
+								}
 							}
 
 							/* ----- */
