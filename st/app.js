@@ -202,7 +202,7 @@ for (var i = 0; i < nestedSortables.length; i++) {
 	new Sortable(nestedSortables[i], {
 		group: 'nested',
 		animation: 150,
-		fallbackOnBody: true,
+		getFallbackParent: () => (document.body),
 		swapThreshold: 0.65
 	});
 }
