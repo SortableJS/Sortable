@@ -346,15 +346,14 @@ function MultiDragPlugin() {
 								if (~multiDragElements.indexOf(children[i])) continue;
 								toggleClass(children[i], options.selectedClass, true);
 								multiDragElements.push(children[i]);
-
-								dispatchEvent({
-									sortable,
-									rootEl,
-									name: 'select',
-									targetEl: children[i],
-									originalEvent: evt
-								});
 							}
+							dispatchEvent({
+								sortable,
+								rootEl,
+								name: 'select',
+								targetEl: children[children.length - 1],
+								originalEvent: evt
+							});
 						}
 					} else {
 						lastMultiDragSelect = dragEl;
@@ -486,14 +485,14 @@ function MultiDragPlugin() {
 				let el = multiDragElements[0];
 				toggleClass(el, this.options.selectedClass, false);
 				multiDragElements.shift();
-				dispatchEvent({
-					sortable: this.sortable,
-					rootEl: this.sortable.el,
-					name: 'deselect',
-					targetEl: el,
-					originalEvent: evt
-				});
 			}
+			dispatchEvent({
+				sortable: this.sortable,
+				rootEl: this.sortable.el,
+				name: 'deselect',
+				targetEl: el,
+				originalEvent: evt
+			});
 		},
 
 		_checkKeyDown(evt) {
