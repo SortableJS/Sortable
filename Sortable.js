@@ -2476,7 +2476,9 @@
         el.removeAttribute('draggable');
       });
 
-      this._onDrop();
+      if (el === rootEl) {
+        this._onDrop();
+      }
 
       this._disableDelayedDragEvents();
 
