@@ -54,12 +54,12 @@ Demo: http://sortablejs.github.io/Sortable/
 
 Install with NPM:
 ```bash
-$ npm install sortablejs --save
+npm install sortablejs --save
 ```
 
 Install with Bower:
 ```bash
-$ bower install --save sortablejs
+bower install --save sortablejs
 ```
 
 Import into your project:
