@@ -431,6 +431,7 @@ function MultiDragPlugin() {
 
 							if (update) {
 								dispatchSortableEvent('update');
+								dispatchSortableEvent('sort');
 							}
 						}
 					}
