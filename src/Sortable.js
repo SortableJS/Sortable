@@ -780,7 +780,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 					target = parent; // store last element
 				}
 				/* jshint boss:true */
-				while (parent = parent.parentNode);
+				while (parent = parent.parentNode || parent.getRootNode().host);
 			}
 
 			_unhideGhostForTarget();
