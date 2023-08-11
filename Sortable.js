@@ -554,202 +554,6 @@
     return Math.sqrt(Math.pow(fromRect.top - animatingRect.top, 2) + Math.pow(fromRect.left - animatingRect.left, 2)) / Math.sqrt(Math.pow(fromRect.top - toRect.top, 2) + Math.pow(fromRect.left - toRect.left, 2)) * options.animation;
   }
 
-  let plugins = [];
-  const defaults = {
-    initializeByDefault: true
-  };
-  var PluginManager = {
-    mount(plugin) {
-      // Set default static properties
-      for (let option in defaults) {
-        if (defaults.hasOwnProperty(option) && !(option in plugin)) {
-          plugin[option] = defaults[option];
-        }
-      }
-      plugins.forEach(p => {
-        if (p.pluginName === plugin.pluginName) {
-          throw `Sortable: Cannot mount plugin ${plugin.pluginName} more than once`;
-        }
-      });
-      plugins.push(plugin);
-    },
-    pluginEvent(eventName, sortable, evt) {
-      this.eventCanceled = false;
-      evt.cancel = () => {
-        this.eventCanceled = true;
-      };
-      const eventNameGlobal = eventName + 'Global';
-      plugins.forEach(plugin => {
-        if (!sortable[plugin.pluginName]) return;
-        // Fire global events if it exists in this sortable
-        if (sortable[plugin.pluginName][eventNameGlobal]) {
-          sortable[plugin.pluginName][eventNameGlobal]({
-            sortable,
-            ...evt
-          });
-        }
-
-        // Only fire plugin event if plugin is enabled in this sortable,
-        // and plugin has event defined
-        if (sortable.options[plugin.pluginName] && sortable[plugin.pluginName][eventName]) {
-          sortable[plugin.pluginName][eventName]({
-            sortable,
-            ...evt
-          });
-        }
-      });
-    },
-    initializePlugins(sortable, el, defaults, options) {
-      plugins.forEach(plugin => {
-        const pluginName = plugin.pluginName;
-        if (!sortable.options[pluginName] && !plugin.initializeByDefault) return;
-        let initialized = new plugin(sortable, el, sortable.options);
-        initialized.sortable = sortable;
-        initialized.options = sortable.options;
-        sortable[pluginName] = initialized;
-
-        // Add default options from plugin
-        _extends(defaults, initialized.defaults);
-      });
-      for (let option in sortable.options) {
-        if (!sortable.options.hasOwnProperty(option)) continue;
-        let modified = this.modifyOption(sortable, option, sortable.options[option]);
-        if (typeof modified !== 'undefined') {
-          sortable.options[option] = modified;
-        }
-      }
-    },
-    getEventProperties(name, sortable) {
-      let eventProperties = {};
-      plugins.forEach(plugin => {
-        if (typeof plugin.eventProperties !== 'function') return;
-        _extends(eventProperties, plugin.eventProperties.call(sortable[plugin.pluginName], name));
-      });
-      return eventProperties;
-    },
-    modifyOption(sortable, name, value) {
-      let modifiedValue;
-      plugins.forEach(plugin => {
-        // Plugin must exist on the Sortable
-        if (!sortable[plugin.pluginName]) return;
-
-        // If static option listener exists for this option, call in the context of the Sortable's instance of this plugin
-        if (plugin.optionListeners && typeof plugin.optionListeners[name] === 'function') {
-          modifiedValue = plugin.optionListeners[name].call(sortable[plugin.pluginName], value);
-        }
-      });
-      return modifiedValue;
-    }
-  };
-
-  function dispatchEvent({
-    sortable,
-    rootEl,
-    name,
-    targetEl,
-    cloneEl,
-    toEl,
-    fromEl,
-    oldIndex,
-    newIndex,
-    oldDraggableIndex,
-    newDraggableIndex,
-    originalEvent,
-    putSortable,
-    extraEventProperties
-  }) {
-    sortable = sortable || rootEl && rootEl[expando];
-    if (!sortable) return;
-    let evt,
-      options = sortable.options,
-      onName = 'on' + name.charAt(0).toUpperCase() + name.substr(1);
-    // Support for new CustomEvent feature
-    if (window.CustomEvent && !IE11OrLess && !Edge) {
-      evt = new CustomEvent(name, {
-        bubbles: true,
-        cancelable: true
-      });
-    } else {
-      evt = document.createEvent('Event');
-      evt.initEvent(name, true, true);
-    }
-    evt.to = toEl || rootEl;
-    evt.from = fromEl || rootEl;
-    evt.item = targetEl || rootEl;
-    evt.clone = cloneEl;
-    evt.oldIndex = oldIndex;
-    evt.newIndex = newIndex;
-    evt.oldDraggableIndex = oldDraggableIndex;
-    evt.newDraggableIndex = newDraggableIndex;
-    evt.originalEvent = originalEvent;
-    evt.pullMode = putSortable ? putSortable.lastPutMode : undefined;
-    let allEventProperties = {
-      ...extraEventProperties,
-      ...PluginManager.getEventProperties(name, sortable)
-    };
-    for (let option in allEventProperties) {
-      evt[option] = allEventProperties[option];
-    }
-    if (rootEl) {
-      rootEl.dispatchEvent(evt);
-    }
-    if (options[onName]) {
-      options[onName].call(sortable, evt);
-    }
-  }
-
-  let pluginEvent = function (eventName, sortable, {
-    evt: originalEvent,
-    ...data
-  } = {}) {
-    PluginManager.pluginEvent.bind(Sortable)(eventName, sortable, {
-      dragEl,
-      parentEl,
-      ghostEl,
-      rootEl,
-      nextEl,
-      lastDownEl,
-      cloneEl,
-      cloneHidden,
-      dragStarted: moved,
-      putSortable,
-      activeSortable: Sortable.active,
-      originalEvent,
-      oldIndex,
-      oldDraggableIndex,
-      newIndex,
-      newDraggableIndex,
-      hideGhostForTarget: _hideGhostForTarget,
-      unhideGhostForTarget: _unhideGhostForTarget,
-      cloneNowHidden() {
-        cloneHidden = true;
-      },
-      cloneNowShown() {
-        cloneHidden = false;
-      },
-      dispatchSortableEvent(name) {
-        _dispatchEvent({
-          sortable,
-          name,
-          originalEvent
-        });
-      },
-      ...data
-    });
-  };
-  function _dispatchEvent(info) {
-    dispatchEvent({
-      putSortable,
-      cloneEl,
-      targetEl: dragEl,
-      rootEl,
-      oldIndex,
-      oldDraggableIndex,
-      newIndex,
-      newDraggableIndex,
-      ...info
-    });
-  }
   let dragEl,
     parentEl,
     ghostEl,
@@ -993,8 +797,6 @@
       emptyInsertThreshold: 5
     };
 
-    // PluginManager.initializePlugins(this, el, defaults);
-
     // Set default options
     for (let name in defaults) {
       !(name in options) && (options[name] = defaults[name]);
@@ -1046,8 +848,7 @@
     },
     _onTapStart: function ( /** Event|TouchEvent */evt) {
       if (!evt.cancelable) return;
-      let _this = this,
-        el = this.el,
+      let el = this.el,
         options = this.options,
         preventOnFilter = options.preventOnFilter,
         type = evt.type,
@@ -1090,17 +891,6 @@
       // Check filter
       if (typeof filter === "function") {
         if (filter.call(this, evt, target, this)) {
-          _dispatchEvent({
-            sortable: _this,
-            rootEl: originalTarget,
-            name: "filter",
-            targetEl: target,
-            toEl: el,
-            fromEl: el
-          });
-          pluginEvent("filter", _this, {
-            evt
-          });
           preventOnFilter && evt.cancelable && evt.preventDefault();
           return; // cancel dnd
         }
@@ -1108,17 +898,6 @@
         filter = filter.split(",").some(function (criteria) {
           criteria = closest(originalTarget, criteria.trim(), el, false);
           if (criteria) {
-            _dispatchEvent({
-              sortable: _this,
-              rootEl: criteria,
-              name: "filter",
-              targetEl: target,
-              fromEl: el,
-              toEl: el
-            });
-            pluginEvent("filter", _this, {
-              evt
-            });
             return true;
           }
         });
@@ -1161,9 +940,6 @@
         this._lastY = (touch || evt).clientY;
         dragEl.style["will-change"] = "all";
         dragStartFn = function () {
-          pluginEvent("delayEnded", _this, {
-            evt
-          });
           if (Sortable.eventCanceled) {
             _this._onDrop();
             return;
@@ -1177,13 +953,6 @@
 
           // Bind the events: dragstart/dragend
           _this._triggerDragStart(evt, touch);
-
-          // Drag start event
-          _dispatchEvent({
-            sortable: _this,
-            name: "choose",
-            originalEvent: evt
-          });
 
           // Chosen item
           toggleClass(dragEl, options.chosenClass, true);
@@ -1205,9 +974,6 @@
           this.options.touchStartThreshold = 4;
           dragEl.draggable = true;
         }
-        pluginEvent("delayStart", this, {
-          evt
-        });
 
         // Delay is impossible for native DnD in Edge or IE
         if (options.delay && (!options.delayOnTouchOnly || touch) && (!this.nativeDraggable || !(Edge || IE11OrLess))) {
@@ -1278,9 +1044,6 @@
     _dragStarted: function (fallback, evt) {
       awaitingDragStarted = false;
       if (rootEl && dragEl) {
-        pluginEvent("dragStarted", this, {
-          evt
-        });
         if (this.nativeDraggable) {
           on(document, "dragover", _checkOutsideTargetEl);
         }
@@ -1291,13 +1054,6 @@
         toggleClass(dragEl, options.ghostClass, true);
         Sortable.active = this;
         fallback && this._appendGhost();
-
-        // Drag start event
-        _dispatchEvent({
-          sortable: this,
-          name: "start",
-          originalEvent: evt
-        });
       } else {
         this._nulling();
       }
@@ -1433,14 +1189,10 @@
       let _this = this;
       let dataTransfer = evt.dataTransfer;
       let options = _this.options;
-      pluginEvent("dragStart", this, {
-        evt
-      });
       if (Sortable.eventCanceled) {
         this._onDrop();
         return;
       }
-      pluginEvent("setupClone", this);
       if (!Sortable.eventCanceled) {
         cloneEl = clone(dragEl);
         cloneEl.removeAttribute("id");
@@ -1453,16 +1205,11 @@
 
       // #1143: IFrame support workaround
       _this.cloneId = _nextTick(function () {
-        pluginEvent("clone", _this);
         if (Sortable.eventCanceled) return;
         if (!_this.options.removeCloneOnHide) {
           rootEl.insertBefore(cloneEl, dragEl);
         }
         _this._hideClone();
-        _dispatchEvent({
-          sortable: _this,
-          name: "clone"
-        });
       });
       !fallback && toggleClass(dragEl, options.dragClass, true);
 
@@ -1509,29 +1256,9 @@
         _this = this,
         completedFired = false;
       if (_silent) return;
-      function dragOverEvent(name, extra) {
-        pluginEvent(name, _this, {
-          evt,
-          isOwner,
-          axis: vertical ? "vertical" : "horizontal",
-          revert,
-          dragRect,
-          targetRect,
-          canSort,
-          fromSortable,
-          target,
-          completed,
-          onMove(target, after) {
-            return onMove(rootEl, el, dragEl, dragRect, target, getRect(target), evt, after);
-          },
-          changed,
-          ...extra
-        });
-      }
 
       // Capture animation state
       function capture() {
-        dragOverEvent("dragOverAnimationCapture");
         _this.captureAnimationState();
         if (_this !== fromSortable) {
           fromSortable.captureAnimationState();
@@ -1540,9 +1267,6 @@
 
       // Return invocation when dragEl is inserted (or completed)
       function completed(insertion) {
-        dragOverEvent("dragOverCompleted", {
-          insertion
-        });
         if (insertion) {
           // Clones must be hidden before folding animation to capture dragRectAbsolute properly
           if (isOwner) {
@@ -1566,7 +1290,6 @@
             _this._ignoreWhileAnimating = target;
           }
           _this.animateAll(function () {
-            dragOverEvent("dragOverAnimationComplete");
             _this._ignoreWhileAnimating = null;
           });
           if (_this !== fromSortable) {
@@ -1595,20 +1318,11 @@
       function changed() {
         newIndex = index(dragEl);
         newDraggableIndex = index(dragEl, options.draggable);
-        _dispatchEvent({
-          sortable: _this,
-          name: "change",
-          toEl: el,
-          newIndex,
-          newDraggableIndex,
-          originalEvent: evt
-        });
       }
       if (evt.preventDefault !== void 0) {
         evt.cancelable && evt.preventDefault();
       }
       target = closest(target, options.draggable, el, true);
-      dragOverEvent("dragOver");
       if (Sortable.eventCanceled) return completedFired;
       if (dragEl.contains(evt.target) || target.animated && target.animatingX && target.animatingY || _this._ignoreWhileAnimating === target) {
         return completed(false);
@@ -1618,13 +1332,11 @@
       : putSortable === this || (this.lastPutMode = activeGroup.checkPull(this, activeSortable, dragEl, evt)) && group.checkPut(this, activeSortable, dragEl, evt))) {
         vertical = this._getDirection(evt, target) === "vertical";
         dragRect = getRect(dragEl);
-        dragOverEvent("dragOverValid");
         if (Sortable.eventCanceled) return completedFired;
         if (revert) {
           parentEl = rootEl; // actualization
           capture();
           this._hideClone();
-          dragOverEvent("revert");
           if (!Sortable.eventCanceled) {
             if (nextEl) {
               rootEl.insertBefore(dragEl, nextEl);
@@ -1770,9 +1482,6 @@
       // Get the index of the dragged element within its parent
       newIndex = index(dragEl);
       newDraggableIndex = index(dragEl, options.draggable);
-      pluginEvent("drop", this, {
-        evt
-      });
       parentEl = dragEl && dragEl.parentNode;
 
       // Get again after plugin event
@@ -1824,69 +1533,8 @@
             toggleClass(dragEl, putSortable ? putSortable.options.ghostClass : this.options.ghostClass, false);
           }
           toggleClass(dragEl, this.options.chosenClass, false);
-
-          // Drag stop event
-          _dispatchEvent({
-            sortable: this,
-            name: "unchoose",
-            toEl: parentEl,
-            newIndex: null,
-            newDraggableIndex: null,
-            originalEvent: evt
-          });
           if (rootEl !== parentEl) {
-            if (newIndex >= 0) {
-              // Add event
-              _dispatchEvent({
-                rootEl: parentEl,
-                name: "add",
-                toEl: parentEl,
-                fromEl: rootEl,
-                originalEvent: evt
-              });
-
-              // Remove event
-              _dispatchEvent({
-                sortable: this,
-                name: "remove",
-                toEl: parentEl,
-                originalEvent: evt
-              });
-
-              // drag from one list and drop into another
-              _dispatchEvent({
-                rootEl: parentEl,
-                name: "sort",
-                toEl: parentEl,
-                fromEl: rootEl,
-                originalEvent: evt
-              });
-              _dispatchEvent({
-                sortable: this,
-                name: "sort",
-                toEl: parentEl,
-                originalEvent: evt
-              });
-            }
             putSortable && putSortable.save();
-          } else {
-            if (newIndex !== oldIndex) {
-              if (newIndex >= 0) {
-                // drag & drop within the same list
-                _dispatchEvent({
-                  sortable: this,
-                  name: "update",
-                  toEl: parentEl,
-                  originalEvent: evt
-                });
-                _dispatchEvent({
-                  sortable: this,
-                  name: "sort",
-                  toEl: parentEl,
-                  originalEvent: evt
-                });
-              }
-            }
           }
           if (Sortable.active) {
             /* jshint eqnull:true */
@@ -1894,12 +1542,6 @@
               newIndex = oldIndex;
               newDraggableIndex = oldDraggableIndex;
             }
-            _dispatchEvent({
-              sortable: this,
-              name: "end",
-              toEl: parentEl,
-              originalEvent: evt
-            });
 
             // Save sorting
             this.save();
@@ -1909,7 +1551,6 @@
       this._nulling();
     },
     _nulling: function () {
-      pluginEvent("nulling", this);
       rootEl = dragEl = parentEl = ghostEl = nextEl = cloneEl = lastDownEl = cloneHidden = tapEvt = touchEvt = moved = newIndex = newDraggableIndex = oldIndex = oldDraggableIndex = lastTarget = lastDirection = putSortable = activeGroup = Sortable.dragged = Sortable.ghost = Sortable.clone = Sortable.active = null;
       savedInputChecked.forEach(function (el) {
         el.checked = true;
@@ -2002,7 +1643,6 @@
       if (value === void 0) {
         return options[name];
       } else {
-        let modifiedValue = PluginManager.modifyOption(this, name, value);
         if (typeof modifiedValue !== "undefined") {
           options[name] = modifiedValue;
         } else {
@@ -2017,7 +1657,6 @@
      * Destroy
      */
     destroy: function () {
-      pluginEvent("destroy", this);
       let el = this.el;
       el[expando] = null;
       off(el, "mousedown", this._onTapStart);
@@ -2038,7 +1677,6 @@
     },
     _hideClone: function () {
       if (!cloneHidden) {
-        pluginEvent("hideClone", this);
         if (Sortable.eventCanceled) return;
         css(cloneEl, "display", "none");
         if (this.options.removeCloneOnHide && cloneEl.parentNode) {
@@ -2053,7 +1691,6 @@
         return;
       }
       if (cloneHidden) {
-        pluginEvent("showClone", this);
         if (Sortable.eventCanceled) return;
 
         // show clone at dragEl or original position

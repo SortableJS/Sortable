@@ -18,10 +18,6 @@ import {
 
 import AnimationStateManager from "./Animation.js";
 
-import PluginManager from "./PluginManager.js";
-
-import dispatchEvent from "./EventDispatcher.js";
-
 import {
 	on,
 	off,
@@ -43,62 +39,6 @@ import {
 	clone,
 	expando,
 } from "./utils.js";
-
-let pluginEvent = function (
-	eventName,
-	sortable,
-	{ evt: originalEvent, ...data } = {}
-) {
-	PluginManager.pluginEvent.bind(Sortable)(eventName, sortable, {
-		dragEl,
-		parentEl,
-		ghostEl,
-		rootEl,
-		nextEl,
-		lastDownEl,
-		cloneEl,
-		cloneHidden,
-		dragStarted: moved,
-		putSortable,
-		activeSortable: Sortable.active,
-		originalEvent,
-
-		oldIndex,
-		oldDraggableIndex,
-		newIndex,
-		newDraggableIndex,
-
-		hideGhostForTarget: _hideGhostForTarget,
-		unhideGhostForTarget: _unhideGhostForTarget,
-
-		cloneNowHidden() {
-			cloneHidden = true;
-		},
-		cloneNowShown() {
-			cloneHidden = false;
-		},
-
-		dispatchSortableEvent(name) {
-			_dispatchEvent({ sortable, name, originalEvent });
-		},
-
-		...data,
-	});
-};
-
-function _dispatchEvent(info) {
-	dispatchEvent({
-		putSortable,
-		cloneEl,
-		targetEl: dragEl,
-		rootEl,
-		oldIndex,
-		oldDraggableIndex,
-		newIndex,
-		newDraggableIndex,
-		...info,
-	});
-}
 
 let dragEl,
 	parentEl,
@@ -419,8 +359,6 @@ function Sortable(el, options) {
 		emptyInsertThreshold: 5,
 	};
 
-	PluginManager.initializePlugins(this, el, defaults);
-
 	// Set default options
 	for (let name in defaults) {
 		!(name in options) && (options[name] = defaults[name]);
@@ -547,15 +485,6 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		// Check filter
 		if (typeof filter === "function") {
 			if (filter.call(this, evt, target, this)) {
-				_dispatchEvent({
-					sortable: _this,
-					rootEl: originalTarget,
-					name: "filter",
-					targetEl: target,
-					toEl: el,
-					fromEl: el,
-				});
-				pluginEvent("filter", _this, { evt });
 				preventOnFilter && evt.cancelable && evt.preventDefault();
 				return; // cancel dnd
 			}
@@ -564,15 +493,6 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 				criteria = closest(originalTarget, criteria.trim(), el, false);
 
 				if (criteria) {
-					_dispatchEvent({
-						sortable: _this,
-						rootEl: criteria,
-						name: "filter",
-						targetEl: target,
-						fromEl: el,
-						toEl: el,
-					});
-					pluginEvent("filter", _this, { evt });
 					return true;
 				}
 			});
@@ -628,7 +548,6 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			dragEl.style["will-change"] = "all";
 
 			dragStartFn = function () {
-				pluginEvent("delayEnded", _this, { evt });
 				if (Sortable.eventCanceled) {
 					_this._onDrop();
 					return;
@@ -643,13 +562,6 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 
 				// Bind the events: dragstart/dragend
 				_this._triggerDragStart(evt, touch);
-
-				// Drag start event
-				_dispatchEvent({
-					sortable: _this,
-					name: "choose",
-					originalEvent: evt,
-				});
 
 				// Chosen item
 				toggleClass(dragEl, options.chosenClass, true);
@@ -673,8 +585,6 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 				this.options.touchStartThreshold = 4;
 				dragEl.draggable = true;
 			}
-
-			pluginEvent("delayStart", this, { evt });
 
 			// Delay is impossible for native DnD in Edge or IE
 			if (
@@ -769,8 +679,6 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		let _this = this;
 		awaitingDragStarted = false;
 		if (rootEl && dragEl) {
-			pluginEvent("dragStarted", this, { evt });
-
 			if (this.nativeDraggable) {
 				on(document, "dragover", _checkOutsideTargetEl);
 			}
@@ -783,13 +691,6 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			Sortable.active = this;
 
 			fallback && this._appendGhost();
-
-			// Drag start event
-			_dispatchEvent({
-				sortable: this,
-				name: "start",
-				originalEvent: evt,
-			});
 		} else {
 			this._nulling();
 		}
@@ -997,13 +898,11 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		let dataTransfer = evt.dataTransfer;
 		let options = _this.options;
 
-		pluginEvent("dragStart", this, { evt });
 		if (Sortable.eventCanceled) {
 			this._onDrop();
 			return;
 		}
 
-		pluginEvent("setupClone", this);
 		if (!Sortable.eventCanceled) {
 			cloneEl = clone(dragEl);
 			cloneEl.removeAttribute("id");
@@ -1018,18 +917,12 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 
 		// #1143: IFrame support workaround
 		_this.cloneId = _nextTick(function () {
-			pluginEvent("clone", _this);
 			if (Sortable.eventCanceled) return;
 
 			if (!_this.options.removeCloneOnHide) {
 				rootEl.insertBefore(cloneEl, dragEl);
 			}
 			_this._hideClone();
-
-			_dispatchEvent({
-				sortable: _this,
-				name: "clone",
-			});
 		});
 
 		!fallback && toggleClass(dragEl, options.dragClass, true);
@@ -1088,39 +981,8 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 
 		if (_silent) return;
 
-		function dragOverEvent(name, extra) {
-			pluginEvent(name, _this, {
-				evt,
-				isOwner,
-				axis: vertical ? "vertical" : "horizontal",
-				revert,
-				dragRect,
-				targetRect,
-				canSort,
-				fromSortable,
-				target,
-				completed,
-				onMove(target, after) {
-					return onMove(
-						rootEl,
-						el,
-						dragEl,
-						dragRect,
-						target,
-						getRect(target),
-						evt,
-						after
-					);
-				},
-				changed,
-				...extra,
-			});
-		}
-
 		// Capture animation state
 		function capture() {
-			dragOverEvent("dragOverAnimationCapture");
-
 			_this.captureAnimationState();
 			if (_this !== fromSortable) {
 				fromSortable.captureAnimationState();
@@ -1129,8 +991,6 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 
 		// Return invocation when dragEl is inserted (or completed)
 		function completed(insertion) {
-			dragOverEvent("dragOverCompleted", { insertion });
-
 			if (insertion) {
 				// Clones must be hidden before folding animation to capture dragRectAbsolute properly
 				if (isOwner) {
@@ -1162,7 +1022,6 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 					_this._ignoreWhileAnimating = target;
 				}
 				_this.animateAll(function () {
-					dragOverEvent("dragOverAnimationComplete");
 					_this._ignoreWhileAnimating = null;
 				});
 				if (_this !== fromSortable) {
@@ -1196,14 +1055,6 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		function changed() {
 			newIndex = index(dragEl);
 			newDraggableIndex = index(dragEl, options.draggable);
-			_dispatchEvent({
-				sortable: _this,
-				name: "change",
-				toEl: el,
-				newIndex,
-				newDraggableIndex,
-				originalEvent: evt,
-			});
 		}
 
 		if (evt.preventDefault !== void 0) {
@@ -1212,7 +1063,6 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 
 		target = closest(target, options.draggable, el, true);
 
-		dragOverEvent("dragOver");
 		if (Sortable.eventCanceled) return completedFired;
 
 		if (
@@ -1243,7 +1093,6 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 
 			dragRect = getRect(dragEl);
 
-			dragOverEvent("dragOverValid");
 			if (Sortable.eventCanceled) return completedFired;
 
 			if (revert) {
@@ -1251,8 +1100,6 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 				capture();
 
 				this._hideClone();
-
-				dragOverEvent("revert");
 
 				if (!Sortable.eventCanceled) {
 					if (nextEl) {
@@ -1493,10 +1340,6 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		newIndex = index(dragEl);
 		newDraggableIndex = index(dragEl, options.draggable);
 
-		pluginEvent("drop", this, {
-			evt,
-		});
-
 		parentEl = dragEl && dragEl.parentNode;
 
 		// Get again after plugin event
@@ -1572,72 +1415,8 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 				}
 				toggleClass(dragEl, this.options.chosenClass, false);
 
-				// Drag stop event
-				_dispatchEvent({
-					sortable: this,
-					name: "unchoose",
-					toEl: parentEl,
-					newIndex: null,
-					newDraggableIndex: null,
-					originalEvent: evt,
-				});
-
 				if (rootEl !== parentEl) {
-					if (newIndex >= 0) {
-						// Add event
-						_dispatchEvent({
-							rootEl: parentEl,
-							name: "add",
-							toEl: parentEl,
-							fromEl: rootEl,
-							originalEvent: evt,
-						});
-
-						// Remove event
-						_dispatchEvent({
-							sortable: this,
-							name: "remove",
-							toEl: parentEl,
-							originalEvent: evt,
-						});
-
-						// drag from one list and drop into another
-						_dispatchEvent({
-							rootEl: parentEl,
-							name: "sort",
-							toEl: parentEl,
-							fromEl: rootEl,
-							originalEvent: evt,
-						});
-
-						_dispatchEvent({
-							sortable: this,
-							name: "sort",
-							toEl: parentEl,
-							originalEvent: evt,
-						});
-					}
-
 					putSortable && putSortable.save();
-				} else {
-					if (newIndex !== oldIndex) {
-						if (newIndex >= 0) {
-							// drag & drop within the same list
-							_dispatchEvent({
-								sortable: this,
-								name: "update",
-								toEl: parentEl,
-								originalEvent: evt,
-							});
-
-							_dispatchEvent({
-								sortable: this,
-								name: "sort",
-								toEl: parentEl,
-								originalEvent: evt,
-							});
-						}
-					}
 				}
 
 				if (Sortable.active) {
@@ -1646,13 +1425,6 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 						newIndex = oldIndex;
 						newDraggableIndex = oldDraggableIndex;
 					}
-
-					_dispatchEvent({
-						sortable: this,
-						name: "end",
-						toEl: parentEl,
-						originalEvent: evt,
-					});
 
 					// Save sorting
 					this.save();
@@ -1663,8 +1435,6 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 	},
 
 	_nulling: function () {
-		pluginEvent("nulling", this);
-
 		rootEl =
 			dragEl =
 			parentEl =
@@ -1796,7 +1566,6 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		if (value === void 0) {
 			return options[name];
 		} else {
-			let modifiedValue = PluginManager.modifyOption(this, name, value);
 			if (typeof modifiedValue !== "undefined") {
 				options[name] = modifiedValue;
 			} else {
@@ -1813,7 +1582,6 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 	 * Destroy
 	 */
 	destroy: function () {
-		pluginEvent("destroy", this);
 		let el = this.el;
 
 		el[expando] = null;
@@ -1845,7 +1613,6 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 
 	_hideClone: function () {
 		if (!cloneHidden) {
-			pluginEvent("hideClone", this);
 			if (Sortable.eventCanceled) return;
 
 			css(cloneEl, "display", "none");
@@ -1863,7 +1630,6 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		}
 
 		if (cloneHidden) {
-			pluginEvent("showClone", this);
 			if (Sortable.eventCanceled) return;
 
 			// show clone at dragEl or original position
