@@ -1,0 +1,63 @@
+{
+  "git-blame.gitWebUrl": "",
+  "editor.inlayHints.enabled": "offUnlessPressed",
+  "editor.inlayHints.padding": true,
+  "javascript.inlayHints.parameterNames.enabled": "none",
+  "typescript.inlayHints.enumMemberValues.enabled": true,
+  "typescript.implementationsCodeLens.enabled": true,
+  "typescript.inlayHints.functionLikeReturnTypes.enabled": true,
+  "typescript.inlayHints.parameterNames.enabled": "all",
+  "typescript.inlayHints.parameterTypes.enabled": true,
+  "typescript.inlayHints.propertyDeclarationTypes.enabled": true,
+  "typescript.inlayHints.variableTypes.suppressWhenTypeMatchesName": false,
+  "typescript.inlayHints.variableTypes.enabled": true,
+  "typescript.tsserver.useSyntaxServer": "auto",
+  "javascript.inlayHints.parameterTypes.enabled": true,
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "cSpell.words": [
+    "actuals",
+    "APKURL",
+    "autoincrement",
+    "bunnycdn",
+    "bunnycdnjs",
+    "cancontinue",
+    "CRUNCHBASE",
+    "ctopotamus",
+    "datasource",
+    "Fundings",
+    "Giftcard",
+    "googleanalytics",
+    "Hotjar",
+    "Hubspot",
+    "iscraper",
+    "metaland",
+    "multitext",
+    "nextjs",
+    "notistack",
+    "openai",
+    "prismix",
+    "pscale",
+    "Roobert",
+    "specialities",
+    "superjson",
+    "tanstack",
+    "testflight",
+    "TRPC",
+    "turborepo",
+    "upsert",
+    "Wellfound",
+    "zustand"
+  ],
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[prisma]": {
+    "editor.defaultFormatter": "Prisma.prisma"
+  },
+  "files.readonlyInclude": {
+    "**/node_modules/**": true,
+    "**/.next/**": true,
+    "**/prisma/schema.prisma": true
+  }
+}
