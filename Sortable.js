@@ -25,8 +25,6 @@
     return _extends.apply(this, arguments);
   }
 
-  var version = "1.15.0";
-
   function userAgent(pattern) {
     if (typeof window !== 'undefined' && window.navigator) {
       return !! /*@__PURE__*/navigator.userAgent.match(pattern);
@@ -1895,7 +1893,7 @@
   };
 
   // Export
-  Sortable.version = version;
+  Sortable.version = 1;
 
   return Sortable;
 
