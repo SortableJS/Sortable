@@ -443,7 +443,7 @@ class Sortable {
 	_onTapStart(/** Event|TouchEvent */ evt) {
 		if (!evt.cancelable) return;
 		let _this = Sortable.get(this),
-			el = _this.el,
+			el = this,
 			options = _this.options,
 			preventOnFilter = _this.options.preventOnFilter,
 			type = evt.type,
@@ -536,8 +536,8 @@ class Sortable {
 		/** Touch */ touch,
 		/** HTMLElement */ target
 	) {
-		let _this = this,
-			el = _this.el,
+		let _this = Sortable.get(this.el),
+			el = this.el,
 			options = _this.options,
 			ownerDocument = el.ownerDocument,
 			dragStartFn;
@@ -562,8 +562,8 @@ class Sortable {
 			tapDistanceLeft = tapEvt.clientX - dragRect.left;
 			tapDistanceTop = tapEvt.clientY - dragRect.top;
 
-			this._lastX = (touch || evt).clientX;
-			this._lastY = (touch || evt).clientY;
+			_this._lastX = (touch || evt).clientX;
+			_this._lastY = (touch || evt).clientY;
 
 			dragEl.style["will-change"] = "all";
 
@@ -602,7 +602,7 @@ class Sortable {
 
 			// Make dragEl draggable (must be before delay for FireFox)
 			if (FireFox && this.nativeDraggable) {
-				this.options.touchStartThreshold = 4;
+				_this.options.touchStartThreshold = 4;
 				dragEl.draggable = true;
 			}
 
@@ -613,7 +613,7 @@ class Sortable {
 				(!this.nativeDraggable || !(Edge || IE11OrLess))
 			) {
 				if (Sortable.eventCanceled) {
-					this._onDrop();
+					_this._onDrop();
 					return;
 				}
 				// If the user moves the pointer or let go the click or touch
@@ -635,26 +635,28 @@ class Sortable {
 	}
 
 	_delayedDragTouchMoveHandler(/** TouchEvent|PointerEvent **/ e) {
+		let _this = Sortable.get(this);
 		let touch = e.touches ? e.touches[0] : e;
 		if (
 			Math.max(
-				Math.abs(touch.clientX - this._lastX),
-				Math.abs(touch.clientY - this._lastY)
+				Math.abs(touch.clientX - _this._lastX),
+				Math.abs(touch.clientY - _this._lastY)
 			) >=
 			Math.floor(
-				this.options.touchStartThreshold /
+				_this.options.touchStartThreshold /
 					((this.nativeDraggable && window.devicePixelRatio) || 1)
 			)
 		) {
-			this._disableDelayedDrag();
+			_this._disableDelayedDrag();
 		}
 	}
 
 	_disableDelayedDrag() {
+		let _this = Sortable.get(this);
 		dragEl && _disableDraggable(dragEl);
 		clearTimeout(this._dragStartTimer);
 
-		this._disableDelayedDragEvents();
+		_this._disableDelayedDragEvents();
 	}
 
 	_disableDelayedDragEvents() {
@@ -668,19 +670,20 @@ class Sortable {
 	}
 
 	_triggerDragStart(/** Event */ evt, /** Touch */ touch) {
+		let _this = Sortable.get(this.el);
 		touch = touch || (evt.pointerType == "touch" && evt);
 
 		if (!this.nativeDraggable || touch) {
-			if (this.options.supportPointer) {
-				on(document, "pointermove", this._onTouchMove);
+			if (_this.options.supportPointer) {
+				on(document, "pointermove", _this._onTouchMove);
 			} else if (touch) {
-				on(document, "touchmove", this._onTouchMove);
+				on(document, "touchmove", _this._onTouchMove);
 			} else {
-				on(document, "mousemove", this._onTouchMove);
+				on(document, "mousemove", _this._onTouchMove);
 			}
 		} else {
-			on(dragEl, "dragend", this);
-			on(rootEl, "dragstart", this._onDragStart);
+			on(dragEl, "dragend", _this);
+			on(rootEl, "dragstart", _this._onDragStart);
 		}
 
 		try {
@@ -695,8 +698,7 @@ class Sortable {
 		} catch (err) {}
 	}
 
-	_dragStarted(fallback, evt) {
-		let _this = this;
+	_dragStarted(fallback) {
 		awaitingDragStarted = false;
 		if (rootEl && dragEl) {
 			if (this.nativeDraggable) {
@@ -717,9 +719,10 @@ class Sortable {
 	}
 
 	_emulateDragOver() {
+		let _this = Sortable.get(this);
 		if (touchEvt) {
-			this._lastX = touchEvt.clientX;
-			this._lastY = touchEvt.clientY;
+			_this._lastX = touchEvt.clientX;
+			_this._lastY = touchEvt.clientY;
 
 			_hideGhostForTarget();
 
@@ -752,7 +755,7 @@ class Sortable {
 							rootEl: parent,
 						});
 
-						if (inserted && !this.options.dragoverBubble) {
+						if (inserted && !_this.options.dragoverBubble) {
 							break;
 						}
 					}
@@ -841,12 +844,13 @@ class Sortable {
 	}
 
 	_appendGhost() {
+		let _this = Sortable.get(this);
 		// Bug if using scale(): https://stackoverflow.com/questions/2637058
 		// Not being adjusted for
 		if (!ghostEl) {
-			let container = this.options.fallbackOnBody ? document.body : rootEl,
+			let container = _this.options.fallbackOnBody ? document.body : rootEl,
 				rect = getRect(dragEl, true, PositionGhostAbsolutely, true, container),
-				options = this.options;
+				options = _this.options;
 
 			// Position absolutely
 			if (PositionGhostAbsolutely) {
@@ -985,18 +989,18 @@ class Sortable {
 	// Returns true - if no further action is needed (either inserted or another condition)
 	_onDragOver(/**Event*/ evt) {
 		let el = this.el,
+			_this = Sortable.get(el),
 			target = evt.target,
 			dragRect,
 			targetRect,
 			revert,
-			options = this.options,
+			options = _this.options,
 			group = options.group,
 			activeSortable = Sortable.active,
 			isOwner = activeGroup === group,
 			canSort = options.sort,
 			fromSortable = putSortable || activeSortable,
 			vertical,
-			_this = this,
 			completedFired = false;
 
 		if (_silent) return;
@@ -1088,7 +1092,7 @@ class Sortable {
 		if (
 			dragEl.contains(evt.target) ||
 			(target.animated && target.animatingX && target.animatingY) ||
-			_this._ignoreWhileAnimating === target
+			this._ignoreWhileAnimating === target
 		) {
 			return completed(false);
 		}
@@ -1511,12 +1515,13 @@ class Sortable {
 	 * @returns {String[]}
 	 */
 	toArray() {
-		let order = [],
+		let _this = Sortable.get(this),
+			order = [],
 			el,
 			children = this.el.children,
 			i = 0,
 			n = children.length,
-			options = this.options;
+			options = _this.options;
 
 		for (; i < n; i++) {
 			el = children[i];
@@ -1533,25 +1538,26 @@ class Sortable {
 	 * @param  {String[]}  order  order of the items
 	 */
 	sort(order, useAnimation) {
-		let items = {},
+		let _this = Sortable.get(this),
+			items = {},
 			rootEl = this.el;
 
-		this.toArray().forEach(function (id, i) {
+		_this.toArray().forEach(function (id, i) {
 			let el = rootEl.children[i];
 
-			if (closest(el, this.options.draggable, rootEl, false)) {
+			if (closest(el, _this.options.draggable, rootEl, false)) {
 				items[id] = el;
 			}
-		}, this);
+		}, _this);
 
-		useAnimation && this.captureAnimationState();
+		useAnimation && _this.captureAnimationState();
 		order.forEach(function (id) {
 			if (items[id]) {
 				rootEl.removeChild(items[id]);
 				rootEl.appendChild(items[id]);
 			}
 		});
-		useAnimation && this.animateAll();
+		useAnimation && _this.animateAll();
 	}
 
 	/**
@@ -1569,7 +1575,8 @@ class Sortable {
 	 * @returns {HTMLElement|null}
 	 */
 	closest(el, selector) {
-		return closest(el, selector || this.options.draggable, this.el, false);
+		let _this = Sortable.get(this);
+		return closest(el, selector || _this.options.draggable, this.el, false);
 	}
 
 	/**
@@ -1600,17 +1607,18 @@ class Sortable {
 	 * Destroy
 	 */
 	destroy() {
-		let el = this.el;
+		let _this = Sortable.get(this),
+			el = this.el;
 
 		el[expando] = null;
 
-		off(el, "mousedown", this._onTapStart);
-		off(el, "touchstart", this._onTapStart);
-		off(el, "pointerdown", this._onTapStart);
+		off(el, "mousedown", _this._onTapStart);
+		off(el, "touchstart", _this._onTapStart);
+		off(el, "pointerdown", _this._onTapStart);
 
 		if (this.nativeDraggable) {
-			off(el, "dragover", this);
-			off(el, "dragenter", this);
+			off(el, "dragover", _this);
+			off(el, "dragenter", _this);
 		}
 		// Remove draggable attributes
 		Array.prototype.forEach.call(
@@ -1620,9 +1628,9 @@ class Sortable {
 			}
 		);
 
-		this._onDrop();
+		_this._onDrop();
 
-		this._disableDelayedDragEvents();
+		_this._disableDelayedDragEvents();
 
 		sortables.splice(sortables.indexOf(this.el), 1);
 
