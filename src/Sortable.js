@@ -85,7 +85,7 @@ const supportDraggable =
 	!IOS &&
 	"draggable" in document.createElement("div");
 
-const supportCssPointerEvents = (function () {
+const supportCssPointerEvents = (() => {
 	if (!documentExists) return;
 	// false when <= IE11
 	if (IE11OrLess) {
@@ -96,7 +96,7 @@ const supportCssPointerEvents = (function () {
 	return el.style.pointerEvents === "auto";
 })();
 
-const _detectDirection = function (el, options) {
+const _detectDirection = (el, options) => {
 	let elCSS = css(el),
 		elWidth =
 			parseInt(elCSS.width) -
@@ -155,7 +155,7 @@ const _detectDirection = function (el, options) {
 		: "horizontal";
 };
 
-const _dragElInRowColumn = function (dragRect, targetRect, vertical) {
+const _dragElInRowColumn = (dragRect, targetRect, vertical) => {
 	let dragElS1Opp = vertical ? dragRect.left : dragRect.top,
 		dragElS2Opp = vertical ? dragRect.right : dragRect.bottom,
 		dragElOppLength = vertical ? dragRect.width : dragRect.height,
@@ -176,7 +176,7 @@ const _dragElInRowColumn = function (dragRect, targetRect, vertical) {
  * @param  {Number} y      Y position
  * @return {HTMLElement}   Element of the first found nearest Sortable
  */
-const _detectNearestEmptySortable = function (x, y) {
+const _detectNearestEmptySortable = (x, y) => {
 	let ret;
 	sortables.some((sortable) => {
 		const threshold = sortable[expando].options.emptyInsertThreshold;
@@ -195,7 +195,7 @@ const _detectNearestEmptySortable = function (x, y) {
 	return ret;
 };
 
-const _prepareGroup = function (options) {
+const _prepareGroup = (options) => {
 	function toFn(value, pull) {
 		return function (to, from, dragEl, evt) {
 			let sameGroup =
@@ -240,13 +240,13 @@ const _prepareGroup = function (options) {
 	options.group = group;
 };
 
-const _hideGhostForTarget = function () {
+const _hideGhostForTarget = () => {
 	if (!supportCssPointerEvents && ghostEl) {
 		css(ghostEl, "display", "none");
 	}
 };
 
-const _unhideGhostForTarget = function () {
+const _unhideGhostForTarget = () => {
 	if (!supportCssPointerEvents && ghostEl) {
 		css(ghostEl, "display", "");
 	}
