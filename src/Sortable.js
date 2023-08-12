@@ -1621,12 +1621,9 @@ class Sortable {
 			off(el, "dragenter", _this);
 		}
 		// Remove draggable attributes
-		Array.prototype.forEach.call(
-			el.querySelectorAll("[draggable]"),
-			function (el) {
-				el.removeAttribute("draggable");
-			}
-		);
+		el.querySelectorAll("[draggable]")?.forEach((el) => {
+			el.removeAttribute("draggable");
+		});
 
 		_this._onDrop();
 
