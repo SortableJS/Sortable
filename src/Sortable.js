@@ -74,181 +74,183 @@ let dragEl,
 	savedInputChecked = [];
 
 /** @const */
-const documentExists = typeof document !== "undefined",
-	PositionGhostAbsolutely = IOS,
-	CSSFloatProperty = Edge || IE11OrLess ? "cssFloat" : "float",
-	// This will not pass for IE9, because IE9 DnD only works on anchors
-	supportDraggable =
-		documentExists &&
-		!ChromeForAndroid &&
-		!IOS &&
-		"draggable" in document.createElement("div"),
-	supportCssPointerEvents = (function () {
-		if (!documentExists) return;
-		// false when <= IE11
-		if (IE11OrLess) {
-			return false;
-		}
-		let el = document.createElement("x");
-		el.style.cssText = "pointer-events:auto";
-		return el.style.pointerEvents === "auto";
-	})(),
-	_detectDirection = function (el, options) {
-		let elCSS = css(el),
-			elWidth =
-				parseInt(elCSS.width) -
-				parseInt(elCSS.paddingLeft) -
-				parseInt(elCSS.paddingRight) -
-				parseInt(elCSS.borderLeftWidth) -
-				parseInt(elCSS.borderRightWidth),
-			child1 = getChild(el, 0, options),
-			child2 = getChild(el, 1, options),
-			firstChildCSS = child1 && css(child1),
-			secondChildCSS = child2 && css(child2),
-			firstChildWidth =
-				firstChildCSS &&
-				parseInt(firstChildCSS.marginLeft) +
-					parseInt(firstChildCSS.marginRight) +
-					getRect(child1).width,
-			secondChildWidth =
-				secondChildCSS &&
-				parseInt(secondChildCSS.marginLeft) +
-					parseInt(secondChildCSS.marginRight) +
-					getRect(child2).width;
+const documentExists = typeof document !== "undefined";
 
-		if (elCSS.display === "flex") {
-			return elCSS.flexDirection === "column" ||
-				elCSS.flexDirection === "column-reverse"
-				? "vertical"
-				: "horizontal";
-		}
+const PositionGhostAbsolutely = IOS;
+const CSSFloatProperty = Edge || IE11OrLess ? "cssFloat" : "float";
+// This will not pass for IE9, because IE9 DnD only works on anchors
+const supportDraggable =
+	documentExists &&
+	!ChromeForAndroid &&
+	!IOS &&
+	"draggable" in document.createElement("div");
 
-		if (elCSS.display === "grid") {
-			return elCSS.gridTemplateColumns.split(" ").length <= 1
-				? "vertical"
-				: "horizontal";
-		}
+const supportCssPointerEvents = (function () {
+	if (!documentExists) return;
+	// false when <= IE11
+	if (IE11OrLess) {
+		return false;
+	}
+	let el = document.createElement("x");
+	el.style.cssText = "pointer-events:auto";
+	return el.style.pointerEvents === "auto";
+})();
 
-		if (child1 && firstChildCSS.float && firstChildCSS.float !== "none") {
-			let touchingSideChild2 =
-				firstChildCSS.float === "left" ? "left" : "right";
+const _detectDirection = function (el, options) {
+	let elCSS = css(el),
+		elWidth =
+			parseInt(elCSS.width) -
+			parseInt(elCSS.paddingLeft) -
+			parseInt(elCSS.paddingRight) -
+			parseInt(elCSS.borderLeftWidth) -
+			parseInt(elCSS.borderRightWidth),
+		child1 = getChild(el, 0, options),
+		child2 = getChild(el, 1, options),
+		firstChildCSS = child1 && css(child1),
+		secondChildCSS = child2 && css(child2),
+		firstChildWidth =
+			firstChildCSS &&
+			parseInt(firstChildCSS.marginLeft) +
+				parseInt(firstChildCSS.marginRight) +
+				getRect(child1).width,
+		secondChildWidth =
+			secondChildCSS &&
+			parseInt(secondChildCSS.marginLeft) +
+				parseInt(secondChildCSS.marginRight) +
+				getRect(child2).width;
 
-			return child2 &&
-				(secondChildCSS.clear === "both" ||
-					secondChildCSS.clear === touchingSideChild2)
-				? "vertical"
-				: "horizontal";
-		}
-
-		return child1 &&
-			(firstChildCSS.display === "block" ||
-				firstChildCSS.display === "flex" ||
-				firstChildCSS.display === "table" ||
-				firstChildCSS.display === "grid" ||
-				(firstChildWidth >= elWidth && elCSS[CSSFloatProperty] === "none") ||
-				(child2 &&
-					elCSS[CSSFloatProperty] === "none" &&
-					firstChildWidth + secondChildWidth > elWidth))
+	if (elCSS.display === "flex") {
+		return elCSS.flexDirection === "column" ||
+			elCSS.flexDirection === "column-reverse"
 			? "vertical"
 			: "horizontal";
-	},
-	_dragElInRowColumn = function (dragRect, targetRect, vertical) {
-		let dragElS1Opp = vertical ? dragRect.left : dragRect.top,
-			dragElS2Opp = vertical ? dragRect.right : dragRect.bottom,
-			dragElOppLength = vertical ? dragRect.width : dragRect.height,
-			targetS1Opp = vertical ? targetRect.left : targetRect.top,
-			targetS2Opp = vertical ? targetRect.right : targetRect.bottom,
-			targetOppLength = vertical ? targetRect.width : targetRect.height;
+	}
 
-		return (
-			dragElS1Opp === targetS1Opp ||
-			dragElS2Opp === targetS2Opp ||
-			dragElS1Opp + dragElOppLength / 2 === targetS1Opp + targetOppLength / 2
-		);
-	},
-	/**
-	 * Detects first nearest empty sortable to X and Y position using emptyInsertThreshold.
-	 * @param  {Number} x      X position
-	 * @param  {Number} y      Y position
-	 * @return {HTMLElement}   Element of the first found nearest Sortable
-	 */
-	_detectNearestEmptySortable = function (x, y) {
-		let ret;
-		sortables.some((sortable) => {
-			const threshold = sortable[expando].options.emptyInsertThreshold;
-			if (!threshold || lastChild(sortable)) return;
+	if (elCSS.display === "grid") {
+		return elCSS.gridTemplateColumns.split(" ").length <= 1
+			? "vertical"
+			: "horizontal";
+	}
 
-			const rect = getRect(sortable),
-				insideHorizontally =
-					x >= rect.left - threshold && x <= rect.right + threshold,
-				insideVertically =
-					y >= rect.top - threshold && y <= rect.bottom + threshold;
+	if (child1 && firstChildCSS.float && firstChildCSS.float !== "none") {
+		let touchingSideChild2 = firstChildCSS.float === "left" ? "left" : "right";
 
-			if (insideHorizontally && insideVertically) {
-				return (ret = sortable);
+		return child2 &&
+			(secondChildCSS.clear === "both" ||
+				secondChildCSS.clear === touchingSideChild2)
+			? "vertical"
+			: "horizontal";
+	}
+
+	return child1 &&
+		(firstChildCSS.display === "block" ||
+			firstChildCSS.display === "flex" ||
+			firstChildCSS.display === "table" ||
+			firstChildCSS.display === "grid" ||
+			(firstChildWidth >= elWidth && elCSS[CSSFloatProperty] === "none") ||
+			(child2 &&
+				elCSS[CSSFloatProperty] === "none" &&
+				firstChildWidth + secondChildWidth > elWidth))
+		? "vertical"
+		: "horizontal";
+};
+
+const _dragElInRowColumn = function (dragRect, targetRect, vertical) {
+	let dragElS1Opp = vertical ? dragRect.left : dragRect.top,
+		dragElS2Opp = vertical ? dragRect.right : dragRect.bottom,
+		dragElOppLength = vertical ? dragRect.width : dragRect.height,
+		targetS1Opp = vertical ? targetRect.left : targetRect.top,
+		targetS2Opp = vertical ? targetRect.right : targetRect.bottom,
+		targetOppLength = vertical ? targetRect.width : targetRect.height;
+
+	return (
+		dragElS1Opp === targetS1Opp ||
+		dragElS2Opp === targetS2Opp ||
+		dragElS1Opp + dragElOppLength / 2 === targetS1Opp + targetOppLength / 2
+	);
+};
+
+/**
+ * Detects first nearest empty sortable to X and Y position using emptyInsertThreshold.
+ * @param  {Number} x      X position
+ * @param  {Number} y      Y position
+ * @return {HTMLElement}   Element of the first found nearest Sortable
+ */
+const _detectNearestEmptySortable = function (x, y) {
+	let ret;
+	sortables.some((sortable) => {
+		const threshold = sortable[expando].options.emptyInsertThreshold;
+		if (!threshold || lastChild(sortable)) return;
+
+		const rect = getRect(sortable),
+			insideHorizontally =
+				x >= rect.left - threshold && x <= rect.right + threshold,
+			insideVertically =
+				y >= rect.top - threshold && y <= rect.bottom + threshold;
+
+		if (insideHorizontally && insideVertically) {
+			return (ret = sortable);
+		}
+	});
+	return ret;
+};
+
+const _prepareGroup = function (options) {
+	function toFn(value, pull) {
+		return function (to, from, dragEl, evt) {
+			let sameGroup =
+				to.options.group.name &&
+				from.options.group.name &&
+				to.options.group.name === from.options.group.name;
+
+			if (value == null && (pull || sameGroup)) {
+				// Default pull value
+				// Default pull and put value if same group
+				return true;
+			} else if (value == null || value === false) {
+				return false;
+			} else if (pull && value === "clone") {
+				return value;
+			} else if (typeof value === "function") {
+				return toFn(value(to, from, dragEl, evt), pull)(to, from, dragEl, evt);
+			} else {
+				let otherGroup = (pull ? to : from).options.group.name;
+
+				return (
+					value === true ||
+					(typeof value === "string" && value === otherGroup) ||
+					(value.join && value.indexOf(otherGroup) > -1)
+				);
 			}
-		});
-		return ret;
-	},
-	_prepareGroup = function (options) {
-		function toFn(value, pull) {
-			return function (to, from, dragEl, evt) {
-				let sameGroup =
-					to.options.group.name &&
-					from.options.group.name &&
-					to.options.group.name === from.options.group.name;
+		};
+	}
 
-				if (value == null && (pull || sameGroup)) {
-					// Default pull value
-					// Default pull and put value if same group
-					return true;
-				} else if (value == null || value === false) {
-					return false;
-				} else if (pull && value === "clone") {
-					return value;
-				} else if (typeof value === "function") {
-					return toFn(value(to, from, dragEl, evt), pull)(
-						to,
-						from,
-						dragEl,
-						evt
-					);
-				} else {
-					let otherGroup = (pull ? to : from).options.group.name;
+	let group = {};
+	let originalGroup = options.group;
 
-					return (
-						value === true ||
-						(typeof value === "string" && value === otherGroup) ||
-						(value.join && value.indexOf(otherGroup) > -1)
-					);
-				}
-			};
-		}
+	if (!originalGroup || typeof originalGroup != "object") {
+		originalGroup = { name: originalGroup };
+	}
 
-		let group = {};
-		let originalGroup = options.group;
+	group.name = originalGroup.name;
+	group.checkPull = toFn(originalGroup.pull, true);
+	group.checkPut = toFn(originalGroup.put);
+	group.revertClone = originalGroup.revertClone;
 
-		if (!originalGroup || typeof originalGroup != "object") {
-			originalGroup = { name: originalGroup };
-		}
+	options.group = group;
+};
 
-		group.name = originalGroup.name;
-		group.checkPull = toFn(originalGroup.pull, true);
-		group.checkPut = toFn(originalGroup.put);
-		group.revertClone = originalGroup.revertClone;
+const _hideGhostForTarget = function () {
+	if (!supportCssPointerEvents && ghostEl) {
+		css(ghostEl, "display", "none");
+	}
+};
 
-		options.group = group;
-	},
-	_hideGhostForTarget = function () {
-		if (!supportCssPointerEvents && ghostEl) {
-			css(ghostEl, "display", "none");
-		}
-	},
-	_unhideGhostForTarget = function () {
-		if (!supportCssPointerEvents && ghostEl) {
-			css(ghostEl, "display", "");
-		}
-	};
+const _unhideGhostForTarget = function () {
+	if (!supportCssPointerEvents && ghostEl) {
+		css(ghostEl, "display", "");
+	}
+};
 
 // #1184 fix - Prevent click event on fallback if dragged but item not changed position
 if (documentExists && !ChromeForAndroid) {
