@@ -351,7 +351,10 @@ function Sortable(el, options) {
 
 	this.el = el; // root element
 	this.options = options = Object.assign({}, options);
-
+	if (this.options.fallbackOnBody) {
+		// backwards compatibility
+		this.options.getFallbackParent = () => (document.body)
+	}
 
 	// Export instance
 	el[expando] = this;
@@ -389,7 +392,9 @@ function Sortable(el, options) {
 		touchStartThreshold: (Number.parseInt ? Number : window).parseInt(window.devicePixelRatio, 10) || 1,
 		forceFallback: false,
 		fallbackClass: 'sortable-fallback',
+		// @obsolete use `getFallbackParent: () => (document.body)`
 		fallbackOnBody: false,
+		getFallbackParent: null,
 		fallbackTolerance: 0,
 		fallbackOffset: {x: 0, y: 0},
 		supportPointer: Sortable.supportPointer !== false && ('PointerEvent' in window) && !Safari,
@@ -851,7 +856,8 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		// Bug if using scale(): https://stackoverflow.com/questions/2637058
 		// Not being adjusted for
 		if (!ghostEl) {
-			let container = this.options.fallbackOnBody ? document.body : rootEl,
+			let fallbackParent = typeof this.options.getFallbackParent === 'function' ? this.options.getFallbackParent() : null
+			let container = fallbackParent ?? rootEl,
 				rect = getRect(dragEl, true, PositionGhostAbsolutely, true, container),
 				options = this.options;
 

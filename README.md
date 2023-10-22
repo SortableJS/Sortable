@@ -143,7 +143,7 @@ var sortable = new Sortable(el, {
 	forceFallback: false,  // ignore the HTML5 DnD behaviour and force the fallback to kick in
 
 	fallbackClass: "sortable-fallback",  // Class name for the cloned DOM Element when using forceFallback
-	fallbackOnBody: false,  // Appends the cloned DOM Element into the Document's Body
+	getFallbackParent: null,  // Getter function that returns the parent for the cloned DOM Element
 	fallbackTolerance: 0, // Specify in pixels how far the mouse should move before it's considered as a drag.
 
 	dragoverBubble: false,
