@@ -26,7 +26,7 @@ Sortable.mount(new AutoScroll());
 ```js
 new Sortable(el, {
 	scroll: true, // Enable the plugin. Can be HTMLElement.
-	forceAutoscrollFallback: false, // force autoscroll plugin to enable even when native browser autoscroll is available
+	forceAutoScrollFallback: false, // force autoscroll plugin to enable even when native browser autoscroll is available
 	scrollFn: function(offsetX, offsetY, originalEvent, touchEvt, hoverTargetEl) { ... }, // if you have custom scrollbar scrollFn may be used for autoscrolling
 	scrollSensitivity: 30, // px, how near the mouse must be to an edge to start scrolling.
 	scrollSpeed: 10, // px, speed of the scrolling
