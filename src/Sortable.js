@@ -34,7 +34,8 @@ import {
 	throttle,
 	scrollBy,
 	clone,
-	expando
+	expando,
+	getContentRect
 } from './utils.js';
 
 
@@ -1788,21 +1789,23 @@ function _unsilent() {
 }
 
 function _ghostIsFirst(evt, vertical, sortable) {
-	let rect = getRect(getChild(sortable.el, 0, sortable.options, true));
+	let firstElRect = getRect(getChild(sortable.el, 0, sortable.options, true));
+	const sortableContentRect = getContentRect(sortable.el);
 	const spacer = 10;
 
 	return vertical ?
-		((evt.clientX < rect.left - spacer) || (evt.clientY < rect.top && evt.clientX < rect.right)) :
-		((evt.clientY < rect.top - spacer) || (evt.clientY < rect.bottom && evt.clientX < rect.left))
+		(evt.clientX < sortableContentRect.left - spacer || evt.clientY < firstElRect.top && evt.clientX < firstElRect.right) :
+		(evt.clientY < sortableContentRect.top - spacer || evt.clientY < firstElRect.bottom && evt.clientX < firstElRect.left)
 }
 
 function _ghostIsLast(evt, vertical, sortable) {
-	let rect = getRect(lastChild(sortable.el, sortable.options.draggable));
+	const lastElRect = getRect(lastChild(sortable.el, sortable.options.draggable));
+	const sortableContentRect = getContentRect(sortable.el);
 	const spacer = 10;
 
 	return vertical ?
-		(evt.clientX > rect.right + spacer || evt.clientX <= rect.right && evt.clientY > rect.bottom && evt.clientX >= rect.left) :
-		(evt.clientX > rect.right && evt.clientY > rect.top || evt.clientX <= rect.right && evt.clientY > rect.bottom + spacer);
+		(evt.clientX > sortableContentRect.right + spacer || evt.clientY > lastElRect.bottom && evt.clientX > lastElRect.left) :
+		(evt.clientY > sortableContentRect.bottom + spacer || evt.clientX > lastElRect.right && evt.clientY > lastElRect.top);
 }
 
 function _getSwapDirection(evt, target, targetRect, vertical, swapThreshold, invertedSwapThreshold, invertSwap, isLastTarget) {

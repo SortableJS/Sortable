@@ -255,6 +255,26 @@ function getRect(el, relativeToContainingBlock, relativeToNonStaticParent, undoS
 }
 
 /**
+ * Returns the content rect of the element (bounding rect minus border and padding)
+ * @param {HTMLElement} el 
+ */
+function getContentRect(el) {
+	let rect = getRect(el);
+	const paddingLeft = parseInt(css(el, 'padding-left')),
+		paddingTop = parseInt(css(el, 'padding-top')),
+		paddingRight = parseInt(css(el, 'padding-right')),
+		paddingBottom = parseInt(css(el, 'padding-bottom'));
+	rect.top += paddingTop + parseInt(css(el, 'border-top-width'));
+	rect.left += paddingLeft + parseInt(css(el, 'border-left-width'));
+	// Client Width/Height includes padding only
+	rect.width = el.clientWidth - paddingLeft - paddingRight;
+	rect.height = el.clientHeight - paddingTop - paddingBottom;
+	rect.bottom = rect.top + rect.height;
+	rect.right = rect.left + rect.width;
+	return rect;
+}
+
+/**
  * Checks if a side of an element is scrolled past a side of its parents
  * @param  {HTMLElement}  el           The element who's side being scrolled out of view is in question
  * @param  {String}       elSide       Side of the element in question ('top', 'left', 'right', 'bottom')
@@ -552,5 +572,6 @@ export {
 	clone,
 	setRect,
 	unsetRect,
+	getContentRect,
 	expando
 };
