@@ -3,67 +3,75 @@ import {
 	index
 } from '../../src/utils.js';
 
-let lastSwapEl;
-
+let swapValidEl;
 
 function SwapPlugin() {
-	function Swap() {
-		this.defaults = {
-			swapClass: 'sortable-swap-highlight'
-		};
-	}
+	class Swap {
+		constructor() {
+			this.defaults = {
+				swapClass: 'sortable-swap-highlight'
+			};
+		}
+		dragOver({ activeSortable, target, dragEl, onMove, completed, cancel }) {
+			let el = this.sortable.el, options = this.options;
 
-	Swap.prototype = {
-		dragStart({ dragEl }) {
-			lastSwapEl = dragEl;
-		},
-		dragOverValid({ completed, target, onMove, activeSortable, changed, cancel }) {
-			if (!activeSortable.options.swap) return;
-			let el = this.sortable.el,
-				options = this.options;
-			if (target && target !== el) {
-				let prevSwapEl = lastSwapEl;
-				if (onMove(target) !== false) {
-					toggleClass(target, options.swapClass, true);
-					lastSwapEl = target;
-				} else {
-					lastSwapEl = null;
-				}
+			if (!activeSortable.options.swap || !target || target === el || target.contains(dragEl) || onMove(target) === false) {
+				swapValidEl && toggleClass(swapValidEl, options.swapClass, false);
+				swapValidEl = null;
 
-				if (prevSwapEl && prevSwapEl !== lastSwapEl) {
-					toggleClass(prevSwapEl, options.swapClass, false);
-				}
+				completed(false);
+				cancel();
 			}
+		}
+		dragOverValid({ target, changed, completed, cancel }) {
+			let options = this.options;
+
+			if (swapValidEl && swapValidEl !== target) {
+				toggleClass(swapValidEl, options.swapClass, false);
+			}
+
+			toggleClass(target, options.swapClass, true);
+			swapValidEl = target;
+
 			changed();
 
 			completed(true);
 			cancel();
-		},
+		}
 		drop({ activeSortable, putSortable, dragEl }) {
-			let toSortable = (putSortable || this.sortable);
-			let options = this.options;
-			lastSwapEl && toggleClass(lastSwapEl, options.swapClass, false);
-			if (lastSwapEl && (options.swap || putSortable && putSortable.options.swap)) {
-				if (dragEl !== lastSwapEl) {
-					toSortable.captureAnimationState();
-					if (toSortable !== activeSortable) activeSortable.captureAnimationState();
-					swapNodes(dragEl, lastSwapEl);
+			if (!swapValidEl) {
+				return;
+			}
 
-					toSortable.animateAll();
-					if (toSortable !== activeSortable) activeSortable.animateAll();
+			let toSortable = putSortable || this.sortable, options = this.options;
+
+			toggleClass(swapValidEl, options.swapClass, false);
+
+			if (options.swap || putSortable && putSortable.options.swap) {
+				toSortable.captureAnimationState();
+				if (toSortable !== activeSortable) {
+					activeSortable.captureAnimationState();
+				}
+
+				swapNodes(dragEl, swapValidEl);
+
+				toSortable.animateAll();
+				if (toSortable !== activeSortable) {
+					activeSortable.animateAll();
 				}
 			}
-		},
-		nulling() {
-			lastSwapEl = null;
 		}
-	};
+		nulling() {
+			swapValidEl = null;
+		}
+	}
+
 
 	return Object.assign(Swap, {
 		pluginName: 'swap',
 		eventProperties() {
 			return {
-				swapItem: lastSwapEl
+				swapItem: swapValidEl
 			};
 		}
 	});
@@ -75,7 +83,9 @@ function swapNodes(n1, n2) {
 		p2 = n2.parentNode,
 		i1, i2;
 
-	if (!p1 || !p2 || p1.isEqualNode(n2) || p2.isEqualNode(n1)) return;
+	if (!p1 || !p2 || p1.isEqualNode(n2) || p2.isEqualNode(n1)) {
+		return;
+	}
 
 	i1 = index(n1);
 	i2 = index(n2);
