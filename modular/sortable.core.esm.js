@@ -2609,19 +2609,9 @@ function SwapPlugin() {
     }) {
       let el = this.sortable.el,
         options = this.options;
-
-      // TODO: Remove this
-      console.log('==== Swap.dragOver');
-      console.log(JSON.stringify({
-        swapValidEl,
-        target
-      }, null, 2));
       if (!activeSortable.options.swap || !target || target === el || target.contains(dragEl) || onMove(target) === false) {
         swapValidEl && toggleClass(swapValidEl, options.swapClass, false);
         swapValidEl = null;
-
-        // TODO: Remove this
-        console.log('==== Swap.dragOver -- will cancel');
         completed(false);
         cancel();
       }
@@ -2633,13 +2623,6 @@ function SwapPlugin() {
       cancel
     }) {
       let options = this.options;
-
-      // TODO: Remove this
-      console.log('==== Swap.dragOverValid');
-      console.log(JSON.stringify({
-        swapValidEl,
-        target
-      }, null, 2));
       if (swapValidEl && swapValidEl !== target) {
         toggleClass(swapValidEl, options.swapClass, false);
       }
@@ -2654,11 +2637,6 @@ function SwapPlugin() {
       putSortable,
       dragEl
     }) {
-      // TODO: Remove this
-      console.log('==== Swap.drop');
-      console.log(JSON.stringify({
-        swapValidEl
-      }, null, 2));
       if (!swapValidEl) {
         return;
       }
@@ -2666,8 +2644,6 @@ function SwapPlugin() {
         options = this.options;
       toggleClass(swapValidEl, options.swapClass, false);
       if (options.swap || putSortable && putSortable.options.swap) {
-        // TODO: Remove this
-        console.log('==== Swap.drop -- will swap');
         toSortable.captureAnimationState();
         if (toSortable !== activeSortable) {
           activeSortable.captureAnimationState();
@@ -2680,8 +2656,6 @@ function SwapPlugin() {
       }
     }
     nulling() {
-      // TODO: Remove this
-      console.log('==== Swap.nulling');
       swapValidEl = null;
     }
   }
