@@ -541,6 +541,23 @@ function unsetRect(el) {
 	css(el, 'height', '');
 }
 
+function getChildContainingRectFromElement(container, options, ghostEl) {
+    const rect = {};
+
+	Array.from(container.children).forEach(child => {
+		if (!closest(child, options.draggable, container, false) || child.animated || child === ghostEl) return;
+		const childRect = getRect(child);
+		rect.left = Math.min(rect.left ?? Infinity, childRect.left);
+		rect.top = Math.min(rect.top ?? Infinity, childRect.top);
+		rect.right = Math.max(rect.right ?? -Infinity, childRect.right);
+		rect.bottom = Math.max(rect.bottom ?? -Infinity, childRect.bottom);
+	});
+	rect.width = rect.right - rect.left;
+	rect.height = rect.bottom - rect.top;
+	rect.x = rect.left;
+	rect.y = rect.top;
+    return rect;
+}
 
 const expando = 'Sortable' + (new Date).getTime();
 
@@ -573,5 +590,6 @@ export {
 	setRect,
 	unsetRect,
 	getContentRect,
+	getChildContainingRectFromElement,
 	expando
 };

@@ -35,7 +35,7 @@ import {
 	scrollBy,
 	clone,
 	expando,
-	getContentRect
+	getChildContainingRectFromElement
 } from './utils.js';
 
 
@@ -1790,22 +1790,22 @@ function _unsilent() {
 
 function _ghostIsFirst(evt, vertical, sortable) {
 	let firstElRect = getRect(getChild(sortable.el, 0, sortable.options, true));
-	const sortableContentRect = getContentRect(sortable.el);
+	const childContainingRect = getChildContainingRectFromElement(sortable.el, sortable.options, ghostEl);
 	const spacer = 10;
 
 	return vertical ?
-		(evt.clientX < sortableContentRect.left - spacer || evt.clientY < firstElRect.top && evt.clientX < firstElRect.right) :
-		(evt.clientY < sortableContentRect.top - spacer || evt.clientY < firstElRect.bottom && evt.clientX < firstElRect.left)
+		(evt.clientX < childContainingRect.left - spacer || evt.clientY < firstElRect.top && evt.clientX < firstElRect.right) :
+		(evt.clientY < childContainingRect.top - spacer || evt.clientY < firstElRect.bottom && evt.clientX < firstElRect.left)
 }
 
 function _ghostIsLast(evt, vertical, sortable) {
 	const lastElRect = getRect(lastChild(sortable.el, sortable.options.draggable));
-	const sortableContentRect = getContentRect(sortable.el);
+	const childContainingRect = getChildContainingRectFromElement(sortable.el, sortable.options, ghostEl);
 	const spacer = 10;
 
 	return vertical ?
-		(evt.clientX > sortableContentRect.right + spacer || evt.clientY > lastElRect.bottom && evt.clientX > lastElRect.left) :
-		(evt.clientY > sortableContentRect.bottom + spacer || evt.clientX > lastElRect.right && evt.clientY > lastElRect.top);
+		(evt.clientX > childContainingRect.right + spacer || evt.clientY > lastElRect.bottom && evt.clientX > lastElRect.left) :
+		(evt.clientY > childContainingRect.bottom + spacer || evt.clientX > lastElRect.right && evt.clientY > lastElRect.top);
 }
 
 function _getSwapDirection(evt, target, targetRect, vertical, swapThreshold, invertedSwapThreshold, invertSwap, isLastTarget) {
@@ -1944,23 +1944,23 @@ if (documentExists) {
 
 // Export utils
 Sortable.utils = {
-	on: on,
-	off: off,
-	css: css,
-	find: find,
+	on,
+	off,
+	css,
+	find,
 	is: function (el, selector) {
 		return !!closest(el, selector, el, false);
 	},
-	extend: extend,
-	throttle: throttle,
-	closest: closest,
-	toggleClass: toggleClass,
-	clone: clone,
-	index: index,
+	extend,
+	throttle,
+	closest,
+	toggleClass,
+	clone,
+	index,
 	nextTick: _nextTick,
 	cancelNextTick: _cancelNextTick,
 	detectDirection: _detectDirection,
-	getChild: getChild
+	getChild
 };
 
 
