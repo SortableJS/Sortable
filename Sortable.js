@@ -1,5 +1,5 @@
 /**!
- * Sortable 1.15.1
+ * Sortable 1.15.2
  * @author	RubaXa   <trash@rubaxa.org>
  * @author	owenm    <owen23355@gmail.com>
  * @license MIT
@@ -134,7 +134,7 @@
     throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
   }
 
-  var version = "1.15.1";
+  var version = "1.15.2";
 
   function userAgent(pattern) {
     if (typeof window !== 'undefined' && window.navigator) {
@@ -333,26 +333,6 @@
       width: width,
       height: height
     };
-  }
-
-  /**
-   * Returns the content rect of the element (bounding rect minus border and padding)
-   * @param {HTMLElement} el 
-   */
-  function getContentRect(el) {
-    var rect = getRect(el);
-    var paddingLeft = parseInt(css(el, 'padding-left')),
-      paddingTop = parseInt(css(el, 'padding-top')),
-      paddingRight = parseInt(css(el, 'padding-right')),
-      paddingBottom = parseInt(css(el, 'padding-bottom'));
-    rect.top += paddingTop + parseInt(css(el, 'border-top-width'));
-    rect.left += paddingLeft + parseInt(css(el, 'border-left-width'));
-    // Client Width/Height includes padding only
-    rect.width = el.clientWidth - paddingLeft - paddingRight;
-    rect.height = el.clientHeight - paddingTop - paddingBottom;
-    rect.bottom = rect.top + rect.height;
-    rect.right = rect.left + rect.width;
-    return rect;
   }
 
   /**
@@ -560,6 +540,23 @@
     css(el, 'left', '');
     css(el, 'width', '');
     css(el, 'height', '');
+  }
+  function getChildContainingRectFromElement(container, options, ghostEl) {
+    var rect = {};
+    Array.from(container.children).forEach(function (child) {
+      var _rect$left, _rect$top, _rect$right, _rect$bottom;
+      if (!closest(child, options.draggable, container, false) || child.animated || child === ghostEl) return;
+      var childRect = getRect(child);
+      rect.left = Math.min((_rect$left = rect.left) !== null && _rect$left !== void 0 ? _rect$left : Infinity, childRect.left);
+      rect.top = Math.min((_rect$top = rect.top) !== null && _rect$top !== void 0 ? _rect$top : Infinity, childRect.top);
+      rect.right = Math.max((_rect$right = rect.right) !== null && _rect$right !== void 0 ? _rect$right : -Infinity, childRect.right);
+      rect.bottom = Math.max((_rect$bottom = rect.bottom) !== null && _rect$bottom !== void 0 ? _rect$bottom : -Infinity, childRect.bottom);
+    });
+    rect.width = rect.right - rect.left;
+    rect.height = rect.bottom - rect.top;
+    rect.x = rect.left;
+    rect.y = rect.top;
+    return rect;
   }
   var expando = 'Sortable' + new Date().getTime();
 
@@ -2253,15 +2250,15 @@
   }
   function _ghostIsFirst(evt, vertical, sortable) {
     var firstElRect = getRect(getChild(sortable.el, 0, sortable.options, true));
-    var sortableContentRect = getContentRect(sortable.el);
+    var childContainingRect = getChildContainingRectFromElement(sortable.el, sortable.options, ghostEl);
     var spacer = 10;
-    return vertical ? evt.clientX < sortableContentRect.left - spacer || evt.clientY < firstElRect.top && evt.clientX < firstElRect.right : evt.clientY < sortableContentRect.top - spacer || evt.clientY < firstElRect.bottom && evt.clientX < firstElRect.left;
+    return vertical ? evt.clientX < childContainingRect.left - spacer || evt.clientY < firstElRect.top && evt.clientX < firstElRect.right : evt.clientY < childContainingRect.top - spacer || evt.clientY < firstElRect.bottom && evt.clientX < firstElRect.left;
   }
   function _ghostIsLast(evt, vertical, sortable) {
     var lastElRect = getRect(lastChild(sortable.el, sortable.options.draggable));
-    var sortableContentRect = getContentRect(sortable.el);
+    var childContainingRect = getChildContainingRectFromElement(sortable.el, sortable.options, ghostEl);
     var spacer = 10;
-    return vertical ? evt.clientX > sortableContentRect.right + spacer || evt.clientY > lastElRect.bottom && evt.clientX > lastElRect.left : evt.clientY > sortableContentRect.bottom + spacer || evt.clientX > lastElRect.right && evt.clientY > lastElRect.top;
+    return vertical ? evt.clientX > childContainingRect.right + spacer || evt.clientY > lastElRect.bottom && evt.clientX > lastElRect.left : evt.clientY > childContainingRect.bottom + spacer || evt.clientX > lastElRect.right && evt.clientY > lastElRect.top;
   }
   function _getSwapDirection(evt, target, targetRect, vertical, swapThreshold, invertedSwapThreshold, invertSwap, isLastTarget) {
     var mouseOnAxis = vertical ? evt.clientY : evt.clientX,
