@@ -755,6 +755,10 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 
 			while (target && target.shadowRoot) {
 				target = target.shadowRoot.elementFromPoint(touchEvt.clientX, touchEvt.clientY);
+				const host = target.getRootNode().host;
+				if (host) {
+					target = host;
+				}
 				if (target === parent) break;
 				parent = target;
 			}
