@@ -1960,7 +1960,8 @@ Sortable.utils = {
 	nextTick: _nextTick,
 	cancelNextTick: _cancelNextTick,
 	detectDirection: _detectDirection,
-	getChild
+	getChild,
+	expando
 };
 
 

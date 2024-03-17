@@ -39,7 +39,8 @@
 	"files": [
 		"Sortable.js",
 		"Sortable.min.js",
-		"modular/"
+		"modular/",
+		"src/"
 	],
 	"keywords": [
 		"sortable",
