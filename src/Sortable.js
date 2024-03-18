@@ -36,7 +36,7 @@ import {
 	clone,
 	expando,
 	getChildContainingRectFromElement,
-	getParentOrHost,
+	getParentOrHost
 } from './utils.js';
 
 
