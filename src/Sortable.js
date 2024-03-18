@@ -35,7 +35,8 @@ import {
 	scrollBy,
 	clone,
 	expando,
-	getChildContainingRectFromElement
+	getChildContainingRectFromElement,
+	getParentOrHost,
 } from './utils.js';
 
 
@@ -755,10 +756,6 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 
 			while (target && target.shadowRoot) {
 				target = target.shadowRoot.elementFromPoint(touchEvt.clientX, touchEvt.clientY);
-				const host = target.getRootNode().host;
-				if (host) {
-					target = host;
-				}
 				if (target === parent) break;
 				parent = target;
 			}
@@ -785,7 +782,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 					target = parent; // store last element
 				}
 				/* jshint boss:true */
-				while (parent = parent.parentNode);
+				while (parent = getParentOrHost(parent));
 			}
 
 			_unhideGhostForTarget();
