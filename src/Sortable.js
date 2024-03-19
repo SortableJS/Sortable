@@ -1550,7 +1550,9 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		switch (evt.type) {
 			case 'drop':
 			case 'dragend':
-				this._onDrop(evt);
+				if (this._onDrop) {
+					this._onDrop(evt);
+				}
 				break;
 
 			case 'dragenter':
