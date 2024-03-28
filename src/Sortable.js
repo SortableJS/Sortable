@@ -542,7 +542,8 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			});
 
 			if (filter) {
-				preventOnFilter && evt.cancelable && evt.preventDefault();
+                preventOnFilter && evt.cancelable;
+                if (evt.target.tagName != 'INPUT') evt.preventDefault();
 				return; // cancel dnd
 			}
 		}
