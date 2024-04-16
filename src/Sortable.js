@@ -958,7 +958,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 
 		// Set proper drop events
 		if (fallback) {
-			ignoreNextClick = true;
+			ignoreNextClick = evt.type !== 'touchmove';
 			_this._loopId = setInterval(_this._emulateDragOver, 50);
 		} else {
 			// Undo what was set in _prepareDragStart before drag started
