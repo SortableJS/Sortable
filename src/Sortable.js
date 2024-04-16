@@ -393,6 +393,7 @@ function Sortable(el, options) {
 		fallbackClass: 'sortable-fallback',
 		fallbackOnBody: false,
 		fallbackTolerance: 0,
+		ignoreNextClickOnFallback: true,
 		fallbackOffset: {x: 0, y: 0},
 		supportPointer: Sortable.supportPointer !== false && ('PointerEvent' in window) && !Safari,
 		emptyInsertThreshold: 5
@@ -958,7 +959,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 
 		// Set proper drop events
 		if (fallback) {
-			ignoreNextClick = true;
+			ignoreNextClick = options.ignoreNextClickOnFallback;
 			_this._loopId = setInterval(_this._emulateDragOver, 50);
 		} else {
 			// Undo what was set in _prepareDragStart before drag started
