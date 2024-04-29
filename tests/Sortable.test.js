@@ -384,3 +384,39 @@ test('Do not insert into empty list if outside emptyInsertThreshold', async brow
 		})
 		.expect(dragStartPosition.innerText).eql(dragEl.innerText);
 });
+
+
+fixture `Right to left`
+	.page `./rtl-list.html`;
+
+test('Sort left list', async browser => {
+	const dragStartPosition = list1.child(0);
+	const dragEl = await dragStartPosition();
+	const dragEndPosition = list1.child(2);
+	const targetStartPosition = list1.child(2);
+	const target = await targetStartPosition();
+	const targetEndPosition = list1.child(1);
+
+	await browser
+		.expect(dragStartPosition.innerText).eql(dragEl.innerText)
+		.expect(targetStartPosition.innerText).eql(target.innerText)
+		.dragToElement(dragEl, target)
+		.expect(dragEndPosition.innerText).eql(dragEl.innerText)
+		.expect(targetEndPosition.innerText).eql(target.innerText);
+});
+
+test('Sort right list', async browser => {
+	const dragStartPosition = list1.child(2);
+	const dragEl = await dragStartPosition();
+	const dragEndPosition = list1.child(0);
+	const targetStartPosition = list1.child(0);
+	const target = await targetStartPosition();
+	const targetEndPosition = list1.child(1);
+
+	await browser
+		.expect(dragStartPosition.innerText).eql(dragEl.innerText)
+		.expect(targetStartPosition.innerText).eql(target.innerText)
+		.dragToElement(dragEl, target)
+		.expect(dragEndPosition.innerText).eql(dragEl.innerText)
+		.expect(targetEndPosition.innerText).eql(target.innerText);
+});
