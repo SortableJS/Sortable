@@ -1539,7 +1539,9 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		Sortable.active = null;
 
 		savedInputChecked.forEach(function (el) {
-			el.checked = true;
+			if (this.el.contains(el)) {
+			        el.checked = true;
+			}
 		});
 
 		savedInputChecked.length =
