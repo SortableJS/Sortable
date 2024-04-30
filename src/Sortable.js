@@ -1538,9 +1538,10 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		Sortable.clone =
 		Sortable.active = null;
 
-		savedInputChecked.forEach(function (el) {
-			if (this.el.contains(el)) {
-			        el.checked = true;
+		let el = this.el;
+		savedInputChecked.forEach(function (checkEl) {
+			if (el.contains(checkEl)) {
+				checkEl.checked = true;
 			}
 		});
 
