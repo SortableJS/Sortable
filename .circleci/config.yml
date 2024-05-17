@@ -1,11 +1,17 @@
 version: 2.0
+orbs:
+  browser-tools: circleci/browser-tools@1.1.0
 jobs:
   build:
     docker:
       - image: cimg/node:16.20.2-browsers
     steps:
+      - browser-tools/install-browser-tools
       - checkout
-
+      - run: |
+          node --version
+          java --version
+          google-chrome --version
       - restore_cache:
           keys:
           - v1-dependencies-{{ checksum "package.json" }}
