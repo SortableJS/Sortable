@@ -691,12 +691,12 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		if (!this.nativeDraggable || touch) {
 			if (this.options.supportPointer) {
 				on(document, 'pointermove', this._onTouchMove);
-				on(document, 'touchmove', this._preventTouchMove);
 			} else if (touch) {
 				on(document, 'touchmove', this._onTouchMove);
 			} else {
 				on(document, 'mousemove', this._onTouchMove);
 			}
+			on(document, 'touchmove', this._preventTouchMove);
 		} else {
 			on(dragEl, 'dragend', this);
 			on(rootEl, 'dragstart', this._onDragStart);
