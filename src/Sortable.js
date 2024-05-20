@@ -1941,6 +1941,15 @@ function _cancelNextTick(id) {
 	return clearTimeout(id);
 }
 
+// Fixed #973:
+if (documentExists && (FireFox || Safari)) {
+	on(document, 'touchmove', function(evt) {
+		if ((Sortable.active || awaitingDragStarted) && evt.cancelable) {
+			evt.preventDefault();
+		}
+	});
+}
+
 // Export utils
 Sortable.utils = {
 	on,
