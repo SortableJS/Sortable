@@ -3,8 +3,8 @@ const itemHeight = 54; // px
 const leeway = 1;
 
 
-fixture `Simple Sorting`
-	.page `./single-list.html`;
+fixture`Simple Sorting`
+	.page`./single-list.html`;
 
 let list1 = Selector('#list1');
 
@@ -49,8 +49,8 @@ test('Swap threshold', async browser => {
 	const targetEndPosition = list1.child(0);
 
 	await browser.eval(() => {
-			Sortable.get(document.getElementById('list1')).option('swapThreshold', 0.6);
-		});
+		Sortable.get(document.getElementById('list1')).option('swapThreshold', 0.6);
+	});
 
 
 	await browser
@@ -77,8 +77,8 @@ test('Invert swap', async browser => {
 	const targetEndPosition = list1.child(0);
 
 	await browser.eval(() => {
-			Sortable.get(document.getElementById('list1')).option('invertSwap', true);
-		});
+		Sortable.get(document.getElementById('list1')).option('invertSwap', true);
+	});
 
 
 	await browser
@@ -106,9 +106,9 @@ test('Inverted swap threshold', async browser => {
 	const targetEndPosition = list1.child(0);
 
 	await browser.eval(() => {
-			Sortable.get(document.getElementById('list1')).option('invertSwap', true);
-			Sortable.get(document.getElementById('list1')).option('invertedSwapThreshold', 0.5);
-		});
+		Sortable.get(document.getElementById('list1')).option('invertSwap', true);
+		Sortable.get(document.getElementById('list1')).option('invertedSwapThreshold', 0.5);
+	});
 
 
 	await browser
@@ -127,8 +127,8 @@ test('Inverted swap threshold', async browser => {
 });
 
 
-fixture `Grouping`
-	.page `./dual-list.html`;
+fixture`Grouping`
+	.page`./dual-list.html`;
 
 let list2 = Selector('#list2');
 
@@ -141,8 +141,8 @@ test('Move to list of the same group', async browser => {
 	const targetEndPosition = list2.child(1);
 
 	await browser.eval(() => {
-			Sortable.get(document.getElementById('list2')).option('group', 'shared');
-		});
+		Sortable.get(document.getElementById('list2')).option('group', 'shared');
+	});
 
 	await browser
 		.expect(dragStartPosition.innerText).eql(dragEl.innerText)
@@ -160,8 +160,8 @@ test('Do not move to list of different group', async browser => {
 	const target = await targetStartPosition();
 
 	await browser.eval(() => {
-			Sortable.get(document.getElementById('list2')).option('group', null);
-		});
+		Sortable.get(document.getElementById('list2')).option('group', null);
+	});
 
 	await browser
 		.expect(dragStartPosition.innerText).eql(dragEl.innerText)
@@ -182,8 +182,8 @@ test('Move to list with put:true', async browser => {
 	const targetEndPosition = list2.child(1);
 
 	await browser.eval(() => {
-			Sortable.get(document.getElementById('list2')).option('group', { put: true });
-		});
+		Sortable.get(document.getElementById('list2')).option('group', { put: true });
+	});
 
 	await browser
 		.expect(dragStartPosition.innerText).eql(dragEl.innerText)
@@ -201,8 +201,8 @@ test('Do not move from list with pull:false', async browser => {
 	const target = await targetStartPosition();
 
 	await browser.eval(() => {
-			Sortable.get(document.getElementById('list1')).option('group', { pull: false });
-		});
+		Sortable.get(document.getElementById('list1')).option('group', { pull: false });
+	});
 
 	await browser
 		.expect(dragStartPosition.innerText).eql(dragEl.innerText)
@@ -221,9 +221,9 @@ test('Clone element if pull:"clone"', async browser => {
 	const targetEndPosition = list2.child(1);
 
 	await browser.eval(() => {
-			Sortable.get(document.getElementById('list1')).option('group', { pull: 'clone' });
-			Sortable.get(document.getElementById('list2')).option('group', { put: true });
-		});
+		Sortable.get(document.getElementById('list1')).option('group', { pull: 'clone' });
+		Sortable.get(document.getElementById('list2')).option('group', { put: true });
+	});
 
 	await browser
 		.expect(dragStartPosition.innerText).eql(dragEl.innerText)
@@ -236,8 +236,8 @@ test('Clone element if pull:"clone"', async browser => {
 
 
 
-fixture `Handles`
-	.page `./handles.html`;
+fixture`Handles`
+	.page`./handles.html`;
 
 test('Do not allow dragging not using handle', async browser => {
 	const dragStartPosition = list1.child(0);
@@ -270,8 +270,8 @@ test('Allow dragging using handle', async browser => {
 		.expect(targetEndPosition.innerText).eql(target.innerText);
 });
 
-fixture `Filter`
-	.page `./filter.html`;
+fixture`Filter`
+	.page`./filter.html`;
 
 test('Do not allow dragging of filtered element', async browser => {
 	const dragStartPosition = list1.child('.filtered');
@@ -306,8 +306,8 @@ test('Allow dragging of non-filtered element', async browser => {
 
 
 
-fixture `Nested`
-	.page `./nested.html`;
+fixture`Nested`
+	.page`./nested.html`;
 
 let list1n1 = Selector('.n1');
 let list1n2 = Selector('.n2');
@@ -347,8 +347,8 @@ test('Dragging from level 0 to level 2', async browser => {
 });
 
 
-fixture `Empty Insert`
-	.page `./empty-list.html`;
+fixture`Empty Insert`
+	.page`./empty-list.html`;
 
 test('Insert into empty list if within emptyInsertThreshold', async browser => {
 	const threshold = await browser.eval(() => Sortable.get(document.getElementById('list2')).option('emptyInsertThreshold'));
@@ -383,4 +383,40 @@ test('Do not insert into empty list if outside emptyInsertThreshold', async brow
 			offsetX: 0
 		})
 		.expect(dragStartPosition.innerText).eql(dragEl.innerText);
+});
+
+
+fixture`Right to left`
+	.page`./rtl-list.html`;
+
+test('Sort left list', async browser => {
+	const dragStartPosition = list1.child(0);
+	const dragEl = await dragStartPosition();
+	const dragEndPosition = list1.child(2);
+	const targetStartPosition = list1.child(2);
+	const target = await targetStartPosition();
+	const targetEndPosition = list1.child(1);
+
+	await browser
+		.expect(dragStartPosition.innerText).eql(dragEl.innerText)
+		.expect(targetStartPosition.innerText).eql(target.innerText)
+		.dragToElement(dragEl, target)
+		.expect(dragEndPosition.innerText).eql(dragEl.innerText)
+		.expect(targetEndPosition.innerText).eql(target.innerText);
+});
+
+test('Sort right list', async browser => {
+	const dragStartPosition = list1.child(2);
+	const dragEl = await dragStartPosition();
+	const dragEndPosition = list1.child(0);
+	const targetStartPosition = list1.child(0);
+	const target = await targetStartPosition();
+	const targetEndPosition = list1.child(1);
+
+	await browser
+		.expect(dragStartPosition.innerText).eql(dragEl.innerText)
+		.expect(targetStartPosition.innerText).eql(target.innerText)
+		.dragToElement(dragEl, target)
+		.expect(dragEndPosition.innerText).eql(dragEl.innerText)
+		.expect(targetEndPosition.innerText).eql(target.innerText);
 });
