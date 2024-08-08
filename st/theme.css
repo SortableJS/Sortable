@@ -87,8 +87,9 @@ a{
 }
 
 code{
-	color: var(--secondary-3);
+	color: var(--secondary-2);
 	font-size: 1.009rem;
+	font-weight: 518;
 }
 
 span.destac{
