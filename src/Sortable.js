@@ -137,6 +137,7 @@ let dragEl,
 	ghostRelativeParentInitialScroll = [], // (left, top)
 
 	_silent = false,
+	userSelect = '',
 	savedInputChecked = [];
 
 	/** @const */
@@ -984,7 +985,8 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 
 		moved = true;
 
-		if (Safari) {
+		if (fallback) {
+			userSelect = css(document.body, 'user-select');
 			css(document.body, 'user-select', 'none');
 		}
 	},
@@ -1380,8 +1382,8 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		this._offUpEvents();
 
 
-		if (Safari) {
-			css(document.body, 'user-select', '');
+		if (!this.nativeDraggable) {
+			css(document.body, 'user-select', userSelect);
 		}
 
 		css(dragEl, 'transform', '');
