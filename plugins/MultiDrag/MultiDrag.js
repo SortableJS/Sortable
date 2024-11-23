@@ -342,8 +342,19 @@ function MultiDragPlugin() {
 								n = lastIndex + 1;
 							}
 
+							const filter = options.filter;
+
 							for (; i < n; i++) {
 								if (~multiDragElements.indexOf(children[i])) continue;
+								// Check if element is draggable
+								if (!closest(children[i], options.draggable, parentEl, false)) continue;
+								// Check if element is filtered
+								const filtered = filter && (typeof filter === 'function' ?
+									filter.call(sortable, evt, children[i], sortable) :
+									filter.split(',').some((criteria) => {
+										return closest(children[i], criteria.trim(), parentEl, false);
+									}));
+								if (filtered) continue;
 								toggleClass(children[i], options.selectedClass, true);
 								multiDragElements.push(children[i]);
 
