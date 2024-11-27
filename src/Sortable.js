@@ -715,10 +715,13 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		}
 
 		try {
-			_nextTick(function () {
+			if (this.nativeDraggable) {
+				window.getSelection().removeAllRanges();
+			}
+			_nextTick(() => {
 				if (document.selection) {
 					document.selection.empty();
-				} else {
+				} else if (!this.nativeDraggable) {
 					window.getSelection().removeAllRanges();
 				}
 			});
