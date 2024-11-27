@@ -715,16 +715,14 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		}
 
 		try {
-			if (this.nativeDraggable) {
+			
+			if (document.selection) {
+				_nextTick(() => {
+					document.selection.empty();
+				});
+			} else if (this.nativeDraggable) {
 				window.getSelection().removeAllRanges();
 			}
-			_nextTick(() => {
-				if (document.selection) {
-					document.selection.empty();
-				} else if (!this.nativeDraggable) {
-					window.getSelection().removeAllRanges();
-				}
-			});
 		} catch (err) {
 		}
 	},
@@ -998,6 +996,8 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		on(document, 'selectstart', _this);
 
 		moved = true;
+
+		window.getSelection().removeAllRanges();
 
 		if (Safari) {
 			css(document.body, 'user-select', 'none');
