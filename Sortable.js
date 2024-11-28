@@ -1,5 +1,5 @@
 /**!
- * Sortable 1.15.5
+ * Sortable 1.15.6
  * @author	RubaXa   <trash@rubaxa.org>
  * @author	owenm    <owen23355@gmail.com>
  * @license MIT
@@ -134,7 +134,7 @@
     throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
   }
 
-  var version = "1.15.5";
+  var version = "1.15.6";
 
   function userAgent(pattern) {
     if (typeof window !== 'undefined' && window.navigator) {
@@ -1127,7 +1127,8 @@
         x: 0,
         y: 0
       },
-      supportPointer: Sortable.supportPointer !== false && 'PointerEvent' in window && !Safari,
+      // Disabled on Safari: #1571; Enabled on Safari IOS: #2244
+      supportPointer: Sortable.supportPointer !== false && 'PointerEvent' in window && (!Safari || IOS),
       emptyInsertThreshold: 5
     };
     PluginManager.initializePlugins(this, el, defaults);
@@ -1418,7 +1419,7 @@
           _nextTick(function () {
             document.selection.empty();
           });
-        } else if (this.nativeDraggable) {
+        } else {
           window.getSelection().removeAllRanges();
         }
       } catch (err) {}
