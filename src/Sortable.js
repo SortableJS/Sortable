@@ -394,7 +394,8 @@ function Sortable(el, options) {
 		fallbackOnBody: false,
 		fallbackTolerance: 0,
 		fallbackOffset: {x: 0, y: 0},
-		supportPointer: Sortable.supportPointer !== false && ('PointerEvent' in window) && !Safari,
+		// Disabled on Safari: #1571; Enabled on Safari IOS: #2244
+		supportPointer: Sortable.supportPointer !== false && ('PointerEvent' in window) && (!Safari || IOS),
 		emptyInsertThreshold: 5
 	};
 
