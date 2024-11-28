@@ -720,7 +720,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 				_nextTick(() => {
 					document.selection.empty();
 				});
-			} else if (this.nativeDraggable) {
+			} else {
 				window.getSelection().removeAllRanges();
 			}
 		} catch (err) {
