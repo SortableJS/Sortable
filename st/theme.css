@@ -1,5 +1,5 @@
 /* Jost Font */
-@import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Jost');
 
 *{
 	margin: 0;
@@ -8,7 +8,7 @@
 }
 
 :root{
-	--font-primary: "Jost", "Helvetica Neue", Helvetica, "Segoe UI", Arial, sans-serif;
+	--font-primary: "Jost", system-ui, "Segoe UI", Arial, sans-serif;
 	--black: #000;
 	--white: #fff;
 	--primary-3: #009bf5;
@@ -51,13 +51,13 @@ body{
 	background: var(--dark-5);
 }
 
-h1, h2, h3, h4, h5, h6{
+h2, h3, h4, h5, h6{
 	font-weight: 700;
 	line-height: 1.15;
 	letter-spacing: -0.00022em;
 }
 
-h1{font-size: 2.986rem;}
+h1{font-size: 2.986rem; font-weight: 900;}
 h2{font-size: 2.488rem;}
 h3{font-size: 2.074rem;}
 h4{font-size: 1.728rem;}
@@ -232,7 +232,7 @@ span.destac{
 	width: 100px;
 	height: 100px;
 	display: inline-block;
-	background: linear-gradient(45deg, var(--secondary-2), var(--secondary-3), var(--secondary-4), var(--secondary-5));
+	background: var(--secondary-5);
 	border-radius: 9px;
 	padding: .5rem;
 	margin: 12px;
@@ -298,45 +298,6 @@ span.destac{
 
 .highlight {
 	background-color: var(--secondary-2);
-}
-
-.btn-top {
-	width: 45px;
-	height: 45px;
-	background: linear-gradient(var(--secondary-5), var(--primary-5));
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	border-radius: 27px;
-	cursor: pointer;
-	position: fixed;
-	bottom: 2rem;
-	right: 1.27rem;
-	border: none;
-
-	.text {
-		font-size: 0.72em;
-		width: 100px;
-		position: absolute;
-		color: var(--light-1);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		bottom: -36px;
-		opacity: 0;
-		transition-duration: .7s;
-	}
-
-	&:hover{
-		.text {
-			opacity: 1;
-			transition-duration: .7s;
-		}
-
-		.arrow {
-			animation: slide-in-bottom .7s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
-		}
-	}
 }
   
 @keyframes slide-in-bottom {
