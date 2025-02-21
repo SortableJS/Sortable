@@ -396,7 +396,8 @@ function Sortable(el, options) {
 		fallbackOffset: {x: 0, y: 0},
 		// Disabled on Safari: #1571; Enabled on Safari IOS: #2244
 		supportPointer: Sortable.supportPointer !== false && ('PointerEvent' in window) && (!Safari || IOS),
-		emptyInsertThreshold: 5
+		emptyInsertThreshold: 5,
+		rtl: false,
 	};
 
 	PluginManager.initializePlugins(this, el, defaults);
@@ -443,6 +444,10 @@ function Sortable(el, options) {
 
 	// Add animation state manager
 	Object.assign(this, AnimationStateManager());
+
+	if (this.options.rtl) {
+		this.el.style.direction = 'rtl';
+	}
 }
 
 Sortable.prototype = /** @lends Sortable.prototype */ {
@@ -1258,7 +1263,8 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 					differentRowCol ? 1 : options.swapThreshold,
 					options.invertedSwapThreshold == null ? options.swapThreshold : options.invertedSwapThreshold,
 					isCircumstantialInvert,
-					lastTarget === target
+					lastTarget === target,
+					options.rtl,
 				);
 
 				let sibling;
@@ -1826,13 +1832,17 @@ function _ghostIsLast(evt, vertical, sortable) {
 		(evt.clientY > childContainingRect.bottom + spacer || evt.clientX > lastElRect.right && evt.clientY > lastElRect.top);
 }
 
-function _getSwapDirection(evt, target, targetRect, vertical, swapThreshold, invertedSwapThreshold, invertSwap, isLastTarget) {
+function _getSwapDirection(evt, target, targetRect, vertical, swapThreshold, invertedSwapThreshold, invertSwap, isLastTarget, rtl = false) {
 	let mouseOnAxis = vertical ? evt.clientY : evt.clientX,
 		targetLength = vertical ? targetRect.height : targetRect.width,
 		targetS1 = vertical ? targetRect.top : targetRect.left,
 		targetS2 = vertical ? targetRect.bottom : targetRect.right,
 		invert = false;
 
+	if (rtl) {
+		targetS1 = vertical ? targetRect.top : targetRect.right;
+		targetS2 = vertical ? targetRect.bottom : targetRect.left;
+	}
 
 	if (!invertSwap) {
 		// Never invert or create dragEl shadow when target movemenet causes mouse to move past the end of regular swapThreshold
