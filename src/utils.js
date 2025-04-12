@@ -38,7 +38,7 @@ function matches(/**HTMLElement*/el, /**String*/selector) {
 }
 
 function getParentOrHost(el) {
-	return (el.host && el !== document && el.host.nodeType)
+	return (el.host && el !== document && el.host.nodeType && el.host !== el)
 		? el.host
 		: el.parentNode;
 }
@@ -256,7 +256,7 @@ function getRect(el, relativeToContainingBlock, relativeToNonStaticParent, undoS
 
 /**
  * Returns the content rect of the element (bounding rect minus border and padding)
- * @param {HTMLElement} el 
+ * @param {HTMLElement} el
  */
 function getContentRect(el) {
 	let rect = getRect(el);
