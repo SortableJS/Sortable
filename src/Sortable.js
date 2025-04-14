@@ -1436,8 +1436,8 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 					sortable: this,
 					name: 'unchoose',
 					toEl: parentEl,
-					newIndex: null,
-					newDraggableIndex: null,
+					newIndex: newIndex,
+					newDraggableIndex: newDraggableIndex,
 					originalEvent: evt
 				});
 
