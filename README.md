@@ -139,6 +139,7 @@ var sortable = new Sortable(el, {
 	invertSwap: false, // Will always use inverted swap zone if set to true
 	invertedSwapThreshold: 1, // Threshold of the inverted swap zone (will be set to swapThreshold value by default)
 	direction: 'horizontal', // Direction of Sortable (will be detected automatically if not given)
+	rtl: false, // If Sortable is written right to left (will be detected automatically if not given)
 
 	forceFallback: false,  // ignore the HTML5 DnD behaviour and force the fallback to kick in
 
@@ -339,7 +340,10 @@ Sortable.create(el, {
 
 
 ---
+#### `rtl` option
+Set to `true` if sorting direction is right to left (including `flex-direction: row-reverse`). Can be set to `true`, `false`, or a function, which will be called whenever a target is dragged over. Must return `true` or `false`.
 
+---
 
 #### `touchStartThreshold` option
 This option is similar to `fallbackTolerance` option.
