@@ -89,6 +89,7 @@ function _dispatchEvent(info) {
 		oldDraggableIndex,
 		newIndex,
 		newDraggableIndex,
+		originalAllEventProperties,
 		...info
 	});
 }
@@ -111,6 +112,8 @@ let dragEl,
 
 	activeGroup,
 	putSortable,
+
+	originalAllEventProperties,
 
 	awaitingDragStarted = false,
 	ignoreNextClick = false,
@@ -360,6 +363,7 @@ function Sortable(el, options) {
 
 	let defaults = {
 		group: null,
+		revertDOM: false,
 		sort: true,
 		disabled: false,
 		store: null,
@@ -1441,16 +1445,75 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 					originalEvent: evt
 				});
 
+				const allEventProperties = PluginManager.getEventProperties(null, rootEl[expando]);
+				originalAllEventProperties = allEventProperties;
 
 				if (rootEl !== parentEl) {
 
 					if (newIndex >= 0) {
+						// drag from one list and drop into another
+
+						/* ----- */
+
+						if (allEventProperties.hasOwnProperty("items") && allEventProperties.items.length > 0) {
+							// Multidrag Plugin
+
+							if (parentEl[expando].options.revertDOM) {
+								// Remove added elements in new list
+								for (const el of allEventProperties.items) {
+									if (parentEl.contains(el)) {
+									parentEl.removeChild(el);
+									}
+								}
+							}
+
+							if (rootEl[expando].options.revertDOM) {
+								// Return items back to original list
+								if (putSortable.lastPutMode === 'clone') {
+									for (const cl of allEventProperties.clones) {
+										if (rootEl.contains(cl)) {
+											rootEl.removeChild(cl);
+										}
+									}
+								}
+
+								for (let m = 0; m < allEventProperties.items.length; m++) {
+									const multEl = allEventProperties.items[m];
+									const prevIx = allEventProperties.oldIndicies[m].index;
+									if (!parentEl.contains(multEl)) {
+										rootEl.insertBefore(multEl, rootEl.children[prevIx]);
+									}
+									Sortable.utils.deselect(multEl);
+								}
+							}
+
+						} else {
+							// Normal Sortable (Not Multidrag Plugin)
+
+							if (parentEl[expando].options.revertDOM) {
+								// Remove added elements in new list
+								parentEl.removeChild(dragEl);
+							}
+
+							if (rootEl[expando].options.revertDOM) {
+								// Return items back to original list
+								if (putSortable.lastPutMode === 'clone') {
+									rootEl.removeChild(cloneEl);
+								}
+								rootEl.insertBefore(dragEl, rootEl.children[oldIndex]);
+							}
+						}
+
+						/* ----- */
+
 						// Add event
 						_dispatchEvent({
 							rootEl: parentEl,
 							name: 'add',
 							toEl: parentEl,
+							toSortable: parentEl[expando],
 							fromEl: rootEl,
+							fromSortable: rootEl[expando],
 							originalEvent: evt
 						});
 
@@ -1459,24 +1522,31 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 							sortable: this,
 							name: 'remove',
 							toEl: parentEl,
+							toSortable: parentEl[expando],
 							originalEvent: evt
 						});
 
-						// drag from one list and drop into another
-						_dispatchEvent({
-							rootEl: parentEl,
-							name: 'sort',
-							toEl: parentEl,
-							fromEl: rootEl,
-							originalEvent: evt
-						});
+						if (!parentEl[expando].options.revertDOM) {
+							_dispatchEvent({
+								rootEl: parentEl,
+								name: 'sort',
+								toEl: parentEl,
+								toSortable: parentEl[expando],
+								fromEl: rootEl,
+								fromSortable: rootEl[expando],
+								originalEvent: evt
+							});
+						}
 
-						_dispatchEvent({
-							sortable: this,
-							name: 'sort',
-							toEl: parentEl,
-							originalEvent: evt
-						});
+						if (!rootEl[expando].options.revertDOM) {
+							_dispatchEvent({
+								sortable: this,
+								name: 'sort',
+								toEl: parentEl,
+								toSortable: parentEl[expando],
+								originalEvent: evt
+							});
+						}
 					}
 
 					putSortable && putSortable.save();
@@ -1484,10 +1554,54 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 					if (newIndex !== oldIndex) {
 						if (newIndex >= 0) {
 							// drag & drop within the same list
+
+							/* ----- */
+
+							if (allEventProperties.hasOwnProperty("items") && allEventProperties.items.length > 0) {
+								// Multidrag Plugin
+
+								if (parentEl[expando].options.revertDOM) {
+									// Remove added elements in new list
+									for (const el of allEventProperties.items) {
+										if (parentEl.contains(el)) {
+											parentEl.removeChild(el);
+										}
+									}
+								}
+
+								if (rootEl[expando].options.revertDOM) {
+									// Return items back to original list
+									for (let m = 0; m < allEventProperties.items.length; m++) {
+										const multEl = allEventProperties.items[m];
+										const prevIx = allEventProperties.oldIndicies[m].index;
+										if (!parentEl.contains(multEl)) {
+											rootEl.insertBefore(multEl, rootEl.children[prevIx]);
+										}
+										Sortable.utils.deselect(multEl);
+									}
+								}
+
+							} else {
+								// Normal Sortable (Not Multidrag Plugin)
+
+								if (parentEl[expando].options.revertDOM) {
+									// Remove added elements in new list
+									parentEl.removeChild(dragEl);
+								}
+
+								if (rootEl[expando].options.revertDOM) {
+									// Return items back to original list
+									rootEl.insertBefore(dragEl, rootEl.children[oldIndex]);
+								}
+							}
+
+							/* ----- */
+
 							_dispatchEvent({
 								sortable: this,
 								name: 'update',
 								toEl: parentEl,
+								toSortable: parentEl[expando],
 								originalEvent: evt
 							});
 
@@ -1495,6 +1609,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 								sortable: this,
 								name: 'sort',
 								toEl: parentEl,
+								toSortable: parentEl[expando],
 								originalEvent: evt
 							});
 						}
