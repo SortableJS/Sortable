@@ -1,6 +1,7 @@
 import {
 	toggleClass,
-	index
+	index,
+	insertOrMoveBefore
 } from '../../src/utils.js';
 
 let lastSwapEl;
@@ -83,8 +84,8 @@ function swapNodes(n1, n2) {
 	if (p1.isEqualNode(p2) && i1 < i2) {
 		i2++;
 	}
-	p1.insertBefore(n2, p1.children[i1]);
-	p2.insertBefore(n1, p2.children[i2]);
+	insertOrMoveBefore(p1, n2, p1.children[i1]);
+	insertOrMoveBefore(p2, n1, p2.children[i2]);
 }
 
 export default SwapPlugin;

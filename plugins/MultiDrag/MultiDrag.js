@@ -10,7 +10,8 @@ import {
 	setRect,
 	unsetRect,
 	matrix,
-	expando
+	expando,
+	insertOrMoveBefore
 } from '../../src/utils.js';
 
 import dispatchEvent from '../../src/EventDispatcher.js';
@@ -421,7 +422,7 @@ function MultiDragPlugin() {
 
 						multiDragElements.forEach(multiDragElement => {
 							if (children[multiDragIndex]) {
-								parentEl.insertBefore(multiDragElement, children[multiDragIndex]);
+								insertOrMoveBefore(parentEl, multiDragElement, children[multiDragIndex]);
 							} else {
 								parentEl.appendChild(multiDragElement);
 							}
@@ -600,7 +601,7 @@ function insertMultiDragElements(clonesInserted, rootEl) {
 	multiDragElements.forEach((multiDragElement, i) => {
 		let target = rootEl.children[multiDragElement.sortableIndex + (clonesInserted ? Number(i) : 0)];
 		if (target) {
-			rootEl.insertBefore(multiDragElement, target);
+			insertOrMoveBefore(rootEl, multiDragElement, target);
 		} else {
 			rootEl.appendChild(multiDragElement);
 		}
@@ -616,7 +617,7 @@ function insertMultiDragClones(elementsInserted, rootEl) {
 	multiDragClones.forEach((clone, i) => {
 		let target = rootEl.children[clone.sortableIndex + (elementsInserted ? Number(i) : 0)];
 		if (target) {
-			rootEl.insertBefore(clone, target);
+			insertOrMoveBefore(rootEl, clone, target);
 		} else {
 			rootEl.appendChild(clone);
 		}

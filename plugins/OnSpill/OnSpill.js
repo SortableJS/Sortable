@@ -1,4 +1,7 @@
-import { getChild } from '../../src/utils.js';
+import {
+	getChild,
+	insertOrMoveBefore
+} from '../../src/utils.js';
 
 
 const drop = function({
@@ -37,7 +40,7 @@ Revert.prototype = {
 		let nextSibling = getChild(this.sortable.el, this.startIndex, this.options);
 
 		if (nextSibling) {
-			this.sortable.el.insertBefore(dragEl, nextSibling);
+			insertOrMoveBefore(this.sortable.el, dragEl, nextSibling);
 		} else {
 			this.sortable.el.appendChild(dragEl);
 		}
