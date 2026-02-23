@@ -244,7 +244,10 @@ function MultiDragPlugin() {
 
 						// Move element(s) to end of parentEl so that it does not interfere with multi-drag clones insertion if they are inserted
 						// while folding, and so that we can capture them again because old sortable will no longer be fromSortable
-						parentEl.appendChild(multiDragElement);
+						if (!multiDragElement.contains(parentEl)) {
+							// multiDragElement can't contains parentEl
+							parentEl.appendChild(multiDragElement);
+						}
 					});
 
 					folding = true;
@@ -423,7 +426,10 @@ function MultiDragPlugin() {
 							if (children[multiDragIndex]) {
 								parentEl.insertBefore(multiDragElement, children[multiDragIndex]);
 							} else {
-								parentEl.appendChild(multiDragElement);
+								if (!multiDragElement.contains(parentEl)) {
+									// multiDragElement can't contains parentEl
+									parentEl.appendChild(multiDragElement);
+								}
 							}
 							multiDragIndex++;
 						});
