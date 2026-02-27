@@ -430,10 +430,10 @@ function Sortable(el, options) {
 		on(el, 'mousedown', this._onTapStart);
 		on(el, 'touchstart', this._onTapStart);
 	}
-
+	this._handleEvent = this.handleEvent.bind(this)
 	if (this.nativeDraggable) {
-		on(el, 'dragover', this);
-		on(el, 'dragenter', this);
+		on(el, 'dragover', this._handleEvent);
+		on(el, 'dragenter', this._handleEvent);
 	}
 
 	sortables.push(this.el);
@@ -1698,8 +1698,8 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		off(el, 'pointerdown', this._onTapStart);
 
 		if (this.nativeDraggable) {
-			off(el, 'dragover', this);
-			off(el, 'dragenter', this);
+			off(el, 'dragover', this._handleEvent);
+			off(el, 'dragenter', this._handleEvent);
 		}
 		// Remove draggable attributes
 		Array.prototype.forEach.call(el.querySelectorAll('[draggable]'), function (el) {
