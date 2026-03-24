@@ -26,6 +26,7 @@ Demo: http://sortablejs.github.io/Sortable/
    * React
      * [ES2015+](https://github.com/SortableJS/react-sortablejs)
      * [Mixin](https://github.com/SortableJS/react-mixin-sortablejs)
+   * [Svelte](#svelte)
    * [Knockout](https://github.com/SortableJS/knockout-sortablejs)
    * [Polymer](https://github.com/SortableJS/polymer-sortablejs)
    * [Vue](https://github.com/SortableJS/Vue.Draggable)
@@ -634,6 +635,69 @@ Sortable.create(el, {
 		}
 	}
 })
+```
+
+
+---
+
+
+<a name="svelte"></a>
+### Svelte
+Demo: https://svelte.dev/playground/498c42e864bb45c5ac05473a1718d6fb?version=5.50.3
+
+```svelte
+<script lang="ts">
+    import type { Attachment } from "svelte/attachments";
+    import Sortable, { type SortableOptions } from "sortablejs";
+
+    export function sortable(
+        options: SortableOptions = {},
+    ): Attachment<HTMLDivElement> {
+        const abortController = new AbortController();
+        return (element) => {
+            /* Build sortable instance with the options */
+            const sortableInstance = new Sortable(element, options);
+
+            /* Disable context menu on touch devices */
+            const isTouchDevice =
+                window.matchMedia("(pointer: coarse)").matches;
+            if (isTouchDevice) {
+                element.addEventListener(
+                    "contextmenu",
+                    (event) => {
+                        event.preventDefault();
+                        console.log("contextmenu", event.target);
+                    },
+                    {
+                        signal: abortController.signal,
+                    },
+                );
+            }
+
+            return () => {
+                abortController.abort();
+                sortableInstance.destroy();
+            };
+        };
+    }
+</script>
+
+<div
+    {@attach sortable({
+        store: {
+            set: (sortable) => {
+                console.log(sortable.toArray());
+            },
+            get: (sortable) => {
+                return sortable.toArray();
+            },
+        },
+    })}
+>
+    {#each [1, 2, 3, 4, 5] as item}
+        <div data-id={item}>{item}</div>
+    {/each}
+</div>
 ```
 
 
