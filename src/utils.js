@@ -561,6 +561,17 @@ function getChildContainingRectFromElement(container, options, ghostEl) {
 
 const expando = 'Sortable' + (new Date).getTime();
 
+function insertOrMoveBefore(rootNode, movedNode, referenceNode) {
+	if (rootNode['moveBefore']) {
+		try {
+			rootNode.moveBefore(movedNode, referenceNode)
+		} catch (e) { // Could throw a HierarchyRequestError in some cases https://developer.mozilla.org/en-US/docs/Web/API/Element/moveBefore#movebefore_constraints
+			rootNode.insertBefore(movedNode, referenceNode)
+		}
+	} else {
+		rootNode.insertBefore(movedNode, referenceNode)
+	}
+}
 
 export {
 	on,
@@ -591,5 +602,6 @@ export {
 	unsetRect,
 	getContentRect,
 	getChildContainingRectFromElement,
-	expando
+	expando,
+	insertOrMoveBefore
 };

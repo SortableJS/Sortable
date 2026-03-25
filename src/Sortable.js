@@ -36,7 +36,8 @@ import {
 	clone,
 	expando,
 	getChildContainingRectFromElement,
-	getParentOrHost
+	getParentOrHost,
+	insertOrMoveBefore
 } from './utils.js';
 
 
@@ -957,7 +958,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			if (Sortable.eventCanceled) return;
 
 			if (!_this.options.removeCloneOnHide) {
-				rootEl.insertBefore(cloneEl, dragEl);
+				insertOrMoveBefore(rootEl, cloneEl, dragEl);
 			}
 			_this._hideClone();
 
@@ -1176,7 +1177,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 
 				if (!Sortable.eventCanceled) {
 					if (nextEl) {
-						rootEl.insertBefore(dragEl, nextEl);
+						insertOrMoveBefore(rootEl, dragEl, nextEl);
 					} else {
 						rootEl.appendChild(dragEl);
 					}
@@ -1207,7 +1208,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 				if (onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt, !!target) !== false) {
 					capture();
 					if (elLastChild && elLastChild.nextSibling) { // the last draggable element is not the last node
-						el.insertBefore(dragEl, elLastChild.nextSibling);
+						insertOrMoveBefore(el, dragEl, elLastChild.nextSibling);
 					}
 					else {
 						el.appendChild(dragEl);
@@ -1229,7 +1230,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 
 				if (onMove(rootEl, el, dragEl, dragRect, target, targetRect, evt, false) !== false) {
 					capture();
-					el.insertBefore(dragEl, firstChild);
+					insertOrMoveBefore(el, dragEl, firstChild);
 					parentEl = el; // actualization
 
 					changed();
@@ -1304,7 +1305,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 					if (after && !nextSibling) {
 						el.appendChild(dragEl);
 					} else {
-						target.parentNode.insertBefore(dragEl, after ? nextSibling : target);
+						insertOrMoveBefore(target.parentNode, dragEl, after ? nextSibling : target);
 					}
 
 					// Undo chrome's scroll adjustment (has no effect on other browsers)
@@ -1742,9 +1743,9 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 
 			// show clone at dragEl or original position
 			if (dragEl.parentNode == rootEl && !this.options.group.revertClone) {
-				rootEl.insertBefore(cloneEl, dragEl);
+				insertOrMoveBefore(rootEl, cloneEl, dragEl);
 			} else if (nextEl) {
-				rootEl.insertBefore(cloneEl, nextEl);
+				insertOrMoveBefore(rootEl, cloneEl, nextEl);
 			} else {
 				rootEl.appendChild(cloneEl);
 			}
