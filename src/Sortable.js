@@ -710,6 +710,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			} else {
 				on(document, 'mousemove', this._onTouchMove);
 			}
+			on(document, 'touchmove', this._preventTouchMove);
 		} else {
 			on(dragEl, 'dragend', this);
 			on(rootEl, 'dragstart', this._onDragStart);
@@ -860,6 +861,12 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			}
 
 			evt.cancelable && evt.preventDefault();
+		}
+	},
+
+	_preventTouchMove: function (/**TouchEvent*/evt) {
+		if (evt.cancelable) {
+			evt.preventDefault();
 		}
 	},
 
@@ -1338,6 +1345,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		off(document, 'mousemove', this._onTouchMove);
 		off(document, 'touchmove', this._onTouchMove);
 		off(document, 'pointermove', this._onTouchMove);
+		off(document, 'touchmove', this._preventTouchMove);
 		off(document, 'dragover', nearestEmptyInsertDetectEvent);
 		off(document, 'mousemove', nearestEmptyInsertDetectEvent);
 		off(document, 'touchmove', nearestEmptyInsertDetectEvent);
@@ -1954,14 +1962,13 @@ function _cancelNextTick(id) {
 }
 
 // Fixed #973:
-if (documentExists) {
+if (documentExists && (FireFox || Safari)) {
 	on(document, 'touchmove', function(evt) {
 		if ((Sortable.active || awaitingDragStarted) && evt.cancelable) {
 			evt.preventDefault();
 		}
 	});
 }
-
 
 // Export utils
 Sortable.utils = {
