@@ -586,7 +586,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			this._lastX = (touch || evt).clientX;
 			this._lastY = (touch || evt).clientY;
 
-			dragEl.style['will-change'] = 'all';
+			dragEl.style['will-change'] = 'transform';
 
 			dragStartFn = function () {
 				pluginEvent('delayEnded', _this, { evt });
