@@ -231,6 +231,15 @@ let dragEl,
 		let ret;
 		sortables.some((sortable) => {
 			const threshold = sortable[expando].options.emptyInsertThreshold;
+
+			sortable[expando]._onDragLeave({
+				type: 'pointermove',
+				clientX: x,
+				clientY: y,
+				target: document.elementFromPoint(x, y),
+				rootEl: sortable
+			});
+
 			if (!threshold || lastChild(sortable)) return;
 
 			const rect = getRect(sortable),
@@ -406,6 +415,8 @@ function Sortable(el, options) {
 		!(name in options) && (options[name] = defaults[name]);
 	}
 
+	options._isHovered = false;
+
 	_prepareGroup(options);
 
 	// Bind all private methods
@@ -434,6 +445,7 @@ function Sortable(el, options) {
 	if (this.nativeDraggable) {
 		on(el, 'dragover', this);
 		on(el, 'dragenter', this);
+		on(el, 'dragleave', this);
 	}
 
 	sortables.push(this.el);
@@ -622,6 +634,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			});
 
 			on(ownerDocument, 'dragover', nearestEmptyInsertDetectEvent);
+			// on(ownerDocument, 'dragleave', nearestEmptyInsertDetectEvent);
 			on(ownerDocument, 'mousemove', nearestEmptyInsertDetectEvent);
 			on(ownerDocument, 'touchmove', nearestEmptyInsertDetectEvent);
 
@@ -736,6 +749,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 
 			if (this.nativeDraggable) {
 				on(document, 'dragover', _checkOutsideTargetEl);
+				// on(document, 'dragleave', _checkOutsideTargetEl);
 			}
 			let options = this.options;
 
@@ -746,6 +760,8 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			Sortable.active = this;
 
 			fallback && this._appendGhost();
+
+			this.options._isHovered = true;
 
 			// Drag start event
 			_dispatchEvent({
@@ -791,6 +807,18 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 						if (inserted && !this.options.dragoverBubble) {
 							break;
 						}
+					} else {
+						// Is dragging over an element (var: target) that is not a Sortable container
+						// This element can be a child of the container or not
+						// This only works inside the window of the browser
+						// So moved outside of this if statement
+						/* parentEl[expando]._onDragLeave({
+							type: 'pointermove',
+							clientX: touchEvt.clientX,
+							clientY: touchEvt.clientY,
+							target: target,
+							rootEl: parent
+						}); */
 					}
 
 					target = parent; // store last element
@@ -798,6 +826,18 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 				/* jshint boss:true */
 				while (parent = getParentOrHost(parent));
 			}
+
+			// I think the bug is because we tell the ParentEl to listen to the DragLeave
+			// but if we change too quickly of parent, then the ParentEl is another...
+			// so is never called and stays with the hover variable on true
+			// So moved to _detectNearestEmptySortable
+			/* parentEl[expando]._onDragLeave({
+				type: 'pointermove',
+				clientX: touchEvt.clientX,
+				clientY: touchEvt.clientY,
+				target: target,
+				rootEl: parent
+			}); */
 
 			_unhideGhostForTarget();
 		}
@@ -1006,6 +1046,32 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 	},
 
 
+	_onDragLeave: function (/**Event*/evt) {
+		var el = this.el,
+			target = evt.target,
+			options = this.options;
+
+		if (!options._isHovered) {
+			// console.log(`there was no hover in ${options.group.name}`)
+			return;
+		}
+		// console.log(`there was hover in ${options.group.name}`, evt)
+		if (
+		    // ( evt.type == 'dragend' || evt.type == 'drop' ) || // from onDrop (makes no sense to trigger a drag-out on a drop event)
+		    ( evt.type == 'dragleave' && ( !el.contains(evt.relatedTarget) || !evt.relatedTarget) ) ||
+		    ( evt.type == 'pointermove' && ( !el.contains(target) || !target ) )
+		) {
+			options._isHovered = false;
+			_dispatchEvent({
+				rootEl: el,
+				name: 'dragOut',
+				originalEvent: evt
+			});
+		}
+
+	},
+
+
 	// Returns true - if no further action is needed (either inserted or another condition)
 	_onDragOver: function (/**Event*/evt) {
 		let el = this.el,
@@ -1136,6 +1202,17 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 
 		dragOverEvent('dragOver');
 		if (Sortable.eventCanceled) return completedFired;
+
+		if ( !options._isHovered && !dragEl.contains(el)
+		     && activeSortable && !options.disabled
+		) {
+			options._isHovered = true;
+			_dispatchEvent({
+				rootEl: el,
+				name: 'dragIn',
+				originalEvent: evt
+			});
+		}
 
 		if (
 			dragEl.contains(evt.target) ||
@@ -1339,6 +1416,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		off(document, 'touchmove', this._onTouchMove);
 		off(document, 'pointermove', this._onTouchMove);
 		off(document, 'dragover', nearestEmptyInsertDetectEvent);
+		off(document, 'dragleave', nearestEmptyInsertDetectEvent);
 		off(document, 'mousemove', nearestEmptyInsertDetectEvent);
 		off(document, 'touchmove', nearestEmptyInsertDetectEvent);
 	},
@@ -1357,6 +1435,8 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 	_onDrop: function (/**Event*/evt) {
 		let el = this.el,
 			options = this.options;
+
+			options._isHovered = false;
 
 		// Get the index of the dragged element within its parent
 		newIndex = index(dragEl);
@@ -1508,6 +1588,23 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 						newDraggableIndex = oldDraggableIndex;
 					}
 
+					sortables.some((sortable) => {
+
+						let x = (evt.changedTouches ? evt.changedTouches[0] : evt).clientX,
+							y = (evt.changedTouches ? evt.changedTouches[0] : evt).clientY,
+							elem = document.elementFromPoint(x, y);
+
+						if ( sortable.contains(elem) ) {
+							_dispatchEvent({
+								sortable: sortable[expando],
+								name: 'drop',
+								originalEvent: evt
+							});
+							return true;
+						}
+						return false;
+					});
+
 					_dispatchEvent({
 						sortable: this,
 						name: 'end',
@@ -1580,6 +1677,10 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 					this._onDragOver(evt);
 					_globalDragOver(evt);
 				}
+				break;
+
+			case 'dragleave':
+				this._onDragLeave(evt);
 				break;
 
 			case 'selectstart':
