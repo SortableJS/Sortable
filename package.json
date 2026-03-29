@@ -10,9 +10,9 @@
 		"rollup-plugin-babel": "^4.3.2",
 		"rollup-plugin-json": "^4.0.0",
 		"rollup-plugin-node-resolve": "^5.0.0",
-		"testcafe": "^1.3.1",
-		"testcafe-browser-provider-saucelabs": "^1.7.0",
-		"testcafe-reporter-xunit": "^2.1.0",
+		"testcafe": "^3.6.0",
+		"testcafe-browser-provider-saucelabs": "^3.0.0",
+		"testcafe-reporter-xunit": "^2.2.3",
 		"uglify-js": "^3.5.12"
 	},
 	"description": "JavaScript library for reorderable drag-and-drop lists on modern browsers and touch devices. No jQuery required. Supports Meteor, AngularJS, React, Polymer, Vue, Knockout and any CSS library, e.g. Bootstrap.",
