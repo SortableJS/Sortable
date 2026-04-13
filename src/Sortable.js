@@ -1149,7 +1149,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 
 		if (activeSortable && !options.disabled &&
 			(isOwner
-				? canSort || (revert = parentEl !== rootEl) // Reverting item into the original list
+				? canSort || ((revert = parentEl !== rootEl) && group.checkPut(this, activeSortable, dragEl, evt)) // Reverting item into the original list
 				: (
 					putSortable === this ||
 					(
