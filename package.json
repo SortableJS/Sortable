@@ -4,6 +4,8 @@
 	"version": "1.15.7",
 	"devDependencies": {
 		"@babel/core": "^7.4.4",
+		"istanbul-lib-instrument": "^6.0.0",
+		"nyc": "^17.0.0",
 		"@babel/plugin-transform-object-assign": "^7.2.0",
 		"@babel/preset-env": "^7.4.4",
 		"rollup": "^1.11.3",
@@ -26,7 +28,8 @@
 		"minify": "node ./scripts/minify.js",
 		"build": "npm run build:es && npm run build:umd && npm run minify",
 		"test:compat": "node ./scripts/test-compat.js",
-		"test": "node ./scripts/test.js"
+		"test": "node ./scripts/test.js",
+		"test:coverage": "node ./scripts/coverage.js"
 	},
 	"maintainers": [
 		"Konstantin Lebedev <ibnRubaXa@gmail.com>",
