@@ -1,0 +1,7 @@
+{
+	"include": ["Sortable.js"],
+	"exclude": [],
+	"reporter": ["lcov", "text", "html"],
+	"report-dir": "coverage",
+	"temp-dir": ".nyc_output"
+}
