@@ -391,7 +391,7 @@ function Sortable(el, options) {
 		touchStartThreshold: (Number.parseInt ? Number : window).parseInt(window.devicePixelRatio, 10) || 1,
 		forceFallback: false,
 		fallbackClass: 'sortable-fallback',
-		fallbackOnBody: false,
+		fallbackOnto: el,
 		fallbackTolerance: 0,
 		fallbackOffset: {x: 0, y: 0},
 		// Disabled on Safari: #1571; Enabled on Safari IOS: #2244
@@ -716,7 +716,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		}
 
 		try {
-			
+
 			if (document.selection) {
 				_nextTick(() => {
 					document.selection.empty();
@@ -867,7 +867,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		// Bug if using scale(): https://stackoverflow.com/questions/2637058
 		// Not being adjusted for
 		if (!ghostEl) {
-			let container = this.options.fallbackOnBody ? document.body : rootEl,
+			let container = this.options.fallbackOnto,
 				rect = getRect(dragEl, true, PositionGhostAbsolutely, true, container),
 				options = this.options;
 
