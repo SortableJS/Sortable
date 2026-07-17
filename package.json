@@ -1,7 +1,7 @@
 {
 	"name": "sortablejs",
 	"exportName": "Sortable",
-	"version": "1.15.0",
+	"version": "1.15.7",
 	"devDependencies": {
 		"@babel/core": "^7.4.4",
 		"@babel/plugin-transform-object-assign": "^7.2.0",
@@ -39,7 +39,8 @@
 	"files": [
 		"Sortable.js",
 		"Sortable.min.js",
-		"modular/"
+		"modular/",
+		"src/"
 	],
 	"keywords": [
 		"sortable",

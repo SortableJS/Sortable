@@ -38,7 +38,7 @@ function matches(/**HTMLElement*/el, /**String*/selector) {
 }
 
 function getParentOrHost(el) {
-	return (el.host && el !== document && el.host.nodeType)
+	return (el.host && el !== document && el.host.nodeType && el.host !== el)
 		? el.host
 		: el.parentNode;
 }
@@ -252,6 +252,26 @@ function getRect(el, relativeToContainingBlock, relativeToNonStaticParent, undoS
 		width: width,
 		height: height
 	};
+}
+
+/**
+ * Returns the content rect of the element (bounding rect minus border and padding)
+ * @param {HTMLElement} el
+ */
+function getContentRect(el) {
+	let rect = getRect(el);
+	const paddingLeft = parseInt(css(el, 'padding-left')),
+		paddingTop = parseInt(css(el, 'padding-top')),
+		paddingRight = parseInt(css(el, 'padding-right')),
+		paddingBottom = parseInt(css(el, 'padding-bottom'));
+	rect.top += paddingTop + parseInt(css(el, 'border-top-width'));
+	rect.left += paddingLeft + parseInt(css(el, 'border-left-width'));
+	// Client Width/Height includes padding only
+	rect.width = el.clientWidth - paddingLeft - paddingRight;
+	rect.height = el.clientHeight - paddingTop - paddingBottom;
+	rect.bottom = rect.top + rect.height;
+	rect.right = rect.left + rect.width;
+	return rect;
 }
 
 /**
@@ -521,6 +541,23 @@ function unsetRect(el) {
 	css(el, 'height', '');
 }
 
+function getChildContainingRectFromElement(container, options, ghostEl) {
+    const rect = {};
+
+	Array.from(container.children).forEach(child => {
+		if (!closest(child, options.draggable, container, false) || child.animated || child === ghostEl) return;
+		const childRect = getRect(child);
+		rect.left = Math.min(rect.left ?? Infinity, childRect.left);
+		rect.top = Math.min(rect.top ?? Infinity, childRect.top);
+		rect.right = Math.max(rect.right ?? -Infinity, childRect.right);
+		rect.bottom = Math.max(rect.bottom ?? -Infinity, childRect.bottom);
+	});
+	rect.width = rect.right - rect.left;
+	rect.height = rect.bottom - rect.top;
+	rect.x = rect.left;
+	rect.y = rect.top;
+    return rect;
+}
 
 const expando = 'Sortable' + (new Date).getTime();
 
@@ -552,5 +589,7 @@ export {
 	clone,
 	setRect,
 	unsetRect,
+	getContentRect,
+	getChildContainingRectFromElement,
 	expando
 };

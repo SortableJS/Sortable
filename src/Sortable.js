@@ -34,7 +34,9 @@ import {
 	throttle,
 	scrollBy,
 	clone,
-	expando
+	expando,
+	getChildContainingRectFromElement,
+	getParentOrHost
 } from './utils.js';
 
 
@@ -396,7 +398,8 @@ function Sortable(el, options) {
 		fallbackOnBody: false,
 		fallbackTolerance: 0,
 		fallbackOffset: {x: 0, y: 0},
-		supportPointer: Sortable.supportPointer !== false && ('PointerEvent' in window) && !Safari,
+		// Disabled on Safari: #1571; Enabled on Safari IOS: #2244
+		supportPointer: Sortable.supportPointer !== false && ('PointerEvent' in window) && (!Safari || IOS),
 		emptyInsertThreshold: 5
 	};
 
@@ -521,7 +524,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 					fromEl: el
 				});
 				pluginEvent('filter', _this, { evt });
-				preventOnFilter && evt.cancelable && evt.preventDefault();
+				preventOnFilter && evt.preventDefault();
 				return; // cancel dnd
 			}
 		}
@@ -544,7 +547,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			});
 
 			if (filter) {
-				preventOnFilter && evt.cancelable && evt.preventDefault();
+				preventOnFilter && evt.preventDefault();
 				return; // cancel dnd
 			}
 		}
@@ -626,9 +629,15 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			on(ownerDocument, 'mousemove', nearestEmptyInsertDetectEvent);
 			on(ownerDocument, 'touchmove', nearestEmptyInsertDetectEvent);
 
-			on(ownerDocument, 'mouseup', _this._onDrop);
-			on(ownerDocument, 'touchend', _this._onDrop);
-			on(ownerDocument, 'touchcancel', _this._onDrop);
+			if (options.supportPointer) {
+				on(ownerDocument, 'pointerup', _this._onDrop);
+				// Native D&D triggers pointercancel
+				!this.nativeDraggable && on(ownerDocument, 'pointercancel', _this._onDrop);
+			} else {
+				on(ownerDocument, 'mouseup', _this._onDrop);
+				on(ownerDocument, 'touchend', _this._onDrop);
+				on(ownerDocument, 'touchcancel', _this._onDrop);
+			}
 
 			// Make dragEl draggable (must be before delay for FireFox)
 			if (FireFox && this.nativeDraggable) {
@@ -647,9 +656,14 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 				// If the user moves the pointer or let go the click or touch
 				// before the delay has been reached:
 				// disable the delayed drag
-				on(ownerDocument, 'mouseup', _this._disableDelayedDrag);
-				on(ownerDocument, 'touchend', _this._disableDelayedDrag);
-				on(ownerDocument, 'touchcancel', _this._disableDelayedDrag);
+				if (options.supportPointer) {
+					on(ownerDocument, 'pointerup', _this._disableDelayedDrag);
+					on(ownerDocument, 'pointercancel', _this._disableDelayedDrag);
+				} else {
+					on(ownerDocument, 'mouseup', _this._disableDelayedDrag);
+					on(ownerDocument, 'touchend', _this._disableDelayedDrag);
+					on(ownerDocument, 'touchcancel', _this._disableDelayedDrag);
+				}
 				on(ownerDocument, 'mousemove', _this._delayedDragTouchMoveHandler);
 				on(ownerDocument, 'touchmove', _this._delayedDragTouchMoveHandler);
 				options.supportPointer && on(ownerDocument, 'pointermove', _this._delayedDragTouchMoveHandler);
@@ -682,6 +696,8 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		off(ownerDocument, 'mouseup', this._disableDelayedDrag);
 		off(ownerDocument, 'touchend', this._disableDelayedDrag);
 		off(ownerDocument, 'touchcancel', this._disableDelayedDrag);
+		off(ownerDocument, 'pointerup', this._disableDelayedDrag);
+		off(ownerDocument, 'pointercancel', this._disableDelayedDrag);
 		off(ownerDocument, 'mousemove', this._delayedDragTouchMoveHandler);
 		off(ownerDocument, 'touchmove', this._delayedDragTouchMoveHandler);
 		off(ownerDocument, 'pointermove', this._delayedDragTouchMoveHandler);
@@ -704,9 +720,9 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		}
 
 		try {
+			
 			if (document.selection) {
-				// Timeout neccessary for IE9
-				_nextTick(function () {
+				_nextTick(() => {
 					document.selection.empty();
 				});
 			} else {
@@ -784,7 +800,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 					target = parent; // store last element
 				}
 				/* jshint boss:true */
-				while (parent = parent.parentNode);
+				while (parent = getParentOrHost(parent));
 			}
 
 			_unhideGhostForTarget();
@@ -985,6 +1001,8 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		on(document, 'selectstart', _this);
 
 		moved = true;
+
+		window.getSelection().removeAllRanges();
 
 		if (Safari) {
 			css(document.body, 'user-select', 'none');
@@ -1335,6 +1353,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		off(ownerDocument, 'mouseup', this._onDrop);
 		off(ownerDocument, 'touchend', this._onDrop);
 		off(ownerDocument, 'pointerup', this._onDrop);
+		off(ownerDocument, 'pointercancel', this._onDrop);
 		off(ownerDocument, 'touchcancel', this._onDrop);
 		off(document, 'selectstart', this);
 	},
@@ -1651,8 +1670,11 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		Sortable.clone =
 		Sortable.active = null;
 
-		savedInputChecked.forEach(function (el) {
-			el.checked = true;
+		let el = this.el;
+		savedInputChecked.forEach(function (checkEl) {
+			if (el.contains(checkEl)) {
+				checkEl.checked = true;
+			}
 		});
 
 		savedInputChecked.length =
@@ -1903,21 +1925,23 @@ function _unsilent() {
 }
 
 function _ghostIsFirst(evt, vertical, sortable) {
-	let rect = getRect(getChild(sortable.el, 0, sortable.options, true));
+	let firstElRect = getRect(getChild(sortable.el, 0, sortable.options, true));
+	const childContainingRect = getChildContainingRectFromElement(sortable.el, sortable.options, ghostEl);
 	const spacer = 10;
 
 	return vertical ?
-		((evt.clientX < rect.left - spacer) || (evt.clientY < rect.top && evt.clientX < rect.right)) :
-		((evt.clientY < rect.top - spacer) || (evt.clientY < rect.bottom && evt.clientX < rect.left))
+		(evt.clientX < childContainingRect.left - spacer || evt.clientY < firstElRect.top && evt.clientX < firstElRect.right) :
+		(evt.clientY < childContainingRect.top - spacer || evt.clientY < firstElRect.bottom && evt.clientX < firstElRect.left)
 }
 
 function _ghostIsLast(evt, vertical, sortable) {
-	let rect = getRect(lastChild(sortable.el, sortable.options.draggable));
+	const lastElRect = getRect(lastChild(sortable.el, sortable.options.draggable));
+	const childContainingRect = getChildContainingRectFromElement(sortable.el, sortable.options, ghostEl);
 	const spacer = 10;
 
 	return vertical ?
-		(evt.clientX > rect.right + spacer || evt.clientX <= rect.right && evt.clientY > rect.bottom && evt.clientX >= rect.left) :
-		(evt.clientX > rect.right && evt.clientY > rect.top || evt.clientX <= rect.right && evt.clientY > rect.bottom + spacer);
+		(evt.clientX > childContainingRect.right + spacer || evt.clientY > lastElRect.bottom && evt.clientX > lastElRect.left) :
+		(evt.clientY > childContainingRect.bottom + spacer || evt.clientX > lastElRect.right && evt.clientY > lastElRect.top);
 }
 
 function _getSwapDirection(evt, target, targetRect, vertical, swapThreshold, invertedSwapThreshold, invertSwap, isLastTarget) {
@@ -2056,23 +2080,24 @@ if (documentExists) {
 
 // Export utils
 Sortable.utils = {
-	on: on,
-	off: off,
-	css: css,
-	find: find,
+	on,
+	off,
+	css,
+	find,
 	is: function (el, selector) {
 		return !!closest(el, selector, el, false);
 	},
-	extend: extend,
-	throttle: throttle,
-	closest: closest,
-	toggleClass: toggleClass,
-	clone: clone,
-	index: index,
+	extend,
+	throttle,
+	closest,
+	toggleClass,
+	clone,
+	index,
 	nextTick: _nextTick,
 	cancelNextTick: _cancelNextTick,
 	detectDirection: _detectDirection,
-	getChild: getChild
+	getChild,
+	expando
 };
 
 

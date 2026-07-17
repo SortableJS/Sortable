@@ -739,8 +739,9 @@ Mounts a plugin to Sortable.
 * clone(el`:HTMLElement`)`:HTMLElement` — create a deep copy of the set of matched elements
 * toggleClass(el`:HTMLElement`, name`:String`, state`:Boolean`) — add or remove one classes from each element
 * detectDirection(el`:HTMLElement`)`:String` — automatically detect the [direction](https://github.com/SortableJS/Sortable/wiki/Swap-Thresholds-and-Direction#direction) of the element as either `'vertical'` or `'horizontal'`
-
-
+* index(el`:HTMLElement`, selector`:String`)`:Number` — index of the element within its parent for a selected set of elements
+* getChild(el`:HTMLElement`, childNum`:Number`, options`:Object`, includeDragEl`:Boolean`):`HTMLElement` — get the draggable element at a given index of draggable elements within a Sortable instance
+* expando`:String` — expando property name for internal use, sortableListElement[expando] returns the Sortable instance of that elemenet
 ---
 
 
