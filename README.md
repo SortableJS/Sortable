@@ -117,7 +117,7 @@ You can use any element for the list and its elements, not just `ul`/`li`. Here 
 var sortable = new Sortable(el, {
 	group: "name",  // or { name: "...", pull: [true, false, 'clone', array], put: [true, false, array] }
 	sort: true,  // sorting inside list
-	delay: 0, // time in milliseconds to define when the sorting should start
+	delay: 0, // Time in milliseconds to wait before the element starts to drag.
 	delayOnTouchOnly: false, // only delay if user is using touch
 	touchStartThreshold: 0, // px, how many pixels the point should move before cancelling a delayed drag event
 	disabled: false, // Disables the sortable if set to true.
@@ -271,7 +271,7 @@ Demo: https://jsbin.com/jayedig/edit?js,output
 
 
 #### `delay` option
-Time in milliseconds to define when the sorting should start.
+Time in milliseconds to wait after the user has put their pointer down before the element starts to drag.
 Unfortunately, due to browser restrictions, delaying is not possible on IE or Edge with native drag & drop.
 
 Demo: https://jsbin.com/zosiwah/edit?js,output
