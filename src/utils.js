@@ -511,13 +511,9 @@ function scrollBy(el, x, y) {
 
 function clone(el) {
 	let Polymer = window.Polymer;
-	let $ = window.jQuery || window.Zepto;
 
 	if (Polymer && Polymer.dom) {
 		return Polymer.dom(el).cloneNode(true);
-	}
-	else if ($) {
-		return $(el).clone(true)[0];
 	}
 	else {
 		return el.cloneNode(true);
