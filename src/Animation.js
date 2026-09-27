@@ -21,7 +21,7 @@ export default function AnimationStateManager() {
 
 				// If animating: compensate for current animation
 				if (child.thisAnimationDuration) {
-					let childMatrix = matrix(child, true);
+					let childMatrix = animationOffset(child);
 					if (childMatrix) {
 						fromRect.top -= childMatrix.f;
 						fromRect.left -= childMatrix.e;
@@ -59,7 +59,7 @@ export default function AnimationStateManager() {
 					prevFromRect = target.prevFromRect,
 					prevToRect = target.prevToRect,
 					animatingRect = state.rect,
-					targetMatrix = matrix(target, true);
+					targetMatrix = animationOffset(target);
 
 
 				if (targetMatrix) {
@@ -131,8 +131,17 @@ export default function AnimationStateManager() {
 
 		animate(target, currentRect, toRect, duration) {
 			if (duration) {
-				css(target, 'transition', '');
-				css(target, 'transform', '');
+				// Keep the authored appearance separate from Sortable's translation.
+				if (!target.sortableAnimationStyle) {
+					target.sortableAnimationStyle = {
+						transform: target.style.transform,
+						transition: target.style.transition,
+						base: css(target, 'transform')
+					};
+				}
+				let style = target.sortableAnimationStyle,
+					base = style.base === 'none' ? '' : style.base;
+				css(target, 'transition', 'none');
 				let elMatrix = matrix(this.el),
 					scaleX = elMatrix && elMatrix.a,
 					scaleY = elMatrix && elMatrix.d,
@@ -142,16 +151,17 @@ export default function AnimationStateManager() {
 				target.animatingX = !!translateX;
 				target.animatingY = !!translateY;
 
-				css(target, 'transform', 'translate3d(' + translateX + 'px,' + translateY + 'px,0)');
+				css(target, 'transform', 'translate3d(' + translateX + 'px,' + translateY + 'px,0) ' + base);
 
 				this.forRepaintDummy = repaint(target); // repaint
 
 				css(target, 'transition', 'transform ' + duration + 'ms' + (this.options.easing ? ' ' + this.options.easing : ''));
-				css(target, 'transform', 'translate3d(0,0,0)');
+				css(target, 'transform', 'translate3d(0,0,0) ' + base);
 				(typeof target.animated === 'number') && clearTimeout(target.animated);
 				target.animated = setTimeout(function () {
-					css(target, 'transition', '');
-					css(target, 'transform', '');
+					css(target, 'transition', style.transition);
+					css(target, 'transform', style.transform);
+					delete target.sortableAnimationStyle;
 					target.animated = false;
 
 					target.animatingX = false;
@@ -172,4 +182,12 @@ function calculateRealTime(animatingRect, fromRect, toRect, options) {
 		Math.sqrt(Math.pow(fromRect.top - animatingRect.top, 2) + Math.pow(fromRect.left - animatingRect.left, 2)) /
 		Math.sqrt(Math.pow(fromRect.top - toRect.top, 2) + Math.pow(fromRect.left - toRect.left, 2))
 	) * options.animation;
+}
+
+// Only subtract Sortable's movement, never an authored translate/rotate/scale.
+function animationOffset(target) {
+	let style = target.sortableAnimationStyle;
+	if (!style) return;
+	let current = matrix(target, true), base = matrix(style.base);
+	if (current && base) return { e: current.e - base.e, f: current.f - base.f };
 }

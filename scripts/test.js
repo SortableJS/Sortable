@@ -9,7 +9,7 @@ createTestCafe().then((tc) => {
 	testcafe = tc;
 	runner = tc.createRunner();
 	return runner
-		.src('./tests/Sortable.test.js')
+		.src(['./tests/Sortable.test.js', './tests/StyledCards.test.js'])
 		.browsers('chrome:headless')
 		.concurrency(3)
 		.run();
