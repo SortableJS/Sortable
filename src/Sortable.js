@@ -811,8 +811,9 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 				fallbackOffset = options.fallbackOffset,
 				touch = evt.touches ? evt.touches[0] : evt,
 				ghostMatrix = ghostEl && matrix(ghostEl, true),
-				scaleX = ghostEl && ghostMatrix && ghostMatrix.a,
-				scaleY = ghostEl && ghostMatrix && ghostMatrix.d,
+				parentMatrix = ghostEl && matrix(ghostEl.parentNode),
+				scaleX = parentMatrix && parentMatrix.a,
+				scaleY = parentMatrix && parentMatrix.d,
 				relativeScrollOffset = PositionGhostAbsolutely && ghostRelativeParent && getRelativeScrollOffset(ghostRelativeParent),
 				dx = ((touch.clientX - tapEvt.clientX)
 						+ fallbackOffset.x) / (scaleX || 1)
@@ -864,8 +865,6 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 	},
 
 	_appendGhost: function () {
-		// Bug if using scale(): https://stackoverflow.com/questions/2637058
-		// Not being adjusted for
 		if (!ghostEl) {
 			let container = this.options.fallbackOnBody ? document.body : rootEl,
 				rect = getRect(dragEl, true, PositionGhostAbsolutely, true, container),
@@ -902,15 +901,19 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			toggleClass(ghostEl, options.fallbackClass, true);
 			toggleClass(ghostEl, options.dragClass, true);
 
-			css(ghostEl, 'transition', '');
-			css(ghostEl, 'transform', '');
+			css(ghostEl, 'transition', 'none');
+			let sourceMatrix = matrix(dragEl), containerMatrix = matrix(container);
+			css(ghostEl, 'transform', sourceMatrix && containerMatrix
+				? containerMatrix.inverse().multiply(sourceMatrix).toString()
+				: css(dragEl, 'transform'));
+			css(ghostEl, 'transform-origin', css(dragEl, 'transform-origin'));
 
 			css(ghostEl, 'box-sizing', 'border-box');
 			css(ghostEl, 'margin', 0);
 			css(ghostEl, 'top', rect.top);
 			css(ghostEl, 'left', rect.left);
-			css(ghostEl, 'width', rect.width);
-			css(ghostEl, 'height', rect.height);
+			css(ghostEl, 'width', dragEl.offsetWidth);
+			css(ghostEl, 'height', dragEl.offsetHeight);
 			css(ghostEl, 'opacity', '0.8');
 			css(ghostEl, 'position', (PositionGhostAbsolutely ? 'absolute' : 'fixed'));
 			css(ghostEl, 'zIndex', '100000');
@@ -921,8 +924,13 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 
 			container.appendChild(ghostEl);
 
-			// Set transform-origin
-			css(ghostEl, 'transform-origin', (tapDistanceLeft / parseInt(ghostEl.style.width) * 100) + '% ' + (tapDistanceTop / parseInt(ghostEl.style.height) * 100) + '%');
+			// Align transformed bounds without changing the authored transform origin.
+			let ghostRect = getRect(ghostEl), sourceRect = getRect(dragEl),
+				parentMatrix = matrix(container),
+				scaleX = parentMatrix && parentMatrix.a || 1,
+				scaleY = parentMatrix && parentMatrix.d || 1;
+			css(ghostEl, 'left', rect.left + (sourceRect.left - ghostRect.left) / scaleX);
+			css(ghostEl, 'top', rect.top + (sourceRect.top - ghostRect.top) / scaleY);
 		}
 	},
 
@@ -987,8 +995,7 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 
 			on(document, 'drop', _this);
 
-			// #1276 fix:
-			css(dragEl, 'transform', 'translateZ(0)');
+			// Leave the source's authored transform intact for native dragging.
 		}
 
 		awaitingDragStarted = true;
@@ -1400,8 +1407,6 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 		if (Safari) {
 			css(document.body, 'user-select', '');
 		}
-
-		css(dragEl, 'transform', '');
 
 		if (evt) {
 			if (moved) {
