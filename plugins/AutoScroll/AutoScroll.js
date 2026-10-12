@@ -175,7 +175,9 @@ const autoScroll = throttle(function(evt, options, rootEl, isFallback) {
 		scrollCustomFn;
 
 	// New scroll root, set scrollEl
-	if (scrollRootEl !== rootEl) {
+	// nulling() resets scrollRootEl to null too, so a pointer outside the viewport
+	// (elementFromPoint -> null) would otherwise skip init and leave scrollEl null
+	if (scrollRootEl !== rootEl || !scrollEl) {
 		scrollRootEl = rootEl;
 
 		clearAutoScrolls();

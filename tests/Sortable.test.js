@@ -1,4 +1,4 @@
-import { Selector } from 'testcafe';
+import { Selector, ClientFunction } from 'testcafe';
 const itemHeight = 54; // px
 const leeway = 1;
 
@@ -383,4 +383,51 @@ test('Do not insert into empty list if outside emptyInsertThreshold', async brow
 			offsetX: 0
 		})
 		.expect(dragStartPosition.innerText).eql(dragEl.innerText);
+});
+
+
+fixture `Auto Scroll`
+	.page `./fallback-list.html`;
+
+// TestCafe's own drag cannot leave the viewport, so dispatch the pointer events directly.
+// TestCafe fails the test on the uncaught error this used to throw.
+const dragWithFirstMoveOutsideViewport = ClientFunction(() => {
+	const item = document.querySelector('#list1').children[0];
+	const rect = item.getBoundingClientRect();
+	const x = rect.left + 10;
+	const y = rect.top + 10;
+	const fire = (target, type, clientX, clientY) => target.dispatchEvent(new PointerEvent(type, {
+		pointerType: 'mouse',
+		isPrimary: true,
+		bubbles: true,
+		cancelable: true,
+		button: 0,
+		clientX,
+		clientY
+	}));
+	const nextTick = () => new Promise(resolve => setTimeout(resolve, 50));
+	let dragStarted = false;
+
+	// A click runs the plugins' nulling(), which resets the auto scroll state
+	fire(item, 'pointerdown', x, y);
+	fire(item, 'pointerup', x, y);
+
+	return nextTick().then(() => {
+		fire(item, 'pointerdown', x, y);
+		fire(item, 'pointermove', x + 10, y + 10);
+		return nextTick();
+	}).then(() => {
+		dragStarted = !!Sortable.active;
+		// Outside the viewport document.elementFromPoint() returns null
+		fire(document, 'pointermove', -30, y);
+		return nextTick();
+	}).then(() => {
+		fire(document, 'pointerup', -30, y);
+		return dragStarted;
+	});
+});
+
+test('Fallback drag whose first move is outside the viewport', async browser => {
+	await browser
+		.expect(dragWithFirstMoveOutsideViewport()).ok();
 });
