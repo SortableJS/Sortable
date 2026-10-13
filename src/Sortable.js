@@ -916,6 +916,21 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 			css(ghostEl, 'zIndex', '100000');
 			css(ghostEl, 'pointerEvents', 'none');
 
+			// A positioned table row is no longer laid out by its table, so its cells
+			// would shrink to fit their content. Keep each cell's original width (#2455)
+			if (css(dragEl, 'display') === 'table-row') {
+				css(ghostEl, 'display', 'table');
+				css(ghostEl, 'tableLayout', 'fixed');
+
+				Array.prototype.forEach.call(dragEl.children, function (cell, i) {
+					let ghostCell = ghostEl.children[i];
+
+					if (ghostCell) {
+						css(ghostCell, 'box-sizing', 'border-box');
+						css(ghostCell, 'width', getRect(cell, true, PositionGhostAbsolutely, true, container).width);
+					}
+				});
+			}
 
 			Sortable.ghost = ghostEl;
 

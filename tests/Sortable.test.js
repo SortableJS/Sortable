@@ -384,3 +384,25 @@ test('Do not insert into empty list if outside emptyInsertThreshold', async brow
 		})
 		.expect(dragStartPosition.innerText).eql(dragEl.innerText);
 });
+
+
+fixture `Table rows`
+	.page `./table.html`;
+
+['tbody1', 'tbody2'].forEach(id => {
+	test(`Fallback ghost keeps the cell widths of the dragged row (#${id})`, async browser => {
+		const tbody = Selector(`#${id}`);
+		const dragEl = await tbody.child(0)();
+
+		await browser
+			.dragToElement(dragEl, tbody.child(2))
+			.expect(tbody.child(2).innerText).eql(dragEl.innerText);
+
+		const { row, ghost } = await browser.eval(() => window.cellWidths[id], { dependencies: { id } });
+
+		await browser.expect(ghost.length).eql(row.length);
+		for (let i = 0; i < row.length; i++) {
+			await browser.expect(Math.abs(ghost[i] - row[i])).lt(leeway);
+		}
+	});
+});

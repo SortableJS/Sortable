@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<style>
+		table { width: 600px; }
+		td, th { border: 1px solid #333; padding: 4px; height: 40px; font-family: Helvetica; }
+		#table1 { table-layout: fixed; border-collapse: collapse; }
+	</style>
+</head>
+<body>
+
+<!-- Column widths come from <colgroup> -->
+<table id="table1">
+	<colgroup>
+		<col style="width: 100px">
+		<col style="width: 300px">
+		<col style="width: 200px">
+	</colgroup>
+	<tbody id="tbody1">
+		<tr><td>1</td><td>a</td><td>x</td></tr>
+		<tr><td>2</td><td>b</td><td>y</td></tr>
+		<tr><td>3</td><td>c</td><td>z</td></tr>
+	</tbody>
+</table>
+
+<!-- Column widths come from the header content (auto layout, separate borders) -->
+<table id="table2">
+	<thead>
+		<tr><th>#</th><th>A much longer header for the second column</th><th>Third</th></tr>
+	</thead>
+	<tbody id="tbody2">
+		<tr><td>1</td><td>a</td><td>x</td></tr>
+		<tr><td>2</td><td>b</td><td>y</td></tr>
+		<tr><td>3</td><td>c</td><td>z</td></tr>
+	</tbody>
+</table>
+
+
+<script src="../Sortable.js"></script>
+
+<script type="text/javascript">
+	window.cellWidths = {};
+
+	function widths(row) {
+		return Array.prototype.map.call(row.children, function (cell) {
+			return cell.getBoundingClientRect().width;
+		});
+	}
+
+	['tbody1', 'tbody2'].forEach(function (id) {
+		new Sortable(document.getElementById(id), {
+			forceFallback: true,
+			onStart: function (evt) {
+				window.cellWidths[id] = {
+					row: widths(evt.item),
+					ghost: widths(Sortable.ghost)
+				};
+			}
+		});
+	});
+</script>
+
+</body>
+</html>
