@@ -384,3 +384,18 @@ test('Do not insert into empty list if outside emptyInsertThreshold', async brow
 		})
 		.expect(dragStartPosition.innerText).eql(dragEl.innerText);
 });
+
+
+fixture `Fallback`
+	.page `./fallback.html`;
+
+test('toArray does not include the fallback ghost', async browser => {
+	const dragEl = await list1.child(0)();
+	const target = await list1.child(2)();
+
+	await browser
+		.dragToElement(dragEl, target)
+		.expect(list1.child(2).innerText).eql(dragEl.innerText)
+		.expect(browser.eval(() => window.orderOnStart)).eql(['a', 'b', 'c', 'd', 'e'])
+		.expect(browser.eval(() => window.orderOnEnd)).eql(['b', 'c', 'a', 'd', 'e']);
+});

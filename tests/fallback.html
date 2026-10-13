@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="./style.css">
+</head>
+<body>
+
+<div class="list" id="list1">
+	<div data-id="a">Item 1.1</div>
+	<div data-id="b">Item 1.2</div>
+	<div data-id="c">Item 1.3</div>
+	<div data-id="d">Item 1.4</div>
+	<div data-id="e">Item 1.5</div>
+</div>
+
+
+<script src="../Sortable.js"></script>
+
+<script type="text/javascript">
+	window.orderOnStart = null;
+	window.orderOnEnd = null;
+
+	new Sortable(document.getElementById('list1'), {
+		forceFallback: true,
+		onStart: function () {
+			window.orderOnStart = this.toArray();
+		},
+		onEnd: function () {
+			window.orderOnEnd = this.toArray();
+		}
+	});
+</script>
+
+</body>
+</html>

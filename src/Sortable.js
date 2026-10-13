@@ -1603,7 +1603,8 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 
 		for (; i < n; i++) {
 			el = children[i];
-			if (closest(el, options.draggable, this.el, false)) {
+			// The fallback ghost is a clone of dragEl that may live inside the list (#2456)
+			if (el !== Sortable.ghost && closest(el, options.draggable, this.el, false)) {
 				order.push(el.getAttribute(options.dataIdAttr) || _generateId(el));
 			}
 		}
