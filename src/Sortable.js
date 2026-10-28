@@ -313,7 +313,8 @@ if (documentExists && !ChromeForAndroid) {
 }
 
 let nearestEmptyInsertDetectEvent = function(evt) {
-	if (dragEl) {
+	// A dragEl the app removed from the DOM mid-drag must not be inserted back: https://github.com/SortableJS/Sortable/issues/2307
+	if (dragEl && dragEl.parentNode) {
 		evt = evt.touches ? evt.touches[0] : evt;
 		let nearest = _detectNearestEmptySortable(evt.clientX, evt.clientY);
 
@@ -759,7 +760,8 @@ Sortable.prototype = /** @lends Sortable.prototype */ {
 	},
 
 	_emulateDragOver: function () {
-		if (touchEvt) {
+		// Nothing to sort once the app has removed dragEl from the DOM mid-drag: https://github.com/SortableJS/Sortable/issues/2307
+		if (touchEvt && dragEl.parentNode) {
 			this._lastX = touchEvt.clientX;
 			this._lastY = touchEvt.clientY;
 
