@@ -384,3 +384,53 @@ test('Do not insert into empty list if outside emptyInsertThreshold', async brow
 		})
 		.expect(dragStartPosition.innerText).eql(dragEl.innerText);
 });
+
+
+fixture `Dragged element removed`
+	.page `./empty-list.html`;
+
+test('Ignore a fallback drag whose element was removed from the DOM', async browser => {
+	const result = await browser.eval(() => new Promise(resolve => {
+		const list1 = document.getElementById('list1');
+		const list2 = document.getElementById('list2');
+
+		const errors = [];
+		window.addEventListener('error', e => errors.push(e.message));
+
+		const dragEl = list1.children[1];
+		const dragRect = dragEl.getBoundingClientRect();
+		const list2Rect = list2.getBoundingClientRect();
+		const fire = (type, target, x, y) => {
+			const init = { bubbles: true, cancelable: true, clientX: x, clientY: y, button: 0, pointerId: 1, pointerType: 'touch', isPrimary: true };
+			target.dispatchEvent(new PointerEvent(type, init));
+			if (type === 'pointermove') {
+				document.dispatchEvent(new MouseEvent('mousemove', init));
+			}
+		};
+
+		const x = dragRect.left + 10;
+		const y = dragRect.top + 10;
+		fire('pointerdown', dragEl, x, y);
+		fire('pointermove', document, x, y + 5);
+		setTimeout(() => {
+			fire('pointermove', document, x, y + 10);
+			const isDragging = !!Sortable.active;
+			// The app removes the item while it is being dragged, e.g. a re-render after a data change
+			dragEl.parentNode.removeChild(dragEl);
+			setTimeout(() => {
+				fire('pointermove', document, list2Rect.left + 1, list2Rect.top + 1);
+				setTimeout(() => {
+					const isReinserted = document.contains(dragEl);
+					fire('pointerup', document, list2Rect.left + 1, list2Rect.top + 1);
+					resolve({ isDragging, errors, isReinserted, list2ChildCount: list2.children.length });
+				}, 200);
+			}, 200);
+		}, 100);
+	}));
+
+	await browser
+		.expect(result.isDragging).ok()
+		.expect(result.errors).eql([])
+		.expect(result.isReinserted).notOk()
+		.expect(result.list2ChildCount).eql(0);
+});
