@@ -161,8 +161,24 @@ let dragEl,
 	})(),
 
 	_detectDirection = function(el, options) {
-		let elCSS = css(el),
-			elWidth = parseInt(elCSS.width)
+		let layoutEl = el,
+			elCSS = css(layoutEl);
+
+		// #1853: display:contents generates no box; use the layout-generating ancestor
+		while (elCSS && elCSS.display === 'contents') {
+			let parent = layoutEl.assignedSlot || layoutEl.parentElement;
+			if (!parent && layoutEl.getRootNode) {
+				const root = layoutEl.getRootNode();
+				if (root && root.host) parent = root.host;
+			}
+			if (!parent || parent === layoutEl || parent.nodeType !== 1) break;
+			const parentCSS = css(parent);
+			if (!parentCSS) break;
+			layoutEl = parent;
+			elCSS = parentCSS;
+		}
+
+		let elWidth = parseInt(elCSS.width)
 				- parseInt(elCSS.paddingLeft)
 				- parseInt(elCSS.paddingRight)
 				- parseInt(elCSS.borderLeftWidth)
@@ -174,12 +190,12 @@ let dragEl,
 			firstChildWidth = firstChildCSS && parseInt(firstChildCSS.marginLeft) + parseInt(firstChildCSS.marginRight) + getRect(child1).width,
 			secondChildWidth = secondChildCSS && parseInt(secondChildCSS.marginLeft) + parseInt(secondChildCSS.marginRight) + getRect(child2).width;
 
-		if (elCSS.display === 'flex') {
+		if (elCSS.display === 'flex' || elCSS.display === 'inline-flex') {
 			return elCSS.flexDirection === 'column' || elCSS.flexDirection === 'column-reverse'
 			? 'vertical' : 'horizontal';
 		}
 
-		if (elCSS.display === 'grid') {
+		if (elCSS.display === 'grid' || elCSS.display === 'inline-grid') {
 			return elCSS.gridTemplateColumns.split(' ').length <= 1 ? 'vertical' : 'horizontal';
 		}
 

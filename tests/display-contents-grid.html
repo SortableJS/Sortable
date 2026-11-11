@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="./style.css">
+	<style>
+		#grid {
+			display: grid;
+			grid-template-columns: 150px 150px 150px;
+			grid-auto-rows: 54px;
+			width: 450px;
+		}
+		#list-contents {
+			display: contents;
+		}
+		#list-contents > div {
+			box-sizing: border-box;
+			width: 80px;
+			justify-self: center;
+		}
+
+		#flex-row {
+			display: flex;
+			flex-direction: row;
+		}
+		#flex-row-inner {
+			display: contents;
+		}
+
+		#flex-col {
+			display: flex;
+			flex-direction: column;
+		}
+		#flex-col-inner {
+			display: contents;
+		}
+
+		#block-outer {
+			display: block;
+			width: 200px;
+		}
+		#block-inner {
+			display: contents;
+		}
+
+		#nested-grid {
+			display: grid;
+			grid-template-columns: 100px 100px;
+		}
+		#nested-outer {
+			display: contents;
+		}
+		#nested-inner {
+			display: contents;
+		}
+
+		#grid-1col {
+			display: grid;
+			grid-template-columns: 100px;
+		}
+		#grid-1col-inner {
+			display: contents;
+		}
+
+		#inline-grid {
+			display: inline-grid;
+			grid-template-columns: 100px 100px;
+		}
+		#inline-grid-inner {
+			display: contents;
+		}
+	</style>
+</head>
+<body>
+
+<div id="grid">
+	<div id="list-contents">
+		<div>Item 1</div>
+		<div>Item 2</div>
+		<div>Item 3</div>
+		<div>Item 4</div>
+		<div>Item 5</div>
+	</div>
+</div>
+
+<div id="flex-row">
+	<div id="flex-row-inner">
+		<div>A</div>
+		<div>B</div>
+	</div>
+</div>
+
+<div id="flex-col">
+	<div id="flex-col-inner">
+		<div>A</div>
+		<div>B</div>
+	</div>
+</div>
+
+<div id="block-outer">
+	<div id="block-inner">
+		<div>A</div>
+		<div>B</div>
+	</div>
+</div>
+
+<div id="nested-grid">
+	<div id="nested-outer">
+		<div id="nested-inner">
+			<div>A</div>
+			<div>B</div>
+		</div>
+	</div>
+</div>
+
+<div id="grid-1col">
+	<div id="grid-1col-inner">
+		<div>A</div>
+		<div>B</div>
+	</div>
+</div>
+
+<div id="inline-grid">
+	<div id="inline-grid-inner">
+		<div>A</div>
+		<div>B</div>
+	</div>
+</div>
+
+<script src="../Sortable.js"></script>
+
+<script type="text/javascript">
+	new Sortable(document.getElementById('list-contents'));
+</script>
+
+</body>
+</html>

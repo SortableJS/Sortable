@@ -384,3 +384,49 @@ test('Do not insert into empty list if outside emptyInsertThreshold', async brow
 		})
 		.expect(dragStartPosition.innerText).eql(dragEl.innerText);
 });
+
+
+fixture `Display contents grid`
+	.page `./display-contents-grid.html`;
+
+const contentsList = Selector('#list-contents');
+
+test('Detect horizontal direction for display:contents inside a multi-column grid', async browser => {
+	const directions = await browser.eval(() => {
+		const opts = { draggable: '>*' };
+		return {
+			grid: Sortable.utils.detectDirection(document.getElementById('list-contents'), opts),
+			flexRow: Sortable.utils.detectDirection(document.getElementById('flex-row-inner'), opts),
+			flexCol: Sortable.utils.detectDirection(document.getElementById('flex-col-inner'), opts),
+			block: Sortable.utils.detectDirection(document.getElementById('block-inner'), opts),
+			nested: Sortable.utils.detectDirection(document.getElementById('nested-inner'), opts),
+			grid1Col: Sortable.utils.detectDirection(document.getElementById('grid-1col-inner'), opts),
+			inlineGrid: Sortable.utils.detectDirection(document.getElementById('inline-grid-inner'), opts)
+		};
+	});
+
+	await browser.expect(directions.grid).eql('horizontal');
+	await browser.expect(directions.flexRow).eql('horizontal');
+	await browser.expect(directions.flexCol).eql('vertical');
+	await browser.expect(directions.block).eql('vertical');
+	await browser.expect(directions.nested).eql('horizontal');
+	await browser.expect(directions.grid1Col).eql('vertical');
+	await browser.expect(directions.inlineGrid).eql('horizontal');
+});
+
+test('Sort across an incomplete display:contents grid row', async browser => {
+	const dragStartPosition = contentsList.child(0);
+	const dragEl = await dragStartPosition();
+	const targetStartPosition = contentsList.child(2);
+	const target = await targetStartPosition();
+
+	await browser
+		.expect(dragStartPosition.innerText).eql(dragEl.innerText)
+		.expect(targetStartPosition.innerText).eql(target.innerText)
+		.dragToElement(dragEl, target)
+		.expect(contentsList.child(0).innerText).eql('Item 2')
+		.expect(contentsList.child(1).innerText).eql('Item 3')
+		.expect(contentsList.child(2).innerText).eql('Item 1')
+		.expect(contentsList.child(3).innerText).eql('Item 4')
+		.expect(contentsList.child(4).innerText).eql('Item 5');
+});
