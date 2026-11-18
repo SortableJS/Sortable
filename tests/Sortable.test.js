@@ -8,6 +8,83 @@ fixture `Simple Sorting`
 
 let list1 = Selector('#list1');
 
+test('Toggle multiple classes with classList', async browser => {
+	const result = await browser.eval(() => {
+		const el = document.createElement('div');
+		el.className = 'keep';
+		Sortable.utils.toggleClass(el, '  chosen\tghost\nchosen  ', true);
+		const added = el.className;
+		Sortable.utils.toggleClass(el, 'chosen ghost', true);
+		const repeated = el.className;
+		Sortable.utils.toggleClass(el, ' \t\n ', true);
+		const whitespace = el.className;
+		Sortable.utils.toggleClass(el, 'chosen\tghost', false);
+		return { added, repeated, whitespace, removed: el.className };
+	});
+
+	await browser.expect(result).eql({
+		added: 'keep chosen ghost',
+		repeated: 'keep chosen ghost',
+		whitespace: 'keep chosen ghost',
+		removed: 'keep'
+	});
+});
+
+test('Toggle multiple classes without classList', async browser => {
+	const result = await browser.eval(() => {
+		const el = { className: 'keep' };
+		const classes = () => el.className.trim().split(/\s+/);
+		Sortable.utils.toggleClass(el, '  chosen\tghost\nchosen  ', true);
+		const added = classes();
+		Sortable.utils.toggleClass(el, 'chosen ghost', true);
+		const repeated = classes();
+		Sortable.utils.toggleClass(el, ' \t\n ', true);
+		const whitespace = classes();
+		Sortable.utils.toggleClass(el, 'chosen\tghost', false);
+		return { added, repeated, whitespace, removed: classes() };
+	});
+
+	await browser.expect(result).eql({
+		added: ['keep', 'chosen', 'ghost'],
+		repeated: ['keep', 'chosen', 'ghost'],
+		whitespace: ['keep', 'chosen', 'ghost'],
+		removed: ['keep']
+	});
+});
+
+test('Apply and remove multiple classes during fallback dragging', async browser => {
+	await browser.eval(() => {
+		const el = document.getElementById('list1');
+		Sortable.get(el).destroy();
+		new Sortable(el, {
+			forceFallback: true,
+			chosenClass: 'chosen-one chosen-two',
+			ghostClass: 'ghost-one ghost-two',
+			dragClass: 'drag-one drag-two',
+			fallbackClass: 'fallback-one fallback-two',
+			onStart(evt) {
+				window.dragClasses = {
+					item: evt.item.className,
+					ghost: Sortable.ghost.className
+				};
+			},
+			onEnd(evt) {
+				window.dropClasses = evt.item.className;
+			}
+		});
+	});
+
+	await browser
+		.dragToElement(list1.child(0), list1.child(2))
+		.expect(list1.child(2).innerText).eql('Item 1.1')
+		.expect(browser.eval(() => window.dragClasses)).eql({
+			item: 'chosen-one chosen-two ghost-one ghost-two',
+			ghost: 'chosen-one chosen-two fallback-one fallback-two drag-one drag-two'
+		})
+		.expect(browser.eval(() => window.dropClasses)).eql('')
+		.expect(Selector('.chosen-one, .chosen-two, .ghost-one, .ghost-two, .drag-one, .drag-two, .fallback-one, .fallback-two').count).eql(0);
+});
+
 test('Sort down list', async browser => {
 	const dragStartPosition = list1.child(0);
 	const dragEl = await dragStartPosition();

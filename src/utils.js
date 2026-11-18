@@ -72,13 +72,23 @@ const R_SPACE = /\s+/g;
 
 function toggleClass(el, name, state) {
 	if (el && name) {
-		if (el.classList) {
-			el.classList[state ? 'add' : 'remove'](name);
-		}
-		else {
-			let className = (' ' + el.className + ' ').replace(R_SPACE, ' ').replace(' ' + name + ' ', ' ');
-			el.className = (className + (state ? ' ' + name : '')).replace(R_SPACE, ' ');
-		}
+		name.split(R_SPACE).forEach(name => {
+			if (!name) return;
+
+			if (el.classList) {
+				el.classList[state ? 'add' : 'remove'](name);
+			}
+			else {
+				let className = (' ' + el.className + ' ').replace(R_SPACE, ' ');
+				if (state) {
+					if (className.indexOf(' ' + name + ' ') === -1) {
+						el.className = className + name;
+					}
+				} else {
+					el.className = className.replace(' ' + name + ' ', ' ');
+				}
+			}
+		});
 	}
 }
 
